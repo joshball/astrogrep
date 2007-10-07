@@ -1,0 +1,1514 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>AstroGrep</name>
+    <version>3.0.1.0</version>
+    <fullname>AstroGrep, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null</fullname>
+  </assembly>
+  <members>
+    <member name="T:AstroGrep.CFileFinder">
+      <summary>
+   File Finder Class 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.FindFirstFile(System.String@)">
+      <summary>
+   Find the first instance of a single filename in the given path 
+ </summary>
+ <param name="Path">path to find a file in</param>
+ <returns>filename, empty string if not found</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.FindNextFile">
+      <summary>
+   Find the next file 
+ </summary>
+ <returns>next file</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.AddFileName(System.String@)">
+      <summary>
+   Add a file name 
+ </summary>
+ <param name="NewFile">file name (possible to be a list)</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.AddFileNameList(System.String@)">
+      <summary>
+   This takes a string of comma separatee 
+ </summary>
+ <param name="NewFiles">Comma separated list of files</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.IsDirectory(System.String@,System.String@)">
+      <summary>
+   A directory is valid if, it is of directory type and isn't the 
+   current, or previous directory ("." and "..") 
+ </summary>
+ <param name="Path">path</param>
+ <param name="DirectoryName">directory name to check</param>
+ <returns />
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.FindFirstDirectory(System.String@)">
+      <summary>
+   Find the first directory 
+ </summary>
+ <param name="Path">path to start</param>
+ <returns>first directory from given path</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.FindNextDirectory">
+      <summary>
+   Find the next directory 
+ </summary>
+ <returns>next directory</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.Initialize">
+      <summary>
+   Initialize class level variables 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CFileFinder.#ctor">
+      <summary>
+   Create a new instance of the class 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="T:AstroGrep.CHitObject">
+      <summary>
+   Hit Object Class 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ 	[Curtis_Beard]	   02/02/2005	ADD: last write date of file/hit collection index 
+ </history></member>
+    <member name="P:AstroGrep.CHitObject.Path">
+      <summary>
+   Gets/Sets the path 
+ </summary>
+ <value>Path</value>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="P:AstroGrep.CHitObject.FileName">
+      <summary>
+   Gets/Sets the filename 
+ </summary>
+ <value>Filename</value>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="P:AstroGrep.CHitObject.GetNumHits">
+      <summary>
+   Retrieves the number of hits 
+ </summary>
+ <value>Number of hits</value>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="P:AstroGrep.CHitObject.LastWriteDate">
+      <summary>
+   Retrieves the last write date of file 
+ </summary>
+ <value>Last Write Date of file</value>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/02/2005	Initial 
+ </history></member>
+    <member name="P:AstroGrep.CHitObject.HitCollectionIndex">
+      <summary>
+   Retrieves this hits index in the global hit collection 
+ </summary>
+ <value>Hit collection index</value>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/06/2005	Initial 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.GetHitString">
+      <summary>
+   Retrieve the entire hit line 
+ </summary>
+ <returns>The entire hit line</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.GetHitLineNumber(System.Int32@)">
+      <summary>
+   Retrieve a hit line number 
+ </summary>
+ <param name="Index">Index of hit in hit array</param>
+ <returns>A hit line number</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.GetHit(System.Int32@)">
+      <summary>
+   Retrieve a hit line 
+ </summary>
+ <param name="Index">Index of hit in hit array</param>
+ <returns>A hit line</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.AddHit(System.Int32,System.String)">
+      <summary>
+   Add a hit to the hit array 
+ </summary>
+ <param name="LineNum">Line number of hit</param>
+ <param name="Line">line of text hit occurred</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.AdjustHitArraySize">
+      <summary>
+   Adjust the hit array size 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.Init">
+      <summary>
+   Initialize Class level variables 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.#ctor">
+      <summary>
+   Create a new instance of class 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObject.#ctor(System.String,System.String)">
+      <summary>
+   Create a new instance of class and set path and filename variables 
+ </summary>
+ <param name="path">Path to search</param>
+ <param name="fileName">Filename to search</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+   [Curtis_Beard]	   02/02/2005	ADD: last write date of file 
+ </history></member>
+    <member name="T:AstroGrep.CHitObjectCollection">
+      <summary>
+   Hit Object Collection 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ </history></member>
+    <member name="P:AstroGrep.CHitObjectCollection.Item(System.Object)">
+      <summary>
+   Retrieve Item from collection 
+ </summary>
+ <param name="vntIndexKey">Item index</param>
+ <value>CHitObject, Nothing on error</value>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="P:AstroGrep.CHitObjectCollection.Count">
+      <summary>
+   Retrieve number of elements in collection 
+ </summary>
+ <value>Number of elements in collection</value>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.Add(System.String@,System.String@)">
+      <summary>
+   Add a CHitObject to the collection 
+ </summary>
+ <param name="Path">path to search</param>
+ <param name="FileName">filename</param>
+ <returns>CHitObject that was added</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+   [Curtis_Beard]    02/06/2005  ADD: Assign hit object's hit collection index 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.AddObject(AstroGrep.CHitObject@)">
+      <summary>
+   Add a CHitObject to the collection 
+ </summary>
+ <param name="hitObject">CHitObject to add</param>
+ <returns>CHitObject added</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.Remove(System.Int32)">
+      <summary>
+   Remove an element from the collection 
+ </summary>
+ <param name="vntIndexKey">Index of element to remove</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.Remove(System.String)">
+      <summary>
+   Remove an element from the collection 
+ </summary>
+ <param name="key">Key of element to remove</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.Init">
+      <summary>
+   Initializes local variables of class 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.#ctor">
+      <summary>
+   Create a new instance of class 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.Terminate">
+      <summary>
+   Cleanup of collection 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.Finalize">
+      <summary>
+   Finalize of Class 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.CHitObjectCollection.GetEnumerator">
+      <summary>
+   Retrieves the enumerator used in the for...each 
+ </summary>
+ <returns>Enumerator for collection</returns>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="T:AstroGrep.Common">
+      <summary>
+   Common Routines and Variables 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	Initial - Moved common routines into this module 
+ </history>
+ '''</member>
+    <member name="M:AstroGrep.Common.LoadRegistrySettings">
+      <summary>
+   Load the stored options from the registry 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion, Try/Catch, naming Conventions 
+   [Curtis_Beard]	   02/11/2005	ADD: Load window settings 
+ </history></member>
+    <member name="M:AstroGrep.Common.UpdateRegistrySettings">
+      <summary>
+   Store static options to the registry 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion, Try/Catch, naming Conventions 
+   [Curtis_Beard]	   02/11/2005	ADD: Save window settings 
+ </history></member>
+    <member name="M:AstroGrep.Common.ClearRegistrySettings">
+      <summary>
+   Clear the registry entries and update the form to reflect 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion, Try/Catch 
+ </history></member>
+    <member name="M:AstroGrep.Common.LoadSearchSettings">
+      <summary>
+   Load the common search settings 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	01/28/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.Common.SaveSearchSettings">
+      <summary>
+   Save the common search settings 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	01/28/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.Common.EditFile(System.String@,System.Int32@)">
+      <summary>
+   Edit a file that the user has double clicked on 
+ </summary>
+ <param name="FileName" />
+ <param name="LineNum" />
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion, Try/Catch 
+   [Curtis_Beard]	   06/13/2005	CHG: Used new cmd line arg specification 
+ </history></member>
+    <member name="M:AstroGrep.Common.WholeWordOnly(System.String,System.String)">
+      <summary>
+   Check to see if the begin/end text around searched text is valid 
+   for a whole word search 
+ </summary>
+ <param name="beginText">Text in front of searched text</param>
+ <param name="endText">Text behind searched text</param>
+ <returns>True - valid, False - otherwise</returns>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	01/27/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.Common.ConvertTwipsToPixels(System.Int32)">
+      <summary>
+   Replaces TwipsToPixels found in compability dll 
+ </summary>
+ <param name="twips">twips to convert</param>
+ <returns>Pixels, Twips on failure</returns>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	01/27/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.Common.ValidBeginText(System.String)">
+      <summary>
+   Validate a start text 
+ </summary>
+ <param name="beginText">text to validate</param>
+ <returns>True - valid, False - otherwise</returns>
+ <remarks>
+ </remarks>
+ <history>
+ 	[cb230008]	01/27/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.Common.ValidEndText(System.String)">
+      <summary>
+   Validate an end text 
+ </summary>
+ <param name="endText">text to validate</param>
+ <returns>True - valid, False - otherwise</returns>
+ <remarks>
+ </remarks>
+ <history>
+ 	[cb230008]	01/27/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.Common.SetWindowSettings">
+      <summary>
+   Attempts to set last window settings 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/11/2005	Created 
+ </history></member>
+    <member name="T:AstroGrep.frmAbout">
+      <summary>
+   About Dialog 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Cleanup 
+ </history></member>
+    <member name="M:AstroGrep.frmAbout.cmdOK_Click(System.Object,System.EventArgs)">
+      <summary>
+   Closes form 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmAbout.frmAbout_Load(System.Object,System.EventArgs)">
+      <summary>
+   Load values for form 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmAbout.lnkHomePage_LinkClicked(System.Object,System.Windows.Forms.LinkLabelLinkClickedEventArgs)">
+      <summary>
+   Opens the systems default browser and displays the web link 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="T:AstroGrep.frmCancel">
+      <summary>
+   Displays a cancel form 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ </history></member>
+    <member name="M:AstroGrep.frmCancel.btnCancel_Click(System.Object,System.EventArgs)">
+      <summary>
+   Cancel Button Click 
+ </summary>
+ <param name="eventSender">system parm</param>
+ <param name="eventArgs">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="T:AstroGrep.frmMain">
+      <summary>
+   Main Form 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.frmMain_Load(System.Object,System.EventArgs)">
+      <summary>
+   Form Load Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ 	[Curtis_Beard]	   04/12/2005	ADD: Command line additions 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.frmMain_Closed(System.Object,System.EventArgs)">
+      <summary>
+   Closed Event - Save settings and exit 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuSaveResults_Click(System.Object,System.EventArgs)">
+      <summary>
+   Save the results to a file 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	Initial 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuPrint_Click(System.Object,System.EventArgs)">
+      <summary>
+   Show Print Dialog 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuExit_Click(System.Object,System.EventArgs)">
+      <summary>
+   Menu Exit 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuSelectAll_Click(System.Object,System.EventArgs)">
+      <summary>
+   Menu Select All Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuOpenSelected_Click(System.Object,System.EventArgs)">
+      <summary>
+   Open Selected Files Event 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuClearMRU_Click(System.Object,System.EventArgs)">
+      <summary>
+   Clear MRU Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuSaveSearchSettings_Click(System.Object,System.EventArgs)">
+      <summary>
+   Save Search Settings Event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/28/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuOptions_Click(System.Object,System.EventArgs)">
+      <summary>
+   Menu Options Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.mnuAbout_Click(System.Object,System.EventArgs)">
+      <summary>
+   Menu About Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.lnkSearchOptions_LinkClicked(System.Object,System.Windows.Forms.LinkLabelLinkClickedEventArgs)">
+      <summary>
+   Hide/Show the Search Options 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/04/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.lstFileNames_SelectedIndexChanged(System.Object,System.EventArgs)">
+      <summary>
+   File Name List Select Index Change Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.lstFileNames_DoubleClick(System.Object,System.EventArgs)">
+      <summary>
+   File Name List Double Click Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.txtHits_MouseDown(System.Object,System.Windows.Forms.MouseEventArgs)">
+      <summary>
+   txtHits Mouse Down Event - Used to detect a double click 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Replaced with mouse down 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.btnCancel_Click(System.Object,System.EventArgs)">
+      <summary>
+   Cancel Button Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.btnSearch_Click(System.Object,System.EventArgs)">
+      <summary>
+   Search Button Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.chkFileNamesOnly_CheckStateChanged(System.Object,System.EventArgs)">
+      <summary>
+   File Names Only Check Box Event 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+   [Curtis_Beard]	   06/13/2005	CHG: Gray out context lines label 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.chkNegation_CheckedChanged(System.Object,System.EventArgs)">
+      <summary>
+   Negation check event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/28/2005	Created 
+ 	[Curtis_Beard]	   06/13/2005	CHG: Gray out file names only when checked 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.lstFileNames_ColumnClick(System.Object,System.Windows.Forms.ColumnClickEventArgs)">
+      <summary>
+   Allow sorting of list view columns 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/06/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.cboFilePath_SelectedIndexChanged(System.Object,System.EventArgs)">
+      <summary>
+   Open Browser for Folder dialog if Browse selected 
+ </summary>
+ <param name="sender">System parm</param>
+ <param name="e">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/11/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.VerifyInterface">
+      <summary>
+   Verify user selected options 
+ </summary>
+ <returns>True - Verified, False - Otherwise</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.AddComboSelection(System.Windows.Forms.ComboBox@,System.String@)">
+      <summary>
+   Add an item to a combo box 
+ </summary>
+ <param name="cbo">Combo Box</param>
+ <param name="newItem">Item to add</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.AddComboSelectionSpecial(System.Windows.Forms.ComboBox@,System.String)">
+      <summary>
+   Add an item to a combo box that needs the Browse.. as last selection 
+ </summary>
+ <param name="combo">Combo Box</param>
+ <param name="newItem">Item to add</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	01/11/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.SetSearchState(System.Boolean)">
+      <summary>
+   Enable/Disable menu items 
+ </summary>
+ <param name="show">True - enable menu items, False - disable</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.HighlightText(AstroGrep.CHitObject)">
+      <summary>
+   Highlight the searched text in the results 
+ </summary>
+ <param name="hitObject">Hit Object containing results</param>
+ <remarks>
+   - Currently only supports non-regular expression searches 
+   - Does support whole word vs partial matches 
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/27/2005	Created 
+ 	[Curtis_Beard]	   04/12/2005	FIX: 1180741, Don't capitalize hit line 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.SetSearchSettings">
+      <summary>
+   Set the Common Search Settings on the form 
+ </summary>
+ <remarks>
+   Should call Common.LoadSearchSettings to load the values 
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/28/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.ShowSearchOptions">
+      <summary>
+   Show/Hide the Search Options Panel 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/05/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmMain.GetSearchOptions">
+      <summary>
+   Retrieve the user selected search options 
+ </summary>
+ <returns>Search Options in a structure</returns>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/06/2005	Created 
+ </history></member>
+    <member name="T:AstroGrep.frmPrint">
+      <summary>
+ 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmPrint.frmPrint_Load(System.Object,System.EventArgs)">
+      <summary>
+   Form Load Event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmPrint.cmdCancel_Click(System.Object,System.EventArgs)">
+      <summary>
+   Cancel Button Event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmPrint.cmdPageSetup_Click(System.Object,System.EventArgs)">
+      <summary>
+   Page Setup Button Event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmPrint.cmdPreview_Click(System.Object,System.EventArgs)">
+      <summary>
+   Print Preview Button Event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmPrint.cmdPrint_Click(System.Object,System.EventArgs)">
+      <summary>
+   Print Button Event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmPrint.pdoc_PrintPage(System.Object,System.Drawing.Printing.PrintPageEventArgs)">
+      <summary>
+   PrintPage Event 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+   PrintPage is the foundational printing event. This event gets fired for every 
+   page that will be printed. You could also handle the BeginPrint and EndPrint 
+   events for more control. 
+ 
+   The following is very 
+   fast and useful for plain text as MeasureString calculates the text that 
+   can be fitted on an entire page. This is not that useful, however, for 
+   formatted text. In that case you would want to have word-level (vs page-level) 
+   control, which is more complicated. 
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="M:AstroGrep.frmPrint.SetDocument">
+      <summary>
+   Set the document to print 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/02/2005	Created 
+ </history></member>
+    <member name="T:AstroGrep.frmProperties">
+      <summary>
+   Properties Dialog 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ </history></member>
+    <member name="M:AstroGrep.frmProperties.btnCancel_Click(System.Object,System.EventArgs)">
+      <summary>
+   Closes the form 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmProperties.btnOK_Click(System.Object,System.EventArgs)">
+      <summary>
+   Validates and saves the user supplied options 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Cleanup 
+ </history></member>
+    <member name="M:AstroGrep.frmProperties.frmProperties_Load(System.Object,System.EventArgs)">
+      <summary>
+   Loads the current values 
+ </summary>
+ <param name="eventSender">System parm</param>
+ <param name="eventArgs">System parm</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.frmProperties.txtCmdOptions_TextChanged(System.Object,System.EventArgs)">
+      <summary>
+ Update the command line preview 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	06/13/2005	Created, Better cmd line arg support 
+ </history></member>
+    <member name="M:AstroGrep.frmProperties.btnBrowse_Click(System.Object,System.EventArgs)">
+      <summary>
+ Allow the user to select the executable of a file editor 
+ </summary>
+ <param name="sender">system parm</param>
+ <param name="e">system parm</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	06/13/2005	Created, Select file 
+ </history></member>
+    <member name="M:AstroGrep.frmProperties.RetrieveCmdLineViewText">
+      <summary>
+ Returns a preview of what the command line will look like to open a file 
+ </summary>
+ <returns>Preview of command line</returns>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	06/13/2005	Created, Better cmd line arg support 
+ </history></member>
+    <member name="T:AstroGrep.ListViewItemComparer">
+      <summary>
+   Used for sorting of list view columns 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	02/06/2005	Created 
+ </history></member>
+    <member name="T:AstroGrep.PrintCode">
+      <summary>
+   Print Routines 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ </history>
+ '''</member>
+    <member name="M:AstroGrep.PrintCode.PrintFileList(AstroGrep.CHitObjectCollection)">
+      <summary>
+   Print the file names only 
+ </summary>
+ <param name="Hits">Hits Collection</param>
+ <returns>Document to print</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.PrintCode.PrintSelectedItems(System.Windows.Forms.ListView,AstroGrep.CHitObjectCollection)">
+      <summary>
+   Print selected hits 
+ </summary>
+ <param name="lstBox">List Box of selections</param>
+ <param name="Hits">Hits Collection</param>
+ <returns>Document to print</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.PrintCode.PrintAllHits(AstroGrep.CHitObjectCollection)">
+      <summary>
+   Print all the hits 
+ </summary>
+ <param name="Hits">Hits Collection</param>
+ <returns>Document to print</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.PrintCode.PrintSingleItem(AstroGrep.CHitObject)">
+      <summary>
+   Print a single hit item 
+ </summary>
+ <param name="ho">Hit to print</param>
+ <returns>Document to print</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.PrintCode.PrintHit(System.String@)">
+      <summary>
+   Print a single hit 
+ </summary>
+ <param name="hit">Hit to print</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.PrintCode.SetupDocument(System.String)">
+      <summary>
+   Setup the document 
+ </summary>
+ <param name="header">Optional - Header of document</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.PrintCode.AddLine(System.String)">
+      <summary>
+   Add the line to the document 
+ </summary>
+ <param name="line">Line to add</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="T:AstroGrep.SearchCode">
+      <summary>
+   Search Routines 
+ </summary>
+ <remarks>
+   AstroGrep File Searching Utility. Written by Theodore L. Ward 
+   Copyright (C) 2002 AstroComma Incorporated. 
+ 
+   This program is free software; you can redistribute it and/or 
+   modify it under the terms of the GNU General Public License 
+   as published by the Free Software Foundation; either version 2 
+   of the License, or (at your option) any later version. 
+ 
+   This program is distributed in the hope that it will be useful, 
+   but WITHOUT ANY WARRANTY; without even the implied warranty of 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+   GNU General Public License for more details. 
+ 
+   You should have received a copy of the GNU General Public License 
+   along with this program; if not, write to the Free Software 
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+   The author may be contacted at: 
+   TheodoreWard@Hotmail.com or TheodoreWard@Yahoo.com 
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.Search(System.String,System.String,System.String,AstroGrep.SearchCode.searchOptions)">
+      <summary>
+   Begin Search 
+ </summary>
+ <param name="path">Path of file</param>
+ <param name="fileName">File name</param>
+ <param name="searchText">Text to Search for</param>
+ <param name="recurse">Use recursion</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Remove gui dependency 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.SetSearch(System.Boolean)">
+      <summary>
+   Enable or disable the searching window 
+ </summary>
+ <param name="enableSearch" />
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.SearchDirectory(System.String@,AstroGrep.CFileFinder@,System.String@,AstroGrep.SearchCode.searchOptions)">
+      <summary>
+   Search Method 
+ </summary>
+ <param name="path">Path to search</param>
+ <param name="fileFinder">File Finder Object</param>
+ <param name="searchText">Text to search for</param>
+ <param name="options">Search Options</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion, use .Net regular expressions 
+ 	[Curtis_Beard]	   01/28/2005	ADD: Negation option 
+   [Curtis_Beard]    02/06/2005  ADD: Use passed in options instead of gui 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.AddHit(System.Int32)">
+      <summary>
+   update the number of hits 
+ </summary>
+ <param name="AddHits">Optional - Number of hits</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.ClearHits">
+      <summary>
+   Clear number of hits 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.GetLineOfInput(System.Int32@)">
+      <summary>
+   Read a line of input 
+ </summary>
+ <param name="fileNum">File number</param>
+ <returns>A line of input</returns>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.AddHitObject(System.String@,System.String@)">
+      <summary>
+   Create a new hit object and initialize it (NOT USED) 
+ </summary>
+ <param name="path">Path for file</param>
+ <param name="fileName">file name</param>
+ <remarks>
+ </remarks>
+ <history>
+   [Theodore_Ward]   ??/??/????  Initial 
+ 	[Curtis_Beard]	   01/11/2005	.Net Conversion 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.KeepSyntaxHighlighted">
+      <summary>
+   Keeps the syntax highlighted 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/02/2005	Initial 
+ </history></member>
+    <member name="M:AstroGrep.SearchCode.AddHitToList(AstroGrep.CHitObject)">
+      <summary>
+   Adds a hit to the list view 
+ </summary>
+ <param name="hit">Hit to Add</param>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	   02/05/2005	Initial 
+ </history></member>
+    <member name="T:AstroGrep.Startup">
+      <summary>
+   Startup for application - used to apply xp style themes 
+ </summary>
+ <remarks>
+ </remarks>
+ <history>
+ 	[Curtis_Beard]	01/27/2005	.Net Conversion/Support for xp themes 
+ </history></member>
+  </members>
+</doc>

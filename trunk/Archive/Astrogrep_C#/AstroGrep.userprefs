@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<UserCombinePreferences filename="/fat/dev/mono/AstroGrep/AstroGrep.mds">
+  <Files>
+    <File filename="./AstroGrepBase/Grep.cs" />
+    <File filename="./Linux/Forms/frmMain.cs" />
+  </Files>
+  <Views>
+    <ViewMemento Id="MonoDevelop.Ide.Gui.Pads.ProjectPad">
+      <TreeView>
+        <Node expanded="True">
+          <Node name="AstroGrep" expanded="True" selected="True" />
+        </Node>
+      </TreeView>
+    </ViewMemento>
+    <ViewMemento Id="MonoDevelop.Ide.Gui.Pads.ClassPad">
+      <TreeView>
+        <Node expanded="True">
+          <Node name="AstroGrep" expanded="False" selected="True" />
+        </Node>
+      </TreeView>
+    </ViewMemento>
+  </Views>
+  <Properties>
+    <Properties>
+      <Property key="ActiveConfiguration" value="Debug" />
+      <Property key="ActiveWindow" value="/fat/dev/mono/AstroGrep/Linux/Forms/frmMain.cs" />
+    </Properties>
+  </Properties>
+</UserCombinePreferences>

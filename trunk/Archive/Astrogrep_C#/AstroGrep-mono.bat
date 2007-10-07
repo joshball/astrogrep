@@ -1,0 +1,1 @@
+@"C:\PROGRA~1\MONO-1~1.8\bin\mono.exe" "C:\projects\AstroGrep\AstroGrep.exe" %*

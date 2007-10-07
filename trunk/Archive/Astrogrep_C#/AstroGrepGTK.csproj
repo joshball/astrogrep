@@ -1,0 +1,294 @@
+<VisualStudioProject>
+    <CSHARP
+        ProjectType = "Local"
+        ProductVersion = "7.10.3077"
+        SchemaVersion = "2.0"
+        ProjectGuid = "{2C978B6F-4523-4937-A7BA-8D3C0C7D33ED}"
+    >
+        <Build>
+            <Settings
+                ApplicationIcon = "Images\AstroGrep_Icon.ico"
+                AssemblyKeyContainerName = ""
+                AssemblyName = "AstroGrep"
+                AssemblyOriginatorKeyFile = ""
+                DefaultClientScript = "JScript"
+                DefaultHTMLPageLayout = "Grid"
+                DefaultTargetSchema = "IE50"
+                DelaySign = "false"
+                OutputType = "WinExe"
+                PreBuildEvent = ""
+                PostBuildEvent = ""
+                RootNamespace = "AstroGrep"
+                RunPostBuildEvent = "OnBuildSuccess"
+                StartupObject = ""
+            >
+                <Config
+                    Name = "Debug"
+                    AllowUnsafeBlocks = "false"
+                    BaseAddress = "285212672"
+                    CheckForOverflowUnderflow = "false"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = "DEBUG;TRACE"
+                    DocumentationFile = ""
+                    DebugSymbols = "true"
+                    FileAlignment = "4096"
+                    IncrementalBuild = "false"
+                    NoStdLib = "false"
+                    NoWarn = ""
+                    Optimize = "false"
+                    OutputPath = "bin\Gtk\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "4"
+                />
+                <Config
+                    Name = "Release"
+                    AllowUnsafeBlocks = "false"
+                    BaseAddress = "285212672"
+                    CheckForOverflowUnderflow = "false"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = "TRACE"
+                    DocumentationFile = ""
+                    DebugSymbols = "false"
+                    FileAlignment = "4096"
+                    IncrementalBuild = "false"
+                    NoStdLib = "false"
+                    NoWarn = ""
+                    Optimize = "true"
+                    OutputPath = "bin\Gtk\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "4"
+                />
+            </Settings>
+            <References>
+                <Reference
+                    Name = "System"
+                    AssemblyName = "System"
+                    HintPath = "..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.dll"
+                />
+                <Reference
+                    Name = "System.Data"
+                    AssemblyName = "System.Data"
+                    HintPath = "..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
+                />
+                <Reference
+                    Name = "System.Drawing"
+                    AssemblyName = "System.Drawing"
+                    HintPath = "..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll"
+                />
+                <Reference
+                    Name = "System.Windows.Forms"
+                    AssemblyName = "System.Windows.Forms"
+                    HintPath = "..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
+                />
+                <Reference
+                    Name = "System.XML"
+                    AssemblyName = "System.Xml"
+                    HintPath = "..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
+                />
+                <Reference
+                    Name = "gtk-sharp"
+                    AssemblyName = "gtk-sharp"
+                    HintPath = "..\..\Program Files\Mono-1.1.13.8\lib\mono\gtk-sharp-2.0\gtk-sharp.dll"
+                />
+                <Reference
+                    Name = "atk-sharp"
+                    AssemblyName = "atk-sharp"
+                    HintPath = "..\..\Program Files\Mono-1.1.13.8\lib\mono\gtk-sharp-2.0\atk-sharp.dll"
+                />
+                <Reference
+                    Name = "glib-sharp"
+                    AssemblyName = "glib-sharp"
+                    HintPath = "..\..\Program Files\Mono-1.1.13.8\lib\mono\gtk-sharp-2.0\glib-sharp.dll"
+                />
+                <Reference
+                    Name = "Mono.Cairo"
+                    AssemblyName = "Mono.Cairo"
+                    HintPath = "..\..\Program Files\Mono-1.1.13.8\lib\mono\1.0\Mono.Cairo.dll"
+                />
+                <Reference
+                    Name = "gdk-sharp"
+                    AssemblyName = "gdk-sharp"
+                    HintPath = "..\..\Program Files\Mono-1.1.13.8\lib\mono\gtk-sharp-2.0\gdk-sharp.dll"
+                />
+                <Reference
+                    Name = "pango-sharp"
+                    AssemblyName = "pango-sharp"
+                    HintPath = "..\..\Program Files\Mono-1.1.13.8\lib\mono\gtk-sharp-2.0\pango-sharp.dll"
+                />
+                <Reference
+                    Name = "gnome-sharp"
+                    AssemblyName = "gnome-sharp"
+                    HintPath = "..\..\Program Files\Mono-1.1.13.8\lib\mono\gac\gnome-sharp\1.0.0.0__35e10195dab3c99f\gnome-sharp.dll"
+                />
+            </References>
+        </Build>
+        <Files>
+            <Include>
+                <File
+                    RelPath = "AssemblyInfo.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "AstroGrepBase\Grep.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "AstroGrepBase\HitObject.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "AstroGrepBase\IAstroGrepPlugin.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "AstroGrepBase\MicrosoftWordPlugin.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "AstroGrepBase\PluginCollection.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "AstroGrepBase\PluginWrapper.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\Common.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\Constants.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\GeneralSettings.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\PluginManager.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\PluginSettings.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\SearchSettings.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\SettingsIO.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Core\TextEditor.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Images\AstroGrep_Banner.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Images\AstroGrep_Icon.ico"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Images\folder-open.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Images\options-general.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Images\options-plugins.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Images\options-results.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Images\options-text-editors.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Language\Deutsch.xml"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Language\English.xml"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Language\Español.xml"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Language\Italiano.xml"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Linux\Common.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Linux\Language.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Linux\Program.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Linux\Controls\LinkLabel.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Linux\Forms\frmAbout.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Linux\Forms\frmErrorLog.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Linux\Forms\frmMain.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Linux\Forms\frmOptions.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+            </Include>
+        </Files>
+    </CSHARP>
+</VisualStudioProject>
+

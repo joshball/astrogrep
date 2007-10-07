@@ -1,0 +1,2 @@
+The latest updates of AstroGrep binaries and source code can be obtained 
+from sourceforge at http://www.sourceforge.net or from http://www.AstroComma.com
