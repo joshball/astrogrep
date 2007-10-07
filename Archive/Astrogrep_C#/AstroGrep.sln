@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroGrep", "AstroGrep.csproj", "{583FF22B-9586-4543-B4B4-747E06C963ED}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{583FF22B-9586-4543-B4B4-747E06C963ED}.Debug.ActiveCfg = Debug|.NET
+		{583FF22B-9586-4543-B4B4-747E06C963ED}.Debug.Build.0 = Debug|.NET
+		{583FF22B-9586-4543-B4B4-747E06C963ED}.Release.ActiveCfg = Release|.NET
+		{583FF22B-9586-4543-B4B4-747E06C963ED}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

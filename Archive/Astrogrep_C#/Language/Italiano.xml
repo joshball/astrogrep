@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<language culture="it-it" version="1.0">
+   <screen name="frmMain" value="AstroGrep">
+      <control name="lblSearchHeading" value=" AstroGrep Ricerca" />
+      <control name="lblSearchText" value="Testo di ricerca" />
+      <control name="lblFileTypes" value="Tipi della lima" />
+      <control name="btnCancel" value="&amp;Annullamento" />
+      <control name="btnSearch" value="&amp;Ricerca" />
+      <control name="lblSearchPath" value="Percorso di ricerca" />
+      <control name="lblContextLines" value="Linee di contesto" tooltip="Mostrare le linee sopra e sotto la parola abbinata" />
+      <control name="chkLineNumbers" value="&amp;Linea numeri" tooltip="Includere la linea numeri prima di ogni fiammifero" />
+      <control name="chkNegation" value="&amp;Negazione" tooltip="Trovare le lime senza il testo di ricerca in loro" />
+      <control name="chkFileNamesOnly" value="&amp;Mostrare i nomi della lima soltanto" tooltip="Mostrare i nomi ma non il soddisfare delle lime che hanno fiammiferi (può essere più veloce sulle grandi lime)" />
+      <control name="chkRecurse" value="&amp;Indici secondari" tooltip="Ricerca negli indici secondari" />
+      <control name="chkWholeWordOnly" value="&amp;Parola intera" tooltip="Soltanto intere parole del fiammifero (non parti delle parole)" />
+      <control name="chkCaseSensitive" value="&amp;Caso sensibile" tooltip="La maiuscola e minusciola del fiammifero segna esattamente" />
+      <control name="chkRegularExpressions" value="&amp;Espressioni normali" tooltip="Usare la corrispondenza normale di espressione" />
+      <control name="lnkSearchOptions" value="Opzioni di ricerca {0}" />
+      <control name="picBrowse" tooltip="Passare in rassegna..." />
+      <menu index="0" value="&amp;Lima">
+         <menuitem index="0" value="Selezionare &amp;Percorso di ricerca..." />
+         <menuitem index="1" value="-" />
+         <menuitem index="2" value="&amp;Risparmi i risultati" />
+         <menuitem index="3" value="Risultati della &amp;stampa..." />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="&amp;Uscita" />
+      </menu>
+      <menu index="1" value="&amp;Pubblicare">
+         <menuitem index="0" value="&amp;Selezionare tutte le lime" />
+         <menuitem index="1" value="&amp;Aprire le lime selezionate" />
+      </menu>
+      <menu index="2" value="&amp;Attrezzi">
+         <menuitem index="0" value="&amp;Liste usate per ultimo libere " />
+         <menuitem index="1" value="-" />
+         <menuitem index="2" value="&amp;Risparmi le opzioni di ricerca" />
+         <menuitem index="3" value="&amp;Opzioni..." />
+      </menu>
+      <menu index="3" value="Aiut&amp;o">
+         <menuitem index="0" value="&amp;Circa..." />
+      </menu>
+   </screen>
+   
+   <screen name="frmAbout" value="Circa il {0}">
+      <control name="lnkHomePage" value="Home Page di {0}" />
+      <control name="cmdOK" value="&amp;Approvazione" />
+   </screen>
+   
+   <screen name="frmAddEditTextEditor" value="Sistemi di editazione testi">
+      <control name="lblAllTypesMessage" value="Un sistema di editazione testi può essere usato per tutti i tipi sconosciuti usando la a * per il tipo della lima." />
+      <control name="lblCmdOptions" value="Linea di ordine Optons:&#xD;&#xA;  %1 - Lima&#xD;&#xA;  %2 - Linea numero&#xD;&#xA;  %3 - Colonna" />
+      <control name="lblCmdOptionsView" value="Previsione: {0}" />
+      <control name="btnBrowse" tooltip="&amp;Individuare..." />
+      <control name="lblCmdLineArgs" value="Linea di ordine" />
+      <control name="lblTextEditorLocation" value="Posizione del sistema di editazione testi" />
+      <control name="lblFileType" value="Tipo della lima" />
+      <control name="btnCancel" value="&amp;Annullamento" />
+      <control name="btnOK" value="&amp;Approvazione" />
+   </screen>
+   
+   <screen name="frmOptions" value="Opzioni">
+      <control name="chkRightClickOption" value="Regolare l'opzione di di &amp;destra-scatto sui dispositivi di piegatura" />
+      <control name="lblStoredPaths" value="Numero di maggior parte di percorsi recentemente utilizzati da immagazzinare" />
+      <control name="btnEdit" value="&amp;Pubblicare..." />
+      <control name="btnRemove" value="Rimuo&amp;vere" />
+      <control name="btnAdd" value="A&amp;ggiungere..." />
+      <control name="lblResultPreview" value="Previsione di risultati" />
+      <control name="lblResultsWindowBack" value="Colore posteriore" />
+      <control name="lblResultsWindowFore" value="Colore anteriore" />
+      <control name="grpResultWindow" value="Finestra di risultati" />
+      <control name="BackColorLabel" value="Colore posteriore" />
+      <control name="ForeColorLabel" value="Colore anteriore" />
+      <control name="grpResultMatch" value="Fiammifero di risultati" />
+      <control name="btnOK" value="&amp;Approvazione" />
+      <control name="btnCancel" value="A&amp;nnullamento" />
+      <control name="ResultsItem" value="&amp;Risultati" />
+      <control name="GeneralItem" value="&amp;Generalità" />
+      <control name="TextEditorsItem" value="R&amp;edattori" />
+      <control name="LanguageGroup" value="Lingua"/>
+      <control name="ExtensionExclusionGroup" value="Escludere le estensioni di lima"/>
+      <control name="PluginsItem" value="&amp;Inserire"/>
+      <control name="chkDesktopShortcut" value="&amp;Scorciatoia Desktop"/>
+      <control name="chkStartMenuShortcut" value="Avviare la scorciatoia del &amp;menu"/>
+      <control name="ShortcutGroup" value="Scorciatoie"/>
+      <control name="PluginDetailsGroup" value="Inserire i particolari"/>
+      <control name="lblPluginDetailName" value="Nome:"/>
+      <control name="lblPluginDetailVersion" value="Versione:"/>
+      <control name="lblPluginDetailAuthor" value="Autore:"/>
+   </screen>
+   
+   <screen name="frmPrint" value="Stampa">
+      <control name="cmdCancel" value="&amp;Annullamento" />
+      <control name="lblSelect" value="Selezionare prego per produrre il tipo:" />
+      <control name="cmdPageSetup" value="&amp;Opzioni" />
+      <control name="cmdPrint" value="&amp;Stampa" />
+      <control name="cmdPreview" value="&amp;Previsione" />
+   </screen>
+   
+   <generic>
+      <text name="Browse" value="Passare in rassegna..."/>
+      
+      <text name="SaveDialogTitle" value="Risparmi i risultati As" />
+      <text name="SaveNoResults" value="Non ci sono attualmente risultati disponibili risparmiare. "/>
+      <text name="SaveError" value="Incapace conservare i risultati: {0}"/>
+      <text name="SaveSaving" value="Risultati di Saving alla lima: {0}"/>
+      <text name="SaveSaved" value="I risultati hanno risparmiato"/>
+      
+      <text name="PrintTypeSelected" value="Articoli selezionati"/>
+      <text name="PrintTypeCurrent" value="Colpo della corrente"/>
+      <text name="PrintTypeFile" value="Lista della lima"/>
+      <text name="PrintTypeAll" value="Tutto colpisce"/>
+      <text name="PrintErrorPageSettings" value="Un errore ha accaduto mentre provava a caricare le impaginazioni. Vi assicurate attualmente avere accesso ad uno stampatore. Uno stampatore deve essere collegato ed accessibile per la stampa a lavoro."/>
+      <text name="PrintErrorPreview" value="Un errore ha accaduto mentre provava a caricare il documento per la anteprima di stampa. Vi assicurate attualmente avere accesso ad uno stampatore. Uno stampatore deve essere collegato ed accessibile per la stampa a lavoro."/>
+      <text name="PrintErrorPrint" value="Un errore ha accaduto mentre provava a caricare il documento per stampare. Vi assicurate attualmente avere accesso ad uno stampatore. Uno stampatore deve essere collegato ed accessibile per la stampa a lavoro."/>
+      <text name="PrintErrorDocument" value="Un errore si è presentato durante la creazione del documento per stampare. ({0})"/>
+      <text name="PrintNoResults" value="Non ci sono attualmente risultati disponibili stampare."/>
+      
+      <text name="OpenFolderDescription" value="Selezionare prego un dispositivo di piegatura iniziante."/>
+      
+      <text name="VerifyErrorContextLines" value="Il numero di linee di contesto deve essere in mezzo {0} e {1}."/>
+      <text name="VerifyErrorFileType" value="Dovete fornire il nome di una lima in cui cercare."/>
+      <text name="VerifyErrorNoStartPath" value="Dovete fornire il percorso per cominciare la ricerca."/>
+      <text name="VerifyErrorInvalidStartPath" value="'{0}' non è un dispositivo di piegatura valido."/>
+      <text name="VerifyErrorNoSearchText" value="Dovete assicurare il testo per cui cercare."/>
+      <text name="VerifyErrorGeneric" value="Incapace convalidare i parametri specificati.  Verificare prego che sono validi."/>
+      
+      <text name="SearchGenericError" value="Un errore ha accaduto cercando: {0}"/>
+      <text name="SearchFileError" value="Un errore ha accaduto cercando la lima: {0}.  La ricerca continuerà."/>
+      <text name="SearchCancelled" value="La ricerca ha annullato"/>
+      <text name="SearchFinished" value="La ricerca ha rifinito"/>
+      <text name="SearchSearching" value="Ricerca {0}"/>
+      <text name="SearchExplorerItem" value="Usando di ricerca {0}..."/>
+      
+      <text name="ResultsPreviewText" value="(21)  I risultati di esempio si allineano e, fiammifero, hanno visualizzato"/>
+      <text name="ResultsPreviewTextMatch" value="fiammifero"/>
+      
+      <text name="ColorOtherText" value="&amp;Abitudine..."/>
+      <!-- todo: color names -->
+      
+      <text name="TextEditorsErrorNoCmdLineForFile" value="Nessuna linea di ordine discussione è stata specificata per il nome di schedario. &#xD;&#xA; Specificare prego la discussione della lima sotto gli attrezzi->Opzioni."/>
+      <text name="TextEditorsErrorNotDefined" value="Nessun sistema di editazione testi è stato specificato per la data lima e nessun sistema di editazione testi è definito per tutti i tipi. &#xD;&#xA; Specificare prego un sistema di editazione testi sotto gli attrezzi->Opzioni."/>
+      <text name="TextEditorsErrorGeneric" value="Errore che pubblica lima {0}.&#xD;&#xA;Il seguente problema ha accaduto: {1}"/>
+      <text name="TextEditorsBrowseTitle" value="Selezionare il sistema di editazione testi eseguibile"/>
+      <text name="TextEditorsAllTypesDefined" value="Tutti i tipi sistema di editazione testi già è definito."/>
+      <text name="TextEditorsColumnFileType" value="Tipo della lima "/>
+      <text name="TextEditorsColumnLocation" value="Sistema di editazione testi"/>
+      <text name="TextEditorsColumnCmdLine" value="Linea di ordine"/>
+      
+      <text name="ResultsColumnFile" value="Nome"/>
+      <text name="ResultsColumnLocation" value="Individuato dentro"/>
+      <text name="ResultsColumnDate" value="Data modificata"/>
+      <text name="ResultsColumnCount" value="Conteggio"/>
+      
+      <text name="PluginsColumnEnabled" value="Permesso"/>
+      <text name="PluginsColumnName" value="Nome"/>
+      <text name="PluginsColumnExtensions" value="Estensioni"/>
+   </generic>
+   
+</language>

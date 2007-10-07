@@ -1,0 +1,17 @@
+<Combine name="AstroGrep" fileversion="2.0">
+  <Configurations active="Debug">
+    <Configuration name="Debug" ctype="CombineConfiguration">
+      <Entry build="True" name="AstroGrep" configuration="Debug" />
+    </Configuration>
+    <Configuration name="Release" ctype="CombineConfiguration">
+      <Entry build="True" name="AstroGrep" configuration="Release" />
+    </Configuration>
+  </Configurations>
+  <DeployTargets />
+  <StartMode startupentry="AstroGrep" single="True">
+    <Execute type="None" entry="AstroGrep" />
+  </StartMode>
+  <Entries>
+    <Entry filename="./AstroGrep/AstroGrep.mdp" />
+  </Entries>
+</Combine>

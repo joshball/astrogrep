@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AstroGrep", "AstroGrep.vbproj", "{A36A2B82-353E-46B8-A338-FF267EED0BDF}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AstroGrepInstaller", "AstroGrepInstaller\AstroGrepInstaller.vdproj", "{E9059909-3F0E-4609-9132-D985357095E4}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{A36A2B82-353E-46B8-A338-FF267EED0BDF}.Debug.ActiveCfg = Debug|.NET
+		{A36A2B82-353E-46B8-A338-FF267EED0BDF}.Debug.Build.0 = Debug|.NET
+		{A36A2B82-353E-46B8-A338-FF267EED0BDF}.Release.ActiveCfg = Release|.NET
+		{A36A2B82-353E-46B8-A338-FF267EED0BDF}.Release.Build.0 = Release|.NET
+		{E9059909-3F0E-4609-9132-D985357095E4}.Debug.ActiveCfg = Release
+		{E9059909-3F0E-4609-9132-D985357095E4}.Release.ActiveCfg = Release
+		{E9059909-3F0E-4609-9132-D985357095E4}.Release.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,10 @@
+frmMain = -251, 75, 689, 713, C, 80, 11, 652, 586, C
+SearchCode = -87, 89, 760, 751, 
+frmCancel = 132, 132, 566, 470, C, 110, 110, 583, 550, C
+frmAbout = 88, 88, 470, 426, C, 44, 44, 679, 516, C
+frmBrowse = 110, 110, 544, 448, C, 154, 154, 627, 594, C
+CFileFinder = 22, 22, 580, 634, 
+CHitObject = 0, 0, 651, 319, C
+CHitObjectCollection = 0, 0, 756, 612, Z
+frmProperties = 66, 66, 624, 678, C, 176, 176, 649, 616, C
+PrintCode = 132, 132, 695, 580, C

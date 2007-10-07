@@ -1,0 +1,21 @@
+[Version]
+Version=2.0.0.20
+
+[AstroGrep.exe <0009>]
+Dest=$(AppPath)
+Date=6/4/02
+Time=21:44
+Version=2.0.0.20
+CABFilename=AstroGrep.CAB
+CABDefaultURL=www.cartooncritic.com
+CABINFFile=AstroGrep.INF
+Uses1=MSVBVM60.DLL
+Uses2=OLEAUT32.DLL
+Uses3=OLEPRO32.DLL
+Uses4=ASYCFILT.DLL
+Uses5=STDOLE2.TLB
+Uses6=COMCAT.DLL
+Uses7=RICHTX32.OCX
+Uses8=COMCT232.OCX
+Uses9=COMCTL32.OCX
+Uses10=COMDLG32.OCX
