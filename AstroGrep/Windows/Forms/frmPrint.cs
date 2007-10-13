@@ -1,8 +1,7 @@
 using System;
+using System.Collections;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace AstroGrep.Windows.Forms

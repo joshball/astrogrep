@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 //
 // General Information about an assembly is controlled through the following 
@@ -13,6 +14,10 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCopyright("Program and source copyright (c) AstroComma Incorporated")]
 [assembly: AssemblyTrademark("AstroGrep")]
 [assembly: AssemblyCulture("")]
+
+// This sets the default COM visibility of types in the assembly to invisible.
+// If you need to expose a type to COM, use [ComVisible(true)] on that type.
+[assembly: ComVisible(false)]
 
 //
 // Version information for an assembly consists of the following four values:
