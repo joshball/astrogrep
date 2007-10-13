@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using Microsoft.Win32;
 
 namespace AstroGrep.Windows
 {
