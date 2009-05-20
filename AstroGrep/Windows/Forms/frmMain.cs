@@ -2742,15 +2742,21 @@ namespace AstroGrep.Windows.Forms
 		/// </history>
 		private void OpenFolderMenuItem_Click(object sender, System.EventArgs e)
 		{
-			foreach(ListViewItem lvi in lstFileNames.SelectedItems)
+			try
 			{
-				string folder = lvi.SubItems[1].Text;
-				if (Directory.Exists(folder))
+				foreach(ListViewItem lvi in lstFileNames.SelectedItems)
 				{
-					System.Diagnostics.Process.Start("Explorer.exe" , folder);
+					string folder = lvi.SubItems[1].Text;
+					if (Directory.Exists(folder))
+					{
+						System.Diagnostics.Process.Start("Explorer.exe" , folder);
+					}
 				}
 			}
-		
+			catch(Exception ex)
+			{
+				MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
 		}
 
 		/// <summary>
