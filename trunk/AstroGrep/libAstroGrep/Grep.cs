@@ -470,6 +470,7 @@ namespace libAstroGrep
       /// [Curtis_Beard]      07/12/2006  CHG: make private
       /// [Curtis_Beard]      07/28/2006  ADD: check extension against exclusion list
       /// [Curtis_Beard]      01/27/2007  ADD: 1561584, check directories/files if hidden or system
+      /// [Ed_Jakubowski]     05/20/2009  ADD: When a blank searchText is given only list files
       /// </history>
       private void Execute(DirectoryInfo SourceDirectory, string SourceDirectoryFilter, string SourceFileFilter, string searchText)
       {
@@ -499,7 +500,20 @@ namespace libAstroGrep
                   continue;
 
                if (!__exclusionList.Contains(SourceFile.Extension.ToLower()))
-                  SearchFile(SourceFile, searchText);
+			   {
+                  if (searchText == "")
+				  {
+				     HitObject _grepHit = new HitObject(SourceFile);
+					 _grepHit.Add("" + Environment.NewLine, 0);
+					 _grepHit.Index = __grepCollection.Count;
+					 __grepCollection.Add(__grepCollection.Count, _grepHit);
+					 OnFileHit(SourceFile, _grepHit.Index);
+				     
+				  }
+				  else
+				     SearchFile(SourceFile, searchText);
+			      
+			   }
             }
             catch (ThreadAbortException)
             {
