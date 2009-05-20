@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.IO;
 
 using libAstroGrep;
 
@@ -111,6 +112,8 @@ namespace AstroGrep.Windows.Forms
 		private System.Windows.Forms.MenuItem CopyMenuItem;
 		private System.Windows.Forms.MenuItem OpenMenuItem;
 		private System.Windows.Forms.MenuItem DeleteMenuItem;
+		private System.Windows.Forms.MenuItem OpenFolderMenuItem;
+		private System.Windows.Forms.MenuItem menuItem2;
       private System.ComponentModel.IContainer components;
 
       /// <summary>
@@ -236,6 +239,8 @@ namespace AstroGrep.Windows.Forms
 			this.OpenMenuItem = new System.Windows.Forms.MenuItem();
 			this.DeleteMenuItem = new System.Windows.Forms.MenuItem();
 			this.menuItem4 = new System.Windows.Forms.MenuItem();
+			this.OpenFolderMenuItem = new System.Windows.Forms.MenuItem();
+			this.menuItem2 = new System.Windows.Forms.MenuItem();
 			this.pnlSearch.SuspendLayout();
 			this.pnlSearchOptions.SuspendLayout();
 			this.PanelOptionsContainer.SuspendLayout();
@@ -734,6 +739,8 @@ namespace AstroGrep.Windows.Forms
 																					   this.CopyMenuItem,
 																					   this.menuItem4,
 																					   this.OpenMenuItem,
+																					   this.OpenFolderMenuItem,
+																					   this.menuItem2,
 																					   this.DeleteMenuItem});
 			// 
 			// CopyMenuItem
@@ -745,19 +752,30 @@ namespace AstroGrep.Windows.Forms
 			// OpenMenuItem
 			// 
 			this.OpenMenuItem.Index = 2;
-			this.OpenMenuItem.Text = "Open";
+			this.OpenMenuItem.Text = "Open File";
 			this.OpenMenuItem.Click += new System.EventHandler(this.OpenMenuItem_Click);
 			// 
 			// DeleteMenuItem
 			// 
-			this.DeleteMenuItem.Index = 3;
-			this.DeleteMenuItem.Text = "Delete";
+			this.DeleteMenuItem.Index = 5;
+			this.DeleteMenuItem.Text = "Delete Item";
 			this.DeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
 			// 
 			// menuItem4
 			// 
 			this.menuItem4.Index = 1;
 			this.menuItem4.Text = "-";
+			// 
+			// OpenFolderMenuItem
+			// 
+			this.OpenFolderMenuItem.Index = 3;
+			this.OpenFolderMenuItem.Text = "Open Directory";
+			this.OpenFolderMenuItem.Click += new System.EventHandler(this.OpenFolderMenuItem_Click);
+			// 
+			// menuItem2
+			// 
+			this.menuItem2.Index = 4;
+			this.menuItem2.Text = "-";
 			// 
 			// frmMain
 			// 
@@ -2714,6 +2732,25 @@ namespace AstroGrep.Windows.Forms
 		private void OpenMenuItem_Click(object sender, System.EventArgs e)
 		{
 			mnuOpenSelected_Click(sender, e);
+		}
+
+		/// <summary>
+		/// Context Menu item for opening selected file's Directory
+		/// </summary>
+		/// /// <history>
+		/// [Ed_Jakbuowski]     05/20/2009  Created
+		/// </history>
+		private void OpenFolderMenuItem_Click(object sender, System.EventArgs e)
+		{
+			foreach(ListViewItem lvi in lstFileNames.SelectedItems)
+			{
+				string folder = lvi.SubItems[1].Text;
+				if (Directory.Exists(folder))
+				{
+					System.Diagnostics.Process.Start("Explorer.exe" , folder);
+				}
+			}
+		
 		}
 
 		/// <summary>
