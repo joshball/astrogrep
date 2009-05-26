@@ -126,6 +126,7 @@ namespace AstroGrep.Core
       public static void Load()
       {
          // for right now, just load the internal plugins
+	     // Mono2.4 doesn't like this plugin.
          Plugin.MicrosoftWord.MicrosoftWordPlugin wordPlugin = new Plugin.MicrosoftWord.MicrosoftWordPlugin();
          PluginWrapper wrapper = new PluginWrapper(wordPlugin, string.Empty, wordPlugin.Name, true, true);
          Add(wrapper);
