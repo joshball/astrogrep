@@ -1703,14 +1703,15 @@ namespace AstroGrep.Windows.Forms
       /// [Theodore_Ward]     ??/??/????  Initial
       /// [Curtis_Beard]	   01/11/2005	.Net Conversion
       /// [Curtis_Beard]	   05/09/2007	CHG: check for a valid item
+      /// [Ed_Jakubowski]	   05/26/2009	CHG: Added if Contains for testing combo item... this helps astrogrep run in mono 2.4
       /// </history>
       private void AddComboSelection(System.Windows.Forms.ComboBox combo, string item)
       {
          if (item.Length > 0)
          {
             // If this path is already in the dropdown, remove it.
-            combo.Items.Remove(item);
-
+			if (combo.Items.Contains(item))
+				combo.Items.Remove(item);
             // Add this path as the first item in the dropdown.
             combo.Items.Insert(0, item);
 
