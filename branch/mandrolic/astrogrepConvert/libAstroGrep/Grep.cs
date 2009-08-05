@@ -46,32 +46,13 @@ namespace libAstroGrep
    /// [Curtis_Beard]		01/27/2007	ADD: 1561584, check directories/files if hidden or system
    /// [Curtis_Beard]		05/25/2007	ADD: Virtual methods for events
    /// [Curtis_Beard]		06/27/2007	CHG: removed message parameters for Complete/Cancel events
+   /// [Andrew_Radford]     05/08/2008  CHG: Convert code to C# 3.5
    /// </history>
    public class Grep
    {
-      #region Declarations
-      private Hashtable __grepCollection = new Hashtable(20);
-
-      private bool __recursiveSearch = true;
-      private bool __useRegularExpressions = false;
-      private bool __caseSensistiveMatch = false;
-      private bool __wholeWordMatch = false;
-      private bool __negation = false;
-      private bool __onlyFileNames = false;
-      private bool __includeLineNumbers = true;
-      private int __contextLines = 0;
-      private StringCollection __exclusionList = new StringCollection();
-      private bool __skipHiddenFiles = false;
-      private bool __skipSystemFiles = false;
-
-      private Thread __thread;
-      private string __directoryPath;
-      //private string __directoryFilter;
-      private string __fileFilter;
-      private string __searchText;
-
-      private PluginCollection __Plugins;
-      #endregion
+       private readonly StringCollection __exclusionList = new StringCollection();
+       private Thread _thread;
+       //private string __directoryFilter;
 
       #region Public Events and Delegates
       /// <summary>File being searched</summary>
@@ -113,191 +94,53 @@ namespace libAstroGrep
       #endregion
 
       #region Public Properties
-      /// <summary>Retrieves all HitObjects for grep</summary>
-      public Hashtable Greps
-      {
-         get 
-         { 
-            return __grepCollection; 
-         }
-      }
 
-      /// <summary>Gets/Sets use of recursion for grep</summary>
-      public bool SearchInSubfolders
-      {
-         get 
-         { 
-            return __recursiveSearch; 
-         }
-         set 
-         { 
-            __recursiveSearch = value; 
-         }
-      }
+       /// <summary>Retrieves all HitObjects for grep</summary>
+       public Hashtable Greps { get; private set; }
 
-      /// <summary>Get/Sets use of regular expressions for grep</summary>
-      public bool UseRegularExpressions
-      {
-         get 
-         { 
-            return __useRegularExpressions; 
-         }
-         set 
-         { 
-            __useRegularExpressions = value; 
-         }
-      }
+       /// <summary>Use of directory recursion for grep</summary>
+       public bool SearchInSubfolders { get; set; }
 
-      /// <summary>Get/Sets use of a case sensitive grep</summary>
-      public bool UseCaseSensitivity
-      {
-         get 
-         { 
-            return __caseSensistiveMatch; 
-         }
-         set 
-         { 
-            __caseSensistiveMatch = value; 
-         }                                        
-      }
+       /// <summary>Use of regular expressions for grep</summary>
+       public bool UseRegularExpressions { get; set; }
 
-      /// <summary>Get/Sets use of a whole word match grep</summary>
-      public bool UseWholeWordMatching
-      {
-         get 
-         { 
-            return __wholeWordMatch; 
-         }
-         set 
-         { 
-            __wholeWordMatch = value;
-         }
-      }
+       /// <summary>Use of a case sensitive grep</summary>
+       public bool UseCaseSensitivity { get; set; }
 
-      /// <summary>Get/Sets use of negated the grep results</summary>
-      public bool UseNegation
-      {
-         get 
-         {
-            return __negation;
-         }
-         set 
-         { 
-            __negation = value;
-         }
-      }
+       /// <summary>Use of a whole word match grep</summary>
+       public bool UseWholeWordMatching { get; set; }
 
-      /// <summary>Get/Sets returning only file names for grep results</summary>
-      public bool ReturnOnlyFileNames
-      {
-         get 
-         {
-            return __onlyFileNames;
-         }
-         set 
-         { 
-            __onlyFileNames = value;
-         }
-      }
+       /// <summary>Use of negation of the grep results</summary>
+       public bool UseNegation { get; set; }
 
-      /// <summary>Get/Sets including line numbers as part of a line</summary>
-      public bool IncludeLineNumbers
-      {
-         get 
-         {
-            return __includeLineNumbers;
-         }
-         set 
-         { 
-            __includeLineNumbers = value;
-         }
-      }
+       /// <summary>Whether to return only file names for grep results</summary>
+       public bool ReturnOnlyFileNames { get; set; }
 
-      /// <summary>Get/Sets the number of context lines included in grep results</summary>
-      public int ContextLines
-      {
-         get 
-         {
-            return __contextLines;
-         }
-         set 
-         { 
-            __contextLines = value;
-         }
-      }
+       /// <summary>Whether to include line numbers as part of a line</summary>
+       public bool IncludeLineNumbers { get; set; }
 
-      /// <summary>Get/Sets the number of context lines included in grep results</summary>
-      public string StartDirectory
-      {
-         get 
-         {
-            return __directoryPath;
-         }
-         set 
-         { 
-            __directoryPath = value;
-         }
-      }
+       /// <summary>The number of context lines included in grep results</summary>
+       public int ContextLines { get; set; }
 
-      /// <summary>Get/Sets the number of context lines included in grep results</summary>
-      public string FileFilter
-      {
-         get 
-         {
-            return __fileFilter;
-         }
-         set 
-         { 
-            __fileFilter = value;
-         }
-      }
+       /// <summary>The start (basr) search directory</summary>
+       public string StartDirectory { get; set; }
 
-      /// <summary>Get/Sets the number of context lines included in grep results</summary>
-      public string SearchText
-      {
-         get 
-         {
-            return __searchText;
-         }
-         set 
-         { 
-            __searchText = value;
-         }
-      }
+       /// <summary>The FileFilter</summary>
+       public string FileFilter { get; set; }
 
-      /// <summary>Get/Sets the PluginCollection containing IAstroGrepPlugins.</summary>
-      public PluginCollection Plugins
-      {
-         get { return __Plugins; }
-         set { __Plugins = value; }
-      }
+       /// <summary>The search text</summary>
+       public string SearchText { get; set; }
 
-      /// <summary>Get/Sets skipping hidden files and directories.</summary>
-      public bool SkipHiddenFiles
-      {
-         get 
-         {
-            return __skipHiddenFiles;
-         }
-         set 
-         { 
-            __skipHiddenFiles = value;
-         }
-      }
+       /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
+       public PluginCollection Plugins { get; set; }
 
-      /// <summary>Get/Sets skipping system files and directories.</summary>
-      public bool SkipSystemFiles
-      {
-         get 
-         {
-            return __skipSystemFiles;
-         }
-         set 
-         { 
-            __skipSystemFiles = value;
-         }
-      }
-      #endregion
+       /// <summary>Whether to skip hidden files and directories.</summary>
+       public bool SkipHiddenFiles { get; set; }
+
+       /// <summary>Whether to skip system files and directories.</summary>
+       public bool SkipSystemFiles { get; set; }
+
+       #endregion
 
       /// <summary>
       /// Initializes a new instance of the Grep class.
@@ -307,10 +150,13 @@ namespace libAstroGrep
       /// </history>
       public Grep()
       {
-         //does nothing right now
+          IncludeLineNumbers = true;
+          SearchInSubfolders = true;
+          Greps = new Hashtable(20);
+          //does nothing right now
       }
 
-      #region Public Methods
+       #region Public Methods
 
       /// <summary>
       /// Begins an asynchronous grep of files for a specified text.
@@ -320,9 +166,8 @@ namespace libAstroGrep
       /// </history>
       public void BeginExecute()
       {
-         __thread = new Thread(new ThreadStart(StartGrep));
-         __thread.IsBackground = true;
-         __thread.Start();
+         _thread = new Thread(StartGrep) {IsBackground = true};
+         _thread.Start();
       }
 
       /// <summary>
@@ -333,10 +178,10 @@ namespace libAstroGrep
       /// </history>
       public void Abort()
       {
-         if (__thread != null)
+         if (_thread != null)
          {
-            __thread.Abort();
-            __thread = null;
+            _thread.Abort();
+            _thread = null;
          }
       }
 
@@ -350,19 +195,17 @@ namespace libAstroGrep
       /// </history>
       public void Execute()
       {
-         string[] _filters = __fileFilter.Split(char.Parse(","));
+         string[] _filters = FileFilter.Split(char.Parse(","));
 
          if (_filters.Length > 0)
          {
             // have to grep for each filter separately
-            foreach (string _filter in _filters)
-            {
-               Execute(new DirectoryInfo(__directoryPath), null, _filter, __searchText);
-            }
+             foreach (var _filter in _filters)
+                 Execute(new DirectoryInfo(StartDirectory), null, _filter, SearchText);
          }
          else
          {
-            Execute(new DirectoryInfo(__directoryPath), null, __fileFilter, __searchText);
+            Execute(new DirectoryInfo(StartDirectory), null, FileFilter, SearchText);
          }
       }
 
@@ -378,7 +221,7 @@ namespace libAstroGrep
       {
          try
          {
-            return (HitObject)__grepCollection[index];
+            return (HitObject)Greps[index];
          }
          catch {}
 
@@ -415,12 +258,7 @@ namespace libAstroGrep
       /// </history>
       public static bool WholeWordOnly(string beginText, string endText)
       {
-         bool _valid = false;
-
-         if (ValidBeginText(beginText) && ValidEndText(endText))
-            _valid = true;
-
-         return _valid;
+          return (ValidBeginText(beginText) && ValidEndText(endText));
       }
       #endregion
 
@@ -505,8 +343,8 @@ namespace libAstroGrep
 				  {
 				     HitObject _grepHit = new HitObject(SourceFile);
 					 _grepHit.Add("" + Environment.NewLine, 0);
-					 _grepHit.Index = __grepCollection.Count;
-					 __grepCollection.Add(__grepCollection.Count, _grepHit);
+					 _grepHit.Index = Greps.Count;
+					 Greps.Add(Greps.Count, _grepHit);
 					 OnFileHit(SourceFile, _grepHit.Index);
 				     
 				  }
@@ -580,52 +418,50 @@ namespace libAstroGrep
          StreamReader _reader = null;
          int _lineNumber = 0;
          HitObject _grepHit = null;
-         Regex _regularExp = null;
-         MatchCollection _regularExpCol = null;
-         int _posInStr = -1;
+          Regex _regularExp;
+          MatchCollection _regularExpCol = null;
          bool _hitOccurred = false;
          bool _fileNameDisplayed = false;
-         string[] _context = new string[11];
+         var _context = new string[11];
          int _contextIndex = 0;
          int _lastHit = 0;
          int _contextLinesCount = ContextLines;
          string _contextSpacer = string.Empty;
-         string _spacer = string.Empty;         
+         string _spacer;         
 
          try
          {
             // Process plugins
-            if (__Plugins != null)
+            if (Plugins != null)
             {
-               for (int i = 0; i < __Plugins.Count; i++)
+               for (int i = 0; i < Plugins.Count; i++)
                {
                   // find a valid plugin for this file type
-                  if (__Plugins[i].Enabled &&
-                     __Plugins[i].Plugin.IsAvailable)
+                  if (Plugins[i].Enabled && Plugins[i].Plugin.IsAvailable)
                   {
                      // detect if plugin supports extension
-                     bool bFound = IsInList(file.Extension, __Plugins[i].Plugin.Extensions, ',');
+                     bool isFound = IsInList(file.Extension, Plugins[i].Plugin.Extensions, ',');
                      
                      // if extension not supported try another plugin
-                     if (!bFound)
+                     if (!isFound)
                         continue;
 
                      Exception pluginEx = null;
 
                      // setup plugin options
-                     __Plugins[i].Plugin.ContextLines = this.ContextLines;
-                     __Plugins[i].Plugin.IncludeLineNumbers = this.IncludeLineNumbers;
-                     __Plugins[i].Plugin.ReturnOnlyFileNames = this.ReturnOnlyFileNames;
-                     __Plugins[i].Plugin.UseCaseSensitivity = this.UseCaseSensitivity;
-                     __Plugins[i].Plugin.UseRegularExpressions = this.UseRegularExpressions;
-                     __Plugins[i].Plugin.UseWholeWordMatching = this.UseWholeWordMatching;
+                     Plugins[i].Plugin.ContextLines = this.ContextLines;
+                     Plugins[i].Plugin.IncludeLineNumbers = this.IncludeLineNumbers;
+                     Plugins[i].Plugin.ReturnOnlyFileNames = this.ReturnOnlyFileNames;
+                     Plugins[i].Plugin.UseCaseSensitivity = this.UseCaseSensitivity;
+                     Plugins[i].Plugin.UseRegularExpressions = this.UseRegularExpressions;
+                     Plugins[i].Plugin.UseWholeWordMatching = this.UseWholeWordMatching;
 
                      // load plugin and perform grep
-                     if (__Plugins[i].Plugin.Load())
+                     if (Plugins[i].Plugin.Load())
                      {
-                        _grepHit = __Plugins[i].Plugin.Grep(file, searchText, ref pluginEx);
+                        _grepHit = Plugins[i].Plugin.Grep(file, searchText, ref pluginEx);
                      }
-                     __Plugins[i].Plugin.Unload();
+                     Plugins[i].Plugin.Unload();
 
                      // if the plugin processed successfully
                      if (pluginEx == null)
@@ -636,8 +472,8 @@ namespace libAstroGrep
                            // only perform is not using negation
                            if (!this.UseNegation)
                            {
-                              _grepHit.Index = __grepCollection.Count;
-                              __grepCollection.Add(__grepCollection.Count, _grepHit);
+                              _grepHit.Index = Greps.Count;
+                              Greps.Add(Greps.Count, _grepHit);
                               OnFileHit(file, _grepHit.Index);
 
                               if (this.ReturnOnlyFileNames)
@@ -650,8 +486,8 @@ namespace libAstroGrep
                         {
                            // no hit but using negation so create one
                            _grepHit = new HitObject(file);
-                           _grepHit.Index = __grepCollection.Count;
-                           __grepCollection.Add(__grepCollection.Count, _grepHit);
+                           _grepHit.Index = Greps.Count;
+                           Greps.Add(Greps.Count, _grepHit);
                            OnFileHit(file, _grepHit.Index);
                         }
                      }
@@ -689,7 +525,8 @@ namespace libAstroGrep
                {
                   _lineNumber += 1;
 
-                  if (UseRegularExpressions)
+                   int _posInStr;
+                   if (UseRegularExpressions)
                   {
                      _posInStr = -1;
                      if (textLine.Length > 0)
@@ -790,9 +627,8 @@ namespace libAstroGrep
 
                      if (!_fileNameDisplayed)
                      {
-                        _grepHit = new HitObject(file);
-                        _grepHit.Index = __grepCollection.Count;
-                        __grepCollection.Add(__grepCollection.Count, _grepHit);
+                        _grepHit = new HitObject(file) {Index = Greps.Count};
+                         Greps.Add(Greps.Count, _grepHit);
 
                         OnFileHit(file, _grepHit.Index);
 
@@ -907,8 +743,8 @@ namespace libAstroGrep
                if (!_fileNameDisplayed)
                {
                   _grepHit = new HitObject(file);
-                  _grepHit.Index = __grepCollection.Count;
-                  __grepCollection.Add(__grepCollection.Count, _grepHit);
+                  _grepHit.Index = Greps.Count;
+                  Greps.Add(Greps.Count, _grepHit);
                   OnFileHit(file, _grepHit.Index);
                }
             }
@@ -946,21 +782,19 @@ namespace libAstroGrep
          _tempLine = line;
 
          // attempt to locate the text in the line
-         if (this.UseCaseSensitivity)
+         if (UseCaseSensitivity)
             _pos = _tempLine.IndexOf(_searchText);
          else
             _pos = _tempLine.ToLower().IndexOf(_searchText.ToLower());
 
          while (_pos > -1)
          {
-            _highlight = false;
-
-            // retrieve parts of text
+             // retrieve parts of text
             _begin = _tempLine.Substring(0, _pos);
             _end = _tempLine.Substring(_pos + _searchText.Length);
 
             // do a check to see if begin and end are valid for wholeword searches
-            if (this.UseWholeWordMatching)
+            if (UseWholeWordMatching)
                _highlight = WholeWordOnly(_begin, _end);
             else
                _highlight = true;
@@ -970,7 +804,7 @@ namespace libAstroGrep
                _count += 1;
 
             // Check remaining string for other hits in same line
-            if (this.UseCaseSensitivity)
+            if (UseCaseSensitivity)
                _pos = _end.IndexOf(_searchText);
             else
                _pos = _end.ToLower().IndexOf(_searchText.ToLower());
@@ -1083,12 +917,12 @@ namespace libAstroGrep
       /// </history>
       private void UnloadPlugins()
       {
-         if (__Plugins != null)
+         if (Plugins != null)
          {
-            for (int i = 0; i < __Plugins.Count; i++)
+            for (int i = 0; i < Plugins.Count; i++)
             {
-               if (__Plugins[i].Plugin != null)
-                  __Plugins[i].Plugin.Unload();
+               if (Plugins[i].Plugin != null)
+                  Plugins[i].Plugin.Unload();
             }
          }
       }

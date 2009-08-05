@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -40,16 +40,14 @@ namespace libAstroGrep
    ///   [Curtis_Beard]	   11/21/2005	ADD: support for total hit count
    ///   [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
    ///   [Curtis_Beard]    09/12/2006  CHG: Converted to C#
+   ///  [Andrew_Radford]   05/08/2009  CHG: Update to C# 3.5, Generic Collections
    /// </history>
 	public class HitObject
 	{
       #region Declarations
-      private FileInfo __file;
-      private StringCollection __lines;
-      private StringCollection __lineNumbers;
-      private int __index;
-      private int __count = 0;
-      private StringCollection __columns;
+	    private readonly List<string> __lines  = new List<string>();
+	    private readonly List<int> __lineNumbers = new List<int>();
+        private readonly List<int> __columns= new List<int>();
       #endregion
 
       #region Constructors
@@ -59,11 +57,8 @@ namespace libAstroGrep
       /// <param name="file">FileInfo object</param>
       public HitObject(FileInfo file)
       {
-         __file = file;
-
-         __lines = new StringCollection();
-         __lineNumbers = new StringCollection();
-         __columns = new StringCollection();
+          HitCount = 0;
+          File = file;
       }
 
       /// <summary>
@@ -72,11 +67,8 @@ namespace libAstroGrep
       /// <param name="path">File path</param>
       public HitObject(string path)
       {
-         __file = new FileInfo(path);
-
-         __lines = new StringCollection();
-         __lineNumbers = new StringCollection();
-         __columns = new StringCollection();
+          HitCount = 0;
+          File = new FileInfo(path);
       }
       #endregion
 
@@ -92,7 +84,7 @@ namespace libAstroGrep
       {
          get 
          {
-            return __file.Name;
+            return File.Name;
          }
       }
 
@@ -107,7 +99,7 @@ namespace libAstroGrep
       {
          get 
          {
-            return __file.FullName;
+            return File.FullName;
          }
       }
 
@@ -122,7 +114,7 @@ namespace libAstroGrep
       {
          get 
          {
-            return __file.DirectoryName;
+            return File.DirectoryName;
          }
       }
 
@@ -137,26 +129,20 @@ namespace libAstroGrep
       {
          get 
          {
-            return __file.LastWriteTime;
+            return File.LastWriteTime;
          }
       }
 
-      /// <summary>
-      /// Retrieve the FileInfo object of this object.
-      /// </summary>
-      /// <value>FileInfo object</value>
-      /// <history>
-      /// 	[Curtis_Beard]		07/27/2006	Created
-      /// </history>
-      public FileInfo File
-      {
-         get 
-         {
-            return __file;
-         }
-      }
+	    /// <summary>
+	    /// Retrieve the FileInfo object of this object.
+	    /// </summary>
+	    /// <value>FileInfo object</value>
+	    /// <history>
+	    /// 	[Curtis_Beard]		07/27/2006	Created
+	    /// </history>
+	    public FileInfo File { get; private set; }
 
-      /// <summary>
+	    /// <summary>
       /// Retrieve all lines containing the search text
       /// </summary>
       /// <value>All lines</value>
@@ -167,7 +153,7 @@ namespace libAstroGrep
       {
          get 
          {
-            StringBuilder _lines = new StringBuilder(__lines.Count);
+            var _lines = new StringBuilder(__lines.Count);
 
             foreach (string _line in __lines)
                _lines.Append(_line);
@@ -191,42 +177,27 @@ namespace libAstroGrep
          }
       }
 
-      /// <summary>
-      /// get {/Set the Index of the hit in the collection
-      /// </summary>
-      /// <value>Index position in collection</value>
-      /// <returns>Index position in collection</returns>
-      /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
-      /// </history>
-      public int Index
-      {
-         get 
-         {
-            return __index;
-         }
-         set 
-         {
-            __index = value;
-         }
-      }
+	    /// <summary>
+	    /// get {/Set the Index of the hit in the collection
+	    /// </summary>
+	    /// <value>Index position in collection</value>
+	    /// <returns>Index position in collection</returns>
+	    /// <history>
+	    /// 	[Curtis_Beard]    09/09/2005	Created
+	    /// </history>
+	    public int Index { get; set; }
 
-      /// <summary>
-      /// get {s the total hit count in the object
-      /// </summary>
-      /// <value>Total Hit Count</value>
-      /// <returns>Total Hit Count</returns>
-      /// <history>
-      ///   [Curtis_Beard]	   11/21/2005	Created
-      /// </history>
-      public int HitCount
-      {
-         get 
-         {
-            return __count;
-         }
-      }
-      #endregion
+	    /// <summary>
+	    /// get {s the total hit count in the object
+	    /// </summary>
+	    /// <value>Total Hit Count</value>
+	    /// <returns>Total Hit Count</returns>
+	    /// <history>
+	    ///   [Curtis_Beard]	   11/21/2005	Created
+	    /// </history>
+	    public int HitCount { get; private set; }
+
+	    #endregion
 
       #region Public Methods
       /// <summary>
@@ -258,7 +229,7 @@ namespace libAstroGrep
          if (index > __lineNumbers.Count)
             return 0;
 
-         return int.Parse(__lineNumbers[index]);
+         return __lineNumbers[index];
       }
 
       /// <summary>
@@ -274,7 +245,7 @@ namespace libAstroGrep
          if (index > __columns.Count)
             return 0;
 
-         return int.Parse(__columns[index]);
+         return __columns[index];
       }
 
       /// <summary>
@@ -290,8 +261,8 @@ namespace libAstroGrep
       public int Add(string line, int lineNumber)
       {
          __lines.Add(line);
-         __lineNumbers.Add(lineNumber.ToString());
-         __columns.Add("1");
+         __lineNumbers.Add(lineNumber);
+         __columns.Add(1);
 
          return __lines.Count - 1;
       }
@@ -309,8 +280,8 @@ namespace libAstroGrep
       public int Add(string line, int lineNumber, int column)
       {
          __lines.Add(line);
-         __lineNumbers.Add(lineNumber.ToString());
-         __columns.Add(column.ToString());
+         __lineNumbers.Add(lineNumber);
+         __columns.Add(column);
 
          return __lines.Count - 1;
       }
@@ -323,7 +294,7 @@ namespace libAstroGrep
       /// </history>
       public void SetHitCount()
       {
-         __count += 1;
+         HitCount += 1;
       }
       
       /// <summary>
@@ -335,7 +306,7 @@ namespace libAstroGrep
       /// </history>
       public void SetHitCount(int count)
       {
-         __count += count;
+         HitCount += count;
       }
       #endregion
 	}
