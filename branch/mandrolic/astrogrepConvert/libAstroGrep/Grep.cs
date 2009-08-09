@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -50,7 +50,7 @@ namespace libAstroGrep
    /// </history>
    public class Grep
    {
-       private readonly StringCollection __exclusionList = new StringCollection();
+       private readonly List<String> __exclusionList = new List<String>();
        private Thread _thread;
        //private string __directoryFilter;
 
@@ -96,8 +96,31 @@ namespace libAstroGrep
       #region Public Properties
 
        /// <summary>Retrieves all HitObjects for grep</summary>
-       public Hashtable Greps { get; private set; }
+       public IList<HitObject> Greps { get; private set; }
 
+        /// <summary>The start (basr) search directory</summary>
+       public string StartDirectory { get; set; }
+
+       /// <summary>The FileFilter</summary>
+       public string FileFilter { get; set; }
+
+       /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
+       public PluginCollection Plugins { get; set; }
+
+       /// <summary>Whether to skip hidden files and directories.</summary>
+       public bool SkipHiddenFiles { get; set; }
+
+       
+       /// <summary>Whether to skip system files and directories.</summary>
+       public bool SkipSystemFiles { get; set; }
+
+       /// <summary>Whether to include line numbers as part of a line</summary>
+       public bool IncludeLineNumbers { get; set; }
+
+
+
+// Search specs start here
+       
        /// <summary>Use of directory recursion for grep</summary>
        public bool SearchInSubfolders { get; set; }
 
@@ -113,33 +136,17 @@ namespace libAstroGrep
        /// <summary>Use of negation of the grep results</summary>
        public bool UseNegation { get; set; }
 
-       /// <summary>Whether to return only file names for grep results</summary>
-       public bool ReturnOnlyFileNames { get; set; }
-
-       /// <summary>Whether to include line numbers as part of a line</summary>
-       public bool IncludeLineNumbers { get; set; }
-
        /// <summary>The number of context lines included in grep results</summary>
        public int ContextLines { get; set; }
-
-       /// <summary>The start (basr) search directory</summary>
-       public string StartDirectory { get; set; }
-
-       /// <summary>The FileFilter</summary>
-       public string FileFilter { get; set; }
 
        /// <summary>The search text</summary>
        public string SearchText { get; set; }
 
-       /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
-       public PluginCollection Plugins { get; set; }
+       /// <summary>Whether to return only file names for grep results</summary>
+       public bool ReturnOnlyFileNames { get; set; }
 
-       /// <summary>Whether to skip hidden files and directories.</summary>
-       public bool SkipHiddenFiles { get; set; }
-
-       /// <summary>Whether to skip system files and directories.</summary>
-       public bool SkipSystemFiles { get; set; }
-
+    
+    
        #endregion
 
       /// <summary>
@@ -152,8 +159,8 @@ namespace libAstroGrep
       {
           IncludeLineNumbers = true;
           SearchInSubfolders = true;
-          Greps = new Hashtable(20);
-          //does nothing right now
+          Greps = new List<HitObject>();
+         
       }
 
        #region Public Methods
@@ -334,17 +341,16 @@ namespace libAstroGrep
             {
                if (SkipSystemFiles && (SourceFile.Attributes & FileAttributes.System) == FileAttributes.System)
                   continue;
-               if (SkipHiddenFiles && (SourceFile.Attributes & FileAttributes.Hidden) == System.IO.FileAttributes.Hidden)
+               if (SkipHiddenFiles && (SourceFile.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                   continue;
 
                if (!__exclusionList.Contains(SourceFile.Extension.ToLower()))
 			   {
                   if (searchText == "")
 				  {
-				     HitObject _grepHit = new HitObject(SourceFile);
-					 _grepHit.Add("" + Environment.NewLine, 0);
-					 _grepHit.Index = Greps.Count;
-					 Greps.Add(Greps.Count, _grepHit);
+				     var _grepHit = new HitObject(SourceFile) {Index = Greps.Count};
+				      _grepHit.Add("" + Environment.NewLine, 0);
+					 Greps.Add(_grepHit);
 					 OnFileHit(SourceFile, _grepHit.Index);
 				     
 				  }
@@ -470,24 +476,23 @@ namespace libAstroGrep
                         if (_grepHit != null)
                         {
                            // only perform is not using negation
-                           if (!this.UseNegation)
+                           if (!UseNegation)
                            {
                               _grepHit.Index = Greps.Count;
-                              Greps.Add(Greps.Count, _grepHit);
+                              Greps.Add(_grepHit);
                               OnFileHit(file, _grepHit.Index);
 
-                              if (this.ReturnOnlyFileNames)
+                              if (ReturnOnlyFileNames)
                                  _grepHit.SetHitCount();
 
                               OnLineHit(_grepHit, _grepHit.Index);
                            }
                         }
-                        else if (this.UseNegation)
+                        else if (UseNegation)
                         {
                            // no hit but using negation so create one
-                           _grepHit = new HitObject(file);
-                           _grepHit.Index = Greps.Count;
-                           Greps.Add(Greps.Count, _grepHit);
+                           _grepHit = new HitObject(file) {Index = Greps.Count};
+                            Greps.Add(_grepHit);
                            OnFileHit(file, _grepHit.Index);
                         }
                      }
@@ -628,7 +633,7 @@ namespace libAstroGrep
                      if (!_fileNameDisplayed)
                      {
                         _grepHit = new HitObject(file) {Index = Greps.Count};
-                         Greps.Add(Greps.Count, _grepHit);
+                         Greps.Add(_grepHit);
 
                         OnFileHit(file, _grepHit.Index);
 
@@ -742,9 +747,8 @@ namespace libAstroGrep
                //add the file to the hit list
                if (!_fileNameDisplayed)
                {
-                  _grepHit = new HitObject(file);
-                  _grepHit.Index = Greps.Count;
-                  Greps.Add(Greps.Count, _grepHit);
+                  _grepHit = new HitObject(file) {Index = Greps.Count};
+                   Greps.Add( _grepHit);
                   OnFileHit(file, _grepHit.Index);
                }
             }

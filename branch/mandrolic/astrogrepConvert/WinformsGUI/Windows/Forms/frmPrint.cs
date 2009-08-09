@@ -1,8 +1,9 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
+using libAstroGrep;
 
 namespace AstroGrep.Windows.Forms
 {
@@ -40,7 +41,7 @@ namespace AstroGrep.Windows.Forms
       private PrintDocument pdoc = new PrintDocument();
       private string __document = string.Empty;
       private ListView __listView;
-      private Hashtable __grepTable;
+      private IList<HitObject> __grepTable;
       private Font __Font;
       private int __CurrentChar = 0;
       private Icon __Icon;
@@ -69,7 +70,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      11/02/2005	Created
       /// [Curtis_Beard]      10/11/2006	CHG: Added Font object and a Icon
       /// </history>
-      public frmPrint(ListView fileList, Hashtable greps, Font font, Icon icon)
+      public frmPrint(ListView fileList, IList<HitObject> greps, Font font, Icon icon)
       {
          //
          // Required for Windows Form Designer support

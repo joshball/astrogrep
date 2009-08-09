@@ -45,7 +45,7 @@ namespace AstroGrep.Windows.Forms
       private Grep __Grep = null;
       private string __SearchOptionsText = "Search Options {0}";
       private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
-      private System.Collections.Specialized.StringCollection __ErrorCollection = new System.Collections.Specialized.StringCollection();
+      private readonly System.Collections.Specialized.StringCollection __ErrorCollection = new System.Collections.Specialized.StringCollection();
       #endregion
 
       #region Delegate Declarations
@@ -2480,11 +2480,11 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   12/07/2005	CHG: Pass in font name and size to print dialog
       /// [Curtis_Beard]	   10/11/2006	CHG: Pass in font and icon
       /// </history>
-      private void mnuPrintResults_Click(object sender, System.EventArgs e)
+      private void mnuPrintResults_Click(object sender, EventArgs e)
       {
          if (lstFileNames.Items.Count > 0)
          {
-            frmPrint _form = new frmPrint(lstFileNames, __Grep.Greps, txtHits.Font, this.Icon);
+            var _form = new frmPrint(lstFileNames, __Grep.Greps, txtHits.Font, Icon);
             _form.ShowDialog(this);
             _form = null;
          }

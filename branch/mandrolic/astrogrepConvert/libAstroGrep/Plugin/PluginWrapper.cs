@@ -26,17 +26,14 @@ namespace libAstroGrep.Plugin
    /// </remarks>
    /// <history>
    /// [Curtis_Beard]		07/31/2006	Created
+   /// [Andrew_Radford]     05/08/2008  CHG: Convert code to C# 3.5
    /// </history>
    public class PluginWrapper
    {
 
       #region Declarations
-      private IAstroGrepPlugin __Plugin = null;
-      private bool __Enabled = false;
-      private string __Path = string.Empty;
-      private string __Name = string.Empty;
-      private bool __Internal = false;
-      #endregion
+
+       #endregion
 
       /// <summary>
       /// Initializes a new instance of the PluginWrapper class.
@@ -45,9 +42,12 @@ namespace libAstroGrep.Plugin
       /// [Curtis_Beard]		07/31/2006	Created
       /// </history>
       public PluginWrapper()
-      {}
+      {
+          AssemblyName = string.Empty;
+          AssemblyPath = string.Empty;
+      }
 
-      /// <summary>
+       /// <summary>
       /// Initializes a new instance of the PluginWrapper class.
       /// </summary>
       /// <param name="plugin">IAstroGrepPlugin</param>
@@ -61,71 +61,51 @@ namespace libAstroGrep.Plugin
       public PluginWrapper(IAstroGrepPlugin plugin, string assemblyPath, 
                            string assemblyName, bool internalPlugin, bool enabled)
       {
-         __Plugin = plugin;
-         __Path = assemblyPath;
-         __Name = assemblyName;
-         __Internal = internalPlugin;
-         __Enabled = enabled;
+         Plugin = plugin;
+         AssemblyPath = assemblyPath;
+         AssemblyName = assemblyName;
+         Internal = internalPlugin;
+         Enabled = enabled;
       }
 
-      /// <summary>
-      /// Contains the IAstroGrepPlugin.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]		07/31/2006	Created
-      /// </history>
-      public IAstroGrepPlugin Plugin
-      {
-         get { return __Plugin; }
-         set { __Plugin = value; }
-      }
+       /// <summary>
+       /// Contains the IAstroGrepPlugin.
+       /// </summary>
+       /// <history>
+       /// [Curtis_Beard]		07/31/2006	Created
+       /// </history>
+       public IAstroGrepPlugin Plugin { get; set; }
 
-      /// <summary>
-      /// Determines whether the plugin is enabled or disabled.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]		07/31/2006	Created
-      /// </history>
-      public bool Enabled
-      {
-         get { return __Enabled; }
-         set { __Enabled = value; }
-      }
+       /// <summary>
+       /// Determines whether the plugin is enabled or disabled.
+       /// </summary>
+       /// <history>
+       /// [Curtis_Beard]		07/31/2006	Created
+       /// </history>
+       public bool Enabled { get; set; }
 
-      /// <summary>
-      /// Determines whether the plugin is an Internal or External plugin.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]		07/31/2006	Created
-      /// </history>
-      public bool Internal
-      {
-         get { return __Internal; }
-         set { __Internal = value; }
-      }
+       /// <summary>
+       /// Determines whether the plugin is an Internal or External plugin.
+       /// </summary>
+       /// <history>
+       /// [Curtis_Beard]		07/31/2006	Created
+       /// </history>
+       public bool Internal { get; set; }
 
-      /// <summary>
-      /// Contains the fully qualified path to the plugin.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]		07/31/2006	Created
-      /// </history>
-      public string AssemblyPath
-      {
-         get { return __Path; }
-         set { __Path = value; }
-      }
+       /// <summary>
+       /// Contains the fully qualified path to the plugin.
+       /// </summary>
+       /// <history>
+       /// [Curtis_Beard]		07/31/2006	Created
+       /// </history>
+       public string AssemblyPath { get; set; }
 
-      /// <summary>
-      /// Contains the full assembly name of the plugin.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]		07/31/2006	Created
-      /// </history>
-      public string AssemblyName
-      {
-         get { return __Name; }
-         set { __Name = value; }
-      }
+       /// <summary>
+       /// Contains the full assembly name of the plugin.
+       /// </summary>
+       /// <history>
+       /// [Curtis_Beard]		07/31/2006	Created
+       /// </history>
+       public string AssemblyName { get; set; }
    }
 }

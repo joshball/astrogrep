@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 using libAstroGrep;
@@ -42,7 +43,7 @@ namespace AstroGrep.Windows
       #region Declarations
       private string __document = string.Empty;
       private ListView __listView;
-      private Hashtable __grepTable;
+      private IList<HitObject> __grepTable;
       #endregion
 
       #region Public Methods
@@ -54,7 +55,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]	   09/10/2005	Created
       /// </history>
-      public GrepPrint(ListView fileList, Hashtable greps)
+      public GrepPrint(ListView fileList, IList<HitObject> greps)
       {
          __listView = fileList;
          __grepTable = greps;
@@ -70,15 +71,12 @@ namespace AstroGrep.Windows
       /// </history>
       public string PrintFileList()
       {
-         HitObject _hit;
-
          SetupDocument(string.Empty);
 
          AddLine("----------------------------------------------------------------------");
 
-         foreach (DictionaryEntry _entry in __grepTable)
+         foreach (var _hit in __grepTable)
          {
-            _hit = (HitObject)_entry.Value;
             AddLine(_hit.FilePath);
             AddLine("----------------------------------------------------------------------");
          }
@@ -104,7 +102,7 @@ namespace AstroGrep.Windows
          for (int _index = 0; _index < __listView.SelectedItems.Count; _index++)
          {
 
-            _hit = (HitObject)__grepTable[int.Parse(__listView.SelectedItems[_index].SubItems[AstroGrep.Constants.COLUMN_INDEX_GREP_INDEX].Text)];
+            _hit = __grepTable[int.Parse(__listView.SelectedItems[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text)];
 
             AddLine("----------------------------------------------------------------------");
             AddLine(_hit.FilePath);
@@ -129,15 +127,10 @@ namespace AstroGrep.Windows
       /// </history>
       public string PrintAllHits()
       {
-         HitObject _hit;
-
          SetupDocument(string.Empty);
 
-         foreach (DictionaryEntry _entry in __grepTable)
+         foreach (var _hit in __grepTable)
          {
-
-            _hit = (HitObject)_entry.Value;
-
             AddLine("----------------------------------------------------------------------");
             AddLine(_hit.FilePath);
             AddLine("----------------------------------------------------------------------");
@@ -164,8 +157,7 @@ namespace AstroGrep.Windows
       {
          if (__listView.SelectedItems.Count > 0)
          {
-
-            HitObject _hit = (HitObject)__grepTable[int.Parse(__listView.SelectedItems[0].SubItems[AstroGrep.Constants.COLUMN_INDEX_GREP_INDEX].Text)];
+            var _hit = __grepTable[int.Parse(__listView.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text)];
 
             SetupDocument(string.Empty);
 
