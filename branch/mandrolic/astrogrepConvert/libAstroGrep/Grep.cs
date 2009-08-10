@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -9,6 +8,39 @@ using libAstroGrep.Plugin;
 
 namespace libAstroGrep
 {
+
+    public interface ISearchSpec
+    {
+        /// <summary>Use of directory recursion for grep</summary>
+        bool SearchInSubfolders { get; }
+
+        /// <summary>Use of regular expressions for grep</summary>
+        bool UseRegularExpressions { get;  }
+
+        /// <summary>Use of a case sensitive grep</summary>
+        bool UseCaseSensitivity { get; }
+
+        /// <summary>Use of a whole word match grep</summary>
+        bool UseWholeWordMatching { get; }
+
+        /// <summary>Use of negation of the grep results</summary>
+        bool UseNegation { get; }
+
+        /// <summary>The number of context lines included in grep results</summary>
+        int ContextLines { get; }
+
+        /// <summary>The search text</summary>
+        string SearchText { get; }
+
+        /// <summary>Whether to return only file names for grep results</summary>
+        bool ReturnOnlyFileNames { get; }
+
+        /// <summary>Sets including line numbers as part of a line</summary>
+        bool IncludeLineNumbers { get; }
+    }
+
+
+
    /// <summary>
    /// Searches files, given a starting directory, for a given search text.  Results 
    /// are populated into a HashTable of HitObjects which contain information 
@@ -48,12 +80,12 @@ namespace libAstroGrep
    /// [Curtis_Beard]		06/27/2007	CHG: removed message parameters for Complete/Cancel events
    /// [Andrew_Radford]     05/08/2008  CHG: Convert code to C# 3.5
    /// </history>
-   public class Grep
+   public class Grep : ISearchSpec
    {
        private readonly List<String> __exclusionList = new List<String>();
        private Thread _thread;
        //private string __directoryFilter;
-
+       
       #region Public Events and Delegates
       /// <summary>File being searched</summary>
       /// <param name="file">FileInfo object of file currently being searched</param>
@@ -454,20 +486,11 @@ namespace libAstroGrep
 
                      Exception pluginEx = null;
 
-                     // setup plugin options
-                     Plugins[i].Plugin.ContextLines = this.ContextLines;
-                     Plugins[i].Plugin.IncludeLineNumbers = this.IncludeLineNumbers;
-                     Plugins[i].Plugin.ReturnOnlyFileNames = this.ReturnOnlyFileNames;
-                     Plugins[i].Plugin.UseCaseSensitivity = this.UseCaseSensitivity;
-                     Plugins[i].Plugin.UseRegularExpressions = this.UseRegularExpressions;
-                     Plugins[i].Plugin.UseWholeWordMatching = this.UseWholeWordMatching;
-
                      // load plugin and perform grep
-                     if (Plugins[i].Plugin.Load())
-                     {
-                        _grepHit = Plugins[i].Plugin.Grep(file, searchText, ref pluginEx);
-                     }
-                     Plugins[i].Plugin.Unload();
+                      if (Plugins[i].Plugin.Load())
+                          _grepHit = Plugins[i].Plugin.Grep(file, searchText, this, ref pluginEx);
+                      
+                      Plugins[i].Plugin.Unload();
 
                      // if the plugin processed successfully
                      if (pluginEx == null)
