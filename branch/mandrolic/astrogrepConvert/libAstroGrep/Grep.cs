@@ -8,40 +8,7 @@ using libAstroGrep.Plugin;
 
 namespace libAstroGrep
 {
-
-    public interface ISearchSpec
-    {
-        /// <summary>Use of directory recursion for grep</summary>
-        bool SearchInSubfolders { get; }
-
-        /// <summary>Use of regular expressions for grep</summary>
-        bool UseRegularExpressions { get;  }
-
-        /// <summary>Use of a case sensitive grep</summary>
-        bool UseCaseSensitivity { get; }
-
-        /// <summary>Use of a whole word match grep</summary>
-        bool UseWholeWordMatching { get; }
-
-        /// <summary>Use of negation of the grep results</summary>
-        bool UseNegation { get; }
-
-        /// <summary>The number of context lines included in grep results</summary>
-        int ContextLines { get; }
-
-        /// <summary>The search text</summary>
-        string SearchText { get; }
-
-        /// <summary>Whether to return only file names for grep results</summary>
-        bool ReturnOnlyFileNames { get; }
-
-        /// <summary>Sets including line numbers as part of a line</summary>
-        bool IncludeLineNumbers { get; }
-    }
-
-
-
-   /// <summary>
+    /// <summary>
    /// Searches files, given a starting directory, for a given search text.  Results 
    /// are populated into a HashTable of HitObjects which contain information 
    /// about the file, line numbers, and the actual lines which the search text was
@@ -149,9 +116,6 @@ namespace libAstroGrep
        /// <summary>Whether to include line numbers as part of a line</summary>
        public bool IncludeLineNumbers { get; set; }
 
-
-
-// Search specs start here
        
        /// <summary>Use of directory recursion for grep</summary>
        public bool SearchInSubfolders { get; set; }
@@ -279,10 +243,8 @@ namespace libAstroGrep
       {
          ext = ext.ToLower();
 
-         if (!__exclusionList.Contains(ext))
-         {
-            __exclusionList.Add(ext);
-         }
+          if (!__exclusionList.Contains(ext))
+              __exclusionList.Add(ext);
       }
 
       /// <summary>
@@ -297,7 +259,7 @@ namespace libAstroGrep
       /// </history>
       public static bool WholeWordOnly(string beginText, string endText)
       {
-          return (ValidBeginText(beginText) && ValidEndText(endText));
+          return (IsValidText(beginText) && IsValidText(endText));
       }
       #endregion
 
@@ -843,97 +805,31 @@ namespace libAstroGrep
          return _count;
       }
 
+
+      static readonly List<string> validTexts = new List<string> 
+      { " ", "<", "$", "+", "*", "[", "{", "(", ".", "?", "!", ",", ":", ";", "-", "\\", "/", "'", "\"", Environment.NewLine, "\r\n", "\r", "\n" };
+        
       /// <summary>
       /// Validate a start text.
       /// </summary>
-      /// <param name="beginText">text to validate</param>
+      /// <param name="text">text to validate</param>
       /// <returns>True - valid, False - otherwise</returns>
       /// <history>
       /// [Curtis_Beard]		12/06/2005	Created
       /// [Curtis_Beard]		02/09/2007	FIX: 1655533, update whole word matching
       /// [Curtis_Beard]		08/21/2007	ADD: '/' character and Environment.NewLine
+      /// [Andrew_Radford]      09/08/2009  CHG: refactored to use list, combined begin and end text methods
       /// </history>
-      private static bool ValidBeginText(string beginText)
+      private static bool IsValidText(string text)
       {
-         if (beginText.Equals(string.Empty) ||
-            beginText.EndsWith(" ") ||
-            beginText.EndsWith("<") ||
-            beginText.EndsWith("$") ||
-            beginText.EndsWith("+") ||
-            beginText.EndsWith("*") ||
-            beginText.EndsWith("[") ||
-            beginText.EndsWith("{") ||
-            beginText.EndsWith("(") ||
-            beginText.EndsWith(".") ||
-            beginText.EndsWith("?") ||
-            beginText.EndsWith("!") ||
-            beginText.EndsWith(",") ||
-            beginText.EndsWith(":") ||
-            beginText.EndsWith(";") ||
-            beginText.EndsWith("-") ||
-            beginText.EndsWith("\\") ||
-            beginText.EndsWith("/") ||
-            beginText.EndsWith("'") ||
-            beginText.EndsWith("\"") ||
-            beginText.EndsWith(Environment.NewLine) ||
-            beginText.EndsWith("\r\n") ||
-            beginText.EndsWith("\r") ||
-            beginText.EndsWith("\n")
-            )
-         {  
-            return true;
-         }
+          if (string.IsNullOrEmpty(text))   
+             return true;
 
-         return false;
+          bool found = false;
+          validTexts.ForEach(s => { if (text.StartsWith(s)) found = true; });
+          return found;
       }
 
-      /// <summary>
-      /// Validate an end text.
-      /// </summary>
-      /// <param name="endText">text to validate</param>
-      /// <returns>True - valid, False - otherwise</returns>
-      /// <history>
-      /// [Curtis_Beard]		2/06/2005	Created
-      /// [Curtis_Beard]		02/09/2007	FIX: 1655533, update whole word matching
-      /// [Curtis_Beard]		08/21/2007	ADD: '/' character and Environment.NewLine
-      /// </history>
-      private static bool ValidEndText(string endText)
-      {
-         if (endText.Equals(string.Empty) ||
-            endText.StartsWith(" ") ||
-            endText.StartsWith("<") ||
-            endText.StartsWith("$") ||
-            endText.StartsWith("+") ||
-            endText.StartsWith("*") ||
-            endText.StartsWith("[") ||
-            endText.StartsWith("{") ||
-            endText.StartsWith("(") ||
-            endText.StartsWith(".") ||
-            endText.StartsWith("?") ||
-            endText.StartsWith("!") ||
-            endText.StartsWith(",") ||
-            endText.StartsWith(":") ||
-            endText.StartsWith(";") ||
-            endText.StartsWith("-") ||
-            endText.StartsWith(">") ||
-            endText.StartsWith("]") ||
-            endText.StartsWith("}") ||
-            endText.StartsWith(")") ||
-            endText.StartsWith("\\") ||
-            endText.StartsWith("/") ||
-            endText.StartsWith("'") ||
-            endText.StartsWith("\"") ||
-            endText.StartsWith(Environment.NewLine) ||
-            endText.StartsWith("\r\n") ||
-            endText.StartsWith("\r") ||
-            endText.StartsWith("\n")
-            )
-         {
-            return true;
-         }
-
-         return false;
-      }
 
       /// <summary>
       /// Unload any plugins that are enabled and available.

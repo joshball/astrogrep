@@ -53,7 +53,7 @@ namespace AstroGrep.Windows.Forms
       private delegate void SetSearchStateCallBack(bool enable);
       private delegate void UpdateStatusMessageCallBack(string message);
       private delegate void ClearItemsCallBack();
-      private delegate void AddToListCallBack(System.IO.FileInfo file, int index);
+      private delegate void AddToListCallBack(FileInfo file, int index);
       private delegate void DisplaySearchErrorsCallBack();
       #endregion
 
@@ -3040,12 +3040,12 @@ namespace AstroGrep.Windows.Forms
             __Grep.SearchText = _expression;
 
             // attach events
-            __Grep.FileHit += new libAstroGrep.Grep.FileHitHandler(ReceiveFileHit);
-            __Grep.LineHit += new libAstroGrep.Grep.LineHitHandler(ReceiveLineHit);
-            __Grep.SearchCancel += new libAstroGrep.Grep.SearchCancelHandler(ReceiveSearchCancel);
-            __Grep.SearchComplete += new libAstroGrep.Grep.SearchCompleteHandler(ReceiveSearchComplete);
-            __Grep.SearchError += new libAstroGrep.Grep.SearchErrorHandler(ReceiveSearchError);
-            __Grep.SearchingFile += new libAstroGrep.Grep.SearchingFileHandler(ReceiveSearchingFile);
+            __Grep.FileHit += ReceiveFileHit;
+            __Grep.LineHit += ReceiveLineHit;
+            __Grep.SearchCancel += ReceiveSearchCancel;
+            __Grep.SearchComplete += ReceiveSearchComplete;
+            __Grep.SearchError += ReceiveSearchError;
+            __Grep.SearchingFile += ReceiveSearchingFile;
 
             __Grep.BeginExecute();
          }
@@ -3114,11 +3114,11 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		07/07/2006	CHG: Make thread safe
       /// [Curtis_Beard]		09/14/2006	CHG: Update to use date's ToString method
       /// </history>
-      private void AddHitToList(System.IO.FileInfo file, int index)
+      private void AddHitToList(FileInfo file, int index)
       {
          if (lstFileNames.InvokeRequired)
          {
-            AddToListCallBack _delegate = new AddToListCallBack(AddHitToList);
+            AddToListCallBack _delegate = AddHitToList;
             lstFileNames.Invoke(_delegate, new object[2] {file, index});
             return;
          }
