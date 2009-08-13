@@ -115,7 +115,6 @@ namespace AstroGrep
       /// Replaces all the search option holders in the given text.
       /// </summary>
       /// <param name="text">Text containing holders</param>
-      /// <param name="spec">Grep Object containing options</param>
       /// <returns>Text with holders replaced</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created

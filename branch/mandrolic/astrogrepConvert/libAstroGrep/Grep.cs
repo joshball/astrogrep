@@ -46,7 +46,7 @@ namespace libAstroGrep
    /// [Curtis_Beard]		06/27/2007	CHG: removed message parameters for Complete/Cancel events
    /// [Andrew_Radford]     05/08/2008  CHG: Convert code to C# 3.5
    /// </history>
-   public class Grep
+    public class Grep 
    {
        private readonly List<String> __exclusionList = new List<String>();
        private Thread _thread;
@@ -99,19 +99,12 @@ namespace libAstroGrep
         /// <summary>The start (basr) search directory</summary>
        public string StartDirectory { get; set; }
 
-       /// <summary>The FileFilter</summary>
-       public string FileFilter { get; set; }
-
-       /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
+        /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
        public PluginCollection Plugins { get; set; }
 
-       /// <summary>Whether to skip hidden files and directories.</summary>
-       public bool SkipHiddenFiles { get; set; }
-
-       /// <summary>Whether to skip system files and directories.</summary>
-       public bool SkipSystemFiles { get; set; }
-
-       public ISearchSpec SearchSpec { get; private set; }
+       public IFileFilterSpec SearchSpec { get; private set; }
+      
+       public ISearchSpec FileFilterSpec { get; private set; }
 
        #endregion
 
