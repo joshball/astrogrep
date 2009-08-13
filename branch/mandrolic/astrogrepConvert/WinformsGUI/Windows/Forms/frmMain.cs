@@ -1529,14 +1529,14 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void LoadSearchSettings()
       {
-         chkRegularExpressions.Checked = AstroGrep.Core.SearchSettings.UseRegularExpressions;
-         chkCaseSensitive.Checked = AstroGrep.Core.SearchSettings.UseCaseSensitivity;
-         chkWholeWordOnly.Checked = AstroGrep.Core.SearchSettings.UseWholeWordMatching;
-         chkLineNumbers.Checked = AstroGrep.Core.SearchSettings.IncludeLineNumbers;
-         chkRecurse.Checked = AstroGrep.Core.SearchSettings.UseRecursion;
-         chkFileNamesOnly.Checked = AstroGrep.Core.SearchSettings.ReturnOnlyFileNames;
-         txtContextLines.Text = AstroGrep.Core.SearchSettings.ContextLines.ToString();
-         chkNegation.Checked = AstroGrep.Core.SearchSettings.UseNegation;
+         chkRegularExpressions.Checked = Core.SearchSettings.UseRegularExpressions;
+         chkCaseSensitive.Checked = Core.SearchSettings.UseCaseSensitivity;
+         chkWholeWordOnly.Checked = Core.SearchSettings.UseWholeWordMatching;
+         chkLineNumbers.Checked = Core.SearchSettings.IncludeLineNumbers;
+         chkRecurse.Checked = Core.SearchSettings.UseRecursion;
+         chkFileNamesOnly.Checked = Core.SearchSettings.ReturnOnlyFileNames;
+         txtContextLines.Text = Core.SearchSettings.ContextLines.ToString();
+         chkNegation.Checked = Core.SearchSettings.UseNegation;
       }
 
       /// <summary>
@@ -1547,16 +1547,16 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void SaveSearchSettings()
       {
-         AstroGrep.Core.SearchSettings.UseRegularExpressions = chkRegularExpressions.Checked;
-         AstroGrep.Core.SearchSettings.UseCaseSensitivity = chkCaseSensitive.Checked;
-         AstroGrep.Core.SearchSettings.UseWholeWordMatching = chkWholeWordOnly.Checked;
-         AstroGrep.Core.SearchSettings.IncludeLineNumbers = chkLineNumbers.Checked;
-         AstroGrep.Core.SearchSettings.UseRecursion = chkRecurse.Checked;
-         AstroGrep.Core.SearchSettings.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
-         AstroGrep.Core.SearchSettings.ContextLines = int.Parse(txtContextLines.Text);
-         AstroGrep.Core.SearchSettings.UseNegation = chkNegation.Checked;
+         Core.SearchSettings.UseRegularExpressions = chkRegularExpressions.Checked;
+         Core.SearchSettings.UseCaseSensitivity = chkCaseSensitive.Checked;
+         Core.SearchSettings.UseWholeWordMatching = chkWholeWordOnly.Checked;
+         Core.SearchSettings.IncludeLineNumbers = chkLineNumbers.Checked;
+         Core.SearchSettings.UseRecursion = chkRecurse.Checked;
+         Core.SearchSettings.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
+         Core.SearchSettings.ContextLines = int.Parse(txtContextLines.Text);
+         Core.SearchSettings.UseNegation = chkNegation.Checked;
 
-         AstroGrep.Core.SearchSettings.Save();
+         Core.SearchSettings.Save();
       }
 
       /// <summary>
@@ -1705,7 +1705,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   05/09/2007	CHG: check for a valid item
       /// [Ed_Jakubowski]	   05/26/2009	CHG: Added if Contains for testing combo item... this helps astrogrep run in mono 2.4
       /// </history>
-      private void AddComboSelection(System.Windows.Forms.ComboBox combo, string item)
+      private static void AddComboSelection(ComboBox combo, string item)
       {
          if (item.Length > 0)
          {
@@ -1720,7 +1720,7 @@ namespace AstroGrep.Windows.Forms
 
             // Only store as many paths as has been set in options.
             //if (combo.Items.Count > Common.NUM_STORED_PATHS)
-            if (combo.Items.Count > AstroGrep.Core.GeneralSettings.MaximumMRUPaths)
+            if (combo.Items.Count > Core.GeneralSettings.MaximumMRUPaths)
             {
                // Remove the last item in the list.
                combo.Items.RemoveAt(combo.Items.Count - 1);
@@ -1745,31 +1745,26 @@ namespace AstroGrep.Windows.Forms
       {
 	     if (hit.HitCount == 0)
 			 return;
-         string _textToSearch = string.Empty;
-         string _searchText = __Grep.SearchText;
-         int _index = 0;
-         string _tempLine = string.Empty;
+          string _searchText = __Grep.SearchSpec.SearchText;
+          string _tempLine;
 
-         string _begin = string.Empty;
-         string _text = string.Empty;
-         string _end = string.Empty;
-         int _pos = 0;
-         bool _highlight = false;
+          string _end;
 
-         // Clear the contents
+          // Clear the contents
          txtHits.Text = string.Empty;
-         txtHits.ForeColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-         txtHits.BackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+         txtHits.ForeColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+         txtHits.BackColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
 
-         if (__Grep.UseRegularExpressions)
+         if (__Grep.SearchSpec.UseRegularExpressions)
             HighlightTextRegEx(hit);
          else
          {
-            // Loop through hits and highlight search for text
-            for (_index = 0; _index < hit.LineCount; _index++)
+             // Loop through hits and highlight search for text
+             int _index = 0;
+             for (_index = 0; _index < hit.LineCount; _index++)
             {
                // Retrieve hit text
-               _textToSearch = hit.RetrieveLine(_index);
+               string _textToSearch = hit.RetrieveLine(_index);
 
                // Set default font
                txtHits.SelectionFont = new Font("Courier New", 9.75F, FontStyle.Regular);
@@ -1777,7 +1772,8 @@ namespace AstroGrep.Windows.Forms
                _tempLine = _textToSearch;
 
                // attempt to locate the text in the line
-               if (__Grep.UseCaseSensitivity)
+                int _pos = 0;
+                if (__Grep.SearchSpec.UseCaseSensitivity)
                   _pos = _tempLine.IndexOf(_searchText);
                else
                   _pos = _tempLine.ToLower().IndexOf(_searchText.ToLower());
@@ -1786,21 +1782,20 @@ namespace AstroGrep.Windows.Forms
                {
                   do
                   {
-                     _highlight = false;
-
-                     //
+                      //
                      // retrieve parts of text
-                     _begin = _tempLine.Substring(0, _pos);
-                     _text = _tempLine.Substring(_pos, _searchText.Length);
+                     string _begin = _tempLine.Substring(0, _pos);
+                     string _text = _tempLine.Substring(_pos, _searchText.Length);
                      _end = _tempLine.Substring(_pos + _searchText.Length);
 
                      // set default color for starting text
-                     txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+                     txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                      // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                      txtHits.SelectedText = _begin;
 
                      // do a check to see if begin and end are valid for wholeword searches
-                     if (__Grep.UseWholeWordMatching)
+                      bool _highlight;
+                      if (__Grep.SearchSpec.UseWholeWordMatching)
                         _highlight = Grep.WholeWordOnly(_begin, _end);
                      else
                         _highlight = true;
@@ -1808,13 +1803,13 @@ namespace AstroGrep.Windows.Forms
                      // set highlight color for searched text
                      if (_highlight)
                      {
-                        txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightForeColor);
+                        txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
                         // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                      }
                      txtHits.SelectedText = _text;
 
                      // Check remaining string for other hits in same line
-                     if (__Grep.UseCaseSensitivity)
+                     if (__Grep.SearchSpec.UseCaseSensitivity)
                         _pos = _end.IndexOf(_searchText);
                      else
                         _pos = _end.ToLower().IndexOf(_searchText.ToLower());
@@ -1859,7 +1854,7 @@ namespace AstroGrep.Windows.Forms
          int _index = 0;
          int _lastPos = 0;
          int _counter = 0;
-         Regex _regEx = new Regex(__Grep.SearchText);
+         Regex _regEx = new Regex(__Grep.SearchSpec.SearchText);
          MatchCollection _col;
          Match _item;
 
@@ -1873,24 +1868,24 @@ namespace AstroGrep.Windows.Forms
             txtHits.SelectionFont = new Font("Courier New", 9.75F, FontStyle.Regular);
 
             // find all reg ex matches in line
-            if (__Grep.UseCaseSensitivity && __Grep.UseWholeWordMatching)
+            if (__Grep.SearchSpec.UseCaseSensitivity && __Grep.SearchSpec.UseWholeWordMatching)
             {
-               _regEx = new Regex("\\b" + __Grep.SearchText + "\\b");
+                _regEx = new Regex("\\b" + __Grep.SearchSpec.SearchText + "\\b");
                _col = _regEx.Matches(_textToSearch);
             }
-            else if (__Grep.UseCaseSensitivity)
+            else if (__Grep.SearchSpec.UseCaseSensitivity)
             {
-               _regEx = new Regex(__Grep.SearchText);
+                _regEx = new Regex(__Grep.SearchSpec.SearchText);
                _col = _regEx.Matches(_textToSearch);
             }
-            else if (__Grep.UseWholeWordMatching)
+            else if (__Grep.SearchSpec.UseWholeWordMatching)
             {
-               _regEx = new Regex("\\b" + __Grep.SearchText + "\\b", RegexOptions.IgnoreCase);
+                _regEx = new Regex("\\b" + __Grep.SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
                _col = _regEx.Matches(_textToSearch);
             }
             else
             {
-               _regEx = new Regex(__Grep.SearchText, RegexOptions.IgnoreCase);
+                _regEx = new Regex(__Grep.SearchSpec.SearchText, RegexOptions.IgnoreCase);
                _col = _regEx.Matches(_textToSearch);
             }
 
@@ -1901,7 +1896,7 @@ namespace AstroGrep.Windows.Forms
                _item = _col[_counter];
 
                // set the start text
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
 
                // check for empty string to prevent assigning nothing to selection text preventing
@@ -1911,12 +1906,12 @@ namespace AstroGrep.Windows.Forms
                   txtHits.SelectedText = _tempString;
 
                // set the hit text
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                txtHits.SelectedText = _textToSearch.Substring(_item.Index, _item.Length);
 
                // set the end text
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                if (_counter + 1 >= _col.Count)
                {
@@ -1935,7 +1930,7 @@ namespace AstroGrep.Windows.Forms
             if (_col.Count == 0)
             {
                //  no match, just a context line
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                txtHits.SelectedText = _textToSearch;
             }
@@ -2189,25 +2184,25 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void SaveResultsAsHTML(string path)
       {
-         System.IO.StreamWriter writer = null;
+         StreamWriter writer = null;
 
          try
          {
             SetStatusBarMessage(string.Format(Language.GetGenericText("SaveSaving"), path));
 
             // Open the file
-            writer = new System.IO.StreamWriter(path, false, System.Text.Encoding.Default);
+            writer = new StreamWriter(path, false, System.Text.Encoding.Default);
 
             string repeat = string.Empty;
             string repeatSection;
-            System.Text.StringBuilder allSections = new System.Text.StringBuilder();
+            var allSections = new System.Text.StringBuilder();
             string repeater;
-            System.Text.StringBuilder lines = new System.Text.StringBuilder();
+            var lines = new System.Text.StringBuilder();
             string template = HTMLHelper.GetContents("Output.html");
             string css = HTMLHelper.GetContents("Output.css");
             int totalHits = 0;
 
-            if (__Grep.ReturnOnlyFileNames)
+            if (__Grep.SearchSpec.ReturnOnlyFileNames)
                template = HTMLHelper.GetContents("Output-fileNameOnly.html");
 
             css = HTMLHelper.ReplaceCssHolders(css);
@@ -2252,7 +2247,7 @@ namespace AstroGrep.Windows.Forms
          }
          catch (Exception ex)
          {
-            MessageBox.Show(string.Format(Language.GetGenericText("SaveError"), ex.ToString()), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(string.Format(Language.GetGenericText("SaveError"), ex), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
          finally
          {
@@ -2294,15 +2289,15 @@ namespace AstroGrep.Windows.Forms
             writer.WriteStartElement("options");
             writer.WriteElementString("searchPath", __Grep.StartDirectory);
             writer.WriteElementString("fileTypes", __Grep.FileFilter);
-            writer.WriteElementString("searchText", __Grep.SearchText);
-            writer.WriteElementString("regularExpressions", __Grep.UseRegularExpressions.ToString());
-            writer.WriteElementString("caseSensitive", __Grep.UseCaseSensitivity.ToString());
-            writer.WriteElementString("wholeWord", __Grep.UseWholeWordMatching.ToString());
-            writer.WriteElementString("recurse", __Grep.SearchInSubfolders.ToString());
-            writer.WriteElementString("showFileNamesOnly", __Grep.ReturnOnlyFileNames.ToString());
-            writer.WriteElementString("negation", __Grep.UseNegation.ToString());
-            writer.WriteElementString("lineNumbers", __Grep.IncludeLineNumbers.ToString());
-            writer.WriteElementString("contextLines", __Grep.ContextLines.ToString());
+            writer.WriteElementString("searchText", __Grep.SearchSpec.SearchText);
+            writer.WriteElementString("regularExpressions", __Grep.SearchSpec.UseRegularExpressions.ToString());
+            writer.WriteElementString("caseSensitive", __Grep.SearchSpec.UseCaseSensitivity.ToString());
+            writer.WriteElementString("wholeWord", __Grep.SearchSpec.UseWholeWordMatching.ToString());
+            writer.WriteElementString("recurse", __Grep.SearchSpec.SearchInSubfolders.ToString());
+            writer.WriteElementString("showFileNamesOnly", __Grep.SearchSpec.ReturnOnlyFileNames.ToString());
+            writer.WriteElementString("negation", __Grep.SearchSpec.UseNegation.ToString());
+            writer.WriteElementString("lineNumbers", __Grep.SearchSpec.IncludeLineNumbers.ToString());
+            writer.WriteElementString("contextLines", __Grep.SearchSpec.ContextLines.ToString());
             writer.WriteEndElement();
 
             writer.WriteStartElement("search");
@@ -2995,13 +2990,12 @@ namespace AstroGrep.Windows.Forms
       {
          string _path;
          string _fileName;
-         string _expression;
 
-         try
+          try
          {
             _fileName = cboFileName.Text;
             _path = cboFilePath.Text.Trim();
-            _expression = cboSearchForText.Text;
+            string _expression = cboSearchForText.Text;
 
             // update combo selections
             AddComboSelection(cboSearchForText, _expression);
@@ -3009,11 +3003,11 @@ namespace AstroGrep.Windows.Forms
             AddComboSelection(cboFilePath, _path);
 
             // Ensure that there is a backslash.
-            if (!_path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-               _path += System.IO.Path.DirectorySeparatorChar.ToString();
+            if (!_path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+               _path += Path.DirectorySeparatorChar.ToString();
 
             // update path and fileName if fileName has a path in it
-            int slashPos = _fileName.LastIndexOf(System.IO.Path.DirectorySeparatorChar.ToString());
+            int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
 				if (slashPos > -1)
 				{
 					// fileName has a slash, so append the directory and get the file filter
@@ -3032,12 +3026,16 @@ namespace AstroGrep.Windows.Forms
             // Clear search errors
             __ErrorCollection.Clear();
 
-            // begin searching
-            __Grep = new Grep();
-            SetGrepOptions();
+            __Grep = new Grep(GetSearchSpecFromUI());
+
+            string[] extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
+            foreach (string ext in extensions)
+                __Grep.AddExclusionExtension(ext.ToLower());
+
+            __Grep.Plugins = Core.PluginManager.Items;
+
             __Grep.StartDirectory = _path;
             __Grep.FileFilter = _fileName;
-            __Grep.SearchText = _expression;
 
             // attach events
             __Grep.FileHit += ReceiveFileHit;
@@ -3066,7 +3064,7 @@ namespace AstroGrep.Windows.Forms
       {
          if (lstFileNames.InvokeRequired)
          {
-            ClearItemsCallBack _delegate = new ClearItemsCallBack(ClearItems);
+            ClearItemsCallBack _delegate = ClearItems;
             lstFileNames.Invoke(_delegate);
             return;
          }
@@ -3074,33 +3072,43 @@ namespace AstroGrep.Windows.Forms
          lstFileNames.Items.Clear();
       }
 
+    // todo: move or replace me
+    struct SearchSpec : ISearchSpec
+    {
+        public bool SearchInSubfolders { get;  set; }
+        public bool UseRegularExpressions { get;  set; }
+        public bool UseCaseSensitivity { get;  set; }
+        public bool UseWholeWordMatching { get;  set; }
+        public bool UseNegation { get;  set; }
+        public int ContextLines { get;  set; }
+        public string SearchText { get;  set; }
+        public bool ReturnOnlyFileNames { get;  set; }
+        public bool IncludeLineNumbers { get;  set; }
+    }
+
+
       /// <summary>
       /// Sets the grep options
       /// </summary>
       /// <history>
       /// [Curtis_Beard]		10/17/2005	Created
       /// [Curtis_Beard]		07/28/2006  ADD: extension exclusion list
+      /// [Andrew_Radford]		13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
       /// </history>
-      private void SetGrepOptions()
+      private ISearchSpec GetSearchSpecFromUI()
       {
-         if (__Grep != null)
-         {
-            // set values from user selected search options
-            __Grep.UseCaseSensitivity = chkCaseSensitive.Checked;
-            __Grep.ContextLines = Convert.ToInt32(txtContextLines.Value);
-            __Grep.IncludeLineNumbers = chkLineNumbers.Checked;
-            __Grep.UseNegation = chkNegation.Checked;
-            __Grep.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
-            __Grep.SearchInSubfolders = chkRecurse.Checked;
-            __Grep.UseRegularExpressions = chkRegularExpressions.Checked;
-            __Grep.UseWholeWordMatching = chkWholeWordOnly.Checked;
-
-            string[] extensions = AstroGrep.Core.GeneralSettings.ExtensionExcludeList.Split(';');
-            foreach (string ext in extensions)
-               __Grep.AddExclusionExtension(ext.ToLower());
-
-            __Grep.Plugins = Core.PluginManager.Items;
-         }
+          return new SearchSpec
+                        {
+                            UseCaseSensitivity = chkCaseSensitive.Checked,
+                            ContextLines = Convert.ToInt32(txtContextLines.Value),
+                            IncludeLineNumbers = chkLineNumbers.Checked,
+                            UseNegation = chkNegation.Checked,
+                            ReturnOnlyFileNames = chkFileNamesOnly.Checked,
+                            SearchInSubfolders = chkRecurse.Checked,
+                            UseRegularExpressions = chkRegularExpressions.Checked,
+                            UseWholeWordMatching = chkWholeWordOnly.Checked,
+                            SearchText = cboSearchForText.Text
+                        };  
       }
 
       /// <summary>
@@ -3123,10 +3131,8 @@ namespace AstroGrep.Windows.Forms
             return;
          }
 
-         ListViewItem _listItem;
-
-         // Create the list item
-         _listItem = new ListViewItem(file.Name);
+          // Create the list item
+         var _listItem = new ListViewItem(file.Name);
          _listItem.SubItems.Add(file.DirectoryName);
          _listItem.SubItems.Add(file.LastWriteTime.ToString());
          _listItem.SubItems.Add("0");

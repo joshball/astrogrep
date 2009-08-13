@@ -57,20 +57,18 @@ namespace libAstroGrep.Plugin
       /// Method that performs grep.
       /// </summary>
       /// <param name="file">FileInfo containing current file</param>
-      /// <param name="searchText">Text to grep</param>
       /// <param name="ex">Contains an Exception if one occurred</param>
       /// <returns>HitObject containing valid hit</returns>
-      HitObject Grep(System.IO.FileInfo file, string searchText, ISearchSpec searchProperties, ref Exception ex);
+      HitObject Grep(System.IO.FileInfo file, ISearchSpec searchSpec, ref Exception ex);
 
       /// <summary>
       /// Method that performs grep.
       /// </summary>
       /// <param name="path">Fully qualified file path</param>
-      /// <param name="searchText">Text to grep</param>
       /// <param name="searchProperties"></param>
       /// <param name="ex">Contains an Exception if one occurred</param>
       /// <returns>HitObject containing valid hit</returns>
-      HitObject Grep(string path, string searchText, ISearchSpec searchProperties ,ref Exception ex);
+      HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex);
 
      
 

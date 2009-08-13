@@ -160,7 +160,9 @@ namespace Plugin.MicrosoftWord
 			get { return PLUGIN_EXTENSIONS; }
 		}
 
-	 
+
+	
+
 	    /// <summary>
 		/// Checks to see if the plugin is available on this system.
 		/// </summary>
@@ -285,21 +287,20 @@ namespace Plugin.MicrosoftWord
 
 	  
 
+
 	    /// <summary>
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="file">FileInfo object</param>
-		/// <param name="searchText">Text to locate</param>
-		/// <param name="searchProperties"></param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null if on error</returns>
 		/// <history>
 		/// [Curtis_Beard]      07/28/2006  Created
 		/// [Curtis_Beard]      05/25/2007  ADD: support for Exception object
 		/// </history>
-        public HitObject Grep(FileInfo file, string searchText, ISearchSpec searchProperties, ref Exception ex)		
+        public HitObject Grep(FileInfo file, ISearchSpec searchSpec, ref Exception ex)
 		{
-			return Grep(file.FullName, searchText, searchProperties, ref ex);
+			return Grep(file.FullName, searchSpec, ref ex);
 		}
 
 
@@ -308,15 +309,13 @@ namespace Plugin.MicrosoftWord
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="path">Fully qualified file path</param>
-		/// <param name="searchText">Text to locate</param>
-		/// <param name="searchProperties"></param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null on error</returns>
 		/// <history>
 		/// [Curtis_Beard]      07/28/2006  Created
 		/// [Curtis_Beard]      05/25/2007  ADD: support for Exception object
 		/// </history>
-        public HitObject Grep(string path, string searchText, ISearchSpec searchProperties, ref Exception ex)
+        public HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex)
 		{
 			// initialize Exception object to null
 			ex = null;
@@ -335,7 +334,7 @@ namespace Plugin.MicrosoftWord
 						string _spacer = new string(' ', MARGINSIZE);
 						string _contextSpacer = string.Empty;
 
-						if (searchProperties.ContextLines > 0)
+                        if (searchSpec.ContextLines > 0)
 						{
 							_contextSpacer = new string(' ', MARGINSIZE);
 							_spacer = _contextSpacer.Substring(_contextSpacer.Length - MARGINSIZE - 2) + "> ";
@@ -357,9 +356,9 @@ namespace Plugin.MicrosoftWord
 						// setup find
 						RunRoutine(find, "ClearFormatting", null);
 						SetProperty(find, "Forward", true);
-						SetProperty(find, "Text", searchText);
-						SetProperty(find, "MatchWholeWord", searchProperties.UseWholeWordMatching);
-						SetProperty(find, "MatchCase", searchProperties.UseCaseSensitivity);
+                        SetProperty(find, "Text", searchSpec.SearchText);
+                        SetProperty(find, "MatchWholeWord", searchSpec.UseWholeWordMatching);
+                        SetProperty(find, "MatchCase", searchSpec.UseCaseSensitivity);
 
 						// start find
 						FindExecute(find);
@@ -376,7 +375,7 @@ namespace Plugin.MicrosoftWord
 							}
 
 							// since a hit was found and only displaying file names, quickly exit
-							if (searchProperties.ReturnOnlyFileNames)
+                            if (searchSpec.ReturnOnlyFileNames)
 								break;
 
 							// retrieve find information
@@ -390,7 +389,7 @@ namespace Plugin.MicrosoftWord
 							if (!(prevLine == lineNum && prevPage == pageNum))
 							{
 								// check for line numbers
-								if (searchProperties.IncludeLineNumbers)
+                                if (searchSpec.IncludeLineNumbers)
 								{
 									// setup line header
 									_spacer = "(" + string.Format("{0},{1}", lineNum, pageNum);

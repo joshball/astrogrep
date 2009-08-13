@@ -1,3 +1,5 @@
+using System;
+
 namespace libAstroGrep
 {
     public interface ISearchSpec
@@ -29,4 +31,6 @@ namespace libAstroGrep
         /// <summary>Sets including line numbers as part of a line</summary>
         bool IncludeLineNumbers { get; }
     }
+
+   
 }
