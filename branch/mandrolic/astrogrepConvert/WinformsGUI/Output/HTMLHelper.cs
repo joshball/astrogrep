@@ -123,7 +123,7 @@ namespace AstroGrep
       {
          var spec = grep.SearchSpec;
 
-         text = text.Replace("%%filetypes%%", "File Types: " + grep.FileFilter);
+         text = text.Replace("%%filetypes%%", "File Types: " + grep.FileFilterSpec.FileFilter);
          text = text.Replace("%%regex%%", "Regular Expressions: " + spec.UseRegularExpressions);
          text = text.Replace("%%casesen%%", "Case Sensitive: " + spec.UseCaseSensitivity);
          text = text.Replace("%%wholeword%%", "Whole Word: " + spec.UseWholeWordMatching);

@@ -102,9 +102,9 @@ namespace libAstroGrep
         /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
        public PluginCollection Plugins { get; set; }
 
-       public IFileFilterSpec SearchSpec { get; private set; }
-      
-       public ISearchSpec FileFilterSpec { get; private set; }
+       public IFileFilterSpec FileFilterSpec { get; private set; }
+
+       public ISearchSpec SearchSpec { get; private set; }
 
        #endregion
 
@@ -113,11 +113,12 @@ namespace libAstroGrep
       /// </summary>
       /// <history>
       /// [Curtis_Beard]		07/12/2006	Created
-      /// [Andrew_Radford]      13/08/2009  Added Const. dependency on ISearchSpec
+      /// [Andrew_Radford]      13/08/2009  Added Const. dependency on ISearchSpec, IFileFilterSpec
       /// </history>
-      public Grep(ISearchSpec searchSpec)
+      public Grep(ISearchSpec searchSpec, IFileFilterSpec filterSpec)
       {
           SearchSpec = searchSpec;
+          FileFilterSpec = filterSpec;
           Greps = new List<HitObject>();
       }
 
@@ -160,14 +161,11 @@ namespace libAstroGrep
       /// </history>
       public void Execute()
       {
-         var _filters = new List<string>(FileFilter.Split(char.Parse(",")));
-
-         if (_filters.Count > 0)
-             _filters.Add(FileFilter);
-
-        // have to grep for each filter separately
-         foreach (var _filter in _filters)
-             Execute(new DirectoryInfo(StartDirectory), null, _filter);
+          if (string.IsNullOrEmpty(FileFilterSpec.FileFilter))
+              Execute(new DirectoryInfo(StartDirectory), null, null);
+          else
+              foreach (var _filter in FileFilterSpec.FileFilter.Split(char.Parse(",")))
+                  Execute(new DirectoryInfo(StartDirectory), null, _filter);
       }
 
       /// <summary>
@@ -291,9 +289,9 @@ namespace libAstroGrep
          {
             try
             {
-               if (SkipSystemFiles && (SourceFile.Attributes & FileAttributes.System) == FileAttributes.System)
+               if (FileFilterSpec.SkipSystemFiles && (SourceFile.Attributes & FileAttributes.System) == FileAttributes.System)
                   continue;
-               if (SkipHiddenFiles && (SourceFile.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+               if (FileFilterSpec.SkipHiddenFiles && (SourceFile.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                   continue;
 
                if (!__exclusionList.Contains(SourceFile.Extension.ToLower()))
@@ -329,9 +327,9 @@ namespace libAstroGrep
             {
                try
                {
-                  if (SkipSystemFiles && (sourceSubDirectory.Attributes & FileAttributes.System) == FileAttributes.System)
+                   if (FileFilterSpec.SkipSystemFiles && (sourceSubDirectory.Attributes & FileAttributes.System) == FileAttributes.System)
                      continue;
-                  if (SkipHiddenFiles && (sourceSubDirectory.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                   if (FileFilterSpec.SkipHiddenFiles && (sourceSubDirectory.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                      continue;
 
                   Execute(sourceSubDirectory, sourceDirectoryFilter, sourceFileFilter);

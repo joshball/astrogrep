@@ -2288,7 +2288,7 @@ namespace AstroGrep.Windows.Forms
             // write out search options
             writer.WriteStartElement("options");
             writer.WriteElementString("searchPath", __Grep.StartDirectory);
-            writer.WriteElementString("fileTypes", __Grep.FileFilter);
+            writer.WriteElementString("fileTypes", __Grep.FileFilterSpec.FileFilter);
             writer.WriteElementString("searchText", __Grep.SearchSpec.SearchText);
             writer.WriteElementString("regularExpressions", __Grep.SearchSpec.UseRegularExpressions.ToString());
             writer.WriteElementString("caseSensitive", __Grep.SearchSpec.UseCaseSensitivity.ToString());
@@ -3026,7 +3026,7 @@ namespace AstroGrep.Windows.Forms
             // Clear search errors
             __ErrorCollection.Clear();
 
-            __Grep = new Grep(GetSearchSpecFromUI());
+            __Grep = new Grep(GetSearchSpecFromUI(),GetFilterSpecFromUI());
 
             string[] extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
             foreach (string ext in extensions)
@@ -3035,7 +3035,6 @@ namespace AstroGrep.Windows.Forms
             __Grep.Plugins = Core.PluginManager.Items;
 
             __Grep.StartDirectory = _path;
-            __Grep.FileFilter = _fileName;
 
             // attach events
             __Grep.FileHit += ReceiveFileHit;
@@ -3087,7 +3086,37 @@ namespace AstroGrep.Windows.Forms
     }
 
 
-      /// <summary>
+    // todo: move or replace me
+    struct FileFilterSpec : IFileFilterSpec
+    {
+        public string FileFilter { get;  set; }
+        public bool SkipHiddenFiles { get;  set; }
+        public bool SkipSystemFiles { get;  set; }
+        public DateTime DateModifiedStare { get;  set; }
+        public DateTime DateModifiedEnd { get;  set; }
+        public int FileSizeMin { get;  set; }
+        public int FileSizeMax { get;  set; }
+        public string FileNameRegex { get;  set; }
+    }
+
+
+         private IFileFilterSpec GetFilterSpecFromUI()
+         {
+             return new FileFilterSpec
+                        {
+                            FileFilter = null,
+                            SkipHiddenFiles = false,
+                            SkipSystemFiles = false,
+                            DateModifiedStare = DateTime.MinValue,
+                            DateModifiedEnd = DateTime.MaxValue,
+                            FileSizeMin = 0,
+                            FileSizeMax = int.MaxValue,
+                            FileNameRegex = null
+                        };
+         }
+
+
+       /// <summary>
       /// Sets the grep options
       /// </summary>
       /// <history>
