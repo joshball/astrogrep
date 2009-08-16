@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Grep.cs" />
     <Compile Include="HitObject.cs" />
+    <Compile Include="IFileFilterSpec.cs" />
     <Compile Include="ISearchSpec.cs" />
     <Compile Include="Plugin\IAstroGrepPlugin.cs" />
     <Compile Include="Plugin\PluginCollection.cs" />
