@@ -137,17 +137,29 @@
     <Compile Include="Windows\Forms\frmAbout.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Forms\frmAbout.Designer.cs">
+      <DependentUpon>frmAbout.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Forms\frmAddEditTextEditor.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Forms\frmAddEditTextEditor.Designer.cs">
+      <DependentUpon>frmAddEditTextEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Forms\frmMain.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\Forms\frmOptions.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\Forms\frmPrint.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmPrint.Designer.cs">
+      <DependentUpon>frmPrint.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\Language.cs">
       <SubType>Code</SubType>
