@@ -289,11 +289,10 @@ namespace libAstroGrep
          {
             try
             {
-               if (FileFilterSpec.SkipSystemFiles && (SourceFile.Attributes & FileAttributes.System) == FileAttributes.System)
-                  continue;
-               if (FileFilterSpec.SkipHiddenFiles && (SourceFile.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                  continue;
+               if (ShouldFiterOut(SourceFile,FileFilterSpec))
+                    continue;
 
+              
                if (!__exclusionList.Contains(SourceFile.Extension.ToLower()))
 			   {
                     // return a 'file hit' if the search text is empty
@@ -342,7 +341,36 @@ namespace libAstroGrep
          }
       }
 
-      /// <summary>
+        /// <summary>
+        /// Return true if the file does not pass the fileFilterSpec, i.e should be skipped
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="fileFilterSpec"></param>
+        /// <returns></returns>
+        private static bool ShouldFiterOut(FileInfo file, IFileFilterSpec fileFilterSpec)
+        {
+            if (fileFilterSpec.SkipSystemFiles && (file.Attributes & FileAttributes.System) == FileAttributes.System)
+                return true;
+            if (fileFilterSpec.SkipHiddenFiles && (file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                return true;
+
+            if (file.LastAccessTime < fileFilterSpec.DateModifiedStare)
+                return true;
+
+            if (file.LastAccessTime > fileFilterSpec.DateModifiedEnd)
+                return true;
+
+            if (file.Length < fileFilterSpec.FileSizeMin)
+                return true;
+
+            if (file.Length > fileFilterSpec.FileSizeMax)
+                return true;
+
+            return false;
+
+        }
+
+        /// <summary>
       /// Search a given file for the searchText.
       /// </summary>
       /// <param name="file">FileInfo object for file to search for searchText</param>

@@ -2411,11 +2411,11 @@ namespace AstroGrep.Windows.Forms
                             FileFilter = null,
                             SkipHiddenFiles = chkHiddenFiles.Checked,
                             SkipSystemFiles = chkSystemFiles.Checked,
-                            DateModifiedStare = DateTime.MinValue,
-                            DateModifiedEnd = DateTime.MaxValue,
-                            FileSizeMin = 0,
-                            FileSizeMax = int.MaxValue,
-                            FileNameRegex = null
+                            DateModifiedStare = dateModBegin.Value,
+                            DateModifiedEnd = dateModEnd.Value,
+                            FileSizeMin = int.Parse(txtMinSize.Text),
+                            FileSizeMax = int.Parse(txtMaxSize.Text),
+                            FileNameRegex = txtFilenameRegex.Text
                         };
          }
 
