@@ -142,6 +142,7 @@ namespace libAstroGrep
       /// <history>
       /// [Curtis_Beard]		07/12/2006	Created
       /// </history>
+      /// Todo: do a kill signal to stop the exception
       public void Abort()
       {
          if (_thread != null)
@@ -354,10 +355,10 @@ namespace libAstroGrep
             if (fileFilterSpec.SkipHiddenFiles && (file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                 return true;
 
-            if (file.LastAccessTime < fileFilterSpec.DateModifiedStare)
+            if (file.LastWriteTime < fileFilterSpec.DateModifiedStare)
                 return true;
 
-            if (file.LastAccessTime > fileFilterSpec.DateModifiedEnd)
+            if (file.LastWriteTime > fileFilterSpec.DateModifiedEnd)
                 return true;
 
             if (file.Length < fileFilterSpec.FileSizeMin)

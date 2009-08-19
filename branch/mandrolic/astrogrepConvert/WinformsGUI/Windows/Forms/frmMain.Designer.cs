@@ -78,8 +78,9 @@ private Label label3;
 private TextBox txtMaxSize;
 private TextBox txtFilenameRegex;
 private Label label5;
+	    private string __FilterOptionsText = "Filter Options {0}";
 
-		private void InitializeComponent()
+	    private void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));

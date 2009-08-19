@@ -45,8 +45,7 @@ namespace AstroGrep.Windows.Forms
       private int __SortColumn = -1;
       private Grep __Grep = null;
       private string __SearchOptionsText = "Search Options {0}";
-      private string __FilterOptionsText = "Filter Options {0}";
-      private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
+       private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
       private readonly System.Collections.Specialized.StringCollection __ErrorCollection = new System.Collections.Specialized.StringCollection();
       #endregion
 
@@ -61,6 +60,8 @@ namespace AstroGrep.Windows.Forms
 
         
       private System.ComponentModel.IContainer components;
+
+        // TODO: Add size to the hit list
 
       /// <summary>
       /// Creates an instance of the frmMain class.
@@ -595,7 +596,7 @@ namespace AstroGrep.Windows.Forms
          ListViewItemComparer comparer;
 
          // set comparer for integer types if the count column, otherwise try date/string
-         if (e.Column == Constants.COLUMN_INDEX_COUNT)
+         if (e.Column == Constants.COLUMN_INDEX_COUNT || e.Column == Constants.COLUMN_INDEX_SIZE)
             comparer = new ListViewItemComparer(e.Column, lstFileNames.Sorting, true);
          else
             comparer = new ListViewItemComparer(e.Column, lstFileNames.Sorting);
@@ -915,15 +916,22 @@ namespace AstroGrep.Windows.Forms
       {
          if (lstFileNames.Columns.Count == 0)
          {
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnFile"), AstroGrep.Core.GeneralSettings.WindowFileColumnNameWidth, HorizontalAlignment.Left);
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnLocation"), AstroGrep.Core.GeneralSettings.WindowFileColumnLocationWidth, HorizontalAlignment.Left);
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnDate"), AstroGrep.Core.GeneralSettings.WindowFileColumnDateWidth, HorizontalAlignment.Left);
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnCount"), AstroGrep.Core.GeneralSettings.WindowFileColumnCountWidth, HorizontalAlignment.Left);
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnFile"), Core.GeneralSettings.WindowFileColumnNameWidth, HorizontalAlignment.Left);
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnLocation"), Core.GeneralSettings.WindowFileColumnLocationWidth, HorizontalAlignment.Left);
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnDate"), Core.GeneralSettings.WindowFileColumnDateWidth, HorizontalAlignment.Left);
+
+             // Todo: langage and width setting
+            lstFileNames.Columns.Add("Size", 80, HorizontalAlignment.Left);
+
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnCount"), Core.GeneralSettings.WindowFileColumnCountWidth, HorizontalAlignment.Left);
          }
          else
          {
             lstFileNames.Columns[Constants.COLUMN_INDEX_FILE].Text = Language.GetGenericText("ResultsColumnFile");
             lstFileNames.Columns[Constants.COLUMN_INDEX_DIRECTORY].Text = Language.GetGenericText("ResultsColumnLocation");
+             // Todo: internationalize
+             lstFileNames.Columns[Constants.COLUMN_INDEX_SIZE].Text = "Size";
+
             lstFileNames.Columns[Constants.COLUMN_INDEX_DATE].Text = Language.GetGenericText("ResultsColumnDate");
             lstFileNames.Columns[Constants.COLUMN_INDEX_COUNT].Text = Language.GetGenericText("ResultsColumnCount");
          }
@@ -2406,17 +2414,22 @@ namespace AstroGrep.Windows.Forms
 
          private IFileFilterSpec GetFilterSpecFromUI()
          {
-             return new FileFilterSpec
+             var spec= new FileFilterSpec
                         {
                             FileFilter = null,
+                            FileNameRegex = txtFilenameRegex.Text,
                             SkipHiddenFiles = chkHiddenFiles.Checked,
                             SkipSystemFiles = chkSystemFiles.Checked,
                             DateModifiedStare = dateModBegin.Value,
                             DateModifiedEnd = dateModEnd.Value,
-                            FileSizeMin = int.Parse(txtMinSize.Text),
-                            FileSizeMax = int.Parse(txtMaxSize.Text),
-                            FileNameRegex = txtFilenameRegex.Text
                         };
+
+             int size;
+
+             spec.FileSizeMin = int.TryParse(txtMinSize.Text, out size) ? size : int.MinValue;
+             spec.FileSizeMax = int.TryParse(txtMaxSize.Text, out size) ? size : int.MaxValue;
+
+             return spec;
          }
 
 
@@ -2468,6 +2481,7 @@ namespace AstroGrep.Windows.Forms
          var _listItem = new ListViewItem(file.Name);
          _listItem.SubItems.Add(file.DirectoryName);
          _listItem.SubItems.Add(file.LastWriteTime.ToString());
+         _listItem.SubItems.Add(file.Length.ToString());
          _listItem.SubItems.Add("0");
          // must be last
          _listItem.SubItems.Add(index.ToString());
