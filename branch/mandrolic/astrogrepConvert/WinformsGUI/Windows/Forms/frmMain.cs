@@ -38,6 +38,11 @@ namespace AstroGrep.Windows.Forms
    /// [Curtis_Beard]      10/15/2005	CHG: Replace search procedures
    /// [Andrew_Radford]    17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
    /// </history>
+   /// TODO:
+   /// * Change main hit list control to a databound grid
+   /// * Extract export code
+   /// * Change export code to produce output using xslt
+   /// * Create XML from a grep report object which is XML serializable
 	public partial class frmMain : Form
 	{
       #region Declarations
@@ -2417,9 +2422,9 @@ namespace AstroGrep.Windows.Forms
              var spec= new FileFilterSpec
                         {
                             FileFilter = null,
+                            SkipHiddenFiles = false,
+                            SkipSystemFiles = false,
                             FileNameRegex = txtFilenameRegex.Text,
-                            SkipHiddenFiles = chkHiddenFiles.Checked,
-                            SkipSystemFiles = chkSystemFiles.Checked,
                             DateModifiedStare = dateModBegin.Value,
                             DateModifiedEnd = dateModEnd.Value,
                         };
