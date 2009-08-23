@@ -238,7 +238,6 @@ private Label label5;
             this.label4.Size = new System.Drawing.Size(53, 13);
             this.label4.TabIndex = 20;
             this.label4.Text = "Max Size:";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // txtMinSize
             // 
@@ -287,6 +286,7 @@ private Label label5;
             this.dateModBegin.Name = "dateModBegin";
             this.dateModBegin.Size = new System.Drawing.Size(132, 20);
             this.dateModBegin.TabIndex = 14;
+            this.dateModBegin.Value = new System.DateTime(1753, 1, 1, 0, 0, 0, 0);
             // 
             // lblContextLines
             // 

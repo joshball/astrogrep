@@ -367,6 +367,14 @@ namespace libAstroGrep
             if (file.Length > fileFilterSpec.FileSizeMax)
                 return true;
 
+            if (string.IsNullOrEmpty(fileFilterSpec.FileNameRegex)==false)
+            {
+                var regularExp = new Regex(fileFilterSpec.FileNameRegex);
+
+                if (regularExp.IsMatch(file.FullName)==false)
+                    return true;
+            }
+
             return false;
 
         }
@@ -425,10 +433,8 @@ namespace libAstroGrep
                   if (Plugins[i].Enabled && Plugins[i].Plugin.IsAvailable)
                   {
                      // detect if plugin supports extension
-                     bool isFound = IsInList(file.Extension, Plugins[i].Plugin.Extensions, ',');
-                     
                      // if extension not supported try another plugin
-                     if (!isFound)
+                      if (!IsInList(file.Extension, Plugins[i].Plugin.Extensions, ','))
                         continue;
 
                      Exception pluginEx = null;
@@ -442,7 +448,6 @@ namespace libAstroGrep
                      // if the plugin processed successfully
                      if (pluginEx == null)
                      {
-                        // check for a hit
                         if (_grepHit != null)
                         {
                            // only perform is not using negation
@@ -496,216 +501,214 @@ namespace libAstroGrep
 
                if (textLine == null)
                   break;
-               else
-               {
-                  _lineNumber += 1;
+               
+                _lineNumber += 1;
 
-                   int _posInStr;
-                   if (SearchSpec.UseRegularExpressions)
-                  {
-                     _posInStr = -1;
-                     if (textLine.Length > 0)
-                     {
-                         if (SearchSpec.UseCaseSensitivity && SearchSpec.UseWholeWordMatching)
+                int _posInStr;
+                if (SearchSpec.UseRegularExpressions)
+                {
+                    _posInStr = -1;
+                    if (textLine.Length > 0)
+                    {
+                        if (SearchSpec.UseCaseSensitivity && SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b");
-                           _regularExpCol = _regularExp.Matches(textLine);
+                            _regularExp = new Regex("\\b" + searchText + "\\b");
+                            _regularExpCol = _regularExp.Matches(textLine);
                         }
                         else if (SearchSpec.UseCaseSensitivity)
                         {
-                           _regularExp = new Regex(searchText);
-                           _regularExpCol = _regularExp.Matches(textLine);
+                            _regularExp = new Regex(searchText);
+                            _regularExpCol = _regularExp.Matches(textLine);
                         }
                         else if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b", RegexOptions.IgnoreCase);
-                           _regularExpCol = _regularExp.Matches(textLine);
+                            _regularExp = new Regex("\\b" + searchText + "\\b", RegexOptions.IgnoreCase);
+                            _regularExpCol = _regularExp.Matches(textLine);
                         }
                         else
                         {
-                           _regularExp = new Regex(searchText, RegexOptions.IgnoreCase);
-                           _regularExpCol = _regularExp.Matches(textLine);
+                            _regularExp = new Regex(searchText, RegexOptions.IgnoreCase);
+                            _regularExpCol = _regularExp.Matches(textLine);
                         }
 
                         if (_regularExpCol.Count > 0)
                         {
                             if (SearchSpec.UseNegation)
-                              _hitOccurred = true;
+                                _hitOccurred = true;
 
-                           _posInStr = 1;
+                            _posInStr = 1;
                         }
-                     }
-                  }
-                  else
-                  {
-                      if (SearchSpec.UseCaseSensitivity)
+                    }
+                }
+                else
+                {
+                    if (SearchSpec.UseCaseSensitivity)
 
                         // Need to escape these characters in SearchText:
                         // < $ + * [ { ( ) .
                         // with a preceeding \
 
                         // If we are looking for whole worlds only, perform the check.
-                         if (SearchSpec.UseWholeWordMatching)
+                        if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b");
-                           if (_regularExp.IsMatch(textLine))
-                           {
-                               if (SearchSpec.UseNegation)
-                                 _hitOccurred = true;
+                            _regularExp = new Regex("\\b" + searchText + "\\b");
+                            if (_regularExp.IsMatch(textLine))
+                            {
+                                if (SearchSpec.UseNegation)
+                                    _hitOccurred = true;
 
-                              _posInStr = 1;
-                           }
-                           else
-                              _posInStr = -1;
+                                _posInStr = 1;
+                            }
+                            else
+                                _posInStr = -1;
                         }
                         else
                         {
-                           _posInStr = textLine.IndexOf(searchText);
+                            _posInStr = textLine.IndexOf(searchText);
 
-                           if (SearchSpec.UseNegation && _posInStr > -1)
-                              _hitOccurred = true;
+                            if (SearchSpec.UseNegation && _posInStr > -1)
+                                _hitOccurred = true;
                         }
-                     else
-                     {
+                    else
+                    {
                         // If we are looking for whole worlds only, perform the check.
-                         if (SearchSpec.UseWholeWordMatching)
+                        if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b", RegexOptions.IgnoreCase);
-                           if (_regularExp.IsMatch(textLine))
-                           {
-                               if (SearchSpec.UseNegation)
-                                 _hitOccurred = true;
+                            _regularExp = new Regex("\\b" + searchText + "\\b", RegexOptions.IgnoreCase);
+                            if (_regularExp.IsMatch(textLine))
+                            {
+                                if (SearchSpec.UseNegation)
+                                    _hitOccurred = true;
 
-                              _posInStr = 1;
-                           }
-                           else
-                              _posInStr = -1;
+                                _posInStr = 1;
+                            }
+                            else
+                                _posInStr = -1;
                         }
                         else
                         {
-                           _posInStr = textLine.ToLower().IndexOf(searchText.ToLower());
+                            _posInStr = textLine.ToLower().IndexOf(searchText.ToLower());
 
-                           if (SearchSpec.UseNegation && _posInStr > -1)
-                              _hitOccurred = true;
+                            if (SearchSpec.UseNegation && _posInStr > -1)
+                                _hitOccurred = true;
                         }
-                     }
-                  }
+                    }
+                }
 
-                  //*******************************************
-                  // We found an occurrence of our search text.
-                  //*******************************************
-                  if (_posInStr > -1)
-                  {
-                     //since we have a hit, check to see if negation is checked
-                      if (SearchSpec.UseNegation)
+                //*******************************************
+                // We found an occurrence of our search text.
+                //*******************************************
+                if (_posInStr > -1)
+                {
+                    //since we have a hit, check to see if negation is checked
+                    if (SearchSpec.UseNegation)
                         break;
 
-                     if (!_fileNameDisplayed)
-                     {
+                    if (!_fileNameDisplayed)
+                    {
                         _grepHit = new HitObject(file) {Index = Greps.Count};
-                         Greps.Add(_grepHit);
+                        Greps.Add(_grepHit);
 
                         OnFileHit(file, _grepHit.Index);
 
                         _fileNameDisplayed = true;
-                     }
+                    }
 
-                     // If we are only showing filenames, go to the next file.
-                     if (SearchSpec.ReturnOnlyFileNames)
-                     {
+                    // If we are only showing filenames, go to the next file.
+                    if (SearchSpec.ReturnOnlyFileNames)
+                    {
                         //notify that at least 1 hit is in file
                         _grepHit.SetHitCount();
                         OnLineHit(_grepHit, _grepHit.Index);
 
                         break;
-                     }
+                    }
 
-                     // Set up line number, or just an indention in front of the line.
-                     if (SearchSpec.IncludeLineNumbers)
-                     {
+                    // Set up line number, or just an indention in front of the line.
+                    if (SearchSpec.IncludeLineNumbers)
+                    {
                         _spacer = "(" + _lineNumber.ToString().Trim();
                         if (_spacer.Length <= 5)
-                           _spacer = _spacer + new string(char.Parse(" "), 6 - _spacer.Length);
+                            _spacer = _spacer + new string(char.Parse(" "), 6 - _spacer.Length);
 
                         _spacer = _spacer + ") ";
                         _contextSpacer = "(" + new string(char.Parse(" "), _spacer.Length - 3) + ") ";
-                     }
+                    }
 
-                     // Display context lines if applicable.
-                     if (SearchSpec.ContextLines > 0 && _lastHit == 0)
-                     {
+                    // Display context lines if applicable.
+                    if (SearchSpec.ContextLines > 0 && _lastHit == 0)
+                    {
                         if (_grepHit.LineCount > 0)
                         {
-                           // Insert a blank space before the context lines.
-                           int _pos = _grepHit.Add(Environment.NewLine, -1);
-                           OnLineHit(_grepHit, _pos);
+                            // Insert a blank space before the context lines.
+                            int _pos = _grepHit.Add(Environment.NewLine, -1);
+                            OnLineHit(_grepHit, _pos);
                         }
 
                         // Display preceeding n context lines before the hit.
                         for (_posInStr = SearchSpec.ContextLines; _posInStr >= 1; _posInStr--)
                         {
-                           _contextIndex = _contextIndex + 1;
-                           if (_contextIndex > SearchSpec.ContextLines)
-                              _contextIndex = 1;
+                            _contextIndex = _contextIndex + 1;
+                            if (_contextIndex > SearchSpec.ContextLines)
+                                _contextIndex = 1;
 
-                           // If there is a match in the first one or two lines,
-                           // the entire preceeding context may not be available.
-                           if (_lineNumber > _posInStr)
-                           {
-                              // Add the context line.
-                              int _pos = _grepHit.Add(_contextSpacer + _context[_contextIndex] + Environment.NewLine, _lineNumber - _posInStr);
-                              OnLineHit(_grepHit, _pos);
-                           }
+                            // If there is a match in the first one or two lines,
+                            // the entire preceeding context may not be available.
+                            if (_lineNumber > _posInStr)
+                            {
+                                // Add the context line.
+                                int _pos = _grepHit.Add(_contextSpacer + _context[_contextIndex] + Environment.NewLine, _lineNumber - _posInStr);
+                                OnLineHit(_grepHit, _pos);
+                            }
                         }
-                     }
+                    }
 
-                     _lastHit = SearchSpec.ContextLines;
+                    _lastHit = SearchSpec.ContextLines;
 
-                     //
-                     // Add the actual "hit".
-                     //
-                     // set first hit column position
-                     if (SearchSpec.UseRegularExpressions)
-                     {
+                    //
+                    // Add the actual "hit".
+                    //
+                    // set first hit column position
+                    if (SearchSpec.UseRegularExpressions)
+                    {
                         // zero based
                         _posInStr = _regularExpCol[0].Index;
-                     }                     
-                     _posInStr += 1;
-                     int _index = _grepHit.Add(_spacer + textLine + Environment.NewLine, _lineNumber, _posInStr);
+                    }                     
+                    _posInStr += 1;
+                    int _index = _grepHit.Add(_spacer + textLine + Environment.NewLine, _lineNumber, _posInStr);
 
-                     if (SearchSpec.UseRegularExpressions)
+                    if (SearchSpec.UseRegularExpressions)
                         _grepHit.SetHitCount(_regularExpCol.Count);
-                     else
-                     {
+                    else
+                    {
                         //determine number of hits
                         _grepHit.SetHitCount(RetrieveLineHitCount(textLine, searchText));
-                     }
+                    }
 
-                     OnLineHit(_grepHit, _index);
-                  }
-                  else if (_lastHit > 0 && SearchSpec.ContextLines > 0)
-                  {
-                     //***************************************************
-                     // We didn't find a hit, but since lastHit is > 0, we
-                     // need to display this context line.
-                     //***************************************************
-                     int _index = _grepHit.Add(_contextSpacer + textLine + Environment.NewLine, _lineNumber);
-                     OnLineHit(_grepHit, _index);
-                     _lastHit -= 1;
+                    OnLineHit(_grepHit, _index);
+                }
+                else if (_lastHit > 0 && SearchSpec.ContextLines > 0)
+                {
+                    //***************************************************
+                    // We didn't find a hit, but since lastHit is > 0, we
+                    // need to display this context line.
+                    //***************************************************
+                    int _index = _grepHit.Add(_contextSpacer + textLine + Environment.NewLine, _lineNumber);
+                    OnLineHit(_grepHit, _index);
+                    _lastHit -= 1;
 
-                  } // Found a hit or not.
+                } // Found a hit or not.
 
-                  // If we are showing context lines, keep the last n lines.
-                  if (SearchSpec.ContextLines > 0)
-                  {
-                      if (_contextIndex == SearchSpec.ContextLines)
+                // If we are showing context lines, keep the last n lines.
+                if (SearchSpec.ContextLines > 0)
+                {
+                    if (_contextIndex == SearchSpec.ContextLines)
                         _contextIndex = 1;
-                     else
+                    else
                         _contextIndex += 1;
 
-                     _context[_contextIndex] = textLine;
-                  }
-               }
+                    _context[_contextIndex] = textLine;
+                }
             } 
             while (true);
 

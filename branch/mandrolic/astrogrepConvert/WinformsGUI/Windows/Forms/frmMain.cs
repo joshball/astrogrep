@@ -82,6 +82,8 @@ namespace AstroGrep.Windows.Forms
 			//
 			InitializeComponent();
 
+          dateModEnd.Value = DateTime.Now;
+
          // Attach event handlers
          this.Resize += new EventHandler(frmMain_Resize);
          this.Closed += new EventHandler(frmMain_Closed);
@@ -2498,22 +2500,6 @@ namespace AstroGrep.Windows.Forms
          _listItem = null;
       }
       #endregion
-
-      private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-      {
-
-      }
-
-      private void panel2_Paint(object sender, PaintEventArgs e)
-      {
-
-      }
-
-      private void label4_Click(object sender, EventArgs e)
-      {
-
-      }
-
 
 
     }
