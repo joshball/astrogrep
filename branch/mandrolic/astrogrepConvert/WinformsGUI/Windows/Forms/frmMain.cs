@@ -85,25 +85,25 @@ namespace AstroGrep.Windows.Forms
           dateModEnd.Value = DateTime.Now;
 
          // Attach event handlers
-         this.Resize += new EventHandler(frmMain_Resize);
-         this.Closed += new EventHandler(frmMain_Closed);
-		 pnlMainSearch.Paint += new PaintEventHandler(pnlMainSearch_Paint);
-         pnlSearch.SizeChanged += new EventHandler(pnlSearch_SizeChanged);
-         PanelOptionsContainer.Paint += new PaintEventHandler(PanelOptionsContainer_Paint);
-         splitLeftRight.Paint += new PaintEventHandler(splitLeftRight_Paint);
-         splitUpDown.Paint += new PaintEventHandler(splitUpDown_Paint);
-         mnuFile.Select += new EventHandler(mnuFile_Select);
-         mnuEdit.Select += new EventHandler(mnuEdit_Select);
-         cboFilePath.DropDown += new EventHandler(cboFilePath_DropDown);
-         cboFileName.DropDown += new EventHandler(cboFileName_DropDown);
-         cboSearchForText.DropDown += new EventHandler(cboSearchForText_DropDown);
-         chkNegation.CheckedChanged += new EventHandler(chkNegation_CheckedChanged);
-         chkFileNamesOnly.CheckedChanged += new EventHandler(chkFileNamesOnly_CheckedChanged);
-         txtHits.MouseDown += new MouseEventHandler(txtHits_MouseDown);
-         lstFileNames.MouseDown += new MouseEventHandler(lstFileNames_MouseDown);
-         lstFileNames.ColumnClick += new ColumnClickEventHandler(lstFileNames_ColumnClick);
-         lstFileNames.HandleCreated += new EventHandler(lstFileNames_HandleCreated);
-         lstFileNames.ItemDrag += new ItemDragEventHandler(lstFileNames_ItemDrag);
+         Resize += frmMain_Resize;
+         Closed += frmMain_Closed;
+		 pnlMainSearch.Paint += pnlMainSearch_Paint;
+         pnlSearch.SizeChanged += pnlSearch_SizeChanged;
+         PanelOptionsContainer.Paint += PanelOptionsContainer_Paint;
+         splitLeftRight.Paint += splitLeftRight_Paint;
+         splitUpDown.Paint += splitUpDown_Paint;
+         mnuFile.Select += mnuFile_Select;
+         mnuEdit.Select += mnuEdit_Select;
+         cboFilePath.DropDown += cboFilePath_DropDown;
+         cboFileName.DropDown += cboFileName_DropDown;
+         cboSearchForText.DropDown += cboSearchForText_DropDown;
+         chkNegation.CheckedChanged += chkNegation_CheckedChanged;
+         chkFileNamesOnly.CheckedChanged += chkFileNamesOnly_CheckedChanged;
+         txtHits.MouseDown += txtHits_MouseDown;
+         lstFileNames.MouseDown += lstFileNames_MouseDown;
+         lstFileNames.ColumnClick += lstFileNames_ColumnClick;
+         lstFileNames.HandleCreated += lstFileNames_HandleCreated;
+         lstFileNames.ItemDrag += lstFileNames_ItemDrag;
          
          try
          {
@@ -729,22 +729,39 @@ namespace AstroGrep.Windows.Forms
          if (Core.GeneralSettings.WindowLeft != -1)
             Left = Core.GeneralSettings.WindowLeft;
 
+         // if the position from settings mean the form is off the visible screen(s)
+         // e.g due to a change in the number of screens/resolution, then position on the 
+         // screen
+         if (!IsOnScreen(this))
+         {
+             Top = 0;
+             Left = 0;
+         }
+
+
          // set the width/height
          if (Core.GeneralSettings.WindowWidth != -1)
             Width = Core.GeneralSettings.WindowWidth;
          if (Core.GeneralSettings.WindowHeight != -1)
             Height = Core.GeneralSettings.WindowHeight;
 
-         if (_state != -1 && _state == (int)FormWindowState.Maximized)
-         {
-            WindowState = FormWindowState.Maximized;
-         }
+          if (_state != -1 && _state == (int) FormWindowState.Maximized)
+              WindowState = FormWindowState.Maximized;
 
-         // set the splitter positions
+          // set the splitter positions
          if (Core.GeneralSettings.WindowSearchPanelWidth != -1)
             pnlSearch.Width = Core.GeneralSettings.WindowSearchPanelWidth;
          if (Core.GeneralSettings.WindowFilePanelHeight != -1)
-            this.lstFileNames.Height = Core.GeneralSettings.WindowFilePanelHeight;
+            lstFileNames.Height = Core.GeneralSettings.WindowFilePanelHeight;
+      }
+
+      public bool IsOnScreen(Form form)
+      {
+          foreach (var screen in Screen.AllScreens)
+              if (screen.WorkingArea.Contains(new Rectangle(form.Left, form.Top, form.Width, form.Height)))
+                  return true;
+
+          return false;
       }
 
       /// <summary>
