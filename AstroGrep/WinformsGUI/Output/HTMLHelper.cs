@@ -86,7 +86,7 @@ namespace AstroGrep
       {
          string newLine;
 
-         if (grep.UseRegularExpressions)
+         if (grep.SearchSpec.UseRegularExpressions)
             newLine = HighlightRegEx(line, grep);
          else
             newLine = HighlightNormal(line, grep);
@@ -115,27 +115,28 @@ namespace AstroGrep
       /// Replaces all the search option holders in the given text.
       /// </summary>
       /// <param name="text">Text containing holders</param>
-      /// <param name="grep">Grep Object containing options</param>
       /// <returns>Text with holders replaced</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
       /// </history>
       public static string ReplaceSearchOptions(string text, Grep grep)
       {
-         text = text.Replace("%%filetypes%%", "File Types: " + grep.FileFilter);
-         text = text.Replace("%%regex%%", "Regular Expressions: " + grep.UseRegularExpressions.ToString());
-         text = text.Replace("%%casesen%%", "Case Sensitive: " + grep.UseCaseSensitivity.ToString());
-         text = text.Replace("%%wholeword%%", "Whole Word: " + grep.UseWholeWordMatching.ToString());
-         text = text.Replace("%%recurse%%", "Recurse: " + grep.SearchInSubfolders.ToString());
-         text = text.Replace("%%filenameonly%%", "Show File Names Only: " + grep.ReturnOnlyFileNames.ToString());
-         text = text.Replace("%%negation%%", "Negation: " + grep.UseNegation.ToString());
-         text = text.Replace("%%linenumbers%%", "Line Numbers: " + grep.IncludeLineNumbers.ToString());
-         text = text.Replace("%%contextlines%%", "Context Lines: " + grep.ContextLines.ToString());
+         var spec = grep.SearchSpec;
+
+         text = text.Replace("%%filetypes%%", "File Types: " + grep.FileFilterSpec.FileFilter);
+         text = text.Replace("%%regex%%", "Regular Expressions: " + spec.UseRegularExpressions);
+         text = text.Replace("%%casesen%%", "Case Sensitive: " + spec.UseCaseSensitivity);
+         text = text.Replace("%%wholeword%%", "Whole Word: " + spec.UseWholeWordMatching);
+         text = text.Replace("%%recurse%%", "Recurse: " + spec.SearchInSubfolders);
+         text = text.Replace("%%filenameonly%%", "Show File Names Only: " + spec.ReturnOnlyFileNames);
+         text = text.Replace("%%negation%%", "Negation: " + spec.UseNegation);
+         text = text.Replace("%%linenumbers%%", "Line Numbers: " + spec.IncludeLineNumbers);
+         text = text.Replace("%%contextlines%%", "Context Lines: " + spec.ContextLines);
 
          text = text.Replace("%%totalfiles%%", grep.Greps.Count.ToString());
-         text = text.Replace("%%searchterm%%", grep.SearchText);
+         text = text.Replace("%%searchterm%%", spec.SearchText);
 
-         if (grep.UseNegation)
+         if (spec.UseNegation)
             text = text.Replace("%%usenegation%%", "not ");
          else
             text = text.Replace("%%usenegation%%", string.Empty);
@@ -144,6 +145,7 @@ namespace AstroGrep
       }
 
       #region Private Methods
+      
       /// <summary>
       /// Returns the given line with the search text highlighted.
       /// </summary>
@@ -155,23 +157,16 @@ namespace AstroGrep
       /// </history>
       private static string HighlightNormal(string line, Grep grep)
       {
-         string _textToSearch = string.Empty;
-         string _searchText = grep.SearchText;
-         string _tempLine = string.Empty;
-
-         string _begin = string.Empty;
-         string _text = string.Empty;
-         string _end = string.Empty;
+         var _searchText = grep.SearchSpec.SearchText;
          int _pos = 0;
-         bool _highlight = false;
          string _newLine = string.Empty;
 
          // Retrieve hit text
-         _textToSearch = line;
-         _tempLine = _textToSearch;
+         string _textToSearch = line;
+         var _tempLine = _textToSearch;
 
          // attempt to locate the text in the line
-         if (grep.UseCaseSensitivity)
+         if (grep.SearchSpec.UseCaseSensitivity)
             _pos = _tempLine.IndexOf(_searchText);
          else
             _pos = _tempLine.ToLower().IndexOf(_searchText.ToLower());
@@ -180,17 +175,17 @@ namespace AstroGrep
          {
             while (_pos > -1)
             {
-               _highlight = false;
+               bool _highlight = false;
 
                //retrieve parts of text
-               _begin = _tempLine.Substring(0, _pos);
-               _text = _tempLine.Substring(_pos, _searchText.Length);
-               _end = _tempLine.Substring(_pos + _searchText.Length);
+               var _begin = _tempLine.Substring(0, _pos);
+               var _text = _tempLine.Substring(_pos, _searchText.Length);
+               var _end = _tempLine.Substring(_pos + _searchText.Length);
 
                _newLine += _begin;
 
                // do a check to see if begin and end are valid for wholeword searches
-               if (grep.UseWholeWordMatching)
+               if (grep.SearchSpec.UseWholeWordMatching)
                   _highlight = Grep.WholeWordOnly(_begin, _end);
                else
                   _highlight = true;
@@ -202,7 +197,7 @@ namespace AstroGrep
                   _newLine += _text;
 
                // Check remaining string for other hits in same line
-               if (grep.UseCaseSensitivity)
+               if (grep.SearchSpec.UseCaseSensitivity)
                   _pos = _end.IndexOf(_searchText);
                else
                   _pos = _end.ToLower().IndexOf(_searchText.ToLower());
@@ -231,37 +226,36 @@ namespace AstroGrep
       /// </history>
       private static string HighlightRegEx(string line, Grep grep)
       {
-         string _textToSearch = string.Empty;
-         string _tempstring  = string.Empty;
+          string _tempstring;
          int _lastPos = 0;
          int _counter = 0;
-         Regex _regEx = new Regex(grep.SearchText);
+         Regex _regEx;
          MatchCollection _col;
          Match _item;
          string _newLine = string.Empty;
 
          //Retrieve hit text
-         _textToSearch = line;
+         string _textToSearch = line;
 
          // find all reg ex matches in line
-         if (grep.UseCaseSensitivity && grep.UseWholeWordMatching)
+         if (grep.SearchSpec.UseCaseSensitivity && grep.SearchSpec.UseWholeWordMatching)
          {
-            _regEx = new Regex("\\b" + grep.SearchText + "\\b");
+             _regEx = new Regex("\\b" + grep.SearchSpec.SearchText + "\\b");
             _col = _regEx.Matches(_textToSearch);
          }
-         else if (grep.UseCaseSensitivity)
+         else if (grep.SearchSpec.UseCaseSensitivity)
          {
-            _regEx = new Regex(grep.SearchText);
+             _regEx = new Regex(grep.SearchSpec.SearchText);
             _col = _regEx.Matches(_textToSearch);
          }
-         else if (grep.UseWholeWordMatching)
+         else if (grep.SearchSpec.UseWholeWordMatching)
          {
-            _regEx = new Regex("\\b" + grep.SearchText + "\\b", RegexOptions.IgnoreCase);
+             _regEx = new Regex("\\b" + grep.SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
             _col = _regEx.Matches(_textToSearch);
          }
          else
          {
-            _regEx = new Regex(grep.SearchText, RegexOptions.IgnoreCase);
+             _regEx = new Regex(grep.SearchSpec.SearchText, RegexOptions.IgnoreCase);
             _col = _regEx.Matches(_textToSearch);
          }
 

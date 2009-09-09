@@ -36,16 +36,22 @@ namespace AstroGrep.Windows.Forms
    /// [Theodore_Ward]     ??/??/????  Initial
    /// [Curtis_Beard]      01/11/2005  .Net Conversion/Comments/Option Strict
    /// [Curtis_Beard]      10/15/2005	CHG: Replace search procedures
+   /// [Andrew_Radford]    17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
    /// </history>
-	public class frmMain : System.Windows.Forms.Form
+   /// TODO:
+   /// * Change main hit list control to a databound grid
+   /// * Extract export code
+   /// * Change export code to produce output using xslt
+   /// * Create XML from a grep report object which is XML serializable
+	public partial class frmMain : Form
 	{
       #region Declarations
       private bool __OptionsShow = true;
       private int __SortColumn = -1;
       private Grep __Grep = null;
       private string __SearchOptionsText = "Search Options {0}";
-      private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
-      private System.Collections.Specialized.StringCollection __ErrorCollection = new System.Collections.Specialized.StringCollection();
+       private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
+      private readonly System.Collections.Specialized.StringCollection __ErrorCollection = new System.Collections.Specialized.StringCollection();
       #endregion
 
       #region Delegate Declarations
@@ -53,68 +59,14 @@ namespace AstroGrep.Windows.Forms
       private delegate void SetSearchStateCallBack(bool enable);
       private delegate void UpdateStatusMessageCallBack(string message);
       private delegate void ClearItemsCallBack();
-      private delegate void AddToListCallBack(System.IO.FileInfo file, int index);
+      private delegate void AddToListCallBack(FileInfo file, int index);
       private delegate void DisplaySearchErrorsCallBack();
       #endregion
 
-      private System.Windows.Forms.ListView lstFileNames;
-      private System.Windows.Forms.RichTextBox txtHits;
-      private System.Windows.Forms.Panel pnlSearch;
-      private System.Windows.Forms.ComboBox cboSearchForText;
-      private System.Windows.Forms.ComboBox cboFileName;
-      private System.Windows.Forms.ComboBox cboFilePath;
-      private System.Windows.Forms.Button btnCancel;
-      private System.Windows.Forms.Button btnSearch;
-      private System.Windows.Forms.Panel pnlSearchOptions;
-      private System.Windows.Forms.Panel pnlMainSearch;
-      private System.Windows.Forms.Label lblSearchText;
-      private System.Windows.Forms.Label lblFileTypes;
-      private System.Windows.Forms.Label lblSearchPath;
-      private System.Windows.Forms.Label lblSearchHeading;
-      private System.Windows.Forms.Splitter splitUpDown;
-      private System.Windows.Forms.Splitter splitLeftRight;
-      private System.Windows.Forms.Panel pnlRightSide;
-      private System.Windows.Forms.StatusBar stbStatus;
-      private System.Windows.Forms.LinkLabel lnkSearchOptions;
-      private System.Windows.Forms.ToolTip toolTip1;
-      private System.Windows.Forms.Panel PanelOptionsContainer;
-      private System.Windows.Forms.CheckBox chkNegation;
-      private System.Windows.Forms.CheckBox chkCaseSensitive;
-      private System.Windows.Forms.CheckBox chkRecurse;
-      private System.Windows.Forms.CheckBox chkFileNamesOnly;
-      private System.Windows.Forms.CheckBox chkLineNumbers;
-      private System.Windows.Forms.CheckBox chkRegularExpressions;
-      private System.Windows.Forms.CheckBox chkWholeWordOnly;
-      private System.Windows.Forms.NumericUpDown txtContextLines;
-      private System.Windows.Forms.Label lblContextLines;
-      private System.Windows.Forms.MenuItem mnuFile;
-      private System.Windows.Forms.MenuItem mnuSaveResults;
-      private System.Windows.Forms.MenuItem mnuPrintResults;
-      private System.Windows.Forms.MenuItem mnuExit;
-      private System.Windows.Forms.MenuItem mnuEdit;
-      private System.Windows.Forms.MenuItem mnuTools;
-      private System.Windows.Forms.MenuItem mnuOptions;
-      private System.Windows.Forms.MenuItem mnuHelp;
-      private System.Windows.Forms.MenuItem mnuAbout;
-      private System.Windows.Forms.MenuItem mnuSelectAll;
-      private System.Windows.Forms.MenuItem mnuOpenSelected;
-      private System.Windows.Forms.MenuItem mnuClearMRU;
-      private System.Windows.Forms.MainMenu mnuAll;
-      private System.Windows.Forms.MenuItem mnuFileSep;
-      private System.Windows.Forms.MenuItem mnuToolsSep;
-      private System.Windows.Forms.MenuItem mnuSaveSearchSettings;
-      private System.Windows.Forms.ImageList ListViewImageList;
-      private AstroGrep.Windows.Controls.PictureButton picBrowse;
-      private System.Windows.Forms.MenuItem mnuBrowse;
-      private System.Windows.Forms.MenuItem mnuFileSep2;
-		private System.Windows.Forms.ContextMenu fileLstMnu;
-		private System.Windows.Forms.MenuItem menuItem4;
-		private System.Windows.Forms.MenuItem CopyMenuItem;
-		private System.Windows.Forms.MenuItem OpenMenuItem;
-		private System.Windows.Forms.MenuItem DeleteMenuItem;
-		private System.Windows.Forms.MenuItem OpenFolderMenuItem;
-		private System.Windows.Forms.MenuItem menuItem2;
+        
       private System.ComponentModel.IContainer components;
+
+        // TODO: Add size to the hit list
 
       /// <summary>
       /// Creates an instance of the frmMain class.
@@ -133,7 +85,7 @@ namespace AstroGrep.Windows.Forms
          // Attach event handlers
          this.Resize += new EventHandler(frmMain_Resize);
          this.Closed += new EventHandler(frmMain_Closed);
-			pnlMainSearch.Paint += new PaintEventHandler(pnlMainSearch_Paint);
+		 pnlMainSearch.Paint += new PaintEventHandler(pnlMainSearch_Paint);
          pnlSearch.SizeChanged += new EventHandler(pnlSearch_SizeChanged);
          PanelOptionsContainer.Paint += new PaintEventHandler(PanelOptionsContainer_Paint);
          splitLeftRight.Paint += new PaintEventHandler(splitLeftRight_Paint);
@@ -156,653 +108,8 @@ namespace AstroGrep.Windows.Forms
             // set font for printing and default display
             txtHits.Font = new Font("Courier New", 9.75F, FontStyle.Regular);
          }
-         catch {}
+         catch {} // todo: why is this here?
 		}
-
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if disposing, false otherwise</param>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if (components != null) 
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
-
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-			this.components = new System.ComponentModel.Container();
-			System.Resources.ResourceManager resources = new System.Resources.ResourceManager(typeof(frmMain));
-			this.pnlSearch = new System.Windows.Forms.Panel();
-			this.pnlSearchOptions = new System.Windows.Forms.Panel();
-			this.PanelOptionsContainer = new System.Windows.Forms.Panel();
-			this.lblContextLines = new System.Windows.Forms.Label();
-			this.txtContextLines = new System.Windows.Forms.NumericUpDown();
-			this.chkWholeWordOnly = new System.Windows.Forms.CheckBox();
-			this.chkRegularExpressions = new System.Windows.Forms.CheckBox();
-			this.chkNegation = new System.Windows.Forms.CheckBox();
-			this.chkLineNumbers = new System.Windows.Forms.CheckBox();
-			this.chkFileNamesOnly = new System.Windows.Forms.CheckBox();
-			this.chkRecurse = new System.Windows.Forms.CheckBox();
-			this.chkCaseSensitive = new System.Windows.Forms.CheckBox();
-			this.lnkSearchOptions = new System.Windows.Forms.LinkLabel();
-			this.pnlMainSearch = new System.Windows.Forms.Panel();
-			this.picBrowse = new AstroGrep.Windows.Controls.PictureButton();
-			this.btnSearch = new System.Windows.Forms.Button();
-			this.btnCancel = new System.Windows.Forms.Button();
-			this.cboFilePath = new System.Windows.Forms.ComboBox();
-			this.cboFileName = new System.Windows.Forms.ComboBox();
-			this.cboSearchForText = new System.Windows.Forms.ComboBox();
-			this.lblSearchText = new System.Windows.Forms.Label();
-			this.lblFileTypes = new System.Windows.Forms.Label();
-			this.lblSearchPath = new System.Windows.Forms.Label();
-			this.lblSearchHeading = new System.Windows.Forms.Label();
-			this.pnlRightSide = new System.Windows.Forms.Panel();
-			this.txtHits = new System.Windows.Forms.RichTextBox();
-			this.splitUpDown = new System.Windows.Forms.Splitter();
-			this.lstFileNames = new System.Windows.Forms.ListView();
-			this.splitLeftRight = new System.Windows.Forms.Splitter();
-			this.mnuAll = new System.Windows.Forms.MainMenu();
-			this.mnuFile = new System.Windows.Forms.MenuItem();
-			this.mnuBrowse = new System.Windows.Forms.MenuItem();
-			this.mnuFileSep2 = new System.Windows.Forms.MenuItem();
-			this.mnuSaveResults = new System.Windows.Forms.MenuItem();
-			this.mnuPrintResults = new System.Windows.Forms.MenuItem();
-			this.mnuFileSep = new System.Windows.Forms.MenuItem();
-			this.mnuExit = new System.Windows.Forms.MenuItem();
-			this.mnuEdit = new System.Windows.Forms.MenuItem();
-			this.mnuSelectAll = new System.Windows.Forms.MenuItem();
-			this.mnuOpenSelected = new System.Windows.Forms.MenuItem();
-			this.mnuTools = new System.Windows.Forms.MenuItem();
-			this.mnuClearMRU = new System.Windows.Forms.MenuItem();
-			this.mnuToolsSep = new System.Windows.Forms.MenuItem();
-			this.mnuSaveSearchSettings = new System.Windows.Forms.MenuItem();
-			this.mnuOptions = new System.Windows.Forms.MenuItem();
-			this.mnuHelp = new System.Windows.Forms.MenuItem();
-			this.mnuAbout = new System.Windows.Forms.MenuItem();
-			this.stbStatus = new System.Windows.Forms.StatusBar();
-			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
-			this.fileLstMnu = new System.Windows.Forms.ContextMenu();
-			this.CopyMenuItem = new System.Windows.Forms.MenuItem();
-			this.OpenMenuItem = new System.Windows.Forms.MenuItem();
-			this.DeleteMenuItem = new System.Windows.Forms.MenuItem();
-			this.menuItem4 = new System.Windows.Forms.MenuItem();
-			this.OpenFolderMenuItem = new System.Windows.Forms.MenuItem();
-			this.menuItem2 = new System.Windows.Forms.MenuItem();
-			this.pnlSearch.SuspendLayout();
-			this.pnlSearchOptions.SuspendLayout();
-			this.PanelOptionsContainer.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.txtContextLines)).BeginInit();
-			this.pnlMainSearch.SuspendLayout();
-			this.pnlRightSide.SuspendLayout();
-			this.SuspendLayout();
-			// 
-			// pnlSearch
-			// 
-			this.pnlSearch.AutoScroll = true;
-			this.pnlSearch.BackColor = System.Drawing.SystemColors.Window;
-			this.pnlSearch.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.pnlSearch.Controls.Add(this.pnlSearchOptions);
-			this.pnlSearch.Controls.Add(this.pnlMainSearch);
-			this.pnlSearch.Dock = System.Windows.Forms.DockStyle.Left;
-			this.pnlSearch.Location = new System.Drawing.Point(0, 0);
-			this.pnlSearch.Name = "pnlSearch";
-			this.pnlSearch.Size = new System.Drawing.Size(240, 484);
-			this.pnlSearch.TabIndex = 0;
-			// 
-			// pnlSearchOptions
-			// 
-			this.pnlSearchOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.pnlSearchOptions.Controls.Add(this.PanelOptionsContainer);
-			this.pnlSearchOptions.Controls.Add(this.lnkSearchOptions);
-			this.pnlSearchOptions.Location = new System.Drawing.Point(16, 208);
-			this.pnlSearchOptions.Name = "pnlSearchOptions";
-			this.pnlSearchOptions.Size = new System.Drawing.Size(200, 224);
-			this.pnlSearchOptions.TabIndex = 1;
-			// 
-			// PanelOptionsContainer
-			// 
-			this.PanelOptionsContainer.Controls.Add(this.lblContextLines);
-			this.PanelOptionsContainer.Controls.Add(this.txtContextLines);
-			this.PanelOptionsContainer.Controls.Add(this.chkWholeWordOnly);
-			this.PanelOptionsContainer.Controls.Add(this.chkRegularExpressions);
-			this.PanelOptionsContainer.Controls.Add(this.chkNegation);
-			this.PanelOptionsContainer.Controls.Add(this.chkLineNumbers);
-			this.PanelOptionsContainer.Controls.Add(this.chkFileNamesOnly);
-			this.PanelOptionsContainer.Controls.Add(this.chkRecurse);
-			this.PanelOptionsContainer.Controls.Add(this.chkCaseSensitive);
-			this.PanelOptionsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.PanelOptionsContainer.Location = new System.Drawing.Point(0, 16);
-			this.PanelOptionsContainer.Name = "PanelOptionsContainer";
-			this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 208);
-			this.PanelOptionsContainer.TabIndex = 1;
-			// 
-			// lblContextLines
-			// 
-			this.lblContextLines.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.lblContextLines.Location = new System.Drawing.Point(56, 175);
-			this.lblContextLines.Name = "lblContextLines";
-			this.lblContextLines.Size = new System.Drawing.Size(127, 20);
-			this.lblContextLines.TabIndex = 8;
-			this.lblContextLines.Text = "Context Lines";
-			this.lblContextLines.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.toolTip1.SetToolTip(this.lblContextLines, "Show lines above and below the word matched");
-			// 
-			// txtContextLines
-			// 
-			this.txtContextLines.Location = new System.Drawing.Point(7, 175);
-			this.txtContextLines.Name = "txtContextLines";
-			this.txtContextLines.Size = new System.Drawing.Size(41, 20);
-			this.txtContextLines.TabIndex = 13;
-			this.toolTip1.SetToolTip(this.txtContextLines, "Show lines above and below the word matched");
-			// 
-			// chkWholeWordOnly
-			// 
-			this.chkWholeWordOnly.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.chkWholeWordOnly.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.chkWholeWordOnly.Location = new System.Drawing.Point(7, 56);
-			this.chkWholeWordOnly.Name = "chkWholeWordOnly";
-			this.chkWholeWordOnly.Size = new System.Drawing.Size(178, 16);
-			this.chkWholeWordOnly.TabIndex = 8;
-			this.chkWholeWordOnly.Text = "&Whole Word";
-			this.toolTip1.SetToolTip(this.chkWholeWordOnly, "Only match entire words (not parts of words)");
-			// 
-			// chkRegularExpressions
-			// 
-			this.chkRegularExpressions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.chkRegularExpressions.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.chkRegularExpressions.Location = new System.Drawing.Point(7, 8);
-			this.chkRegularExpressions.Name = "chkRegularExpressions";
-			this.chkRegularExpressions.Size = new System.Drawing.Size(178, 16);
-			this.chkRegularExpressions.TabIndex = 6;
-			this.chkRegularExpressions.Text = "Regular &Expressions";
-			this.toolTip1.SetToolTip(this.chkRegularExpressions, "Use \"regular expression\" matching");
-			// 
-			// chkNegation
-			// 
-			this.chkNegation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.chkNegation.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.chkNegation.Location = new System.Drawing.Point(7, 128);
-			this.chkNegation.Name = "chkNegation";
-			this.chkNegation.Size = new System.Drawing.Size(178, 16);
-			this.chkNegation.TabIndex = 11;
-			this.chkNegation.Text = "&Negation";
-			this.toolTip1.SetToolTip(this.chkNegation, "Find the files without the Search Text in them");
-			// 
-			// chkLineNumbers
-			// 
-			this.chkLineNumbers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.chkLineNumbers.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.chkLineNumbers.Location = new System.Drawing.Point(7, 152);
-			this.chkLineNumbers.Name = "chkLineNumbers";
-			this.chkLineNumbers.Size = new System.Drawing.Size(178, 16);
-			this.chkLineNumbers.TabIndex = 12;
-			this.chkLineNumbers.Text = "&Line Numbers";
-			this.toolTip1.SetToolTip(this.chkLineNumbers, "Include line numbers before each match");
-			// 
-			// chkFileNamesOnly
-			// 
-			this.chkFileNamesOnly.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.chkFileNamesOnly.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.chkFileNamesOnly.Location = new System.Drawing.Point(7, 104);
-			this.chkFileNamesOnly.Name = "chkFileNamesOnly";
-			this.chkFileNamesOnly.Size = new System.Drawing.Size(178, 16);
-			this.chkFileNamesOnly.TabIndex = 10;
-			this.chkFileNamesOnly.Text = "Show File Names &Only";
-			this.toolTip1.SetToolTip(this.chkFileNamesOnly, "Show names but not contents of files that have matches (may be faster on large fi" +
-				"les)");
-			// 
-			// chkRecurse
-			// 
-			this.chkRecurse.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.chkRecurse.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.chkRecurse.Location = new System.Drawing.Point(7, 80);
-			this.chkRecurse.Name = "chkRecurse";
-			this.chkRecurse.Size = new System.Drawing.Size(178, 16);
-			this.chkRecurse.TabIndex = 9;
-			this.chkRecurse.Text = "&Recurse";
-			this.toolTip1.SetToolTip(this.chkRecurse, "Search in subdirectories");
-			// 
-			// chkCaseSensitive
-			// 
-			this.chkCaseSensitive.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.chkCaseSensitive.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.chkCaseSensitive.Location = new System.Drawing.Point(7, 32);
-			this.chkCaseSensitive.Name = "chkCaseSensitive";
-			this.chkCaseSensitive.Size = new System.Drawing.Size(178, 16);
-			this.chkCaseSensitive.TabIndex = 7;
-			this.chkCaseSensitive.Text = "&Case Sensitive";
-			this.toolTip1.SetToolTip(this.chkCaseSensitive, "Match upper and lower case letters exactly");
-			// 
-			// lnkSearchOptions
-			// 
-			this.lnkSearchOptions.ActiveLinkColor = System.Drawing.SystemColors.ActiveCaption;
-			this.lnkSearchOptions.Dock = System.Windows.Forms.DockStyle.Top;
-			this.lnkSearchOptions.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.lnkSearchOptions.LinkColor = System.Drawing.SystemColors.ActiveCaption;
-			this.lnkSearchOptions.Location = new System.Drawing.Point(0, 0);
-			this.lnkSearchOptions.Name = "lnkSearchOptions";
-			this.lnkSearchOptions.Size = new System.Drawing.Size(200, 16);
-			this.lnkSearchOptions.TabIndex = 5;
-			this.lnkSearchOptions.TabStop = true;
-			this.lnkSearchOptions.Text = "Search Options >>";
-			this.lnkSearchOptions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.lnkSearchOptions.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkSearchOptions_LinkClicked);
-			// 
-			// pnlMainSearch
-			// 
-			this.pnlMainSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.pnlMainSearch.Controls.Add(this.picBrowse);
-			this.pnlMainSearch.Controls.Add(this.btnSearch);
-			this.pnlMainSearch.Controls.Add(this.btnCancel);
-			this.pnlMainSearch.Controls.Add(this.cboFilePath);
-			this.pnlMainSearch.Controls.Add(this.cboFileName);
-			this.pnlMainSearch.Controls.Add(this.cboSearchForText);
-			this.pnlMainSearch.Controls.Add(this.lblSearchText);
-			this.pnlMainSearch.Controls.Add(this.lblFileTypes);
-			this.pnlMainSearch.Controls.Add(this.lblSearchPath);
-			this.pnlMainSearch.Controls.Add(this.lblSearchHeading);
-			this.pnlMainSearch.Location = new System.Drawing.Point(16, 8);
-			this.pnlMainSearch.Name = "pnlMainSearch";
-			this.pnlMainSearch.Size = new System.Drawing.Size(200, 192);
-			this.pnlMainSearch.TabIndex = 0;
-			// 
-			// picBrowse
-			// 
-			this.picBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picBrowse.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.picBrowse.Image = ((System.Drawing.Image)(resources.GetObject("picBrowse.Image")));
-			this.picBrowse.Location = new System.Drawing.Point(176, 42);
-			this.picBrowse.Name = "picBrowse";
-			this.picBrowse.Size = new System.Drawing.Size(16, 16);
-			this.picBrowse.TabIndex = 6;
-			this.picBrowse.TabStop = false;
-			this.picBrowse.Click += new System.EventHandler(this.picBrowse_Click);
-			// 
-			// btnSearch
-			// 
-			this.btnSearch.BackColor = System.Drawing.SystemColors.Control;
-			this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.btnSearch.Location = new System.Drawing.Point(8, 160);
-			this.btnSearch.Name = "btnSearch";
-			this.btnSearch.TabIndex = 0;
-			this.btnSearch.Text = "&Search";
-			this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
-			// 
-			// btnCancel
-			// 
-			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCancel.BackColor = System.Drawing.SystemColors.Control;
-			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Enabled = false;
-			this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.btnCancel.Location = new System.Drawing.Point(115, 160);
-			this.btnCancel.Name = "btnCancel";
-			this.btnCancel.TabIndex = 4;
-			this.btnCancel.Text = "&Cancel";
-			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-			// 
-			// cboFilePath
-			// 
-			this.cboFilePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.cboFilePath.Location = new System.Drawing.Point(8, 40);
-			this.cboFilePath.Name = "cboFilePath";
-			this.cboFilePath.Size = new System.Drawing.Size(160, 21);
-			this.cboFilePath.TabIndex = 1;
-			// 
-			// cboFileName
-			// 
-			this.cboFileName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.cboFileName.Location = new System.Drawing.Point(8, 80);
-			this.cboFileName.Name = "cboFileName";
-			this.cboFileName.Size = new System.Drawing.Size(184, 21);
-			this.cboFileName.TabIndex = 2;
-			// 
-			// cboSearchForText
-			// 
-			this.cboSearchForText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.cboSearchForText.Location = new System.Drawing.Point(8, 120);
-			this.cboSearchForText.Name = "cboSearchForText";
-			this.cboSearchForText.Size = new System.Drawing.Size(184, 21);
-			this.cboSearchForText.TabIndex = 3;
-			// 
-			// lblSearchText
-			// 
-			this.lblSearchText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSearchText.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.lblSearchText.Location = new System.Drawing.Point(8, 104);
-			this.lblSearchText.Name = "lblSearchText";
-			this.lblSearchText.Size = new System.Drawing.Size(180, 16);
-			this.lblSearchText.TabIndex = 3;
-			this.lblSearchText.Text = "Search Text";
-			// 
-			// lblFileTypes
-			// 
-			this.lblFileTypes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.lblFileTypes.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.lblFileTypes.Location = new System.Drawing.Point(8, 64);
-			this.lblFileTypes.Name = "lblFileTypes";
-			this.lblFileTypes.Size = new System.Drawing.Size(180, 16);
-			this.lblFileTypes.TabIndex = 2;
-			this.lblFileTypes.Text = "File Types";
-			// 
-			// lblSearchPath
-			// 
-			this.lblSearchPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSearchPath.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.lblSearchPath.Location = new System.Drawing.Point(8, 24);
-			this.lblSearchPath.Name = "lblSearchPath";
-			this.lblSearchPath.Size = new System.Drawing.Size(180, 16);
-			this.lblSearchPath.TabIndex = 1;
-			this.lblSearchPath.Text = "Search Path";
-			// 
-			// lblSearchHeading
-			// 
-			this.lblSearchHeading.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-				| System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSearchHeading.BackColor = System.Drawing.SystemColors.ActiveCaption;
-			this.lblSearchHeading.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.lblSearchHeading.Location = new System.Drawing.Point(0, 0);
-			this.lblSearchHeading.Name = "lblSearchHeading";
-			this.lblSearchHeading.Size = new System.Drawing.Size(202, 16);
-			this.lblSearchHeading.TabIndex = 0;
-			this.lblSearchHeading.Text = "AstroGrep Search";
-			this.lblSearchHeading.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// pnlRightSide
-			// 
-			this.pnlRightSide.Controls.Add(this.txtHits);
-			this.pnlRightSide.Controls.Add(this.splitUpDown);
-			this.pnlRightSide.Controls.Add(this.lstFileNames);
-			this.pnlRightSide.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pnlRightSide.DockPadding.Left = 8;
-			this.pnlRightSide.Location = new System.Drawing.Point(240, 0);
-			this.pnlRightSide.Name = "pnlRightSide";
-			this.pnlRightSide.Size = new System.Drawing.Size(544, 484);
-			this.pnlRightSide.TabIndex = 1;
-			// 
-			// txtHits
-			// 
-			this.txtHits.DetectUrls = false;
-			this.txtHits.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtHits.Location = new System.Drawing.Point(8, 200);
-			this.txtHits.Name = "txtHits";
-			this.txtHits.ReadOnly = true;
-			this.txtHits.Size = new System.Drawing.Size(536, 284);
-			this.txtHits.TabIndex = 1;
-			this.txtHits.Text = "";
-			this.txtHits.WordWrap = false;
-			// 
-			// splitUpDown
-			// 
-			this.splitUpDown.Dock = System.Windows.Forms.DockStyle.Top;
-			this.splitUpDown.Location = new System.Drawing.Point(8, 192);
-			this.splitUpDown.Name = "splitUpDown";
-			this.splitUpDown.Size = new System.Drawing.Size(536, 8);
-			this.splitUpDown.TabIndex = 2;
-			this.splitUpDown.TabStop = false;
-			// 
-			// lstFileNames
-			// 
-			this.lstFileNames.ContextMenu = this.fileLstMnu;
-			this.lstFileNames.Dock = System.Windows.Forms.DockStyle.Top;
-			this.lstFileNames.FullRowSelect = true;
-			this.lstFileNames.HideSelection = false;
-			this.lstFileNames.Location = new System.Drawing.Point(8, 0);
-			this.lstFileNames.Name = "lstFileNames";
-			this.lstFileNames.Size = new System.Drawing.Size(536, 192);
-			this.lstFileNames.TabIndex = 0;
-			this.lstFileNames.View = System.Windows.Forms.View.Details;
-			this.lstFileNames.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstFileNames_KeyDown);
-			this.lstFileNames.SelectedIndexChanged += new System.EventHandler(this.lstFileNames_SelectedIndexChanged);
-			// 
-			// splitLeftRight
-			// 
-			this.splitLeftRight.Location = new System.Drawing.Point(240, 0);
-			this.splitLeftRight.MinExtra = 100;
-			this.splitLeftRight.MinSize = 240;
-			this.splitLeftRight.Name = "splitLeftRight";
-			this.splitLeftRight.Size = new System.Drawing.Size(8, 484);
-			this.splitLeftRight.TabIndex = 2;
-			this.splitLeftRight.TabStop = false;
-			// 
-			// mnuAll
-			// 
-			this.mnuAll.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																				   this.mnuFile,
-																				   this.mnuEdit,
-																				   this.mnuTools,
-																				   this.mnuHelp});
-			// 
-			// mnuFile
-			// 
-			this.mnuFile.Index = 0;
-			this.mnuFile.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					this.mnuBrowse,
-																					this.mnuFileSep2,
-																					this.mnuSaveResults,
-																					this.mnuPrintResults,
-																					this.mnuFileSep,
-																					this.mnuExit});
-			this.mnuFile.Text = "&File";
-			// 
-			// mnuBrowse
-			// 
-			this.mnuBrowse.Index = 0;
-			this.mnuBrowse.Shortcut = System.Windows.Forms.Shortcut.CtrlO;
-			this.mnuBrowse.Text = "Select Sea&rch Path...";
-			this.mnuBrowse.Click += new System.EventHandler(this.mnuBrowse_Click);
-			// 
-			// mnuFileSep2
-			// 
-			this.mnuFileSep2.Index = 1;
-			this.mnuFileSep2.Text = "-";
-			// 
-			// mnuSaveResults
-			// 
-			this.mnuSaveResults.Index = 2;
-			this.mnuSaveResults.Shortcut = System.Windows.Forms.Shortcut.CtrlS;
-			this.mnuSaveResults.Text = "&Save Results";
-			this.mnuSaveResults.Click += new System.EventHandler(this.mnuSaveResults_Click);
-			// 
-			// mnuPrintResults
-			// 
-			this.mnuPrintResults.Index = 3;
-			this.mnuPrintResults.Shortcut = System.Windows.Forms.Shortcut.CtrlP;
-			this.mnuPrintResults.Text = "&Print Results";
-			this.mnuPrintResults.Click += new System.EventHandler(this.mnuPrintResults_Click);
-			// 
-			// mnuFileSep
-			// 
-			this.mnuFileSep.Index = 4;
-			this.mnuFileSep.Text = "-";
-			// 
-			// mnuExit
-			// 
-			this.mnuExit.Index = 5;
-			this.mnuExit.Shortcut = System.Windows.Forms.Shortcut.CtrlQ;
-			this.mnuExit.Text = "E&xit";
-			this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
-			// 
-			// mnuEdit
-			// 
-			this.mnuEdit.Index = 1;
-			this.mnuEdit.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					this.mnuSelectAll,
-																					this.mnuOpenSelected});
-			this.mnuEdit.Text = "&Edit";
-			// 
-			// mnuSelectAll
-			// 
-			this.mnuSelectAll.Index = 0;
-			this.mnuSelectAll.Text = "&Select All Files";
-			this.mnuSelectAll.Click += new System.EventHandler(this.mnuSelectAll_Click);
-			// 
-			// mnuOpenSelected
-			// 
-			this.mnuOpenSelected.Index = 1;
-			this.mnuOpenSelected.Text = "&Open Selected Files";
-			this.mnuOpenSelected.Click += new System.EventHandler(this.mnuOpenSelected_Click);
-			// 
-			// mnuTools
-			// 
-			this.mnuTools.Index = 2;
-			this.mnuTools.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					 this.mnuClearMRU,
-																					 this.mnuToolsSep,
-																					 this.mnuSaveSearchSettings,
-																					 this.mnuOptions});
-			this.mnuTools.Text = "&Tools";
-			// 
-			// mnuClearMRU
-			// 
-			this.mnuClearMRU.Index = 0;
-			this.mnuClearMRU.Text = "&Clear Most Recently Used Lists";
-			this.mnuClearMRU.Click += new System.EventHandler(this.mnuClearMRU_Click);
-			// 
-			// mnuToolsSep
-			// 
-			this.mnuToolsSep.Index = 1;
-			this.mnuToolsSep.Text = "-";
-			// 
-			// mnuSaveSearchSettings
-			// 
-			this.mnuSaveSearchSettings.Index = 2;
-			this.mnuSaveSearchSettings.Text = "&Save Search Options";
-			this.mnuSaveSearchSettings.Click += new System.EventHandler(this.mnuSaveSearchSettings_Click);
-			// 
-			// mnuOptions
-			// 
-			this.mnuOptions.Index = 3;
-			this.mnuOptions.Shortcut = System.Windows.Forms.Shortcut.F9;
-			this.mnuOptions.Text = "&Options...";
-			this.mnuOptions.Click += new System.EventHandler(this.mnuOptions_Click);
-			// 
-			// mnuHelp
-			// 
-			this.mnuHelp.Index = 3;
-			this.mnuHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					this.mnuAbout});
-			this.mnuHelp.Text = "&Help";
-			// 
-			// mnuAbout
-			// 
-			this.mnuAbout.Index = 0;
-			this.mnuAbout.Text = "&About...";
-			this.mnuAbout.Click += new System.EventHandler(this.mnuAbout_Click);
-			// 
-			// stbStatus
-			// 
-			this.stbStatus.Location = new System.Drawing.Point(0, 484);
-			this.stbStatus.Name = "stbStatus";
-			this.stbStatus.Size = new System.Drawing.Size(784, 22);
-			this.stbStatus.TabIndex = 3;
-			// 
-			// ListViewImageList
-			// 
-			this.ListViewImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-			this.ListViewImageList.ImageSize = new System.Drawing.Size(16, 16);
-			this.ListViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ListViewImageList.ImageStream")));
-			this.ListViewImageList.TransparentColor = System.Drawing.Color.Transparent;
-			// 
-			// fileLstMnu
-			// 
-			this.fileLstMnu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					   this.CopyMenuItem,
-																					   this.menuItem4,
-																					   this.OpenMenuItem,
-																					   this.OpenFolderMenuItem,
-																					   this.menuItem2,
-																					   this.DeleteMenuItem});
-			// 
-			// CopyMenuItem
-			// 
-			this.CopyMenuItem.Index = 0;
-			this.CopyMenuItem.Text = "Copy";
-			this.CopyMenuItem.Click += new System.EventHandler(this.CopyMenuItem_Click);
-			// 
-			// OpenMenuItem
-			// 
-			this.OpenMenuItem.Index = 2;
-			this.OpenMenuItem.Text = "Open File";
-			this.OpenMenuItem.Click += new System.EventHandler(this.OpenMenuItem_Click);
-			// 
-			// DeleteMenuItem
-			// 
-			this.DeleteMenuItem.Index = 5;
-			this.DeleteMenuItem.Text = "Delete Item";
-			this.DeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
-			// 
-			// menuItem4
-			// 
-			this.menuItem4.Index = 1;
-			this.menuItem4.Text = "-";
-			// 
-			// OpenFolderMenuItem
-			// 
-			this.OpenFolderMenuItem.Index = 3;
-			this.OpenFolderMenuItem.Text = "Open Directory";
-			this.OpenFolderMenuItem.Click += new System.EventHandler(this.OpenFolderMenuItem_Click);
-			// 
-			// menuItem2
-			// 
-			this.menuItem2.Index = 4;
-			this.menuItem2.Text = "-";
-			// 
-			// frmMain
-			// 
-			this.AcceptButton = this.btnSearch;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.CancelButton = this.btnCancel;
-			this.ClientSize = new System.Drawing.Size(784, 506);
-			this.Controls.Add(this.splitLeftRight);
-			this.Controls.Add(this.pnlRightSide);
-			this.Controls.Add(this.pnlSearch);
-			this.Controls.Add(this.stbStatus);
-			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Menu = this.mnuAll;
-			this.Name = "frmMain";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "AstroGrep";
-			this.Load += new System.EventHandler(this.frmMain_Load);
-			this.pnlSearch.ResumeLayout(false);
-			this.pnlSearchOptions.ResumeLayout(false);
-			this.PanelOptionsContainer.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.txtContextLines)).EndInit();
-			this.pnlMainSearch.ResumeLayout(false);
-			this.pnlRightSide.ResumeLayout(false);
-			this.ResumeLayout(false);
-
-		}
-		#endregion
 
       #region Form Events
       /// <summary>
@@ -1294,7 +601,7 @@ namespace AstroGrep.Windows.Forms
          ListViewItemComparer comparer;
 
          // set comparer for integer types if the count column, otherwise try date/string
-         if (e.Column == Constants.COLUMN_INDEX_COUNT)
+         if (e.Column == Constants.COLUMN_INDEX_COUNT || e.Column == Constants.COLUMN_INDEX_SIZE)
             comparer = new ListViewItemComparer(e.Column, lstFileNames.Sorting, true);
          else
             comparer = new ListViewItemComparer(e.Column, lstFileNames.Sorting);
@@ -1392,8 +699,8 @@ namespace AstroGrep.Windows.Forms
             cboSearchForText.SelectedIndex = 0;
 
          // Result Window Colors
-         txtHits.ForeColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-         txtHits.BackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+         txtHits.ForeColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+         txtHits.BackColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
 
          // File list columns
          SetColumnsText();
@@ -1412,30 +719,30 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void LoadWindowSettings()
       {
-         int _state = AstroGrep.Core.GeneralSettings.WindowState;
+         int _state = Core.GeneralSettings.WindowState;
 
          // set the top/left
-         if (AstroGrep.Core.GeneralSettings.WindowTop != -1)
-            this.Top = AstroGrep.Core.GeneralSettings.WindowTop;
-         if (AstroGrep.Core.GeneralSettings.WindowLeft != -1)
-            this.Left = AstroGrep.Core.GeneralSettings.WindowLeft;
+         if (Core.GeneralSettings.WindowTop != -1)
+            Top = Core.GeneralSettings.WindowTop;
+         if (Core.GeneralSettings.WindowLeft != -1)
+            Left = Core.GeneralSettings.WindowLeft;
 
          // set the width/height
-         if (AstroGrep.Core.GeneralSettings.WindowWidth != -1)
-            this.Width = AstroGrep.Core.GeneralSettings.WindowWidth;
-         if (AstroGrep.Core.GeneralSettings.WindowHeight != -1)
-            this.Height = AstroGrep.Core.GeneralSettings.WindowHeight;
+         if (Core.GeneralSettings.WindowWidth != -1)
+            Width = Core.GeneralSettings.WindowWidth;
+         if (Core.GeneralSettings.WindowHeight != -1)
+            Height = Core.GeneralSettings.WindowHeight;
 
          if (_state != -1 && _state == (int)FormWindowState.Maximized)
          {
-            this.WindowState = FormWindowState.Maximized;
+            WindowState = FormWindowState.Maximized;
          }
 
          // set the splitter positions
-         if (AstroGrep.Core.GeneralSettings.WindowSearchPanelWidth != -1)
-            this.pnlSearch.Width = AstroGrep.Core.GeneralSettings.WindowSearchPanelWidth;
-         if (AstroGrep.Core.GeneralSettings.WindowFilePanelHeight != -1)
-            this.lstFileNames.Height = AstroGrep.Core.GeneralSettings.WindowFilePanelHeight;
+         if (Core.GeneralSettings.WindowSearchPanelWidth != -1)
+            pnlSearch.Width = Core.GeneralSettings.WindowSearchPanelWidth;
+         if (Core.GeneralSettings.WindowFilePanelHeight != -1)
+            this.lstFileNames.Height = Core.GeneralSettings.WindowFilePanelHeight;
       }
 
       /// <summary>
@@ -1449,21 +756,21 @@ namespace AstroGrep.Windows.Forms
          SaveWindowSettings();
 
          //save column widths
-         AstroGrep.Core.GeneralSettings.WindowFileColumnNameWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_FILE].Width;
-         AstroGrep.Core.GeneralSettings.WindowFileColumnLocationWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_DIRECTORY].Width;
-         AstroGrep.Core.GeneralSettings.WindowFileColumnDateWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_DATE].Width;
-         AstroGrep.Core.GeneralSettings.WindowFileColumnCountWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_COUNT].Width;
+         Core.GeneralSettings.WindowFileColumnNameWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_FILE].Width;
+         Core.GeneralSettings.WindowFileColumnLocationWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_DIRECTORY].Width;
+         Core.GeneralSettings.WindowFileColumnDateWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_DATE].Width;
+         Core.GeneralSettings.WindowFileColumnCountWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_COUNT].Width;
 
          //save divider panel positions
-         AstroGrep.Core.GeneralSettings.WindowSearchPanelWidth = pnlSearch.Width;
-         AstroGrep.Core.GeneralSettings.WindowFilePanelHeight = lstFileNames.Height;
+         Core.GeneralSettings.WindowSearchPanelWidth = pnlSearch.Width;
+         Core.GeneralSettings.WindowFilePanelHeight = lstFileNames.Height;
 
          //save search comboboxes
-         AstroGrep.Core.GeneralSettings.SearchStarts = Common.GetComboBoxEntriesAsString(cboFilePath);
-         AstroGrep.Core.GeneralSettings.SearchFilters = Common.GetComboBoxEntriesAsString(cboFileName);
-         AstroGrep.Core.GeneralSettings.SearchTexts = Common.GetComboBoxEntriesAsString(cboSearchForText);
+         Core.GeneralSettings.SearchStarts = Common.GetComboBoxEntriesAsString(cboFilePath);
+         Core.GeneralSettings.SearchFilters = Common.GetComboBoxEntriesAsString(cboFileName);
+         Core.GeneralSettings.SearchTexts = Common.GetComboBoxEntriesAsString(cboSearchForText);
 
-         AstroGrep.Core.GeneralSettings.Save();
+         Core.GeneralSettings.Save();
       }
 
       /// <summary>
@@ -1474,18 +781,18 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void SaveWindowSettings()
       {
-         if (this.WindowState == FormWindowState.Normal)
+         if (WindowState == FormWindowState.Normal)
          {
-            AstroGrep.Core.GeneralSettings.WindowLeft = this.Left;
-            AstroGrep.Core.GeneralSettings.WindowTop = this.Top;
-            AstroGrep.Core.GeneralSettings.WindowWidth = this.Width;
-            AstroGrep.Core.GeneralSettings.WindowHeight = this.Height;
-            AstroGrep.Core.GeneralSettings.WindowState = (int)this.WindowState;
+            Core.GeneralSettings.WindowLeft = this.Left;
+            Core.GeneralSettings.WindowTop = this.Top;
+            Core.GeneralSettings.WindowWidth = this.Width;
+            Core.GeneralSettings.WindowHeight = this.Height;
+            Core.GeneralSettings.WindowState = (int)this.WindowState;
          }
          else
          {
             // just save the state, so that previous normal dimensions are valid
-            AstroGrep.Core.GeneralSettings.WindowState = (int)this.WindowState;
+            Core.GeneralSettings.WindowState = (int)this.WindowState;
          }
       }
 
@@ -1507,8 +814,8 @@ namespace AstroGrep.Windows.Forms
             if (items.Length > 0)
             {
                int start = items.Length;
-               if (start > AstroGrep.Core.GeneralSettings.MaximumMRUPaths)
-                  start = AstroGrep.Core.GeneralSettings.MaximumMRUPaths;
+               if (start > Core.GeneralSettings.MaximumMRUPaths)
+                  start = Core.GeneralSettings.MaximumMRUPaths;
 
                combo.BeginUpdate();
                for (int i = start - 1; i > -1; i--)
@@ -1529,14 +836,14 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void LoadSearchSettings()
       {
-         chkRegularExpressions.Checked = AstroGrep.Core.SearchSettings.UseRegularExpressions;
-         chkCaseSensitive.Checked = AstroGrep.Core.SearchSettings.UseCaseSensitivity;
-         chkWholeWordOnly.Checked = AstroGrep.Core.SearchSettings.UseWholeWordMatching;
-         chkLineNumbers.Checked = AstroGrep.Core.SearchSettings.IncludeLineNumbers;
-         chkRecurse.Checked = AstroGrep.Core.SearchSettings.UseRecursion;
-         chkFileNamesOnly.Checked = AstroGrep.Core.SearchSettings.ReturnOnlyFileNames;
-         txtContextLines.Text = AstroGrep.Core.SearchSettings.ContextLines.ToString();
-         chkNegation.Checked = AstroGrep.Core.SearchSettings.UseNegation;
+         chkRegularExpressions.Checked = Core.SearchSettings.UseRegularExpressions;
+         chkCaseSensitive.Checked = Core.SearchSettings.UseCaseSensitivity;
+         chkWholeWordOnly.Checked = Core.SearchSettings.UseWholeWordMatching;
+         chkLineNumbers.Checked = Core.SearchSettings.IncludeLineNumbers;
+         chkRecurse.Checked = Core.SearchSettings.UseRecursion;
+         chkFileNamesOnly.Checked = Core.SearchSettings.ReturnOnlyFileNames;
+         txtContextLines.Text = Core.SearchSettings.ContextLines.ToString();
+         chkNegation.Checked = Core.SearchSettings.UseNegation;
       }
 
       /// <summary>
@@ -1547,16 +854,16 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void SaveSearchSettings()
       {
-         AstroGrep.Core.SearchSettings.UseRegularExpressions = chkRegularExpressions.Checked;
-         AstroGrep.Core.SearchSettings.UseCaseSensitivity = chkCaseSensitive.Checked;
-         AstroGrep.Core.SearchSettings.UseWholeWordMatching = chkWholeWordOnly.Checked;
-         AstroGrep.Core.SearchSettings.IncludeLineNumbers = chkLineNumbers.Checked;
-         AstroGrep.Core.SearchSettings.UseRecursion = chkRecurse.Checked;
-         AstroGrep.Core.SearchSettings.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
-         AstroGrep.Core.SearchSettings.ContextLines = int.Parse(txtContextLines.Text);
-         AstroGrep.Core.SearchSettings.UseNegation = chkNegation.Checked;
+         Core.SearchSettings.UseRegularExpressions = chkRegularExpressions.Checked;
+         Core.SearchSettings.UseCaseSensitivity = chkCaseSensitive.Checked;
+         Core.SearchSettings.UseWholeWordMatching = chkWholeWordOnly.Checked;
+         Core.SearchSettings.IncludeLineNumbers = chkLineNumbers.Checked;
+         Core.SearchSettings.UseRecursion = chkRecurse.Checked;
+         Core.SearchSettings.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
+         Core.SearchSettings.ContextLines = int.Parse(txtContextLines.Text);
+         Core.SearchSettings.UseNegation = chkNegation.Checked;
 
-         AstroGrep.Core.SearchSettings.Save();
+         Core.SearchSettings.Save();
       }
 
       /// <summary>
@@ -1601,6 +908,9 @@ namespace AstroGrep.Windows.Forms
          }
       }
 
+     
+
+
       /// <summary>
       /// Sets the file list's columns' text to the correct language.
       /// </summary>
@@ -1611,15 +921,22 @@ namespace AstroGrep.Windows.Forms
       {
          if (lstFileNames.Columns.Count == 0)
          {
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnFile"), AstroGrep.Core.GeneralSettings.WindowFileColumnNameWidth, HorizontalAlignment.Left);
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnLocation"), AstroGrep.Core.GeneralSettings.WindowFileColumnLocationWidth, HorizontalAlignment.Left);
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnDate"), AstroGrep.Core.GeneralSettings.WindowFileColumnDateWidth, HorizontalAlignment.Left);
-            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnCount"), AstroGrep.Core.GeneralSettings.WindowFileColumnCountWidth, HorizontalAlignment.Left);
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnFile"), Core.GeneralSettings.WindowFileColumnNameWidth, HorizontalAlignment.Left);
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnLocation"), Core.GeneralSettings.WindowFileColumnLocationWidth, HorizontalAlignment.Left);
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnDate"), Core.GeneralSettings.WindowFileColumnDateWidth, HorizontalAlignment.Left);
+
+             // Todo: langage and width setting
+            lstFileNames.Columns.Add("Size", 80, HorizontalAlignment.Left);
+
+            lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnCount"), Core.GeneralSettings.WindowFileColumnCountWidth, HorizontalAlignment.Left);
          }
          else
          {
             lstFileNames.Columns[Constants.COLUMN_INDEX_FILE].Text = Language.GetGenericText("ResultsColumnFile");
             lstFileNames.Columns[Constants.COLUMN_INDEX_DIRECTORY].Text = Language.GetGenericText("ResultsColumnLocation");
+             // Todo: internationalize
+             lstFileNames.Columns[Constants.COLUMN_INDEX_SIZE].Text = "Size";
+
             lstFileNames.Columns[Constants.COLUMN_INDEX_DATE].Text = Language.GetGenericText("ResultsColumnDate");
             lstFileNames.Columns[Constants.COLUMN_INDEX_COUNT].Text = Language.GetGenericText("ResultsColumnCount");
          }
@@ -1705,7 +1022,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   05/09/2007	CHG: check for a valid item
       /// [Ed_Jakubowski]	   05/26/2009	CHG: Added if Contains for testing combo item... this helps astrogrep run in mono 2.4
       /// </history>
-      private void AddComboSelection(System.Windows.Forms.ComboBox combo, string item)
+      private static void AddComboSelection(ComboBox combo, string item)
       {
          if (item.Length > 0)
          {
@@ -1720,7 +1037,7 @@ namespace AstroGrep.Windows.Forms
 
             // Only store as many paths as has been set in options.
             //if (combo.Items.Count > Common.NUM_STORED_PATHS)
-            if (combo.Items.Count > AstroGrep.Core.GeneralSettings.MaximumMRUPaths)
+            if (combo.Items.Count > Core.GeneralSettings.MaximumMRUPaths)
             {
                // Remove the last item in the list.
                combo.Items.RemoveAt(combo.Items.Count - 1);
@@ -1745,31 +1062,26 @@ namespace AstroGrep.Windows.Forms
       {
 	     if (hit.HitCount == 0)
 			 return;
-         string _textToSearch = string.Empty;
-         string _searchText = __Grep.SearchText;
-         int _index = 0;
-         string _tempLine = string.Empty;
+          string _searchText = __Grep.SearchSpec.SearchText;
+          string _tempLine;
 
-         string _begin = string.Empty;
-         string _text = string.Empty;
-         string _end = string.Empty;
-         int _pos = 0;
-         bool _highlight = false;
+          string _end;
 
-         // Clear the contents
+          // Clear the contents
          txtHits.Text = string.Empty;
-         txtHits.ForeColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-         txtHits.BackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+         txtHits.ForeColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+         txtHits.BackColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
 
-         if (__Grep.UseRegularExpressions)
+         if (__Grep.SearchSpec.UseRegularExpressions)
             HighlightTextRegEx(hit);
          else
          {
-            // Loop through hits and highlight search for text
-            for (_index = 0; _index < hit.LineCount; _index++)
+             // Loop through hits and highlight search for text
+             int _index = 0;
+             for (_index = 0; _index < hit.LineCount; _index++)
             {
                // Retrieve hit text
-               _textToSearch = hit.RetrieveLine(_index);
+               string _textToSearch = hit.RetrieveLine(_index);
 
                // Set default font
                txtHits.SelectionFont = new Font("Courier New", 9.75F, FontStyle.Regular);
@@ -1777,7 +1089,8 @@ namespace AstroGrep.Windows.Forms
                _tempLine = _textToSearch;
 
                // attempt to locate the text in the line
-               if (__Grep.UseCaseSensitivity)
+                int _pos = 0;
+                if (__Grep.SearchSpec.UseCaseSensitivity)
                   _pos = _tempLine.IndexOf(_searchText);
                else
                   _pos = _tempLine.ToLower().IndexOf(_searchText.ToLower());
@@ -1786,21 +1099,20 @@ namespace AstroGrep.Windows.Forms
                {
                   do
                   {
-                     _highlight = false;
-
-                     //
+                      //
                      // retrieve parts of text
-                     _begin = _tempLine.Substring(0, _pos);
-                     _text = _tempLine.Substring(_pos, _searchText.Length);
+                     string _begin = _tempLine.Substring(0, _pos);
+                     string _text = _tempLine.Substring(_pos, _searchText.Length);
                      _end = _tempLine.Substring(_pos + _searchText.Length);
 
                      // set default color for starting text
-                     txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+                     txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                      // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                      txtHits.SelectedText = _begin;
 
                      // do a check to see if begin and end are valid for wholeword searches
-                     if (__Grep.UseWholeWordMatching)
+                      bool _highlight;
+                      if (__Grep.SearchSpec.UseWholeWordMatching)
                         _highlight = Grep.WholeWordOnly(_begin, _end);
                      else
                         _highlight = true;
@@ -1808,13 +1120,13 @@ namespace AstroGrep.Windows.Forms
                      // set highlight color for searched text
                      if (_highlight)
                      {
-                        txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightForeColor);
+                        txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
                         // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                      }
                      txtHits.SelectedText = _text;
 
                      // Check remaining string for other hits in same line
-                     if (__Grep.UseCaseSensitivity)
+                     if (__Grep.SearchSpec.UseCaseSensitivity)
                         _pos = _end.IndexOf(_searchText);
                      else
                         _pos = _end.ToLower().IndexOf(_searchText.ToLower());
@@ -1859,7 +1171,7 @@ namespace AstroGrep.Windows.Forms
          int _index = 0;
          int _lastPos = 0;
          int _counter = 0;
-         Regex _regEx = new Regex(__Grep.SearchText);
+         Regex _regEx = new Regex(__Grep.SearchSpec.SearchText);
          MatchCollection _col;
          Match _item;
 
@@ -1873,24 +1185,24 @@ namespace AstroGrep.Windows.Forms
             txtHits.SelectionFont = new Font("Courier New", 9.75F, FontStyle.Regular);
 
             // find all reg ex matches in line
-            if (__Grep.UseCaseSensitivity && __Grep.UseWholeWordMatching)
+            if (__Grep.SearchSpec.UseCaseSensitivity && __Grep.SearchSpec.UseWholeWordMatching)
             {
-               _regEx = new Regex("\\b" + __Grep.SearchText + "\\b");
+                _regEx = new Regex("\\b" + __Grep.SearchSpec.SearchText + "\\b");
                _col = _regEx.Matches(_textToSearch);
             }
-            else if (__Grep.UseCaseSensitivity)
+            else if (__Grep.SearchSpec.UseCaseSensitivity)
             {
-               _regEx = new Regex(__Grep.SearchText);
+                _regEx = new Regex(__Grep.SearchSpec.SearchText);
                _col = _regEx.Matches(_textToSearch);
             }
-            else if (__Grep.UseWholeWordMatching)
+            else if (__Grep.SearchSpec.UseWholeWordMatching)
             {
-               _regEx = new Regex("\\b" + __Grep.SearchText + "\\b", RegexOptions.IgnoreCase);
+                _regEx = new Regex("\\b" + __Grep.SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
                _col = _regEx.Matches(_textToSearch);
             }
             else
             {
-               _regEx = new Regex(__Grep.SearchText, RegexOptions.IgnoreCase);
+                _regEx = new Regex(__Grep.SearchSpec.SearchText, RegexOptions.IgnoreCase);
                _col = _regEx.Matches(_textToSearch);
             }
 
@@ -1901,7 +1213,7 @@ namespace AstroGrep.Windows.Forms
                _item = _col[_counter];
 
                // set the start text
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
 
                // check for empty string to prevent assigning nothing to selection text preventing
@@ -1911,12 +1223,12 @@ namespace AstroGrep.Windows.Forms
                   txtHits.SelectedText = _tempString;
 
                // set the hit text
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                txtHits.SelectedText = _textToSearch.Substring(_item.Index, _item.Length);
 
                // set the end text
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                if (_counter + 1 >= _col.Count)
                {
@@ -1935,7 +1247,7 @@ namespace AstroGrep.Windows.Forms
             if (_col.Count == 0)
             {
                //  no match, just a context line
-               txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                txtHits.SelectedText = _textToSearch;
             }
@@ -2189,25 +1501,25 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void SaveResultsAsHTML(string path)
       {
-         System.IO.StreamWriter writer = null;
+         StreamWriter writer = null;
 
          try
          {
             SetStatusBarMessage(string.Format(Language.GetGenericText("SaveSaving"), path));
 
             // Open the file
-            writer = new System.IO.StreamWriter(path, false, System.Text.Encoding.Default);
+            writer = new StreamWriter(path, false, System.Text.Encoding.Default);
 
             string repeat = string.Empty;
             string repeatSection;
-            System.Text.StringBuilder allSections = new System.Text.StringBuilder();
+            var allSections = new System.Text.StringBuilder();
             string repeater;
-            System.Text.StringBuilder lines = new System.Text.StringBuilder();
+            var lines = new System.Text.StringBuilder();
             string template = HTMLHelper.GetContents("Output.html");
             string css = HTMLHelper.GetContents("Output.css");
             int totalHits = 0;
 
-            if (__Grep.ReturnOnlyFileNames)
+            if (__Grep.SearchSpec.ReturnOnlyFileNames)
                template = HTMLHelper.GetContents("Output-fileNameOnly.html");
 
             css = HTMLHelper.ReplaceCssHolders(css);
@@ -2252,7 +1564,7 @@ namespace AstroGrep.Windows.Forms
          }
          catch (Exception ex)
          {
-            MessageBox.Show(string.Format(Language.GetGenericText("SaveError"), ex.ToString()), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(string.Format(Language.GetGenericText("SaveError"), ex), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
          finally
          {
@@ -2293,16 +1605,16 @@ namespace AstroGrep.Windows.Forms
             // write out search options
             writer.WriteStartElement("options");
             writer.WriteElementString("searchPath", __Grep.StartDirectory);
-            writer.WriteElementString("fileTypes", __Grep.FileFilter);
-            writer.WriteElementString("searchText", __Grep.SearchText);
-            writer.WriteElementString("regularExpressions", __Grep.UseRegularExpressions.ToString());
-            writer.WriteElementString("caseSensitive", __Grep.UseCaseSensitivity.ToString());
-            writer.WriteElementString("wholeWord", __Grep.UseWholeWordMatching.ToString());
-            writer.WriteElementString("recurse", __Grep.SearchInSubfolders.ToString());
-            writer.WriteElementString("showFileNamesOnly", __Grep.ReturnOnlyFileNames.ToString());
-            writer.WriteElementString("negation", __Grep.UseNegation.ToString());
-            writer.WriteElementString("lineNumbers", __Grep.IncludeLineNumbers.ToString());
-            writer.WriteElementString("contextLines", __Grep.ContextLines.ToString());
+            writer.WriteElementString("fileTypes", __Grep.FileFilterSpec.FileFilter);
+            writer.WriteElementString("searchText", __Grep.SearchSpec.SearchText);
+            writer.WriteElementString("regularExpressions", __Grep.SearchSpec.UseRegularExpressions.ToString());
+            writer.WriteElementString("caseSensitive", __Grep.SearchSpec.UseCaseSensitivity.ToString());
+            writer.WriteElementString("wholeWord", __Grep.SearchSpec.UseWholeWordMatching.ToString());
+            writer.WriteElementString("recurse", __Grep.SearchSpec.SearchInSubfolders.ToString());
+            writer.WriteElementString("showFileNamesOnly", __Grep.SearchSpec.ReturnOnlyFileNames.ToString());
+            writer.WriteElementString("negation", __Grep.SearchSpec.UseNegation.ToString());
+            writer.WriteElementString("lineNumbers", __Grep.SearchSpec.IncludeLineNumbers.ToString());
+            writer.WriteElementString("contextLines", __Grep.SearchSpec.ContextLines.ToString());
             writer.WriteEndElement();
 
             writer.WriteStartElement("search");
@@ -2480,11 +1792,11 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   12/07/2005	CHG: Pass in font name and size to print dialog
       /// [Curtis_Beard]	   10/11/2006	CHG: Pass in font and icon
       /// </history>
-      private void mnuPrintResults_Click(object sender, System.EventArgs e)
+      private void mnuPrintResults_Click(object sender, EventArgs e)
       {
          if (lstFileNames.Items.Count > 0)
          {
-            frmPrint _form = new frmPrint(lstFileNames, __Grep.Greps, txtHits.Font, this.Icon);
+            var _form = new frmPrint(lstFileNames, __Grep.Greps, txtHits.Font, Icon);
             _form.ShowDialog(this);
             _form = null;
          }
@@ -2995,13 +2307,12 @@ namespace AstroGrep.Windows.Forms
       {
          string _path;
          string _fileName;
-         string _expression;
 
-         try
+          try
          {
             _fileName = cboFileName.Text;
             _path = cboFilePath.Text.Trim();
-            _expression = cboSearchForText.Text;
+            string _expression = cboSearchForText.Text;
 
             // update combo selections
             AddComboSelection(cboSearchForText, _expression);
@@ -3009,11 +2320,11 @@ namespace AstroGrep.Windows.Forms
             AddComboSelection(cboFilePath, _path);
 
             // Ensure that there is a backslash.
-            if (!_path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-               _path += System.IO.Path.DirectorySeparatorChar.ToString();
+            if (!_path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+               _path += Path.DirectorySeparatorChar.ToString();
 
             // update path and fileName if fileName has a path in it
-            int slashPos = _fileName.LastIndexOf(System.IO.Path.DirectorySeparatorChar.ToString());
+            int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
 				if (slashPos > -1)
 				{
 					// fileName has a slash, so append the directory and get the file filter
@@ -3032,20 +2343,23 @@ namespace AstroGrep.Windows.Forms
             // Clear search errors
             __ErrorCollection.Clear();
 
-            // begin searching
-            __Grep = new Grep();
-            SetGrepOptions();
+            __Grep = new Grep(GetSearchSpecFromUI(),GetFilterSpecFromUI());
+
+            string[] extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
+            foreach (string ext in extensions)
+                __Grep.AddExclusionExtension(ext.ToLower());
+
+            __Grep.Plugins = Core.PluginManager.Items;
+
             __Grep.StartDirectory = _path;
-            __Grep.FileFilter = _fileName;
-            __Grep.SearchText = _expression;
 
             // attach events
-            __Grep.FileHit += new libAstroGrep.Grep.FileHitHandler(ReceiveFileHit);
-            __Grep.LineHit += new libAstroGrep.Grep.LineHitHandler(ReceiveLineHit);
-            __Grep.SearchCancel += new libAstroGrep.Grep.SearchCancelHandler(ReceiveSearchCancel);
-            __Grep.SearchComplete += new libAstroGrep.Grep.SearchCompleteHandler(ReceiveSearchComplete);
-            __Grep.SearchError += new libAstroGrep.Grep.SearchErrorHandler(ReceiveSearchError);
-            __Grep.SearchingFile += new libAstroGrep.Grep.SearchingFileHandler(ReceiveSearchingFile);
+            __Grep.FileHit += ReceiveFileHit;
+            __Grep.LineHit += ReceiveLineHit;
+            __Grep.SearchCancel += ReceiveSearchCancel;
+            __Grep.SearchComplete += ReceiveSearchComplete;
+            __Grep.SearchError += ReceiveSearchError;
+            __Grep.SearchingFile += ReceiveSearchingFile;
 
             __Grep.BeginExecute();
          }
@@ -3066,7 +2380,7 @@ namespace AstroGrep.Windows.Forms
       {
          if (lstFileNames.InvokeRequired)
          {
-            ClearItemsCallBack _delegate = new ClearItemsCallBack(ClearItems);
+            ClearItemsCallBack _delegate = ClearItems;
             lstFileNames.Invoke(_delegate);
             return;
          }
@@ -3074,33 +2388,78 @@ namespace AstroGrep.Windows.Forms
          lstFileNames.Items.Clear();
       }
 
-      /// <summary>
+    // todo: move or replace me
+    struct SearchSpec : ISearchSpec
+    {
+        public bool SearchInSubfolders { get;  set; }
+        public bool UseRegularExpressions { get;  set; }
+        public bool UseCaseSensitivity { get;  set; }
+        public bool UseWholeWordMatching { get;  set; }
+        public bool UseNegation { get;  set; }
+        public int ContextLines { get;  set; }
+        public string SearchText { get;  set; }
+        public bool ReturnOnlyFileNames { get;  set; }
+        public bool IncludeLineNumbers { get;  set; }
+    }
+
+
+    // todo: move or replace me
+    struct FileFilterSpec : IFileFilterSpec
+    {
+        public string FileFilter { get;  set; }
+        public bool SkipHiddenFiles { get;  set; }
+        public bool SkipSystemFiles { get;  set; }
+        public DateTime DateModifiedStare { get;  set; }
+        public DateTime DateModifiedEnd { get;  set; }
+        public int FileSizeMin { get;  set; }
+        public int FileSizeMax { get;  set; }
+        public string FileNameRegex { get;  set; }
+    }
+
+
+         private IFileFilterSpec GetFilterSpecFromUI()
+         {
+             var spec= new FileFilterSpec
+                        {
+                            FileFilter = null,
+                            SkipHiddenFiles = false,
+                            SkipSystemFiles = false,
+                            FileNameRegex = txtFilenameRegex.Text,
+                            DateModifiedStare = dateModBegin.Value,
+                            DateModifiedEnd = dateModEnd.Value,
+                        };
+
+             int size;
+
+             spec.FileSizeMin = int.TryParse(txtMinSize.Text, out size) ? size : int.MinValue;
+             spec.FileSizeMax = int.TryParse(txtMaxSize.Text, out size) ? size : int.MaxValue;
+
+             return spec;
+         }
+
+
+       /// <summary>
       /// Sets the grep options
       /// </summary>
       /// <history>
       /// [Curtis_Beard]		10/17/2005	Created
       /// [Curtis_Beard]		07/28/2006  ADD: extension exclusion list
+      /// [Andrew_Radford]		13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
       /// </history>
-      private void SetGrepOptions()
+      private ISearchSpec GetSearchSpecFromUI()
       {
-         if (__Grep != null)
-         {
-            // set values from user selected search options
-            __Grep.UseCaseSensitivity = chkCaseSensitive.Checked;
-            __Grep.ContextLines = Convert.ToInt32(txtContextLines.Value);
-            __Grep.IncludeLineNumbers = chkLineNumbers.Checked;
-            __Grep.UseNegation = chkNegation.Checked;
-            __Grep.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
-            __Grep.SearchInSubfolders = chkRecurse.Checked;
-            __Grep.UseRegularExpressions = chkRegularExpressions.Checked;
-            __Grep.UseWholeWordMatching = chkWholeWordOnly.Checked;
-
-            string[] extensions = AstroGrep.Core.GeneralSettings.ExtensionExcludeList.Split(';');
-            foreach (string ext in extensions)
-               __Grep.AddExclusionExtension(ext.ToLower());
-
-            __Grep.Plugins = Core.PluginManager.Items;
-         }
+          return new SearchSpec
+                        {
+                            UseCaseSensitivity = chkCaseSensitive.Checked,
+                            ContextLines = Convert.ToInt32(txtContextLines.Value),
+                            IncludeLineNumbers = chkLineNumbers.Checked,
+                            UseNegation = chkNegation.Checked,
+                            ReturnOnlyFileNames = chkFileNamesOnly.Checked,
+                            SearchInSubfolders = chkRecurse.Checked,
+                            UseRegularExpressions = chkRegularExpressions.Checked,
+                            UseWholeWordMatching = chkWholeWordOnly.Checked,
+                            SearchText = cboSearchForText.Text
+                        };  
       }
 
       /// <summary>
@@ -3114,21 +2473,20 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		07/07/2006	CHG: Make thread safe
       /// [Curtis_Beard]		09/14/2006	CHG: Update to use date's ToString method
       /// </history>
-      private void AddHitToList(System.IO.FileInfo file, int index)
+      private void AddHitToList(FileInfo file, int index)
       {
          if (lstFileNames.InvokeRequired)
          {
-            AddToListCallBack _delegate = new AddToListCallBack(AddHitToList);
+            AddToListCallBack _delegate = AddHitToList;
             lstFileNames.Invoke(_delegate, new object[2] {file, index});
             return;
          }
 
-         ListViewItem _listItem;
-
-         // Create the list item
-         _listItem = new ListViewItem(file.Name);
+          // Create the list item
+         var _listItem = new ListViewItem(file.Name);
          _listItem.SubItems.Add(file.DirectoryName);
          _listItem.SubItems.Add(file.LastWriteTime.ToString());
+         _listItem.SubItems.Add(file.Length.ToString());
          _listItem.SubItems.Add("0");
          // must be last
          _listItem.SubItems.Add(index.ToString());
@@ -3141,6 +2499,22 @@ namespace AstroGrep.Windows.Forms
       }
       #endregion
 
+      private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+      {
 
-   }
+      }
+
+      private void panel2_Paint(object sender, PaintEventArgs e)
+      {
+
+      }
+
+      private void label4_Click(object sender, EventArgs e)
+      {
+
+      }
+
+
+
+    }
 }

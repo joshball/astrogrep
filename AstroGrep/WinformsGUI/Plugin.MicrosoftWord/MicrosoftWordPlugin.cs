@@ -40,28 +40,21 @@ namespace Plugin.MicrosoftWord
 	public class MicrosoftWordPlugin : IDisposable, IAstroGrepPlugin
 	{
 		#region Declarations
-		private bool __IsAvailable = false;
-		private bool __IsUsable = false;
+		private bool __IsAvailable;
+		private bool __IsUsable;
 		private Type __WordType;
 		private object __WordApplication;
 		private object __WordDocuments;
 		private object __WordSelection;
 
-		private bool __useRegularExpressions = false;
-		private bool __caseSensistiveMatch = false;
-		private bool __wholeWordMatch = false;
-		private bool __onlyFileNames = false;
-		private bool __includeLineNumbers = true;
-		private int __contextLines = 0;
-
-		private string PLUGIN_NAME = "Microsoft Word";
-		private string PLUGIN_VERSION = "1.1.1";
-		private string PLUGIN_AUTHOR = "The AstroGrep Team";
-		private string PLUGIN_DESCRIPTION = "Searches Microsoft Word documents for specified text.  Line numbers are shown as (Line,Page).  Currently doesn't support Regular Expressions or Context lines.";
+		private const string PLUGIN_NAME = "Microsoft Word";
+		private const string PLUGIN_VERSION = "1.1.1";
+		private const string PLUGIN_AUTHOR = "The AstroGrep Team";
+		private const string PLUGIN_DESCRIPTION = "Searches Microsoft Word documents for specified text.  Line numbers are shown as (Line,Page).  Currently doesn't support Regular Expressions or Context lines.";
 		private const string PLUGIN_EXTENSIONS = ".doc,.docx";
 
-		private object MISSING_VALUE = System.Reflection.Missing.Value;
-		private string NEW_LINE = Environment.NewLine;
+		private readonly object MISSING_VALUE = Missing.Value;
+		private readonly string NEW_LINE = Environment.NewLine;
 		#endregion
 
 		#region Class Level
@@ -167,7 +160,10 @@ namespace Plugin.MicrosoftWord
 			get { return PLUGIN_EXTENSIONS; }
 		}
 
-		/// <summary>
+
+	
+
+	    /// <summary>
 		/// Checks to see if the plugin is available on this system.
 		/// </summary>
 		public bool IsAvailable
@@ -289,39 +285,42 @@ namespace Plugin.MicrosoftWord
 			__IsUsable = false;
 		}
 
-		/// <summary>
+	  
+
+
+	    /// <summary>
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="file">FileInfo object</param>
-		/// <param name="searchText">Text to locate</param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null if on error</returns>
 		/// <history>
 		/// [Curtis_Beard]      07/28/2006  Created
 		/// [Curtis_Beard]      05/25/2007  ADD: support for Exception object
 		/// </history>
-		public HitObject Grep(System.IO.FileInfo file, string searchText, ref Exception ex)
+        public HitObject Grep(FileInfo file, ISearchSpec searchSpec, ref Exception ex)
 		{
-			return Grep(file.FullName, searchText, ref ex);
+			return Grep(file.FullName, searchSpec, ref ex);
 		}
+
+
 
 		/// <summary>
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="path">Fully qualified file path</param>
-		/// <param name="searchText">Text to locate</param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null on error</returns>
 		/// <history>
 		/// [Curtis_Beard]      07/28/2006  Created
 		/// [Curtis_Beard]      05/25/2007  ADD: support for Exception object
 		/// </history>
-		public HitObject Grep(string path, string searchText, ref Exception ex)
+        public HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex)
 		{
 			// initialize Exception object to null
 			ex = null;
 
-			if (this.IsAvailable && this.IsUsable)
+			if (IsAvailable && IsUsable)
 			{
 				try
 				{
@@ -335,7 +334,7 @@ namespace Plugin.MicrosoftWord
 						string _spacer = new string(' ', MARGINSIZE);
 						string _contextSpacer = string.Empty;
 
-						if (__contextLines > 0)
+                        if (searchSpec.ContextLines > 0)
 						{
 							_contextSpacer = new string(' ', MARGINSIZE);
 							_spacer = _contextSpacer.Substring(_contextSpacer.Length - MARGINSIZE - 2) + "> ";
@@ -357,9 +356,9 @@ namespace Plugin.MicrosoftWord
 						// setup find
 						RunRoutine(find, "ClearFormatting", null);
 						SetProperty(find, "Forward", true);
-						SetProperty(find, "Text", searchText);
-						SetProperty(find, "MatchWholeWord", __wholeWordMatch);
-						SetProperty(find, "MatchCase", __caseSensistiveMatch);
+                        SetProperty(find, "Text", searchSpec.SearchText);
+                        SetProperty(find, "MatchWholeWord", searchSpec.UseWholeWordMatching);
+                        SetProperty(find, "MatchCase", searchSpec.UseCaseSensitivity);
 
 						// start find
 						FindExecute(find);
@@ -376,7 +375,7 @@ namespace Plugin.MicrosoftWord
 							}
 
 							// since a hit was found and only displaying file names, quickly exit
-							if (__onlyFileNames)
+                            if (searchSpec.ReturnOnlyFileNames)
 								break;
 
 							// retrieve find information
@@ -390,7 +389,7 @@ namespace Plugin.MicrosoftWord
 							if (!(prevLine == lineNum && prevPage == pageNum))
 							{
 								// check for line numbers
-								if (__includeLineNumbers)
+                                if (searchSpec.IncludeLineNumbers)
 								{
 									// setup line header
 									_spacer = "(" + string.Format("{0},{1}", lineNum, pageNum);
@@ -575,7 +574,7 @@ namespace Plugin.MicrosoftWord
 		/// </history>
 		private void CloseDocument(object doc)
 		{
-			if (this.IsAvailable && doc != null)
+			if (IsAvailable && doc != null)
 				doc.GetType().InvokeMember("Close", BindingFlags.InvokeMethod, null, doc, new object[] {});
 		}
 
@@ -590,7 +589,7 @@ namespace Plugin.MicrosoftWord
 		/// </history>
 		private object Information(object obj, WdInformation type)
 		{
-			if (this.IsAvailable && obj != null)
+			if (IsAvailable && obj != null)
 				return obj.GetType().InvokeMember("Information", BindingFlags.GetProperty, null, obj, new object[1] {(int)type});
 
 			return null;
@@ -813,44 +812,6 @@ namespace Plugin.MicrosoftWord
 		private void Trace(string message)
 		{
 			System.Diagnostics.Debug.WriteLine(PLUGIN_NAME + " Plugin: " + message);
-		}
-		#endregion
-
-		#region Grep Options
-		/// <summary>Sets number of context lines.</summary>
-		public int ContextLines
-		{
-			set { __contextLines = value; }
-		}
-
-		/// <summary>Sets whether to include line numbers.</summary>
-		public bool IncludeLineNumbers
-		{
-			set { __includeLineNumbers = value; }
-		}
-
-		/// <summary>Sets if only file names are returned.</summary>
-		public bool ReturnOnlyFileNames
-		{
-			set { __onlyFileNames = value; }
-		}
-
-		/// <summary>Sets whether the search is case sensitive.</summary>
-		public bool UseCaseSensitivity
-		{
-			set { __caseSensistiveMatch = value; }
-		}
-
-		/// <summary>Sets whether the search value is a regular expression.</summary>
-		public bool UseRegularExpressions
-		{
-			set { __useRegularExpressions = value; }
-		}
-
-		/// <summary>Sets whether the search matches only whole words.</summary>
-		public bool UseWholeWordMatching
-		{
-			set { __wholeWordMatch = value; }
 		}
 		#endregion
 	}
