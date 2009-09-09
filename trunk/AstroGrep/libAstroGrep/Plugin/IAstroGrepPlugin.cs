@@ -57,21 +57,22 @@ namespace libAstroGrep.Plugin
       /// Method that performs grep.
       /// </summary>
       /// <param name="file">FileInfo containing current file</param>
-      /// <param name="searchText">Text to grep</param>
       /// <param name="ex">Contains an Exception if one occurred</param>
       /// <returns>HitObject containing valid hit</returns>
-      HitObject Grep(System.IO.FileInfo file, string searchText, ref Exception ex);
+      HitObject Grep(System.IO.FileInfo file, ISearchSpec searchSpec, ref Exception ex);
 
       /// <summary>
       /// Method that performs grep.
       /// </summary>
       /// <param name="path">Fully qualified file path</param>
-      /// <param name="searchText">Text to grep</param>
+      /// <param name="searchProperties"></param>
       /// <param name="ex">Contains an Exception if one occurred</param>
       /// <returns>HitObject containing valid hit</returns>
-      HitObject Grep(string path, string searchText, ref Exception ex);
+      HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex);
 
-      // Plugin Properties
+     
+
+
       /// <summary>
       /// Gets whether plugin is available to use.
       /// </summary>
@@ -108,41 +109,6 @@ namespace libAstroGrep.Plugin
       string Description
       { get; }
 
-      // Grep Options
-      /// <summary>
-      /// Sets use of regular expressions for grep.
-      /// </summary>
-      bool UseRegularExpressions
-      { set; }
-
-      /// <summary>
-      /// Sets use of a case sensitive grep.
-      /// </summary>
-      bool UseCaseSensitivity
-      { set; }
-
-      /// <summary>
-      /// Sets use of a whole word match grep.
-      /// </summary>
-      bool UseWholeWordMatching
-      { set; }
-
-      /// <summary>
-      /// Sets returning only file names for grep results.
-      /// </summary>
-      bool ReturnOnlyFileNames
-      { set; }
-
-      /// <summary>
-      /// Sets including line numbers as part of a line.
-      /// </summary>
-      bool IncludeLineNumbers
-      { set; }
-
-      /// <summary>
-      /// Sets the number of context lines included in grep results.
-      /// </summary>
-      int ContextLines
-      { set; }
+     
    }
 }

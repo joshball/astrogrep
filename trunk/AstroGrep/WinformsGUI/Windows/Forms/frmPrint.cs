@@ -1,8 +1,9 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
+using libAstroGrep;
 
 namespace AstroGrep.Windows.Forms
 {
@@ -33,30 +34,20 @@ namespace AstroGrep.Windows.Forms
    /// <history>
    /// [Curtis_Beard]	   02/02/2005	Created
    /// [Curtis_Beard]      11/02/2005	CHG: cleanup, pass in font info, comment headers changed
+   /// [Andrew_Radford]    17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
    /// </history>
-   public class frmPrint : System.Windows.Forms.Form
+   public partial class frmPrint : Form
    {
       #region Declarations
       private PrintDocument pdoc = new PrintDocument();
       private string __document = string.Empty;
-      private ListView __listView;
-      private Hashtable __grepTable;
+      
+      private IList<HitObject> __grepTable;
       private Font __Font;
       private int __CurrentChar = 0;
       private Icon __Icon;
       #endregion
 
-      private System.Windows.Forms.Button cmdPrint;
-      private System.Windows.Forms.Button cmdPreview;
-      private System.Windows.Forms.Button cmdPageSetup;
-      private System.Windows.Forms.Button cmdCancel;
-      private System.Windows.Forms.Label lblSelect;
-      private System.Windows.Forms.ListBox lstPrintTypes;
-
-      /// <summary>
-      /// Required designer variable.
-      /// </summary>
-      private System.ComponentModel.Container components = null;
 
       /// <summary>
       /// Creates an instance of this class setting its private objects
@@ -69,7 +60,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      11/02/2005	Created
       /// [Curtis_Beard]      10/11/2006	CHG: Added Font object and a Icon
       /// </history>
-      public frmPrint(ListView fileList, Hashtable greps, Font font, Icon icon)
+      public frmPrint(ListView fileList, IList<HitObject> greps, Font font, Icon icon)
       {
          //
          // Required for Windows Form Designer support
@@ -81,120 +72,8 @@ namespace AstroGrep.Windows.Forms
          __Font = font;
          __Icon = icon;
 
-         pdoc.PrintPage += new PrintPageEventHandler(pdoc_PrintPage);
+         pdoc.PrintPage += pdoc_PrintPage;
       }
-
-      /// <summary>
-      /// Clean up any resources being used.
-      /// </summary>
-      protected override void Dispose( bool disposing )
-      {
-         if( disposing )
-         {
-            if(components != null)
-            {
-               components.Dispose();
-            }
-         }
-         base.Dispose( disposing );
-      }
-
-      #region Windows Form Designer generated code
-      /// <summary>
-      /// Required method for Designer support - do not modify
-      /// the contents of this method with the code editor.
-      /// </summary>
-      private void InitializeComponent()
-      {
-         this.cmdPrint = new System.Windows.Forms.Button();
-         this.cmdPreview = new System.Windows.Forms.Button();
-         this.cmdPageSetup = new System.Windows.Forms.Button();
-         this.cmdCancel = new System.Windows.Forms.Button();
-         this.lblSelect = new System.Windows.Forms.Label();
-         this.lstPrintTypes = new System.Windows.Forms.ListBox();
-         this.SuspendLayout();
-         // 
-         // cmdPrint
-         // 
-         this.cmdPrint.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.cmdPrint.Location = new System.Drawing.Point(8, 160);
-         this.cmdPrint.Name = "cmdPrint";
-         this.cmdPrint.Size = new System.Drawing.Size(96, 23);
-         this.cmdPrint.TabIndex = 1;
-         this.cmdPrint.Text = "&Print";
-         this.cmdPrint.Click += new System.EventHandler(this.cmdPrint_Click);
-         // 
-         // cmdPreview
-         // 
-         this.cmdPreview.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.cmdPreview.Location = new System.Drawing.Point(120, 160);
-         this.cmdPreview.Name = "cmdPreview";
-         this.cmdPreview.Size = new System.Drawing.Size(96, 23);
-         this.cmdPreview.TabIndex = 2;
-         this.cmdPreview.Text = "Pre&view";
-         this.cmdPreview.Click += new System.EventHandler(this.cmdPreview_Click);
-         // 
-         // cmdPageSetup
-         // 
-         this.cmdPageSetup.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.cmdPageSetup.Location = new System.Drawing.Point(232, 160);
-         this.cmdPageSetup.Name = "cmdPageSetup";
-         this.cmdPageSetup.Size = new System.Drawing.Size(96, 23);
-         this.cmdPageSetup.TabIndex = 3;
-         this.cmdPageSetup.Text = "Page &Setup";
-         this.cmdPageSetup.Click += new System.EventHandler(this.cmdPageSetup_Click);
-         // 
-         // cmdCancel
-         // 
-         this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-         this.cmdCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.cmdCancel.Location = new System.Drawing.Point(344, 160);
-         this.cmdCancel.Name = "cmdCancel";
-         this.cmdCancel.Size = new System.Drawing.Size(96, 23);
-         this.cmdCancel.TabIndex = 4;
-         this.cmdCancel.Text = "&Cancel";
-         this.cmdCancel.Click += new System.EventHandler(this.cmdCancel_Click);
-         // 
-         // lblSelect
-         // 
-         this.lblSelect.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.lblSelect.Location = new System.Drawing.Point(8, 8);
-         this.lblSelect.Name = "lblSelect";
-         this.lblSelect.Size = new System.Drawing.Size(432, 16);
-         this.lblSelect.TabIndex = 4;
-         this.lblSelect.Text = "Please select the output type:";
-         // 
-         // lstPrintTypes
-         // 
-         this.lstPrintTypes.Location = new System.Drawing.Point(8, 32);
-         this.lstPrintTypes.Name = "lstPrintTypes";
-         this.lstPrintTypes.Size = new System.Drawing.Size(432, 121);
-         this.lstPrintTypes.TabIndex = 0;
-         // 
-         // frmPrint
-         // 
-         this.AcceptButton = this.cmdPrint;
-         this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-         this.CancelButton = this.cmdCancel;
-         this.ClientSize = new System.Drawing.Size(450, 191);
-         this.Controls.Add(this.lstPrintTypes);
-         this.Controls.Add(this.lblSelect);
-         this.Controls.Add(this.cmdCancel);
-         this.Controls.Add(this.cmdPageSetup);
-         this.Controls.Add(this.cmdPreview);
-         this.Controls.Add(this.cmdPrint);
-         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-         this.MaximizeBox = false;
-         this.MinimizeBox = false;
-         this.Name = "frmPrint";
-         this.ShowInTaskbar = false;
-         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-         this.Text = "Print";
-         this.Load += new System.EventHandler(this.frmPrint_Load);
-         this.ResumeLayout(false);
-
-      }
-      #endregion
 
       /// <summary>
       /// Form Load Event
@@ -204,7 +83,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]      02/02/2005	Created
       /// </history>
-      private void frmPrint_Load(object sender, System.EventArgs e)
+      private void frmPrint_Load(object sender, EventArgs e)
       {
          //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
          Language.ProcessForm(this);
@@ -234,7 +113,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]      02/02/2005	Created
       /// </history>
-      private void cmdPrint_Click(object sender, System.EventArgs e)
+      private void cmdPrint_Click(object sender, EventArgs e)
       {
          try
          {
@@ -262,7 +141,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      10/06/2006	CHG: Set icon and make resizable
       /// [Curtis_Beard]      11/02/2006	CHG: translate form text
       /// </history>
-      private void cmdPreview_Click(object sender, System.EventArgs e)
+      private void cmdPreview_Click(object sender, EventArgs e)
       {
          try
          {
@@ -298,7 +177,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      02/02/2005	Created
       /// [Curtis_Beard]      11/02/2005	CHG: remove setting the default margins
       /// </history>
-      private void cmdPageSetup_Click(object sender, System.EventArgs e)
+      private void cmdPageSetup_Click(object sender, EventArgs e)
       {
          PageSetupDialog psd = new PageSetupDialog();
 
@@ -325,7 +204,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]      02/02/2005	Created
       /// </history>
-      private void cmdCancel_Click(object sender, System.EventArgs e)
+      private void cmdCancel_Click(object sender, EventArgs e)
       {
          this.Close();
       }

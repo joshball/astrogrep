@@ -52,16 +52,12 @@ namespace AstroGrep
       public static string PLUGIN_ARGS_SEPARATOR = "|@@|";
 
       // ListView column index constants
-      /// <summary></summary>
       public const int COLUMN_INDEX_FILE = 0;
-      /// <summary></summary>
       public const int COLUMN_INDEX_DIRECTORY = 1;
-      /// <summary></summary>
       public const int COLUMN_INDEX_DATE = 2;
-      /// <summary></summary>
-      public const int COLUMN_INDEX_COUNT = 3;
-      /// <summary></summary>
-      public const int COLUMN_INDEX_GREP_INDEX  = 4;   //Must be last
+      public const int COLUMN_INDEX_SIZE = 3;
+      public const int COLUMN_INDEX_COUNT = 4;
+      public const int COLUMN_INDEX_GREP_INDEX  = 5;   //Must be last
 
       /// <summary>Identifier for all file types</summary>
       public const string ALL_FILE_TYPES = "*";
