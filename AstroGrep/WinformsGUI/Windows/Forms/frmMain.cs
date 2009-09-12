@@ -2307,32 +2307,14 @@ namespace AstroGrep.Windows.Forms
           /// </history>
           private void StartSearch()
           {
-             string _path;
-             string _fileName;
-
               try
              {
-                _fileName = cboFileName.Text;
-                _path = cboFilePath.Text.Trim();
-                string _expression = cboSearchForText.Text;
+                 string _path = cboFilePath.Text.Trim();
 
-                // update combo selections
-                AddComboSelection(cboSearchForText, _expression);
-                AddComboSelection(cboFileName, _fileName);
+                 // update combo selections
+                AddComboSelection(cboSearchForText, cboSearchForText.Text);
+                AddComboSelection(cboFileName, cboFileName.Text);
                 AddComboSelection(cboFilePath, _path);
-
-                // Ensure that there is a backslash.
-                if (!_path.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                   _path += Path.DirectorySeparatorChar.ToString();
-
-                // update path and fileName if fileName has a path in it
-                int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
-				    if (slashPos > -1)
-				    {
-					    // fileName has a slash, so append the directory and get the file filter
-					    _path += _fileName.Substring(0, slashPos);
-					    _fileName = _fileName.Substring(slashPos + 1);
-				    }
 
                 // disable gui
                 SetSearchState(false);
@@ -2345,10 +2327,17 @@ namespace AstroGrep.Windows.Forms
                 // Clear search errors
                 __ErrorCollection.Clear();
 
-                __Grep = new Grep(GetSearchSpecFromUI(),GetFilterSpecFromUI());
+                 var fileFilterSpec = GetFilterSpecFromUI();
+                 __Grep = new Grep(GetSearchSpecFromUI(),fileFilterSpec);
 
-                string[] extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
-                foreach (string ext in extensions)
+
+                // fileName has a slash, so append the directory and get the file filter
+                int slashPos = fileFilterSpec.FileFilter.LastIndexOf(Path.DirectorySeparatorChar.ToString());
+                if (slashPos > -1)
+                    _path += cboFileName.Text.Substring(0, slashPos);
+
+                var extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
+                foreach (var ext in extensions)
                     __Grep.AddExclusionExtension(ext.ToLower());
 
                 __Grep.Plugins = Core.PluginManager.Items;
@@ -2421,9 +2410,21 @@ namespace AstroGrep.Windows.Forms
 
              private IFileFilterSpec GetFilterSpecFromUI()
              {
+                 string _fileName = cboFileName.Text;
+                 string _path = cboFilePath.Text.Trim();
+
+                 // Ensure that there is a backslash.
+                 if (!_path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                     _path += Path.DirectorySeparatorChar.ToString();
+
+                 // update path and fileName if fileName has a path in it
+                 int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
+                 if (slashPos > -1)
+                     _fileName = _fileName.Substring(slashPos + 1);
+
                  var spec= new FileFilterSpec
                             {
-                                FileFilter = null,
+                                FileFilter = _fileName,
                                 SkipHiddenFiles = false,
                                 SkipSystemFiles = false,
                                 FileNameRegex = txtFilenameRegex.Text,
