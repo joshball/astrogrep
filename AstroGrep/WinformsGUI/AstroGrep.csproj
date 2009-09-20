@@ -116,6 +116,7 @@
     <Compile Include="Core\TextEditor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Output\HitListExport.cs" />
     <Compile Include="Output\HTMLHelper.cs">
       <SubType>Code</SubType>
     </Compile>
