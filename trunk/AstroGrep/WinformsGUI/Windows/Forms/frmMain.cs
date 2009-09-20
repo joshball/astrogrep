@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.IO;
-
+using AstroGrep.Output;
 using libAstroGrep;
 
 namespace AstroGrep.Windows.Forms
@@ -1443,236 +1443,8 @@ namespace AstroGrep.Windows.Forms
              }
           }
 
-          /// <summary>
-          /// Save results to a text file
-          /// </summary>
-          /// <param name="path">Fully qualified file path</param>
-          /// <history>
-          /// [Curtis_Beard]		09/06/2006	Created
-          /// </history>
-          private void SaveResultsAsText(string path)
-          {
-             System.IO.StreamWriter writer = null;
+     
 
-             try
-             {
-                // Open the file
-                writer = new System.IO.StreamWriter(path, false, System.Text.Encoding.Default);
-
-                SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), path));
-
-                // loop through File Names list
-                for (int _index = 0; _index < lstFileNames.Items.Count; _index++)
-                {
-                   HitObject _hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.Items[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-
-                   // write info to a file
-                   writer.WriteLine("-------------------------------------------------------------------------------");
-                   writer.WriteLine(_hit.FilePath);
-                   writer.WriteLine("-------------------------------------------------------------------------------");
-                   writer.Write(_hit.Lines);
-                   writer.WriteLine("");
-
-                   // clear hit object
-                   _hit = null;
-                }
-             }
-             catch (Exception ex)
-             {
-                MessageBox.Show(String.Format(Language.GetGenericText("SaveError"), ex.ToString()), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-             }
-             finally
-             {
-                // Close file
-                if (writer != null)
-                {
-                   writer.Flush();
-                   writer.Close();
-                }
-
-                SetStatusBarMessage(Language.GetGenericText("SaveSaved"));
-             }
-          }
-
-          /// <summary>
-          /// Save results to a html file
-          /// </summary>
-          /// <param name="path">Fully qualified file path</param>
-          /// <history>
-          /// [Curtis_Beard]		09/06/2006	Created
-          /// </history>
-          private void SaveResultsAsHTML(string path)
-          {
-             StreamWriter writer = null;
-
-             try
-             {
-                SetStatusBarMessage(string.Format(Language.GetGenericText("SaveSaving"), path));
-
-                // Open the file
-                writer = new StreamWriter(path, false, System.Text.Encoding.Default);
-
-                string repeat = string.Empty;
-                string repeatSection;
-                var allSections = new System.Text.StringBuilder();
-                string repeater;
-                var lines = new System.Text.StringBuilder();
-                string template = HTMLHelper.GetContents("Output.html");
-                string css = HTMLHelper.GetContents("Output.css");
-                int totalHits = 0;
-
-                if (__Grep.SearchSpec.ReturnOnlyFileNames)
-                   template = HTMLHelper.GetContents("Output-fileNameOnly.html");
-
-                css = HTMLHelper.ReplaceCssHolders(css);
-                template = template.Replace("%%style%%", css);
-                template = template.Replace("%%title%%", "AstroGrep Results");
-
-                int rStart = template.IndexOf("[repeat]");
-                int rStop = template.IndexOf("[/repeat]") + "[/repeat]".Length;
-                repeat = template.Substring(rStart, rStop - rStart);
-
-                repeatSection = repeat;
-                repeatSection = repeatSection.Replace("[repeat]", string.Empty);
-                repeatSection = repeatSection.Replace("[/repeat]", string.Empty);
-
-                // loop through File Names list
-                for (int _index = 0; _index < lstFileNames.Items.Count; _index++)
-                {
-                   HitObject _hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.Items[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-
-                   lines = new System.Text.StringBuilder();
-                   repeater = repeatSection;
-                   repeater = repeater.Replace("%%file%%", _hit.FilePath);
-                   totalHits += _hit.HitCount;
-
-                   for (int _jIndex = 0; _jIndex < _hit.LineCount; _jIndex++)
-                      lines.Append(HTMLHelper.GetHighlightLine(_hit.RetrieveLine(_jIndex), __Grep));
-
-                   repeater = repeater.Replace("%%lines%%", lines.ToString());
-
-                   // clear hit object
-                   _hit = null;
-
-                   allSections.Append(repeater);
-                }
-
-                template = template.Replace(repeat, allSections.ToString());
-                template = template.Replace("%%totalhits%%", totalHits.ToString());
-                template = HTMLHelper.ReplaceSearchOptions(template, __Grep);
-
-                // write out template to the file
-                writer.WriteLine(template);
-             }
-             catch (Exception ex)
-             {
-                MessageBox.Show(string.Format(Language.GetGenericText("SaveError"), ex), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-             }
-             finally
-             {
-                // Close file
-                if (writer != null)
-                {
-                   writer.Flush();
-                   writer.Close();
-                }
-
-                SetStatusBarMessage(Language.GetGenericText("SaveSaved"));
-             }
-          }
-
-          /// <summary>
-          /// Save results to a xml file
-          /// </summary>
-          /// <param name="path">Fully qualified file path</param>
-          /// <history>
-          /// [Curtis_Beard]		09/06/2006	Created
-          /// </history>
-          private void SaveResultsAsXML(string path)
-          {
-             System.Xml.XmlTextWriter writer = null;
-
-             try
-             {
-                SetStatusBarMessage(string.Format(Language.GetGenericText("SaveSaving"), path));
-
-                // Open the file
-                writer = new System.Xml.XmlTextWriter(path, System.Text.Encoding.UTF8);
-                writer.Formatting = System.Xml.Formatting.Indented;
-
-                writer.WriteStartDocument(true);
-                writer.WriteStartElement("astrogrep");
-                writer.WriteAttributeString("version", "1.0");
-
-                // write out search options
-                writer.WriteStartElement("options");
-                writer.WriteElementString("searchPath", __Grep.StartDirectory);
-                writer.WriteElementString("fileTypes", __Grep.FileFilterSpec.FileFilter);
-                writer.WriteElementString("searchText", __Grep.SearchSpec.SearchText);
-                writer.WriteElementString("regularExpressions", __Grep.SearchSpec.UseRegularExpressions.ToString());
-                writer.WriteElementString("caseSensitive", __Grep.SearchSpec.UseCaseSensitivity.ToString());
-                writer.WriteElementString("wholeWord", __Grep.SearchSpec.UseWholeWordMatching.ToString());
-                writer.WriteElementString("recurse", __Grep.SearchSpec.SearchInSubfolders.ToString());
-                writer.WriteElementString("showFileNamesOnly", __Grep.SearchSpec.ReturnOnlyFileNames.ToString());
-                writer.WriteElementString("negation", __Grep.SearchSpec.UseNegation.ToString());
-                writer.WriteElementString("lineNumbers", __Grep.SearchSpec.IncludeLineNumbers.ToString());
-                writer.WriteElementString("contextLines", __Grep.SearchSpec.ContextLines.ToString());
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("search");
-                writer.WriteAttributeString("totalfiles", __Grep.Greps.Count.ToString());
-
-                // get total hits
-                int totalHits = 0;
-                for (int _index = 0; _index < lstFileNames.Items.Count; _index++)
-                {
-                   HitObject _hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.Items[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-
-                   // add to total
-                   totalHits += _hit.HitCount;
-
-                   // clear hit object
-                   _hit = null;
-                }
-                writer.WriteAttributeString("totalfound", totalHits.ToString());
-
-                for (int _index = 0; _index < lstFileNames.Items.Count; _index++)
-                {
-                   writer.WriteStartElement("item");
-                   HitObject _hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.Items[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-
-                   writer.WriteAttributeString("file", _hit.FilePath);
-                   writer.WriteAttributeString("total", _hit.HitCount.ToString());
-
-                   // write out lines
-                   for (int _jIndex = 0; _jIndex < _hit.LineCount; _jIndex++)
-                      writer.WriteElementString("line", _hit.RetrieveLine(_jIndex));
-
-                   // clear hit object
-                   _hit = null;
-
-                   writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();   //search
-                writer.WriteEndElement();   //astrogrep
-             }
-             catch (Exception ex)
-             {
-                MessageBox.Show(string.Format(Language.GetGenericText("SaveError"), ex.ToString()), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-             }
-             finally
-             {
-                // Close file
-                if (writer != null)
-                {
-                   writer.Flush();
-                   writer.Close();
-                }
-
-                SetStatusBarMessage(Language.GetGenericText("SaveSaved"));
-             }
-          }
 
           /// <summary>
           /// Set the view states of the controls.
@@ -1750,39 +1522,65 @@ namespace AstroGrep.Windows.Forms
           /// </history>
           private void mnuSaveResults_Click(object sender, System.EventArgs e)
           {
-             SaveFileDialog dlg = new SaveFileDialog();
-             dlg.CheckPathExists = true;
-             dlg.AddExtension = true;
-             dlg.Title = Language.GetGenericText("SaveDialogTitle");
-             dlg.Filter = "Text (*.txt)|*.txt|HTML (*.html)|*.html|XML (*.xml)|*.xml";
+              // only show dialog if information to save
+              if (lstFileNames.Items.Count <= 0)
+              {
+                  MessageBox.Show(Language.GetGenericText("SaveNoResults"), Constants.ProductName, MessageBoxButtons.OK,
+                                  MessageBoxIcon.Information);
+                  return;
+              }
 
-             // only show dialog if information to save
-             if (lstFileNames.Items.Count > 0)
-             {
-                if (dlg.ShowDialog(this) == DialogResult.OK)
-                {
-                   switch (dlg.FilterIndex)
-                   {
+              var dlg = new SaveFileDialog
+                           {
+                               CheckPathExists = true,
+                               AddExtension = true,
+                               Title = Language.GetGenericText("SaveDialogTitle"),
+                               Filter = "Text (*.txt)|*.txt|HTML (*.html)|*.html|XML (*.xml)|*.xml"
+                           };
+
+            
+              if (dlg.ShowDialog(this) == DialogResult.OK)
+              {
+                  switch (dlg.FilterIndex)
+                  {
                       case 1:
-                         // Save to text
-                         SaveResultsAsText(dlg.FileName);
-                         break;
+                          // Save to text
+                          OutputResults(dlg.FileName, HitListExport.SaveResultsAsText);
+                          break;
                       case 2:
-                         // Save to html
-                         SaveResultsAsHTML(dlg.FileName);
-                         break;
+                          // Save to html
+                          SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), dlg.FileName));
+                          OutputResults(dlg.FileName, HitListExport.SaveResultsAsHTML);
+                          break;
                       case 3:
-                         // Save to xml
-                         SaveResultsAsXML(dlg.FileName);
-                         break;
-                   }
-                }
-             }
-             else
-                MessageBox.Show(Language.GetGenericText("SaveNoResults"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                          SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), dlg.FileName));
+                          OutputResults(dlg.FileName, HitListExport.SaveResultsAsXML);
+                          break;
+                  }
+              }
           }
 
-          /// <summary>
+        private void OutputResults(string filename,HitListExport.ExportDelegate outputter )
+        {
+            SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), filename));
+            try
+            {
+                outputter(filename, __Grep, lstFileNames);
+                SetStatusBarMessage(Language.GetGenericText("SaveSaved"));
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    String.Format(Language.GetGenericText("SaveError"), ex),
+                    Constants.ProductName,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+
+        }
+
+       /// <summary>
           /// Show Print Dialog
           /// </summary>
           /// <param name="sender">system parm</param>
@@ -2285,7 +2083,7 @@ namespace AstroGrep.Windows.Forms
           {
              if (stbStatus.InvokeRequired)
              {
-                UpdateStatusMessageCallBack _delegate = new UpdateStatusMessageCallBack(SetStatusBarMessage);
+                UpdateStatusMessageCallBack _delegate = SetStatusBarMessage;
                 stbStatus.Invoke(_delegate, new object[1] {message});
                 return;
              }

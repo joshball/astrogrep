@@ -106,7 +106,6 @@ private Label label5;
             this.chkCaseSensitive = new System.Windows.Forms.CheckBox();
             this.lnkSearchOptions = new System.Windows.Forms.LinkLabel();
             this.pnlMainSearch = new System.Windows.Forms.Panel();
-            this.picBrowse = new AstroGrep.Windows.Controls.PictureButton();
             this.btnSearch = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.cboFilePath = new System.Windows.Forms.ComboBox();
@@ -149,13 +148,14 @@ private Label label5;
             this.stbStatus = new System.Windows.Forms.StatusBar();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
+            this.picBrowse = new AstroGrep.Windows.Controls.PictureButton();
             this.pnlSearch.SuspendLayout();
             this.pnlSearchOptions.SuspendLayout();
             this.PanelOptionsContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtContextLines)).BeginInit();
             this.pnlMainSearch.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picBrowse)).BeginInit();
             this.pnlRightSide.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picBrowse)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlSearch
@@ -168,7 +168,7 @@ private Label label5;
             this.pnlSearch.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlSearch.Location = new System.Drawing.Point(0, 0);
             this.pnlSearch.Name = "pnlSearch";
-            this.pnlSearch.Size = new System.Drawing.Size(240, 661);
+            this.pnlSearch.Size = new System.Drawing.Size(240, 619);
             this.pnlSearch.TabIndex = 0;
             // 
             // pnlSearchOptions
@@ -423,20 +423,8 @@ private Label label5;
             this.pnlMainSearch.Controls.Add(this.lblSearchHeading);
             this.pnlMainSearch.Location = new System.Drawing.Point(16, 8);
             this.pnlMainSearch.Name = "pnlMainSearch";
-            this.pnlMainSearch.Size = new System.Drawing.Size(200, 192);
+            this.pnlMainSearch.Size = new System.Drawing.Size(183, 192);
             this.pnlMainSearch.TabIndex = 0;
-            // 
-            // picBrowse
-            // 
-            this.picBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.picBrowse.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picBrowse.Image = ((System.Drawing.Image)(resources.GetObject("picBrowse.Image")));
-            this.picBrowse.Location = new System.Drawing.Point(159, 42);
-            this.picBrowse.Name = "picBrowse";
-            this.picBrowse.Size = new System.Drawing.Size(16, 16);
-            this.picBrowse.TabIndex = 6;
-            this.picBrowse.TabStop = false;
-            this.picBrowse.Click += new System.EventHandler(this.picBrowse_Click);
             // 
             // btnSearch
             // 
@@ -457,7 +445,7 @@ private Label label5;
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Enabled = false;
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnCancel.Location = new System.Drawing.Point(98, 160);
+            this.btnCancel.Location = new System.Drawing.Point(81, 160);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -471,7 +459,7 @@ private Label label5;
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.cboFilePath.Location = new System.Drawing.Point(8, 40);
             this.cboFilePath.Name = "cboFilePath";
-            this.cboFilePath.Size = new System.Drawing.Size(143, 21);
+            this.cboFilePath.Size = new System.Drawing.Size(126, 21);
             this.cboFilePath.TabIndex = 1;
             // 
             // cboFileName
@@ -480,7 +468,7 @@ private Label label5;
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.cboFileName.Location = new System.Drawing.Point(8, 80);
             this.cboFileName.Name = "cboFileName";
-            this.cboFileName.Size = new System.Drawing.Size(167, 21);
+            this.cboFileName.Size = new System.Drawing.Size(150, 21);
             this.cboFileName.TabIndex = 2;
             // 
             // cboSearchForText
@@ -489,7 +477,7 @@ private Label label5;
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.cboSearchForText.Location = new System.Drawing.Point(8, 120);
             this.cboSearchForText.Name = "cboSearchForText";
-            this.cboSearchForText.Size = new System.Drawing.Size(167, 21);
+            this.cboSearchForText.Size = new System.Drawing.Size(150, 21);
             this.cboSearchForText.TabIndex = 3;
             // 
             // lblSearchText
@@ -499,7 +487,7 @@ private Label label5;
             this.lblSearchText.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.lblSearchText.Location = new System.Drawing.Point(8, 104);
             this.lblSearchText.Name = "lblSearchText";
-            this.lblSearchText.Size = new System.Drawing.Size(163, 16);
+            this.lblSearchText.Size = new System.Drawing.Size(146, 16);
             this.lblSearchText.TabIndex = 3;
             this.lblSearchText.Text = "Search Text";
             // 
@@ -510,7 +498,7 @@ private Label label5;
             this.lblFileTypes.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.lblFileTypes.Location = new System.Drawing.Point(8, 64);
             this.lblFileTypes.Name = "lblFileTypes";
-            this.lblFileTypes.Size = new System.Drawing.Size(163, 16);
+            this.lblFileTypes.Size = new System.Drawing.Size(146, 16);
             this.lblFileTypes.TabIndex = 2;
             this.lblFileTypes.Text = "File Types";
             // 
@@ -521,7 +509,7 @@ private Label label5;
             this.lblSearchPath.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.lblSearchPath.Location = new System.Drawing.Point(8, 24);
             this.lblSearchPath.Name = "lblSearchPath";
-            this.lblSearchPath.Size = new System.Drawing.Size(163, 16);
+            this.lblSearchPath.Size = new System.Drawing.Size(146, 16);
             this.lblSearchPath.TabIndex = 1;
             this.lblSearchPath.Text = "Search Path";
             // 
@@ -533,7 +521,7 @@ private Label label5;
             this.lblSearchHeading.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.lblSearchHeading.Location = new System.Drawing.Point(0, 0);
             this.lblSearchHeading.Name = "lblSearchHeading";
-            this.lblSearchHeading.Size = new System.Drawing.Size(185, 16);
+            this.lblSearchHeading.Size = new System.Drawing.Size(168, 16);
             this.lblSearchHeading.TabIndex = 0;
             this.lblSearchHeading.Text = "AstroGrep Search";
             this.lblSearchHeading.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -547,7 +535,7 @@ private Label label5;
             this.pnlRightSide.Location = new System.Drawing.Point(240, 0);
             this.pnlRightSide.Name = "pnlRightSide";
             this.pnlRightSide.Padding = new System.Windows.Forms.Padding(8, 0, 0, 0);
-            this.pnlRightSide.Size = new System.Drawing.Size(544, 661);
+            this.pnlRightSide.Size = new System.Drawing.Size(544, 619);
             this.pnlRightSide.TabIndex = 1;
             // 
             // txtHits
@@ -557,7 +545,7 @@ private Label label5;
             this.txtHits.Location = new System.Drawing.Point(8, 200);
             this.txtHits.Name = "txtHits";
             this.txtHits.ReadOnly = true;
-            this.txtHits.Size = new System.Drawing.Size(536, 461);
+            this.txtHits.Size = new System.Drawing.Size(536, 419);
             this.txtHits.TabIndex = 1;
             this.txtHits.Text = "";
             this.txtHits.WordWrap = false;
@@ -636,7 +624,7 @@ private Label label5;
             this.splitLeftRight.MinExtra = 100;
             this.splitLeftRight.MinSize = 240;
             this.splitLeftRight.Name = "splitLeftRight";
-            this.splitLeftRight.Size = new System.Drawing.Size(8, 661);
+            this.splitLeftRight.Size = new System.Drawing.Size(8, 619);
             this.splitLeftRight.TabIndex = 2;
             this.splitLeftRight.TabStop = false;
             // 
@@ -767,7 +755,7 @@ private Label label5;
             // 
             // stbStatus
             // 
-            this.stbStatus.Location = new System.Drawing.Point(0, 661);
+            this.stbStatus.Location = new System.Drawing.Point(0, 619);
             this.stbStatus.Name = "stbStatus";
             this.stbStatus.Size = new System.Drawing.Size(784, 26);
             this.stbStatus.TabIndex = 3;
@@ -779,12 +767,24 @@ private Label label5;
             this.ListViewImageList.Images.SetKeyName(0, "");
             this.ListViewImageList.Images.SetKeyName(1, "");
             // 
+            // picBrowse
+            // 
+            this.picBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.picBrowse.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.picBrowse.Image = ((System.Drawing.Image)(resources.GetObject("picBrowse.Image")));
+            this.picBrowse.Location = new System.Drawing.Point(142, 42);
+            this.picBrowse.Name = "picBrowse";
+            this.picBrowse.Size = new System.Drawing.Size(16, 16);
+            this.picBrowse.TabIndex = 6;
+            this.picBrowse.TabStop = false;
+            this.picBrowse.Click += new System.EventHandler(this.picBrowse_Click);
+            // 
             // frmMain
             // 
             this.AcceptButton = this.btnSearch;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(784, 687);
+            this.ClientSize = new System.Drawing.Size(784, 645);
             this.Controls.Add(this.splitLeftRight);
             this.Controls.Add(this.pnlRightSide);
             this.Controls.Add(this.pnlSearch);
@@ -801,8 +801,8 @@ private Label label5;
             this.PanelOptionsContainer.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtContextLines)).EndInit();
             this.pnlMainSearch.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picBrowse)).EndInit();
             this.pnlRightSide.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.picBrowse)).EndInit();
             this.ResumeLayout(false);
 
 		}
