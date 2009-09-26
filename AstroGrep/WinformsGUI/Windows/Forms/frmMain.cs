@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -624,7 +625,7 @@ namespace AstroGrep.Windows.Forms
           /// </history>
           private void lstFileNames_HandleCreated(object sender, EventArgs e)
           {
-             Windows.API.SetHeaderImageList(lstFileNames.Handle, ListViewImageList.Handle);
+             //Windows.API.SetHeaderImageList(lstFileNames.Handle, ListViewImageList.Handle);
           }
 
           /// <summary>
@@ -634,22 +635,26 @@ namespace AstroGrep.Windows.Forms
           /// <param name="e">system parameter</param>
           /// <history>
           /// [Curtis_Beard]		07/25/2006	ADD: 1512028, Drag support
+          /// [Andrew_Radford]		26/09/2009	FIX: 2864409, Drag and drop to editor open only 1 file
           /// </history>
           private void lstFileNames_ItemDrag(object sender, ItemDragEventArgs e)
           {
-             ListViewItem item = (ListViewItem)e.Item;
-             string path = item.SubItems[Constants.COLUMN_INDEX_DIRECTORY].Text + 
-				    System.IO.Path.DirectorySeparatorChar.ToString() + 
-				    item.SubItems[Constants.COLUMN_INDEX_FILE].Text;
+             //   ListViewItem listViewItem = (ListViewItem)e.Item;
+              var lst = sender as ListView;
+              var paths = new List<string>();
 
-             if (System.IO.File.Exists(path))
-             {
-                string[] paths = new string[1];
-                paths[0] = path;
-                DataObject data = new DataObject(DataFormats.FileDrop, paths);
+              foreach (ListViewItem item in lst.SelectedItems)
+              {
+                  var path = item.SubItems[Constants.COLUMN_INDEX_DIRECTORY].Text +
+                   Path.DirectorySeparatorChar +
+                   item.SubItems[Constants.COLUMN_INDEX_FILE].Text;
 
-                lstFileNames.DoDragDrop(data, DragDropEffects.Copy);
-             }
+                  if (File.Exists(path))
+                      paths.Add(path);
+              }
+
+              var dataObject = new DataObject(DataFormats.FileDrop, paths.ToArray());
+              lstFileNames.DoDragDrop(dataObject, DragDropEffects.Copy);
           }
 
           /// <summary>
