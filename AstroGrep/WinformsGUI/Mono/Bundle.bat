@@ -1,5 +1,5 @@
 REM  This bundle script will combine all AstroGrep's dependency assemblies from mono.  This is done so that you can 
-REM  Build Astrogrep that can run without installing .net framwork or mono framework.
+REM  build an Astrogrep executable that can run without installing .net framwork or mono framework.
 REM
 REM  This script requires that you have Mono2.4 installed to c:\mono-2.4\  (http://www.go-mono.com/mono-downloads/download.html)
 REM  also you should have upx.exe in your path (http://upx.sourceforge.net/).  Upx is optional but nice because the bundled exe
