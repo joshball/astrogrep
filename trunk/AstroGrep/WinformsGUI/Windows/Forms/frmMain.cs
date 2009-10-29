@@ -130,12 +130,13 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]		07/25/2006	CHG: Moved cmd line processing to ProcessCommandLine routine
           /// [Curtis_Beard]		10/10/2006	CHG: Remove call to load search settings, perform check only.
           /// [Curtis_Beard]		10/11/2007	ADD: convert language value if necessary
+          /// [Ed_Jakubowski]		10/29/2009	CHG: Fix for Startup Path when using Mono 2.4
           /// </history>
           private void frmMain_Load(object sender, System.EventArgs e)
           {
              // Parse command line, must be before any use of config files
              CommandLineProcessing.CommandLineArguments args = CommandLineProcessing.Process(Environment.GetCommandLineArgs());
-
+             
              // set defaults
              txtContextLines.Maximum = Constants.MAX_CONTEXT_LINES;
              lnkSearchOptions.Text = __SearchOptionsText;
@@ -159,6 +160,10 @@ namespace AstroGrep.Windows.Forms
              // Load the search settings
              Legacy.ConvertSearchSettings();
              LoadSearchSettings();
+             
+             // Make sure in Mono to set the command-line path
+             if (args.IsValidStartPath)
+                 cboFilePath.Text = args.StartPath;
 
              // Delete registry entry (if exist)
              Legacy.DeleteRegistry();
