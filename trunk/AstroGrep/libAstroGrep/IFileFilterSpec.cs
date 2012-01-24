@@ -2,25 +2,38 @@ using System;
 
 namespace libAstroGrep
 {
-    public interface IFileFilterSpec
-    {
-        /// <summary>The FileFilter</summary>
-        string FileFilter { get; }
+   /// <summary>
+   /// Interface to grep that allow filter of files.
+   /// </summary>
+   public interface IFileFilterSpec
+   {
+      /// <summary>The FileFilter</summary>
+      string FileFilter { get; }
 
-        /// <summary>Whether to skip hidden files and directories.</summary>
-        bool SkipHiddenFiles { get; }
+      /// <summary>Whether to skip hidden files and directories.</summary>
+      bool SkipHiddenFiles { get; }
 
-        /// <summary>Whether to skip system files and directories.</summary>
-        bool SkipSystemFiles { get; }
+      /// <summary>Whether to skip system files and directories.</summary>
+      bool SkipSystemFiles { get; }
 
-        DateTime DateModifiedStare { get; }
+      /// <summary>
+      /// Modified start date
+      /// </summary>
+      DateTime DateModifiedStart { get; }
 
-        DateTime DateModifiedEnd { get; }
+      /// <summary>
+      /// Modified end date
+      /// </summary>
+      DateTime DateModifiedEnd { get; }
 
-        int FileSizeMin { get; }
+      /// <summary>
+      /// Minimum file size
+      /// </summary>
+      int FileSizeMin { get; }
 
-        int FileSizeMax { get; }
-
-        string FileNameRegex { get; }
-    }
+      /// <summary>
+      /// Maximum file size
+      /// </summary>
+      int FileSizeMax { get; }
+   }
 }
