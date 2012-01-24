@@ -342,36 +342,35 @@ namespace libAstroGrep
          }
       }
 
-        /// <summary>
-        /// Return true if the file does not pass the fileFilterSpec, i.e should be skipped
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="fileFilterSpec"></param>
-        /// <returns></returns>
-        private static bool ShouldFiterOut(FileInfo file, IFileFilterSpec fileFilterSpec)
-        {
-            if (fileFilterSpec.SkipSystemFiles && (file.Attributes & FileAttributes.System) == FileAttributes.System)
-                return true;
-            if (fileFilterSpec.SkipHiddenFiles && (file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                return true;
+      /// <summary>
+      /// Return true if the file does not pass the fileFilterSpec, i.e should be skipped
+      /// </summary>
+      /// <param name="file">FileInfo object of current file</param>
+      /// <param name="fileFilterSpec">Current file filter settings</param>
+      /// <returns>true if file does not pass file filter settings, false otherwise</returns>
+      private static bool ShouldFiterOut(FileInfo file, IFileFilterSpec fileFilterSpec)
+      {
+         if (fileFilterSpec.SkipSystemFiles && (file.Attributes & FileAttributes.System) == FileAttributes.System)
+             return true;
+         if (fileFilterSpec.SkipHiddenFiles && (file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+             return true;
 
-            if (file.LastWriteTime < fileFilterSpec.DateModifiedStare)
-                return true;
+         if (file.LastWriteTime < fileFilterSpec.DateModifiedStart)
+             return true;
 
-            if (file.LastWriteTime > fileFilterSpec.DateModifiedEnd)
-                return true;
+         if (file.LastWriteTime > fileFilterSpec.DateModifiedEnd)
+             return true;
 
-            if (file.Length < fileFilterSpec.FileSizeMin)
-                return true;
+         if (file.Length < fileFilterSpec.FileSizeMin)
+             return true;
 
-            if (file.Length > fileFilterSpec.FileSizeMax)
-                return true;
+         if (file.Length > fileFilterSpec.FileSizeMax)
+             return true;
 
-            return false;
+         return false;
+      }
 
-        }
-
-        /// <summary>
+      /// <summary>
       /// Search a given file for the searchText.
       /// </summary>
       /// <param name="file">FileInfo object for file to search for searchText</param>

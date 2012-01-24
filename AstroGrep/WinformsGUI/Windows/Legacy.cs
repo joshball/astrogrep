@@ -275,6 +275,7 @@ namespace AstroGrep.Windows
 		/// <history>
 		/// [Curtis_Beard]		05/22/2007  Created
 		/// [Curtis_Beard]		08/30/2007  ADD: support for installer language values
+      /// [Curtis_Beard]		01/24/2012  CHG: remove default case
 		/// </history>
 		public static void ConvertLanguageValue()
 		{
@@ -302,7 +303,6 @@ namespace AstroGrep.Windows
 
 				case "English":
 				case "1033":
-				default:
 					Core.GeneralSettings.Language = "en-us";
 					break;
 			}

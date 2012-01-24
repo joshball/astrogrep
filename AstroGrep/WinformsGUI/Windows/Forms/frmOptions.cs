@@ -759,6 +759,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		07/21/2006	ADD: Custom colors for fore/back of results
       /// [Curtis_Beard]		07/28/2006	ADD: extension exclusion list
       /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
+      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
       /// </history>
       private void frmOptions_Load(object sender, System.EventArgs e)
       {
@@ -775,11 +776,6 @@ namespace AstroGrep.Windows.Forms
          btnResultsWindowForeColor.SelectedColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
          btnResultsWindowBackColor.SelectedColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
 
-         // Disable back color, not supported in .Net v1.1
-         BackColorLabel.Visible = false;
-         BackColorButton.Visible = false;
-         BackColorButton.SelectedColor = SystemColors.Window;
-
          tbcOptions.SelectedTab = tabGeneral;
 
          LoadEditors(Common.GetTextEditors());
@@ -787,14 +783,14 @@ namespace AstroGrep.Windows.Forms
 
          //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
          Language.ProcessForm(this);
-			Language.LegacyLoadComboBox(cboLanguage);
+         Language.LegacyLoadComboBox(cboLanguage);
 
 			// set the user selected language
 			if (cboLanguage.Items.Count > 0)
 			{
 				foreach (object oItem in cboLanguage.Items)
 				{
-					LanguageItem item = (LanguageItem)oItem;
+				   LanguageItem item = (LanguageItem)oItem;
 					if (item.Culture.Equals(Core.GeneralSettings.Language))
 					{
 						cboLanguage.SelectedItem = item;
@@ -818,6 +814,7 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
       /// </history>
       private void UpdateResultsPreview()
       {
@@ -836,7 +833,6 @@ namespace AstroGrep.Windows.Forms
 
          if (tbcOptions.SelectedTab == tabResults)
          {
-
             // Clear the contents
             rtxtResultsPreview.Text = string.Empty;
             rtxtResultsPreview.ForeColor = btnResultsWindowForeColor.SelectedColor;
@@ -867,7 +863,7 @@ namespace AstroGrep.Windows.Forms
 
                   // set default color for starting text
                   rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
-                  // txtHits.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
+                  rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
                   rtxtResultsPreview.SelectedText = _begin;
 
                   // do a check to see if begin and end are valid for wholeword searches
@@ -877,7 +873,7 @@ namespace AstroGrep.Windows.Forms
                   if (_highlight)
                   {
                      rtxtResultsPreview.SelectionColor = ForeColorButton.SelectedColor;
-                     // rtxtResultsPreview.SelectionBackColor = BackColorButton.SelectedColor;
+                     rtxtResultsPreview.SelectionBackColor = BackColorButton.SelectedColor;
                   }
                   rtxtResultsPreview.SelectedText = _text;
 
@@ -889,7 +885,7 @@ namespace AstroGrep.Windows.Forms
                   if (_pos < 0)
                   {
                      rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
-                     // rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
+                     rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
                      rtxtResultsPreview.SelectedText = _end;
                   }
 
@@ -899,14 +895,14 @@ namespace AstroGrep.Windows.Forms
             {
                // set default color, no search text found
                rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
-               // rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
+               rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
                rtxtResultsPreview.SelectedText = _textToSearch;
             }
          }
       }
 
       /// <summary>
-      /// Handle when a new color h been selected.
+      /// Handle when a new color has been selected.
       /// </summary>
       /// <param name="newColor">new Color</param>
       /// <history>
@@ -1040,6 +1036,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      11/10/2006  FIX: Don't load new language, just set that it changed
       /// [Curtis_Beard]      11/13/2006  CHG: Only try and save the search option if enabled
       /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
+      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
       /// </history>
       private void btnOK_Click(object sender, System.EventArgs e)
       {
@@ -1058,9 +1055,6 @@ namespace AstroGrep.Windows.Forms
 				Core.GeneralSettings.Language = item.Culture;
 				__LanguageChange = true;
 			}
-
-         // Since .Net v1.1 has no support for BackColor, always save as Window color
-         Core.GeneralSettings.HighlightBackColor = Common.ConvertColorToString(SystemColors.Window);
 
          if (chkRightClickOption.Enabled)
          {

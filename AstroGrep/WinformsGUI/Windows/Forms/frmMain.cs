@@ -1068,7 +1068,8 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard] 	   12/06/2005	CHG: call WholeWordOnly from Grep class
           /// [Curtis_Beard] 	   04/21/2006	CHG: highlight regular expression searches
           /// [Curtis_Beard] 	   09/28/2006	FIX: use grep object for settings instead of gui items
-          /// [Ed_Jakubowski]      05/20/2009   CHG: Skip highlight if hitCount = 0
+          /// [Ed_Jakubowski]    05/20/2009  CHG: Skip highlight if hitCount = 0
+          /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
           /// </history>
           private void HighlightText(HitObject hit)
           {
@@ -1119,7 +1120,7 @@ namespace AstroGrep.Windows.Forms
 
                          // set default color for starting text
                          txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-                         // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                         txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                          txtHits.SelectedText = _begin;
 
                          // do a check to see if begin and end are valid for wholeword searches
@@ -1133,7 +1134,7 @@ namespace AstroGrep.Windows.Forms
                          if (_highlight)
                          {
                             txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-                            // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
+                            txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                          }
                          txtHits.SelectedText = _text;
 
@@ -1148,7 +1149,7 @@ namespace AstroGrep.Windows.Forms
                          if (_pos < 0)
                          {
                             txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-                            // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                            txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                             txtHits.SelectedText = _end;
                          }
 
@@ -1158,7 +1159,7 @@ namespace AstroGrep.Windows.Forms
                    {
                       // set default color, no search text found
                       txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-                      // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                      txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                       txtHits.SelectedText = _textToSearch;
                    }
                 }
@@ -1175,6 +1176,7 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]	   07/07/2006	FIX: 1512029, highlight whole word and case sensitive matches
           /// [Curtis_Beard] 	   09/28/2006	FIX: use grep object for settings instead of gui items, remove searchText parameter
           /// [Curtis_Beard]	   05/18/2006	FIX: 1723815, use correct whole word matching regex
+          /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
           /// </history>
           private void HighlightTextRegEx(HitObject hit)
           {
@@ -1226,7 +1228,7 @@ namespace AstroGrep.Windows.Forms
 
                    // set the start text
                    txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-                   // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                   txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
 
                    // check for empty string to prevent assigning nothing to selection text preventing
                    //  a system beep
@@ -1236,12 +1238,12 @@ namespace AstroGrep.Windows.Forms
 
                    // set the hit text
                    txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-                   // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
+                   txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                    txtHits.SelectedText = _textToSearch.Substring(_item.Index, _item.Length);
 
                    // set the end text
                    txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-                   // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                   txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                    if (_counter + 1 >= _col.Count)
                    {
                       //  no more hits so just set the rest
@@ -1260,7 +1262,7 @@ namespace AstroGrep.Windows.Forms
                 {
                    //  no match, just a context line
                    txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-                   // txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                   txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                    txtHits.SelectedText = _textToSearch;
                 }
              }
@@ -2187,66 +2189,63 @@ namespace AstroGrep.Windows.Forms
              lstFileNames.Items.Clear();
           }
 
-        // todo: move or replace me
-        struct SearchSpec : ISearchSpec
-        {
-            public bool SearchInSubfolders { get;  set; }
-            public bool UseRegularExpressions { get;  set; }
-            public bool UseCaseSensitivity { get;  set; }
-            public bool UseWholeWordMatching { get;  set; }
-            public bool UseNegation { get;  set; }
-            public int ContextLines { get;  set; }
-            public string SearchText { get;  set; }
-            public bool ReturnOnlyFileNames { get;  set; }
-            public bool IncludeLineNumbers { get;  set; }
-        }
+          // todo: move or replace me
+          struct SearchSpec : ISearchSpec
+          {
+             public bool SearchInSubfolders { get; set; }
+             public bool UseRegularExpressions { get; set; }
+             public bool UseCaseSensitivity { get; set; }
+             public bool UseWholeWordMatching { get; set; }
+             public bool UseNegation { get; set; }
+             public int ContextLines { get; set; }
+             public string SearchText { get; set; }
+             public bool ReturnOnlyFileNames { get; set; }
+             public bool IncludeLineNumbers { get; set; }
+          }
 
 
-        // todo: move or replace me
-        struct FileFilterSpec : IFileFilterSpec
-        {
-            public string FileFilter { get;  set; }
-            public bool SkipHiddenFiles { get;  set; }
-            public bool SkipSystemFiles { get;  set; }
-            public DateTime DateModifiedStare { get;  set; }
-            public DateTime DateModifiedEnd { get;  set; }
-            public int FileSizeMin { get;  set; }
-            public int FileSizeMax { get;  set; }
-            public string FileNameRegex { get;  set; }
-        }
+          // todo: move or replace me
+          struct FileFilterSpec : IFileFilterSpec
+          {
+             public string FileFilter { get; set; }
+             public bool SkipHiddenFiles { get; set; }
+             public bool SkipSystemFiles { get; set; }
+             public DateTime DateModifiedStart { get; set; }
+             public DateTime DateModifiedEnd { get; set; }
+             public int FileSizeMin { get; set; }
+             public int FileSizeMax { get; set; }
+          }
 
+           private IFileFilterSpec GetFilterSpecFromUI()
+           {
+              string _fileName = cboFileName.Text;
+              string _path = cboFilePath.Text.Trim();
 
-             private IFileFilterSpec GetFilterSpecFromUI()
-             {
-                 string _fileName = cboFileName.Text;
-                 string _path = cboFilePath.Text.Trim();
+              // Ensure that there is a backslash.
+              if (!_path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                 _path += Path.DirectorySeparatorChar.ToString();
 
-                 // Ensure that there is a backslash.
-                 if (!_path.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                     _path += Path.DirectorySeparatorChar.ToString();
+              // update path and fileName if fileName has a path in it
+              int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
+              if (slashPos > -1)
+                 _fileName = _fileName.Substring(slashPos + 1);
 
-                 // update path and fileName if fileName has a path in it
-                 int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
-                 if (slashPos > -1)
-                     _fileName = _fileName.Substring(slashPos + 1);
+              var spec = new FileFilterSpec
+                        {
+                           FileFilter = _fileName,
+                           SkipHiddenFiles = false,
+                           SkipSystemFiles = false,
+                           DateModifiedStart = dateModBegin.Value,
+                           DateModifiedEnd = dateModEnd.Value,
+                        };
 
-                 var spec= new FileFilterSpec
-                            {
-                                FileFilter = _fileName,
-                                SkipHiddenFiles = false,
-                                SkipSystemFiles = false,
-                                FileNameRegex = txtFilenameRegex.Text,
-                                DateModifiedStare = dateModBegin.Value,
-                                DateModifiedEnd = dateModEnd.Value,
-                            };
+              int size;
 
-                 int size;
+              spec.FileSizeMin = int.TryParse(txtMinSize.Text, out size) ? size : int.MinValue;
+              spec.FileSizeMax = int.TryParse(txtMaxSize.Text, out size) ? size : int.MaxValue;
 
-                 spec.FileSizeMin = int.TryParse(txtMinSize.Text, out size) ? size : int.MinValue;
-                 spec.FileSizeMax = int.TryParse(txtMaxSize.Text, out size) ? size : int.MaxValue;
-
-                 return spec;
-             }
+              return spec;
+           }
 
 
            /// <summary>
