@@ -1808,18 +1808,34 @@ namespace AstroGrep.Windows.Forms
 		    /// Sends all selected items from the file list to the clipboard
 		    /// </summary>
 		    /// /// <history>
-		    /// [Ed_Jakbuowski]     05/20/2009  Created
+		    /// [Ed_Jakbuowski]       05/20/2009  Created
+          /// [Curtis_Beard]        01/31/2012  FIX: 3482207, show all columns when copying data
 		    /// </history>
 		    private void CopyMenuItem_Click(object sender, System.EventArgs e)
 		    {
 			    if (lstFileNames.SelectedItems.Count <= 0)
 				    return;
-			    string data = "";
+
+			    System.Text.StringBuilder data = new System.Text.StringBuilder();
 			    try
 			    {
-				    foreach(ListViewItem lvi in lstFileNames.SelectedItems)
-					    data += lvi.Text+ ", " + lvi.SubItems[1].Text + ", " + lvi.SubItems[2].Text + ", " + lvi.SubItems[3].Text + Environment.NewLine;
-				    Clipboard.SetDataObject(data);
+                foreach (ListViewItem lvi in lstFileNames.SelectedItems)
+                {
+                   data.Append(lvi.Text);
+                  
+                   // skip first and last columns (filename, sort order)
+                   for (int i = 0; i < lvi.SubItems.Count; i++)
+                   {
+                      if (i != 0 && i != lvi.SubItems.Count - 1)
+                      {
+                         var subLvi = lvi.SubItems[i];
+                         data.Append(", ");
+                         data.Append(subLvi.Text);
+                      }
+                   }
+                   data.Append(Environment.NewLine);
+                }
+				    Clipboard.SetDataObject(data.ToString());
 			    }
 			    catch(Exception ex)
 			    {

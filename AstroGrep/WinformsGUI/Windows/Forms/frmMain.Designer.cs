@@ -74,7 +74,6 @@ private Label label4;
 private TextBox txtMinSize;
 private Label label3;
 private TextBox txtMaxSize;
-	    private string __FilterOptionsText = "Filter Options {0}";
 
 	    private void InitializeComponent()
 		{
