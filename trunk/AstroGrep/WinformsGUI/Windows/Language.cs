@@ -289,6 +289,48 @@ namespace AstroGrep.Windows
       }
 
       /// <summary>
+      /// Sets the given context menuitem's text property.
+      /// </summary>
+      /// <param name="holder">Control containing ContextMenu</param>
+      /// <param name="item">MenuItem to set</param>
+      /// <history>
+      /// [Curtis_Beard]		02/01/2012	Created
+      /// </history>
+      public static void SetContextMenuItemText(Control holder, MenuItem item)
+      {
+         if (__RootNode != null)
+         {
+            string formName = GetParentControl(holder).Name;
+            XmlNode node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']/control[@name='" + holder.Name + "']/menuitem[@index='" + item.Index + "']");
+
+            if (node != null)
+            {
+               if (node.Attributes["value"] != null)
+               {
+                  item.Text = node.Attributes["value"].Value;
+               }
+            }
+         }
+      }
+
+      /// <summary>
+      /// Retrieves the top most control (parent) of the given control.
+      /// </summary>
+      /// <param name="ctrl">Control to find parent</param>
+      /// <returns>Control that is the top most parent of the given control</returns>
+      private static Control GetParentControl(Control ctrl)
+      {
+         if (ctrl.Parent == null)
+         {
+            return ctrl;
+         }
+         else
+         {
+            return GetParentControl(ctrl.Parent);
+         }
+      }
+
+      /// <summary>
       /// Gets a string value from the generic text section of a language file.
       /// </summary>
       /// <param name="name">Key name to retrieve</param>
@@ -440,15 +482,29 @@ namespace AstroGrep.Windows
       /// <param name="tip">ToolTip for control</param>
       /// <history>
       /// [Curtis_Beard]		07/31/2006	Created
+      /// [Curtis_Beard]		02/01/2012	ADD: support for control's contextmenu
       /// </history>
       private static void ProcessControl(Control control, ToolTip tip)
       {
          if (control.Controls.Count == 0)
+         {
             SetControlText(control, tip);
+
+            // set context menu if available
+            if (control.ContextMenu != null && control.ContextMenu.MenuItems.Count > 0)
+            {
+               foreach (MenuItem item in control.ContextMenu.MenuItems)
+               {
+                  SetContextMenuItemText(control, item);
+               }
+            }
+         }
          else
          {
             foreach (Control child in control.Controls)
+            {
                ProcessControl(child, tip);
+            }
 
             SetControlText(control, tip);
          }

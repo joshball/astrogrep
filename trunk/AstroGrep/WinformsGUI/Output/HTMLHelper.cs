@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 using libAstroGrep;
 
@@ -101,12 +102,14 @@ namespace AstroGrep
       /// <returns>Text with holders replaced</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
+      /// [Curtis_Beard]		01/31/2012	ADD: support highlight back color option
       /// </history>
       public static string ReplaceCssHolders(string css)
       {
          css = css.Replace("%%resultback%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor)));
          css = css.Replace("%%resultfore%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor)));
          css = css.Replace("%%highlightfore%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightForeColor)));
+         css = css.Replace("%%highlightback%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor)));
 
          return css;
       }
@@ -118,11 +121,13 @@ namespace AstroGrep
       /// <returns>Text with holders replaced</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
+      /// [Curtis_Beard]		01/31/2012	ADD: display for additional options (skip hidden/system options, search paths, modified dates, file sizes)
       /// </history>
       public static string ReplaceSearchOptions(string text, Grep grep)
       {
          var spec = grep.SearchSpec;
 
+         text = text.Replace("%%searchpaths%%", "Search Path(s): " + string.Join(", ", spec.StartDirectories));
          text = text.Replace("%%filetypes%%", "File Types: " + grep.FileFilterSpec.FileFilter);
          text = text.Replace("%%regex%%", "Regular Expressions: " + spec.UseRegularExpressions);
          text = text.Replace("%%casesen%%", "Case Sensitive: " + spec.UseCaseSensitivity);
@@ -132,6 +137,36 @@ namespace AstroGrep
          text = text.Replace("%%negation%%", "Negation: " + spec.UseNegation);
          text = text.Replace("%%linenumbers%%", "Line Numbers: " + spec.IncludeLineNumbers);
          text = text.Replace("%%contextlines%%", "Context Lines: " + spec.ContextLines);
+         text = text.Replace("%%skiphidden%%", "Skip Hidden Files/Directories: " + grep.FileFilterSpec.SkipHiddenFiles);
+         text = text.Replace("%%skipsystem%%", "Skip System Files/Directories: " + grep.FileFilterSpec.SkipSystemFiles);
+
+         string modDateStart = string.Empty;
+         if (grep.FileFilterSpec.DateModifiedStart != DateTimePicker.MinimumDateTime)
+         {
+            modDateStart = "Modified Date Start: " + grep.FileFilterSpec.DateModifiedStart + "<br/>";
+         }
+         text = text.Replace("%%moddatestart%%", modDateStart);
+
+         string modDateEnd = string.Empty;
+         if (grep.FileFilterSpec.DateModifiedEnd < DateTimePicker.MaximumDateTime)
+         {
+            modDateEnd = "Modified Date End: " + grep.FileFilterSpec.DateModifiedEnd + "<br/>";
+         }         
+         text = text.Replace("%%moddateend%%", modDateEnd);
+
+         string minSize = string.Empty;
+         if (grep.FileFilterSpec.FileSizeMin != long.MinValue)
+         {
+            minSize = "Min File Size: " + grep.FileFilterSpec.FileSizeMin + "<br/>";
+         }
+         text = text.Replace("%%filesizemin%%", minSize);
+
+         string maxSize = string.Empty;
+         if (grep.FileFilterSpec.FileSizeMax != long.MaxValue)
+         {
+            maxSize = "Max File Size: " + grep.FileFilterSpec.FileSizeMax + "<br/>";
+         }         
+         text = text.Replace("%%filesizemax%%", maxSize);
 
          text = text.Replace("%%totalfiles%%", grep.Greps.Count.ToString());
          text = text.Replace("%%searchterm%%", spec.SearchText);

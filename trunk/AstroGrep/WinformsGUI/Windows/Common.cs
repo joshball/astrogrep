@@ -459,6 +459,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]	   07/10/2006	ADD: Initial
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
+      /// [Curtis_Beard]	   01/31/2012	CHG: 3054576, apply patch to allow quotes in command line
       /// </history>
       private static void EditFile(string editor, string args, string path, int line, int column)
       {
@@ -477,7 +478,15 @@ namespace AstroGrep.Windows
                //  %2 with line number
                //  %3 with column
                string _text = args;
-               _text = _text.Replace("%1", "\"" + path + "\"");
+               if (_text.IndexOf("\"") == -1)
+               {
+                  // only include quotes around path if not defined in command line
+                  _text = _text.Replace("%1", "\"" + path + "\"");
+               }
+               else
+               {
+                  _text = _text.Replace("%1", path);
+               }
                _text = _text.Replace("%2", line.ToString());
                _text = _text.Replace("%3", column.ToString());
 

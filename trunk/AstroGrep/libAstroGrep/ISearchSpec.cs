@@ -2,6 +2,9 @@ namespace libAstroGrep
 {
     public interface ISearchSpec
     {
+        /// <summary>Array of start directories</summary>
+        string[] StartDirectories { get; }
+
         /// <summary>Use of directory recursion for grep</summary>
         bool SearchInSubfolders { get; }
 

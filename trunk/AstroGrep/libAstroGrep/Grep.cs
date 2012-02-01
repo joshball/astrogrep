@@ -44,7 +44,7 @@ namespace libAstroGrep
    /// [Curtis_Beard]		01/27/2007	ADD: 1561584, check directories/files if hidden or system
    /// [Curtis_Beard]		05/25/2007	ADD: Virtual methods for events
    /// [Curtis_Beard]		06/27/2007	CHG: removed message parameters for Complete/Cancel events
-   /// [Andrew_Radford]     05/08/2008  CHG: Convert code to C# 3.5
+   /// [Andrew_Radford]    05/08/2008  CHG: Convert code to C# 3.5
    /// </history>
     public class Grep 
    {
@@ -95,9 +95,6 @@ namespace libAstroGrep
 
        /// <summary>Retrieves all HitObjects for grep</summary>
        public IList<HitObject> Greps { get; private set; }
-
-        /// <summary>The start (basr) search directory</summary>
-       public string StartDirectory { get; set; }
 
         /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
        public PluginCollection Plugins { get; set; }
@@ -162,11 +159,23 @@ namespace libAstroGrep
       /// </history>
       public void Execute()
       {
-          if (string.IsNullOrEmpty(FileFilterSpec.FileFilter))
-              Execute(new DirectoryInfo(StartDirectory), null, null);
-          else
-              foreach (var _filter in FileFilterSpec.FileFilter.Split(char.Parse(",")))
-                  Execute(new DirectoryInfo(StartDirectory), null, _filter);
+         if (string.IsNullOrEmpty(FileFilterSpec.FileFilter))
+         {
+            foreach (var dir in SearchSpec.StartDirectories)
+            {
+               Execute(new DirectoryInfo(dir), null, null);
+            }
+         }
+         else
+         {
+            foreach (var _filter in FileFilterSpec.FileFilter.Split(char.Parse(",")))
+            {
+               foreach (var dir in SearchSpec.StartDirectories)
+               {
+                  Execute(new DirectoryInfo(dir), null, _filter);
+               }
+            }
+         }
       }
 
       /// <summary>

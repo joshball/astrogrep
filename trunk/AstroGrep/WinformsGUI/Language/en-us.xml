@@ -15,8 +15,26 @@
       <control name="chkWholeWordOnly" value="&amp;Whole Word" tooltip="Only match entire words (not parts of words)" />
       <control name="chkCaseSensitive" value="&amp;Case Sensitive" tooltip="Match upper and lower case letters exactly" />
       <control name="chkRegularExpressions" value="Regular &amp;Expressions" tooltip="Use &quot;regular expression&quot; matching" />
+      <control name="chkSkipHidden" value="Skip Hidden Files/Directories" tooltip="Ignore files/directories marked as hidden" />
+      <control name="chkSkipSystem" value="Skip System Files/Directories" tooltip="Ignore files/directories marked as system" />
       <control name="lnkSearchOptions" value="Search Options {0}" />
       <control name="picBrowse" tooltip="Browse..." />
+      <control name="label1" value="Modified After:" />
+      <control name="label2" value="Modified Before:" />
+      <control name="label3" value="Min Size:" />
+      <control name="label4" value="Max Size:" />
+      <control name="lstFileNames">
+         <menuitem index="0" value="Copy" />
+         <menuitem index="1" value="Copy Name" />
+         <menuitem index="2" value="Copy Located In" />
+         <menuitem index="3" value="Copy Located In + Name" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="Open File" />
+         <menuitem index="6" value="Open Directory" />
+         <menuitem index="7" value="-" />
+         <menuitem index="8" value="Delete Item" />
+      </control>
+
       <menu index="0" value="&amp;File">
          <menuitem index="0" value="Select Sea&amp;rch Path" />
          <menuitem index="1" value="-" />
@@ -77,6 +95,7 @@
       <control name="tabTextEditors" value="Text Editors" />
       <control name="LanguageGroup" value="Language"/>
       <control name="ExtensionExclusionGroup" value="Exclude File Extensions"/>
+      <control name="btnRestoreDefaultExtensions" value="Restore Default Extensions"/>
       <control name="tabPlugins" value="Plugins"/>
       <control name="chkDesktopShortcut" value="&amp;Desktop Shortcut"/>
       <control name="chkStartMenuShortcut" value="Start &amp;Menu Shortcut"/>
@@ -152,6 +171,7 @@
       <text name="ResultsColumnLocation" value="Located In"/>
       <text name="ResultsColumnDate" value="Date Modified"/>
       <text name="ResultsColumnCount" value="Count"/>
+      <text name="ResultsColumnSize" value="Size"/>
       
       <text name="PluginsColumnEnabled" value="Enabled"/>
       <text name="PluginsColumnName" value="Name"/>

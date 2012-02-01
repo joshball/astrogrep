@@ -15,8 +15,26 @@
       <control name="chkWholeWordOnly" value="&amp;Solo parole intere" tooltip="Ricerca solo parole intere, non porzioni di termini" />
       <control name="chkCaseSensitive" value="&amp;Maiuscole/minuscole" tooltip="Attiva la distinzione tra maiuscole e minuscole durante la ricerca" />
       <control name="chkRegularExpressions" value="Espressione &amp;regolare" tooltip="Esegue una ricerca per &apos;espressioni regolari&apos;" />
+      <control name="chkSkipHidden" value="Ignora file nascosti/directory" tooltip="Ignore files/directories marked as hidden" />
+      <control name="chkSkipSystem" value="Ignora file di sistema/directory" tooltip="Ignore files/directories marked as system" />
       <control name="lnkSearchOptions" value="Opzioni di ricerca  {0}" />
       <control name="picBrowse" tooltip="Sfoglia..." />
+      <control name="label1" value="Dopo aver modificato:" />
+      <control name="label2" value="Prima della modifica:" />
+      <control name="label3" value="Dimensione minima:" />
+      <control name="label4" value="Dimensione massima:" />
+      <control name="lstFileNames">
+         <menuitem index="0" value="copia" />
+         <menuitem index="1" value="copia nome" />
+         <menuitem index="2" value="situata in copia" />
+         <menuitem index="3" value="copia Situato In Nome +" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="file aperto" />
+         <menuitem index="6" value="elenco aperto" />
+         <menuitem index="7" value="-" />
+         <menuitem index="8" value="cancellare voce" />
+      </control>
+      
       <menu index="0" value="&amp;File">
          <menuitem index="0" value="Seleziona &amp;percorso di ricerca" />
          <menuitem index="1" value="-" />
@@ -80,6 +98,7 @@
       <control name="tabTextEditors" value="Editor di testo" />
       <control name="LanguageGroup" value="Lingua"/>
       <control name="ExtensionExclusionGroup" value="Estensioni file escluse"/>
+      <control name="btnRestoreDefaultExtensions" value="Ripristina estensioni di default"/>
       <control name="tabPlugins" value="Plugin"/>
       <control name="chkDesktopShortcut" value="Collegamenti sul &amp;desktop"/>
       <control name="chkStartMenuShortcut" value="Collegamenti del &amp;menu di avvio"/>
@@ -151,13 +170,14 @@ Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="TextEditorsColumnFileType" value="Tipo file"/>
       <text name="TextEditorsColumnLocation" value="Editor di testo"/>
       <text name="TextEditorsColumnCmdLine" value="Riga di comando"/>
-      <text name="TextEditorsErrorNoEditor" value="Please define a text editor."/>
-      <text name="TextEditorsErrorFileTypeExists" value="The file type already exists.  Please try again."/>
+      <text name="TextEditorsErrorNoEditor" value="Si prega di definire un editor di testo."/>
+      <text name="TextEditorsErrorFileTypeExists" value="Il tipo di file esiste già. Si prega di riprovare."/>
       
       <text name="ResultsColumnFile" value="Nome"/>
       <text name="ResultsColumnLocation" value="Situato in"/>
       <text name="ResultsColumnDate" value="Data di modifica"/>
       <text name="ResultsColumnCount" value="Conteggio"/>
+      <text name="ResultsColumnSize" value="Dimensione"/>
       
       <text name="PluginsColumnEnabled" value="Attivato"/>
       <text name="PluginsColumnName" value="Nome"/>

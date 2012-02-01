@@ -67,8 +67,6 @@ namespace AstroGrep.Windows.Forms
         
       private System.ComponentModel.IContainer components;
 
-        // TODO: Add size to the hit list
-
       /// <summary>
       /// Creates an instance of the frmMain class.
       /// </summary>
@@ -109,9 +107,10 @@ namespace AstroGrep.Windows.Forms
              try
              {
                 // set font for printing and default display
+                // here so as to allow error if font not defined on system
                 txtHits.Font = new Font("Courier New", 9.75F, FontStyle.Regular);
              }
-             catch {} // todo: why is this here?
+             catch {}
 		    }
 
           #region Form Events
@@ -131,6 +130,7 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]		10/10/2006	CHG: Remove call to load search settings, perform check only.
           /// [Curtis_Beard]		10/11/2007	ADD: convert language value if necessary
           /// [Ed_Jakubowski]		10/29/2009	CHG: Fix for Startup Path when using Mono 2.4
+          /// [Curtis_Beard]		01/30/2012	CHG: 1955653, set focus to search text on startup
           /// </history>
           private void frmMain_Load(object sender, System.EventArgs e)
           {
@@ -163,7 +163,9 @@ namespace AstroGrep.Windows.Forms
              
              // Make sure in Mono to set the command-line path
              if (args.IsValidStartPath)
-                 cboFilePath.Text = args.StartPath;
+             {
+                cboFilePath.Text = args.StartPath;
+             }
 
              // Delete registry entry (if exist)
              Legacy.DeleteRegistry();
@@ -176,6 +178,9 @@ namespace AstroGrep.Windows.Forms
 
              // Handle any command line arguments
              ProcessCommandLine(args);
+
+             // set focus to search text combobox
+             cboSearchForText.Select();
           }
 
           /// <summary>
@@ -762,6 +767,7 @@ namespace AstroGrep.Windows.Forms
           /// </summary>
           /// <history>
           /// [Curtis_Beard]	   10/11/2006	Created
+          /// [Curtis_Beard]	   01/31/2012	ADD: save size column width
           /// </history>
           private void SaveSettings()
           {
@@ -772,6 +778,7 @@ namespace AstroGrep.Windows.Forms
              Core.GeneralSettings.WindowFileColumnLocationWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_DIRECTORY].Width;
              Core.GeneralSettings.WindowFileColumnDateWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_DATE].Width;
              Core.GeneralSettings.WindowFileColumnCountWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_COUNT].Width;
+             Core.GeneralSettings.WindowFileColumnSizeWidth = lstFileNames.Columns[Constants.COLUMN_INDEX_SIZE].Width;
 
              //save divider panel positions
              Core.GeneralSettings.WindowSearchPanelWidth = pnlSearch.Width;
@@ -845,6 +852,7 @@ namespace AstroGrep.Windows.Forms
           /// <history>
           /// [Curtis_Beard]	   01/28/2005	Created
           /// [Curtis_Beard]	   10/10/2006	CHG: Use search settings implementation.
+          /// [Curtis_Beard]	   01/31/2012	ADD: 1561584, ability to skip hidden/system files/directories
           /// </history>
           private void LoadSearchSettings()
           {
@@ -856,6 +864,8 @@ namespace AstroGrep.Windows.Forms
              chkFileNamesOnly.Checked = Core.SearchSettings.ReturnOnlyFileNames;
              txtContextLines.Text = Core.SearchSettings.ContextLines.ToString();
              chkNegation.Checked = Core.SearchSettings.UseNegation;
+             chkSkipHidden.Checked = Core.SearchSettings.SkipHidden;
+             chkSkipSystem.Checked = Core.SearchSettings.SkipSystem;
           }
 
           /// <summary>
@@ -863,6 +873,7 @@ namespace AstroGrep.Windows.Forms
           /// </summary>
           /// <history>
           /// [Curtis_Beard]	   10/11/2006	Created
+          /// [Curtis_Beard]	   01/31/2012	ADD: 1561584, ability to skip hidden/system files/directories
           /// </history>
           private void SaveSearchSettings()
           {
@@ -874,6 +885,8 @@ namespace AstroGrep.Windows.Forms
              Core.SearchSettings.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
              Core.SearchSettings.ContextLines = int.Parse(txtContextLines.Text);
              Core.SearchSettings.UseNegation = chkNegation.Checked;
+             Core.SearchSettings.SkipHidden = chkSkipHidden.Checked;
+             Core.SearchSettings.SkipSystem = chkSkipSystem.Checked;
 
              Core.SearchSettings.Save();
           }
@@ -928,6 +941,7 @@ namespace AstroGrep.Windows.Forms
           /// </summary>
           /// <history>
           /// [Curtis_Beard]		07/25/2006	Created
+          /// [Curtis_Beard]	   01/31/2012	ADD: size column width/language
           /// </history>
           private void SetColumnsText()
           {
@@ -936,19 +950,14 @@ namespace AstroGrep.Windows.Forms
                 lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnFile"), Core.GeneralSettings.WindowFileColumnNameWidth, HorizontalAlignment.Left);
                 lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnLocation"), Core.GeneralSettings.WindowFileColumnLocationWidth, HorizontalAlignment.Left);
                 lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnDate"), Core.GeneralSettings.WindowFileColumnDateWidth, HorizontalAlignment.Left);
-
-                 // Todo: langage and width setting
-                lstFileNames.Columns.Add("Size", 80, HorizontalAlignment.Left);
-
+                lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnSize"), 80, HorizontalAlignment.Left);
                 lstFileNames.Columns.Add(Language.GetGenericText("ResultsColumnCount"), Core.GeneralSettings.WindowFileColumnCountWidth, HorizontalAlignment.Left);
              }
              else
              {
                 lstFileNames.Columns[Constants.COLUMN_INDEX_FILE].Text = Language.GetGenericText("ResultsColumnFile");
                 lstFileNames.Columns[Constants.COLUMN_INDEX_DIRECTORY].Text = Language.GetGenericText("ResultsColumnLocation");
-                 // Todo: internationalize
-                 lstFileNames.Columns[Constants.COLUMN_INDEX_SIZE].Text = "Size";
-
+                lstFileNames.Columns[Constants.COLUMN_INDEX_SIZE].Text = Language.GetGenericText("ResultsColumnSize");
                 lstFileNames.Columns[Constants.COLUMN_INDEX_DATE].Text = Language.GetGenericText("ResultsColumnDate");
                 lstFileNames.Columns[Constants.COLUMN_INDEX_COUNT].Text = Language.GetGenericText("ResultsColumnCount");
              }
@@ -962,7 +971,8 @@ namespace AstroGrep.Windows.Forms
           /// [Theodore_Ward]   ??/??/????  Initial
           /// [Curtis_Beard]	   01/11/2005	.Net Conversion
           /// [Curtis_Beard]	   10/14/2005	CHG: Use max context lines constant in message
-          /// [Ed_Jakubowski]	   05/20/2009    Allow filename only searching
+          /// [Ed_Jakubowski]	   05/20/2009  CHG: Allow filename only searching
+          /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
 	      /// </history>
           private bool VerifyInterface()
           {
@@ -999,19 +1009,23 @@ namespace AstroGrep.Windows.Forms
                    return false;
                 }
 
-                if (!System.IO.Directory.Exists(cboFilePath.Text.Trim()))
+                string[] paths = cboFilePath.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string path in paths)
                 {
-                   MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorInvalidStartPath"), cboFilePath.Text),
-                      Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                   return false;
+                   if (!System.IO.Directory.Exists(path))
+                   {
+                      MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorInvalidStartPath"), path),
+                         Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                      return false;
+                   }
                 }
 
-                if (cboSearchForText.Text.Trim().Equals(string.Empty))
-                {
-                   //MessageBox.Show(Language.GetGenericText("VerifyErrorNoSearchText"),
-                   //   Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                   //return false;
-                }
+                //if (cboSearchForText.Text.Trim().Equals(string.Empty))
+                //{
+                //   MessageBox.Show(Language.GetGenericText("VerifyErrorNoSearchText"),
+                //      Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                //   return false;
+                //}
              }
              catch
              {
@@ -1531,6 +1545,8 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]	   10/14/2005	CHG: use No Results for message box title 
           /// [Curtis_Beard]	   12/07/2005	CHG: Use column constant
           /// [Curtis_Beard]	   09/06/2006	CHG: Update to support html and xml output
+          /// [Andrew_Radford]   20/09/2009	CHG: Use export class
+          /// [Curtis_Beard]	   01/31/2012	CHG: show status bar message only once for text/html/xml
           /// </history>
           private void mnuSaveResults_Click(object sender, System.EventArgs e)
           {
@@ -1561,25 +1577,24 @@ namespace AstroGrep.Windows.Forms
                           break;
                       case 2:
                           // Save to html
-                          SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), dlg.FileName));
                           OutputResults(dlg.FileName, HitListExport.SaveResultsAsHTML);
                           break;
                       case 3:
-                          SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), dlg.FileName));
+                          // Save to xml
                           OutputResults(dlg.FileName, HitListExport.SaveResultsAsXML);
                           break;
                   }
               }
           }
 
-        private void OutputResults(string filename,HitListExport.ExportDelegate outputter )
+        private void OutputResults(string filename, HitListExport.ExportDelegate outputter)
         {
             SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), filename));
+
             try
             {
                 outputter(filename, __Grep, lstFileNames);
                 SetStatusBarMessage(Language.GetGenericText("SaveSaved"));
-
             }
             catch (Exception ex)
             {
@@ -1807,7 +1822,9 @@ namespace AstroGrep.Windows.Forms
 		    /// <summary>
 		    /// Sends all selected items from the file list to the clipboard
 		    /// </summary>
-		    /// /// <history>
+          /// <param name="sender">system parameter</param>
+          /// <param name="e">system parameter</param>
+		    /// <history>
 		    /// [Ed_Jakbuowski]       05/20/2009  Created
           /// [Curtis_Beard]        01/31/2012  FIX: 3482207, show all columns when copying data
 		    /// </history>
@@ -1842,6 +1859,93 @@ namespace AstroGrep.Windows.Forms
 				    MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			    }
 		    }
+
+          /// <summary>
+          /// Sends all selected items from the file list to the clipboard
+          /// </summary>
+          /// <param name="sender">system parameter</param>
+          /// <param name="e">system parameter</param>
+          /// <history>
+          /// [Curtis_Beard]        01/31/2012  ADD: 2078252, add right click options for copying name,located in,located in + name
+          /// </history>
+          private void CopyNameMenuItem_Click(object sender, System.EventArgs e)
+          {
+             if (lstFileNames.SelectedItems.Count <= 0)
+                return;
+
+             System.Text.StringBuilder data = new System.Text.StringBuilder();
+             try
+             {
+                foreach (ListViewItem lvi in lstFileNames.SelectedItems)
+                {
+                   data.Append(lvi.Text);
+                   data.Append(Environment.NewLine);
+                }
+                Clipboard.SetDataObject(data.ToString());
+             }
+             catch (Exception ex)
+             {
+                MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+             }
+          }
+
+          /// <summary>
+          /// Sends all selected items from the file list to the clipboard
+          /// </summary>
+          /// <param name="sender">system parameter</param>
+          /// <param name="e">system parameter</param>
+          /// <history>
+          /// [Curtis_Beard]        01/31/2012  ADD: 2078252, add right click options for copying name,located in,located in + name
+          /// </history>
+          private void CopyLocatedInMenuItem_Click(object sender, System.EventArgs e)
+          {
+             if (lstFileNames.SelectedItems.Count <= 0)
+                return;
+
+             System.Text.StringBuilder data = new System.Text.StringBuilder();
+             try
+             {
+                foreach (ListViewItem lvi in lstFileNames.SelectedItems)
+                {
+                   data.Append(lvi.SubItems[1].Text);
+                   data.Append(Environment.NewLine);
+                }
+                Clipboard.SetDataObject(data.ToString());
+             }
+             catch (Exception ex)
+             {
+                MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+             }
+          }
+
+          /// <summary>
+          /// Sends all selected items from the file list to the clipboard
+          /// </summary>
+          /// <param name="sender">system parameter</param>
+          /// <param name="e">system parameter</param>
+          /// <history>
+          /// [Curtis_Beard]        01/31/2012  ADD: 2078252, add right click options for copying name,located in,located in + name
+          /// </history>
+          private void CopyLocatedInAndNameMenuItem_Click(object sender, System.EventArgs e)
+          {
+             if (lstFileNames.SelectedItems.Count <= 0)
+                return;
+
+             System.Text.StringBuilder data = new System.Text.StringBuilder();
+             try
+             {
+                foreach (ListViewItem lvi in lstFileNames.SelectedItems)
+                {
+                   data.AppendFormat("{0}{1}{2}", lvi.SubItems[1].Text, Path.DirectorySeparatorChar.ToString() ,lvi.Text);
+                   data.Append(Environment.NewLine);
+                }
+                Clipboard.SetDataObject(data.ToString());
+             }
+             catch (Exception ex)
+             {
+                MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+             }
+          }
 
 		    /// <summary>
 		    /// Need certain keyboard events on the lstFileNames.
@@ -2013,12 +2117,13 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]		06/27/2007  CHG: removed message parameter
           /// [Curtis_Beard]		08/07/2007  ADD: 1741735, display any search errors
           /// [Ed_Jakubowski]		05/20/2009  ADD: Display the Count
+          /// [Curtis_Beard]		01/30/2012  CHG: use language class for count text
           /// </history>
           private void ReceiveSearchComplete()
           {
              string message = Language.GetGenericText("SearchFinished");
-             
-             SetStatusBarMessage(message + "    Count: " + this.lstFileNames.Items.Count.ToString());
+
+             SetStatusBarMessage(string.Format("{0}    {1}: {2}", message, Language.GetGenericText("ResultsColumnCount", "Count"), this.lstFileNames.Items.Count.ToString()));
              SetSearchState(true);
 
              DisplaySearchErrors();
@@ -2130,17 +2235,18 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]		11/22/2006	CHG: Remove use of browse in combobox
           /// [Curtis_Beard]		08/07/2007  ADD: 1741735, better search error handling
           /// [Curtis_Beard]		08/21/2007  FIX: 1778467, make sure file pattern is correct if a '\' is present
+          /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
           /// </history>
           private void StartSearch()
           {
-              try
+             try
              {
-                 string _path = cboFilePath.Text.Trim();
+                string path = cboFilePath.Text.Trim();                
 
                  // update combo selections
                 AddComboSelection(cboSearchForText, cboSearchForText.Text);
                 AddComboSelection(cboFileName, cboFileName.Text);
-                AddComboSelection(cboFilePath, _path);
+                AddComboSelection(cboFilePath, path);
 
                 // disable gui
                 SetSearchState(false);
@@ -2153,22 +2259,22 @@ namespace AstroGrep.Windows.Forms
                 // Clear search errors
                 __ErrorCollection.Clear();
 
-                 var fileFilterSpec = GetFilterSpecFromUI();
-                 __Grep = new Grep(GetSearchSpecFromUI(),fileFilterSpec);
+                // setup structs to pass to grep
+                var fileFilterSpec = GetFilterSpecFromUI();
+                var searchSpec = GetSearchSpecFromUI(path, fileFilterSpec.FileFilter);
 
+                // create new grep instance
+                __Grep = new Grep(searchSpec, fileFilterSpec);
 
-                // fileName has a slash, so append the directory and get the file filter
-                int slashPos = fileFilterSpec.FileFilter.LastIndexOf(Path.DirectorySeparatorChar.ToString());
-                if (slashPos > -1)
-                    _path += cboFileName.Text.Substring(0, slashPos);
-
+                // setup extension exclusions
                 var extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
                 foreach (var ext in extensions)
-                    __Grep.AddExclusionExtension(ext.ToLower());
+                {
+                   __Grep.AddExclusionExtension(ext.ToLower());
+                }
 
+                // add plugins
                 __Grep.Plugins = Core.PluginManager.Items;
-
-                __Grep.StartDirectory = _path;
 
                 // attach events
                 __Grep.FileHit += ReceiveFileHit;
@@ -2208,6 +2314,7 @@ namespace AstroGrep.Windows.Forms
           // todo: move or replace me
           struct SearchSpec : ISearchSpec
           {
+             public string[] StartDirectories { get; set; }
              public bool SearchInSubfolders { get; set; }
              public bool UseRegularExpressions { get; set; }
              public bool UseCaseSensitivity { get; set; }
@@ -2228,18 +2335,20 @@ namespace AstroGrep.Windows.Forms
              public bool SkipSystemFiles { get; set; }
              public DateTime DateModifiedStart { get; set; }
              public DateTime DateModifiedEnd { get; set; }
-             public int FileSizeMin { get; set; }
-             public int FileSizeMax { get; set; }
+             public long FileSizeMin { get; set; }
+             public long FileSizeMax { get; set; }
           }
 
+          /// <summary>
+          /// Sets the grep options
+          /// </summary>
+          /// <history>
+          /// [Andrew_Radford]		13/08/2009  CHG: Now retruns IFileFilterSpec rather than altering global state
+          /// [Curtis_Beard]		   01/31/2012  ADD: 1561584, ability to ignore hidden/system files/directories
+          /// </history>
            private IFileFilterSpec GetFilterSpecFromUI()
            {
-              string _fileName = cboFileName.Text;
-              string _path = cboFilePath.Text.Trim();
-
-              // Ensure that there is a backslash.
-              if (!_path.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                 _path += Path.DirectorySeparatorChar.ToString();
+              string _fileName = cboFileName.Text;              
 
               // update path and fileName if fileName has a path in it
               int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
@@ -2249,43 +2358,60 @@ namespace AstroGrep.Windows.Forms
               var spec = new FileFilterSpec
                         {
                            FileFilter = _fileName,
-                           SkipHiddenFiles = false,
-                           SkipSystemFiles = false,
+                           SkipHiddenFiles = chkSkipHidden.Checked,
+                           SkipSystemFiles = chkSkipSystem.Checked,
                            DateModifiedStart = dateModBegin.Value,
-                           DateModifiedEnd = dateModEnd.Value,
+                           DateModifiedEnd = dateModEnd.Value
                         };
 
-              int size;
+              long size;
 
-              spec.FileSizeMin = int.TryParse(txtMinSize.Text, out size) ? size : int.MinValue;
-              spec.FileSizeMax = int.TryParse(txtMaxSize.Text, out size) ? size : int.MaxValue;
+              spec.FileSizeMin = long.TryParse(txtMinSize.Text, out size) ? size : long.MinValue;
+              spec.FileSizeMax = long.TryParse(txtMaxSize.Text, out size) ? size : long.MaxValue;
 
               return spec;
            }
 
 
-           /// <summary>
+          /// <summary>
           /// Sets the grep options
           /// </summary>
           /// <history>
           /// [Curtis_Beard]		10/17/2005	Created
           /// [Curtis_Beard]		07/28/2006  ADD: extension exclusion list
-          /// [Andrew_Radford]		13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
+          /// [Andrew_Radford]   13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
+          /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
           /// </history>
-          private ISearchSpec GetSearchSpecFromUI()
+          private ISearchSpec GetSearchSpecFromUI(string path, string fileFilter)
           {
-              return new SearchSpec
-                            {
-                                UseCaseSensitivity = chkCaseSensitive.Checked,
-                                ContextLines = Convert.ToInt32(txtContextLines.Value),
-                                IncludeLineNumbers = chkLineNumbers.Checked,
-                                UseNegation = chkNegation.Checked,
-                                ReturnOnlyFileNames = chkFileNamesOnly.Checked,
-                                SearchInSubfolders = chkRecurse.Checked,
-                                UseRegularExpressions = chkRegularExpressions.Checked,
-                                UseWholeWordMatching = chkWholeWordOnly.Checked,
-                                SearchText = cboSearchForText.Text
-                            };  
+             string[] paths = path.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+             var spec = new SearchSpec
+                  {
+                       UseCaseSensitivity = chkCaseSensitive.Checked,
+                       ContextLines = Convert.ToInt32(txtContextLines.Value),
+                       IncludeLineNumbers = chkLineNumbers.Checked,
+                       UseNegation = chkNegation.Checked,
+                       ReturnOnlyFileNames = chkFileNamesOnly.Checked,
+                       SearchInSubfolders = chkRecurse.Checked,
+                       UseRegularExpressions = chkRegularExpressions.Checked,
+                       UseWholeWordMatching = chkWholeWordOnly.Checked,
+                       SearchText = cboSearchForText.Text
+                  };
+
+             // fileName has a slash, so append the directory and get the file filter
+             int slashPos = fileFilter.LastIndexOf(Path.DirectorySeparatorChar.ToString());
+             if (slashPos > -1)
+             {
+                // append to each starting directory
+                for (int i = 0; i < paths.Length; i++)
+                {
+                   paths[i] += fileFilter.Substring(0, slashPos);
+                }
+             }
+             spec.StartDirectories = paths;
+
+             return spec;     
           }
 
           /// <summary>
