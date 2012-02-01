@@ -86,6 +86,7 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.CheckBox chkRightClickOption;      
 
       private bool __LanguageChange = false;
+      private Button btnRestoreDefaultExtensions;
 
 		/// <summary>
 		/// Required designer variable.
@@ -135,6 +136,10 @@ namespace AstroGrep.Windows.Forms
 		{
          this.tbcOptions = new System.Windows.Forms.TabControl();
          this.tabGeneral = new System.Windows.Forms.TabPage();
+         this.ShortcutGroup = new System.Windows.Forms.GroupBox();
+         this.chkStartMenuShortcut = new System.Windows.Forms.CheckBox();
+         this.chkDesktopShortcut = new System.Windows.Forms.CheckBox();
+         this.chkRightClickOption = new System.Windows.Forms.CheckBox();
          this.ExtensionExclusionGroup = new System.Windows.Forms.GroupBox();
          this.txtExcludeList = new System.Windows.Forms.TextBox();
          this.LanguageGroup = new System.Windows.Forms.GroupBox();
@@ -153,13 +158,9 @@ namespace AstroGrep.Windows.Forms
          this.lblResultPreview = new System.Windows.Forms.Label();
          this.rtxtResultsPreview = new System.Windows.Forms.RichTextBox();
          this.grpResultWindow = new System.Windows.Forms.GroupBox();
-         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
-         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
          this.lblResultsWindowBack = new System.Windows.Forms.Label();
          this.lblResultsWindowFore = new System.Windows.Forms.Label();
          this.grpResultMatch = new System.Windows.Forms.GroupBox();
-         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
-         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
          this.BackColorLabel = new System.Windows.Forms.Label();
          this.ForeColorLabel = new System.Windows.Forms.Label();
          this.tabPlugins = new System.Windows.Forms.TabPage();
@@ -177,12 +178,14 @@ namespace AstroGrep.Windows.Forms
          this.PluginsColumnExt = new System.Windows.Forms.ColumnHeader();
          this.btnOK = new System.Windows.Forms.Button();
          this.btnCancel = new System.Windows.Forms.Button();
-         this.ShortcutGroup = new System.Windows.Forms.GroupBox();
-         this.chkStartMenuShortcut = new System.Windows.Forms.CheckBox();
-         this.chkDesktopShortcut = new System.Windows.Forms.CheckBox();
-         this.chkRightClickOption = new System.Windows.Forms.CheckBox();
+         this.btnRestoreDefaultExtensions = new System.Windows.Forms.Button();
+         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
+         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
+         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
+         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
          this.tbcOptions.SuspendLayout();
          this.tabGeneral.SuspendLayout();
+         this.ShortcutGroup.SuspendLayout();
          this.ExtensionExclusionGroup.SuspendLayout();
          this.LanguageGroup.SuspendLayout();
          this.tabTextEditors.SuspendLayout();
@@ -191,14 +194,13 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.SuspendLayout();
          this.tabPlugins.SuspendLayout();
          this.PluginDetailsGroup.SuspendLayout();
-         this.ShortcutGroup.SuspendLayout();
          this.SuspendLayout();
          // 
          // tbcOptions
          // 
-         this.tbcOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.tbcOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                     | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.tbcOptions.Controls.Add(this.tabGeneral);
          this.tbcOptions.Controls.Add(this.tabTextEditors);
          this.tbcOptions.Controls.Add(this.tabResults);
@@ -223,33 +225,77 @@ namespace AstroGrep.Windows.Forms
          this.tabGeneral.TabIndex = 0;
          this.tabGeneral.Text = "General";
          // 
+         // ShortcutGroup
+         // 
+         this.ShortcutGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
+         this.ShortcutGroup.Controls.Add(this.chkStartMenuShortcut);
+         this.ShortcutGroup.Controls.Add(this.chkDesktopShortcut);
+         this.ShortcutGroup.Controls.Add(this.chkRightClickOption);
+         this.ShortcutGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.ShortcutGroup.Location = new System.Drawing.Point(8, 40);
+         this.ShortcutGroup.Name = "ShortcutGroup";
+         this.ShortcutGroup.Size = new System.Drawing.Size(480, 80);
+         this.ShortcutGroup.TabIndex = 35;
+         this.ShortcutGroup.TabStop = false;
+         this.ShortcutGroup.Text = "Shortcuts";
+         // 
+         // chkStartMenuShortcut
+         // 
+         this.chkStartMenuShortcut.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.chkStartMenuShortcut.Location = new System.Drawing.Point(232, 48);
+         this.chkStartMenuShortcut.Name = "chkStartMenuShortcut";
+         this.chkStartMenuShortcut.Size = new System.Drawing.Size(240, 24);
+         this.chkStartMenuShortcut.TabIndex = 29;
+         this.chkStartMenuShortcut.Text = "Start Menu Shortcut";
+         // 
+         // chkDesktopShortcut
+         // 
+         this.chkDesktopShortcut.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.chkDesktopShortcut.Location = new System.Drawing.Point(8, 48);
+         this.chkDesktopShortcut.Name = "chkDesktopShortcut";
+         this.chkDesktopShortcut.Size = new System.Drawing.Size(224, 24);
+         this.chkDesktopShortcut.TabIndex = 28;
+         this.chkDesktopShortcut.Text = "Desktop Shortcut";
+         // 
+         // chkRightClickOption
+         // 
+         this.chkRightClickOption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
+         this.chkRightClickOption.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.chkRightClickOption.Location = new System.Drawing.Point(8, 24);
+         this.chkRightClickOption.Name = "chkRightClickOption";
+         this.chkRightClickOption.Size = new System.Drawing.Size(464, 17);
+         this.chkRightClickOption.TabIndex = 20;
+         this.chkRightClickOption.Text = "Set right-click option on folders";
+         // 
          // ExtensionExclusionGroup
          // 
-         this.ExtensionExclusionGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.ExtensionExclusionGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
+         this.ExtensionExclusionGroup.Controls.Add(this.btnRestoreDefaultExtensions);
          this.ExtensionExclusionGroup.Controls.Add(this.txtExcludeList);
          this.ExtensionExclusionGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.ExtensionExclusionGroup.Location = new System.Drawing.Point(8, 192);
          this.ExtensionExclusionGroup.Name = "ExtensionExclusionGroup";
-         this.ExtensionExclusionGroup.Size = new System.Drawing.Size(472, 56);
+         this.ExtensionExclusionGroup.Size = new System.Drawing.Size(472, 80);
          this.ExtensionExclusionGroup.TabIndex = 34;
          this.ExtensionExclusionGroup.TabStop = false;
          this.ExtensionExclusionGroup.Text = "Exclude File Extensions";
          // 
          // txtExcludeList
          // 
-         this.txtExcludeList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.txtExcludeList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.txtExcludeList.Location = new System.Drawing.Point(16, 24);
          this.txtExcludeList.Name = "txtExcludeList";
          this.txtExcludeList.Size = new System.Drawing.Size(440, 20);
          this.txtExcludeList.TabIndex = 25;
-         this.txtExcludeList.Text = "";
          // 
          // LanguageGroup
          // 
-         this.LanguageGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.LanguageGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.LanguageGroup.Controls.Add(this.cboLanguage);
          this.LanguageGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.LanguageGroup.Location = new System.Drawing.Point(8, 128);
@@ -271,31 +317,31 @@ namespace AstroGrep.Windows.Forms
          // 
          this.cboPathMRUCount.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cboPathMRUCount.Items.AddRange(new object[] {
-                                                             "1",
-                                                             "2",
-                                                             "3",
-                                                             "4",
-                                                             "5",
-                                                             "6",
-                                                             "7",
-                                                             "8",
-                                                             "9",
-                                                             "10",
-                                                             "11",
-                                                             "12",
-                                                             "13",
-                                                             "14",
-                                                             "15",
-                                                             "16",
-                                                             "17",
-                                                             "18",
-                                                             "19",
-                                                             "20",
-                                                             "21",
-                                                             "22",
-                                                             "23",
-                                                             "24",
-                                                             "25"});
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25"});
          this.cboPathMRUCount.Location = new System.Drawing.Point(8, 8);
          this.cboPathMRUCount.Name = "cboPathMRUCount";
          this.cboPathMRUCount.Size = new System.Drawing.Size(56, 21);
@@ -303,11 +349,11 @@ namespace AstroGrep.Windows.Forms
          // 
          // lblStoredPaths
          // 
-         this.lblStoredPaths.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.lblStoredPaths.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.lblStoredPaths.BackColor = System.Drawing.SystemColors.Control;
          this.lblStoredPaths.Cursor = System.Windows.Forms.Cursors.Default;
-         this.lblStoredPaths.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((System.Byte)(0)));
+         this.lblStoredPaths.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
          this.lblStoredPaths.ForeColor = System.Drawing.SystemColors.ControlText;
          this.lblStoredPaths.Location = new System.Drawing.Point(80, 8);
          this.lblStoredPaths.Name = "lblStoredPaths";
@@ -334,6 +380,7 @@ namespace AstroGrep.Windows.Forms
          this.btnEdit.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.btnEdit.Location = new System.Drawing.Point(96, 208);
          this.btnEdit.Name = "btnEdit";
+         this.btnEdit.Size = new System.Drawing.Size(75, 23);
          this.btnEdit.TabIndex = 16;
          this.btnEdit.Text = "&Edit...";
          this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
@@ -343,6 +390,7 @@ namespace AstroGrep.Windows.Forms
          this.btnRemove.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.btnRemove.Location = new System.Drawing.Point(184, 208);
          this.btnRemove.Name = "btnRemove";
+         this.btnRemove.Size = new System.Drawing.Size(75, 23);
          this.btnRemove.TabIndex = 15;
          this.btnRemove.Text = "&Delete";
          this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
@@ -352,18 +400,19 @@ namespace AstroGrep.Windows.Forms
          this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.btnAdd.Location = new System.Drawing.Point(8, 208);
          this.btnAdd.Name = "btnAdd";
+         this.btnAdd.Size = new System.Drawing.Size(75, 23);
          this.btnAdd.TabIndex = 14;
          this.btnAdd.Text = "&Add...";
          this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
          // 
          // TextEditorsList
          // 
-         this.TextEditorsList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.TextEditorsList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.TextEditorsList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-                                                                                          this.ColumnType,
-                                                                                          this.ColumnEditor,
-                                                                                          this.ColumnArguments});
+            this.ColumnType,
+            this.ColumnEditor,
+            this.ColumnArguments});
          this.TextEditorsList.FullRowSelect = true;
          this.TextEditorsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
          this.TextEditorsList.HideSelection = false;
@@ -372,9 +421,10 @@ namespace AstroGrep.Windows.Forms
          this.TextEditorsList.Name = "TextEditorsList";
          this.TextEditorsList.Size = new System.Drawing.Size(472, 184);
          this.TextEditorsList.TabIndex = 13;
+         this.TextEditorsList.UseCompatibleStateImageBehavior = false;
          this.TextEditorsList.View = System.Windows.Forms.View.Details;
-         this.TextEditorsList.DoubleClick += new System.EventHandler(this.TextEditorsList_DoubleClick);
          this.TextEditorsList.SelectedIndexChanged += new System.EventHandler(this.TextEditorsList_SelectedIndexChanged);
+         this.TextEditorsList.DoubleClick += new System.EventHandler(this.TextEditorsList_DoubleClick);
          // 
          // ColumnType
          // 
@@ -405,8 +455,8 @@ namespace AstroGrep.Windows.Forms
          // 
          // lblResultPreview
          // 
-         this.lblResultPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.lblResultPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.lblResultPreview.Location = new System.Drawing.Point(8, 168);
          this.lblResultPreview.Name = "lblResultPreview";
          this.lblResultPreview.Size = new System.Drawing.Size(472, 16);
@@ -415,8 +465,8 @@ namespace AstroGrep.Windows.Forms
          // 
          // rtxtResultsPreview
          // 
-         this.rtxtResultsPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.rtxtResultsPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.rtxtResultsPreview.Location = new System.Drawing.Point(8, 184);
          this.rtxtResultsPreview.Name = "rtxtResultsPreview";
          this.rtxtResultsPreview.ReadOnly = true;
@@ -426,8 +476,8 @@ namespace AstroGrep.Windows.Forms
          // 
          // grpResultWindow
          // 
-         this.grpResultWindow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.grpResultWindow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.grpResultWindow.Controls.Add(this.btnResultsWindowBackColor);
          this.grpResultWindow.Controls.Add(this.btnResultsWindowForeColor);
          this.grpResultWindow.Controls.Add(this.lblResultsWindowBack);
@@ -439,20 +489,6 @@ namespace AstroGrep.Windows.Forms
          this.grpResultWindow.TabIndex = 24;
          this.grpResultWindow.TabStop = false;
          this.grpResultWindow.Text = "Results Window";
-         // 
-         // btnResultsWindowBackColor
-         // 
-         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(376, 24);
-         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
-         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((System.Byte)(255)), ((System.Byte)(255)), ((System.Byte)(255)));
-         this.btnResultsWindowBackColor.TabIndex = 22;
-         // 
-         // btnResultsWindowForeColor
-         // 
-         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
-         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
-         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((System.Byte)(0)), ((System.Byte)(0)), ((System.Byte)(0)));
-         this.btnResultsWindowForeColor.TabIndex = 21;
          // 
          // lblResultsWindowBack
          // 
@@ -474,8 +510,8 @@ namespace AstroGrep.Windows.Forms
          // 
          // grpResultMatch
          // 
-         this.grpResultMatch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.grpResultMatch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.grpResultMatch.Controls.Add(this.BackColorButton);
          this.grpResultMatch.Controls.Add(this.ForeColorButton);
          this.grpResultMatch.Controls.Add(this.BackColorLabel);
@@ -487,20 +523,6 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.TabIndex = 23;
          this.grpResultMatch.TabStop = false;
          this.grpResultMatch.Text = "Results Match";
-         // 
-         // BackColorButton
-         // 
-         this.BackColorButton.Location = new System.Drawing.Point(376, 24);
-         this.BackColorButton.Name = "BackColorButton";
-         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((System.Byte)(255)), ((System.Byte)(255)), ((System.Byte)(255)));
-         this.BackColorButton.TabIndex = 18;
-         // 
-         // ForeColorButton
-         // 
-         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
-         this.ForeColorButton.Name = "ForeColorButton";
-         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((System.Byte)(0)), ((System.Byte)(0)), ((System.Byte)(0)));
-         this.ForeColorButton.TabIndex = 17;
          // 
          // BackColorLabel
          // 
@@ -532,8 +554,8 @@ namespace AstroGrep.Windows.Forms
          // 
          // PluginDetailsGroup
          // 
-         this.PluginDetailsGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.PluginDetailsGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.PluginDetailsGroup.Controls.Add(this.lblPluginDetailAuthor);
          this.PluginDetailsGroup.Controls.Add(this.lblPluginVersion);
          this.PluginDetailsGroup.Controls.Add(this.lblPluginName);
@@ -573,8 +595,8 @@ namespace AstroGrep.Windows.Forms
          // 
          // lblPluginDescription
          // 
-         this.lblPluginDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.lblPluginDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.lblPluginDescription.Location = new System.Drawing.Point(272, 24);
          this.lblPluginDescription.Name = "lblPluginDescription";
          this.lblPluginDescription.Size = new System.Drawing.Size(192, 88);
@@ -605,13 +627,13 @@ namespace AstroGrep.Windows.Forms
          // 
          // PluginsList
          // 
-         this.PluginsList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+         this.PluginsList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
          this.PluginsList.CheckBoxes = true;
          this.PluginsList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-                                                                                      this.PluginsColumnEnabled,
-                                                                                      this.PluginsColumnName,
-                                                                                      this.PluginsColumnExt});
+            this.PluginsColumnEnabled,
+            this.PluginsColumnName,
+            this.PluginsColumnExt});
          this.PluginsList.FullRowSelect = true;
          this.PluginsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
          this.PluginsList.HideSelection = false;
@@ -620,6 +642,7 @@ namespace AstroGrep.Windows.Forms
          this.PluginsList.Name = "PluginsList";
          this.PluginsList.Size = new System.Drawing.Size(472, 96);
          this.PluginsList.TabIndex = 2;
+         this.PluginsList.UseCompatibleStateImageBehavior = false;
          this.PluginsList.View = System.Windows.Forms.View.Details;
          this.PluginsList.SelectedIndexChanged += new System.EventHandler(this.PluginsList_SelectedIndexChanged);
          this.PluginsList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PluginsList_ItemCheck);
@@ -646,6 +669,7 @@ namespace AstroGrep.Windows.Forms
          this.btnOK.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.btnOK.Location = new System.Drawing.Point(352, 344);
          this.btnOK.Name = "btnOK";
+         this.btnOK.Size = new System.Drawing.Size(75, 23);
          this.btnOK.TabIndex = 1;
          this.btnOK.Text = "&OK";
          this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
@@ -657,53 +681,54 @@ namespace AstroGrep.Windows.Forms
          this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.btnCancel.Location = new System.Drawing.Point(432, 344);
          this.btnCancel.Name = "btnCancel";
+         this.btnCancel.Size = new System.Drawing.Size(75, 23);
          this.btnCancel.TabIndex = 2;
          this.btnCancel.Text = "&Cancel";
          this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
          // 
-         // ShortcutGroup
+         // btnRestoreDefaultExtensions
          // 
-         this.ShortcutGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-         this.ShortcutGroup.Controls.Add(this.chkStartMenuShortcut);
-         this.ShortcutGroup.Controls.Add(this.chkDesktopShortcut);
-         this.ShortcutGroup.Controls.Add(this.chkRightClickOption);
-         this.ShortcutGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.ShortcutGroup.Location = new System.Drawing.Point(8, 40);
-         this.ShortcutGroup.Name = "ShortcutGroup";
-         this.ShortcutGroup.Size = new System.Drawing.Size(480, 80);
-         this.ShortcutGroup.TabIndex = 35;
-         this.ShortcutGroup.TabStop = false;
-         this.ShortcutGroup.Text = "Shortcuts";
+         this.btnRestoreDefaultExtensions.AutoSize = true;
+         this.btnRestoreDefaultExtensions.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnRestoreDefaultExtensions.Location = new System.Drawing.Point(16, 50);
+         this.btnRestoreDefaultExtensions.Name = "btnRestoreDefaultExtensions";
+         this.btnRestoreDefaultExtensions.Size = new System.Drawing.Size(149, 23);
+         this.btnRestoreDefaultExtensions.TabIndex = 26;
+         this.btnRestoreDefaultExtensions.Text = "Restore Default Extensions";
+         this.btnRestoreDefaultExtensions.UseVisualStyleBackColor = true;
+         this.btnRestoreDefaultExtensions.Click += new System.EventHandler(this.btnRestoreDefaultExtensions_Click);
          // 
-         // chkStartMenuShortcut
+         // btnResultsWindowBackColor
          // 
-         this.chkStartMenuShortcut.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.chkStartMenuShortcut.Location = new System.Drawing.Point(232, 48);
-         this.chkStartMenuShortcut.Name = "chkStartMenuShortcut";
-         this.chkStartMenuShortcut.Size = new System.Drawing.Size(240, 24);
-         this.chkStartMenuShortcut.TabIndex = 29;
-         this.chkStartMenuShortcut.Text = "Start Menu Shortcut";
+         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(376, 24);
+         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
+         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.btnResultsWindowBackColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowBackColor.TabIndex = 22;
          // 
-         // chkDesktopShortcut
+         // btnResultsWindowForeColor
          // 
-         this.chkDesktopShortcut.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.chkDesktopShortcut.Location = new System.Drawing.Point(8, 48);
-         this.chkDesktopShortcut.Name = "chkDesktopShortcut";
-         this.chkDesktopShortcut.Size = new System.Drawing.Size(224, 24);
-         this.chkDesktopShortcut.TabIndex = 28;
-         this.chkDesktopShortcut.Text = "Desktop Shortcut";
+         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
+         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
+         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.btnResultsWindowForeColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowForeColor.TabIndex = 21;
          // 
-         // chkRightClickOption
+         // BackColorButton
          // 
-         this.chkRightClickOption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-         this.chkRightClickOption.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.chkRightClickOption.Location = new System.Drawing.Point(8, 24);
-         this.chkRightClickOption.Name = "chkRightClickOption";
-         this.chkRightClickOption.Size = new System.Drawing.Size(464, 17);
-         this.chkRightClickOption.TabIndex = 20;
-         this.chkRightClickOption.Text = "Set right-click option on folders";
+         this.BackColorButton.Location = new System.Drawing.Point(376, 24);
+         this.BackColorButton.Name = "BackColorButton";
+         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.BackColorButton.Size = new System.Drawing.Size(75, 23);
+         this.BackColorButton.TabIndex = 18;
+         // 
+         // ForeColorButton
+         // 
+         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
+         this.ForeColorButton.Name = "ForeColorButton";
+         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.ForeColorButton.Size = new System.Drawing.Size(75, 23);
+         this.ForeColorButton.TabIndex = 17;
          // 
          // frmOptions
          // 
@@ -724,7 +749,9 @@ namespace AstroGrep.Windows.Forms
          this.Load += new System.EventHandler(this.frmOptions_Load);
          this.tbcOptions.ResumeLayout(false);
          this.tabGeneral.ResumeLayout(false);
+         this.ShortcutGroup.ResumeLayout(false);
          this.ExtensionExclusionGroup.ResumeLayout(false);
+         this.ExtensionExclusionGroup.PerformLayout();
          this.LanguageGroup.ResumeLayout(false);
          this.tabTextEditors.ResumeLayout(false);
          this.tabResults.ResumeLayout(false);
@@ -732,7 +759,6 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.ResumeLayout(false);
          this.tabPlugins.ResumeLayout(false);
          this.PluginDetailsGroup.ResumeLayout(false);
-         this.ShortcutGroup.ResumeLayout(false);
          this.ResumeLayout(false);
 
       }
@@ -1236,6 +1262,16 @@ namespace AstroGrep.Windows.Forms
             }
          }
       }
+
+      /// <summary>
+      /// Set the file extension exclude list to the default values.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      private void btnRestoreDefaultExtensions_Click(object sender, EventArgs e)
+      {
+         txtExcludeList.Text = Constants.DEFAULT_EXTENSION_EXCLUDE_LIST;
+      }
       #endregion
 
       #region Plugin Methods
@@ -1323,6 +1359,6 @@ namespace AstroGrep.Windows.Forms
          lblPluginAuthor.Text = plugin.Author;
          lblPluginDescription.Text = plugin.Description;
       }
-      #endregion
+      #endregion      
 	}
 }

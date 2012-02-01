@@ -15,8 +15,26 @@
       <control name="chkWholeWordOnly" value="&amp;Ganzes Wörter" tooltip="Nur nach ganzen Wörtern suchen (nicht nach Teilworten)" />
       <control name="chkCaseSensitive" value="&amp;Groß-/Kleinschreibung beachten" tooltip="Achtet genau auf groß- und kleingeschriebene Buchstaben" />
       <control name="chkRegularExpressions" value="Reguläre &amp;Ausdrücke" tooltip="Benutzt &quot;Reguläre Ausdrücke&quot; zur Suche" />
+      <control name="chkSkipHidden" value="Overslaan Verborgen bestanden/mappen" tooltip="Ignore files/directories marked as hidden" />
+      <control name="chkSkipSystem" value="Overslaan Systeem bestanden/mappen" tooltip="Ignore files/directories marked as system" />
       <control name="lnkSearchOptions" value="Such-Einstellungen {0}" />
       <control name="picBrowse" tooltip="Durchsuchen..." />
+      <control name="label1" value="Gewijzigd na:" />
+      <control name="label2" value="Gewijzigd Voor:" />
+      <control name="label3" value="Min Maat:" />
+      <control name="label4" value="Max Maat:" />
+      <control name="lstFileNames">
+         <menuitem index="0" value="kopie" />
+         <menuitem index="1" value="kopie naam" />
+         <menuitem index="2" value="exemplaar bevindt zich in" />
+         <menuitem index="3" value="exemplaar bevindt zich in + naam" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="bestand te openen" />
+         <menuitem index="6" value="telefoonboek te openen" />
+         <menuitem index="7" value="-" />
+         <menuitem index="8" value="Item verwijderen" />
+      </control>
+      
       <menu index="0" value="&amp;Datei">
          <menuitem index="0" value="&amp;Suchpfad vorwählen..." />
          <menuitem index="1" value="-" />
@@ -77,6 +95,7 @@
       <control name="tabTextEditors" value="Texteditoren" />
       <control name="LanguageGroup" value="Sprache"/>
       <control name="ExtensionExclusionGroup" value="Dateiendung ausschließen"/>
+      <control name="btnRestoreDefaultExtensions" value="Herstellen standaard extensies"/>
       <control name="tabPlugins" value="Erweiterungen"/>
       <control name="chkDesktopShortcut" value="Verknüpfung auf dem &amp;Desktop"/>
       <control name="chkStartMenuShortcut" value="Verknüpfung im Start&amp;menü"/>
@@ -145,13 +164,14 @@
       <text name="TextEditorsColumnFileType" value="Dateityp"/>
       <text name="TextEditorsColumnLocation" value="Texteditor"/>
       <text name="TextEditorsColumnCmdLine" value="Kommandozeile"/>
-      <text name="TextEditorsErrorNoEditor" value="Please define a text editor."/>
-      <text name="TextEditorsErrorFileTypeExists" value="The file type already exists.  Please try again."/>
+      <text name="TextEditorsErrorNoEditor" value="Definieer een text editor."/>
+      <text name="TextEditorsErrorFileTypeExists" value="Het bestandstype bestaat reeds. Probeer het opnieuw."/>
 
       <text name="ResultsColumnFile" value="Name"/>
       <text name="ResultsColumnLocation" value="Befindet sich in"/>
       <text name="ResultsColumnDate" value="Änderungsdatum"/>
       <text name="ResultsColumnCount" value="Anzahl"/>
+      <text name="ResultsColumnSize" value="Maat"/>
 
       <text name="PluginsColumnEnabled" value="Aktiv"/>
       <text name="PluginsColumnName" value="Name"/>

@@ -12,6 +12,7 @@
 <h4>%%searchterm%% was found %%totalhits%% times in %%totalfiles%% files</h4>
 <div class="searchoptions">
    <h3 class="header">Search Options</h3>
+   <!--%%searchpaths%%<br />-->
    %%filetypes%%<br />
    %%regex%%<br />
    %%casesen%%<br />
@@ -21,20 +22,26 @@
    %%negation%%<br />
    %%linenumbers%%<br />
    %%contextlines%%<br />
+   %%skiphidden%%<br />
+   %%skipsystem%%<br />
+   %%moddatestart%%
+   %%moddateend%%
+   %%filesizemin%%
+   %%filesizemax%%
 </div>
 [repeat]
 <p class="hit">
--------------------------------------------------------------------------------
+%%filesep%%
 <br/>
 %%file%%
 <br/>
--------------------------------------------------------------------------------
+%%filesep%%
 <br/>
 %%lines%%
 </p>
 [/repeat]
 <div id="footer">
-   Copyright ©2002-2006 AstroComma Incorporated.  All rights reserved.<br/>
+   Copyright &copy;2002-2006 AstroComma Incorporated.  All rights reserved.<br/>
 	AstroGrep is freely distributable with certain <a target="_top" href="http://www.gnu.org/copyleft/gpl.html#SEC3" title="View the license restrictions"> restrictions</a> under
    the <a target="_top" href="http://www.gnu.org/copyleft/gpl.html" title="View the GNU Public License">GNU Public License</a><br/>
 </div>

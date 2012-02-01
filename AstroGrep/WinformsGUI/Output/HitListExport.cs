@@ -40,30 +40,52 @@ namespace AstroGrep.Output
         /// Save results to a text file
         /// </summary>
         /// <param name="path">Fully qualified file path</param>
+        /// <param name="grep">libAstroGrep object</param>
+        /// <param name="lstFileNames">ListView containing hits</param>
         /// <history>
-        /// [Curtis_Beard]		09/06/2006	Created
+        /// [Curtis_Beard]		  09/06/2006	Created
         /// [Andrew_Radford]    20/09/2009	Extracted from main form code-behind
+        /// [Curtis_Beard]		  01/31/2012	CHG: output some basic search information, make divider same length as filename
         /// </history>
-        public static void SaveResultsAsText(string path, Grep grepper, ListView listViewOnTheUIChangeThisDependency)
+        public static void SaveResultsAsText(string path, Grep grep, ListView lstFileNames)
         {
-
             // Open the file
             using (var writer = new System.IO.StreamWriter(path, false, System.Text.Encoding.Default))
             {
-                // loop through File Names list
-                for (int _index = 0; _index < listViewOnTheUIChangeThisDependency.Items.Count; _index++)
-                {
-                    var hitNum = int.Parse(listViewOnTheUIChangeThisDependency.Items[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text);
+                StringBuilder builder = new StringBuilder();
+                int totalHits = 0;
 
-                    var _hit = grepper.RetrieveHitObject(hitNum);
+                // loop through File Names list
+                for (int _index = 0; _index < lstFileNames.Items.Count; _index++)
+                {
+                    var hitNum = int.Parse(lstFileNames.Items[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text);
+
+                    var _hit = grep.RetrieveHitObject(hitNum);
+                    totalHits += _hit.HitCount;
+
 
                     // write info to a file
-                    writer.WriteLine("-------------------------------------------------------------------------------");
-                    writer.WriteLine(_hit.FilePath);
-                    writer.WriteLine("-------------------------------------------------------------------------------");
-                    writer.Write(_hit.Lines);
-                    writer.WriteLine("");
+                    builder.AppendLine(new string('-', _hit.FilePath.Length));
+                    builder.AppendLine(_hit.FilePath);
+                    builder.AppendLine(new string('-', _hit.FilePath.Length));
+                    builder.AppendLine(_hit.Lines);
+                    builder.AppendLine();
                 }
+
+                // output basic search information as a header
+                writer.WriteLine("AstroGrep Results");
+                writer.WriteLine("-----------------");
+                writer.WriteLine(string.Format("{0} was found {1} time{2} in {3} file{4}",
+                   grep.SearchSpec.SearchText, 
+                   totalHits, 
+                   totalHits > 1 ? "s" : "", 
+                   grep.Greps.Count, 
+                   grep.Greps.Count > 1 ? "s" : ""));
+                writer.WriteLine("");
+                writer.WriteLine("");
+
+                // output actual results
+                writer.Write(builder.ToString());
             }
         }
 
@@ -74,9 +96,12 @@ namespace AstroGrep.Output
         /// Save results to a html file
         /// </summary>
         /// <param name="path">Fully qualified file path</param>
+        /// <param name="grep">libAstroGrep object</param>
+        /// <param name="lstFileNames">ListView containing hits</param>
         /// <history>
-        /// [Curtis_Beard]		09/06/2006	Created
+        /// [Curtis_Beard]		  09/06/2006	Created
         /// [Andrew_Radford]    20/09/2009	Extracted from main form code-behind
+        /// [Curtis_Beard]		  01/31/2012	CHG: make divider same length as filename
         /// </history>
         public static void SaveResultsAsHTML(string path, Grep grep, ListView lstFileNames)
         {
@@ -113,6 +138,7 @@ namespace AstroGrep.Output
                     lines = new StringBuilder();
                     repeater = repeatSection;
                     repeater = repeater.Replace("%%file%%", hitObject.FilePath);
+                    repeater = repeater.Replace("%%filesep%%", new string('-', hitObject.FilePath.Length));
                     totalHits += hitObject.HitCount;
 
                     for (int _jIndex = 0; _jIndex < hitObject.LineCount; _jIndex++)
@@ -139,9 +165,12 @@ namespace AstroGrep.Output
         /// Save results to a xml file
         /// </summary>
         /// <param name="path">Fully qualified file path</param>
+        /// <param name="grep">libAstroGrep object</param>
+        /// <param name="lstFileNames">ListView containing hits</param>
         /// <history>
         /// [Curtis_Beard]		09/06/2006	Created
-        /// [Andrew_Radford]    20/09/2009	Extracted from main form code-behind
+        /// [Andrew_Radford]  20/09/2009	Extracted from main form code-behind
+        /// [Curtis_Beard]		01/31/2012	ADD: display for additional options (skip hidden/system options, search paths, modified dates, file sizes)
         /// </history>
         public static void SaveResultsAsXML(string path, Grep grep, ListView lstFileNames)
         {
@@ -155,7 +184,7 @@ namespace AstroGrep.Output
 
                 // write out search options
                 writer.WriteStartElement("options");
-                writer.WriteElementString("searchPath", grep.StartDirectory);
+                writer.WriteElementString("searchPaths", string.Join(", ", grep.SearchSpec.StartDirectories));
                 writer.WriteElementString("fileTypes", grep.FileFilterSpec.FileFilter);
                 writer.WriteElementString("searchText", grep.SearchSpec.SearchText);
                 writer.WriteElementString("regularExpressions", grep.SearchSpec.UseRegularExpressions.ToString());
@@ -166,6 +195,24 @@ namespace AstroGrep.Output
                 writer.WriteElementString("negation", grep.SearchSpec.UseNegation.ToString());
                 writer.WriteElementString("lineNumbers", grep.SearchSpec.IncludeLineNumbers.ToString());
                 writer.WriteElementString("contextLines", grep.SearchSpec.ContextLines.ToString());
+                writer.WriteElementString("skipHidden", grep.FileFilterSpec.SkipHiddenFiles.ToString());
+                writer.WriteElementString("skipSystem", grep.FileFilterSpec.SkipSystemFiles.ToString());
+                if (grep.FileFilterSpec.DateModifiedStart != DateTimePicker.MinimumDateTime)
+                {
+                   writer.WriteElementString("dateModifiedStart", grep.FileFilterSpec.DateModifiedStart.ToString());
+                }
+                if (grep.FileFilterSpec.DateModifiedEnd < DateTimePicker.MaximumDateTime)
+                {
+                   writer.WriteElementString("dateModifiedEnd", grep.FileFilterSpec.DateModifiedEnd.ToString());
+                }
+                if (grep.FileFilterSpec.FileSizeMin != long.MinValue)
+                {
+                   writer.WriteElementString("fileSizeMin", grep.FileFilterSpec.FileSizeMin.ToString());
+                }
+                if (grep.FileFilterSpec.FileSizeMax != long.MaxValue)
+                {
+                   writer.WriteElementString("fileSizeMax", grep.FileFilterSpec.FileSizeMax.ToString());
+                }
                 writer.WriteEndElement();
 
                 writer.WriteStartElement("search");

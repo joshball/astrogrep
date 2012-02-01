@@ -22,6 +22,7 @@ h4
    background-color: %%resultback%%;
    color: %%resultfore%%;
    margin: 5px 5px 15px 5px;
+   font-family: Lucida Console,Default;
 }
 
 .hit-file
@@ -29,11 +30,13 @@ h4
    background-color: %%resultback%%;
    color: %%resultfore%%;
    margin: 0px 5px 0px 5px;
+   font-family: Lucida Console,Default;
 }
 
 .searchtext
 {
    color: %%highlightfore%%;
+   background-color: %%highlightback%%;
 }
 
 .searchoptions

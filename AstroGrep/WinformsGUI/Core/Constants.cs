@@ -29,6 +29,7 @@ namespace AstroGrep
    /// <history>
    /// [Curtis_Beard]		07/20/2006	Created
    /// [Curtis_Beard]		11/02/2006	ADD: Constants for plugin separators
+   /// [Curtis_Beard]	   01/31/2012	CHG: 1947760, update default exclude list to exclude images (bmp,gif,jpg,jpeg,png)
    /// </history>
    public class Constants
    {
@@ -63,10 +64,10 @@ namespace AstroGrep
       public const string ALL_FILE_TYPES = "*";
 
       /// <summary>Default language</summary>
-      public static string DEFAULT_LANGUAGE = "English";
+      public static string DEFAULT_LANGUAGE = "en-us";
 
       /// <summary>Default extension exclusion list</summary>
-      public static string DEFAULT_EXTENSION_EXCLUDE_LIST = ".exe;.dll;.pdb;.sys;.ppt";
+      public static string DEFAULT_EXTENSION_EXCLUDE_LIST = ".exe;.dll;.pdb;.msi;.sys;.ppt;.gif;.jpg;.jpeg;.png;.bmp";
 
       /// <summary>Product name</summary>
       public const string ProductName = "AstroGrep";

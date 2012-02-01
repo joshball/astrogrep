@@ -15,8 +15,26 @@
       <control name="chkWholeWordOnly" value="&amp;Palabra entera" tooltip="Solamente palabras enteras del fósforo (no piezas de palabras)" />
       <control name="chkCaseSensitive" value="Cas&amp;o sensible" tooltip="La mayúscula y minúscula del fósforo pone letras exactamente" />
       <control name="chkRegularExpressions" value="&amp;Expresiones regulares" tooltip="Utilizar emparejar regular de la expresión" />
+      <control name="chkSkipHidden" value="Omitir archivos ocultos/Directorios" tooltip="Ignore files/directories marked as hidden" />
+      <control name="chkSkipSystem" value="Omitir archivos del sistema/Directorios" tooltip="Ignore files/directories marked as system" />
       <control name="lnkSearchOptions" value="Opciones de la búsqueda {0}" />
       <control name="picBrowse" tooltip="Hojear..." />
+      <control name="label1" value="Después de modificar:" />
+      <control name="label2" value="Antes de modificar:" />
+      <control name="label3" value="Tamaño mínimo:" />
+      <control name="label4" value="Tamaño máximo:" />
+      <control name="lstFileNames">
+         <menuitem index="0" value="copia" />
+         <menuitem index="1" value="copiar el nombre" />
+         <menuitem index="2" value="copia ubicada en" />
+         <menuitem index="3" value="copia ubicada en el nombre de +" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="archivo abierto" />
+         <menuitem index="6" value="directorio abierto" />
+         <menuitem index="7" value="-" />
+         <menuitem index="8" value="suprimir el punto" />
+      </control>
+      
       <menu index="0" value="&amp;Archivo">
          <menuitem index="0" value="Seleccionar &amp;Camino de búsqueda en un fichero..." />
          <menuitem index="1" value="-" />
@@ -77,6 +95,7 @@
       <control name="tabTextEditors" value="Editores de textos" />
       <control name="LanguageGroup" value="Lengua"/>
       <control name="ExtensionExclusionGroup" value="Excluir las extensiones de archivo"/>
+      <control name="btnRestoreDefaultExtensions" value="Restaurar las extensiones por defecto"/>
       <control name="tabPlugins" value="Plugins"/>
       <control name="chkDesktopShortcut" value="Ata&amp;jo de escritorio"/>
       <control name="chkStartMenuShortcut" value="Encender el atajo del &amp;menú"/>
@@ -145,13 +164,14 @@
       <text name="TextEditorsColumnFileType" value="Tipo del archivo"/>
       <text name="TextEditorsColumnLocation" value="Editor de textos"/>
       <text name="TextEditorsColumnCmdLine" value="Línea de comando"/>
-      <text name="TextEditorsErrorNoEditor" value="Please define a text editor."/>
-      <text name="TextEditorsErrorFileTypeExists" value="The file type already exists.  Please try again."/>
+      <text name="TextEditorsErrorNoEditor" value="Por favor, defina un editor de texto."/>
+      <text name="TextEditorsErrorFileTypeExists" value="El tipo de archivo ya existe. Por favor, inténtalo de nuevo."/>
       
       <text name="ResultsColumnFile" value="Nombre"/>
       <text name="ResultsColumnLocation" value="Localizado adentro"/>
       <text name="ResultsColumnDate" value="La fecha se modificó"/>
       <text name="ResultsColumnCount" value="Cuenta"/>
+      <text name="ResultsColumnSize" value="Tamaño"/>
       
       <text name="PluginsColumnEnabled" value="Permitido"/>
       <text name="PluginsColumnName" value="Nombre"/>

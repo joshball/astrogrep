@@ -29,11 +29,11 @@ namespace libAstroGrep
       /// <summary>
       /// Minimum file size
       /// </summary>
-      int FileSizeMin { get; }
+      long FileSizeMin { get; }
 
       /// <summary>
       /// Maximum file size
       /// </summary>
-      int FileSizeMax { get; }
+      long FileSizeMax { get; }
    }
 }

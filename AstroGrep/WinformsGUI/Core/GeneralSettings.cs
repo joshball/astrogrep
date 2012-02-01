@@ -32,6 +32,8 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]      04/14/2007  FIX: 1677004, make sure search panel width is at least default
    /// [Curtis_Beard]      04/25/2007  FIX: 1700029, always get correct config path
    /// [Curtis_Beard]      08/10/2007  CHG: use 800x600 for default size
+   /// [Curtis_Beard]	   01/31/2012	ADD: size column width
+   /// [Curtis_Beard]	   01/31/2012	CHG: 1947760, update default exclude list to exclude images (bmp,gif,jpg,jpeg,png)
    /// </history>
    public sealed class GeneralSettings
    {
@@ -53,8 +55,8 @@ namespace AstroGrep.Core
       private string matchBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
       private int mruListCount = 15;
 
-      private string language = "English";
-      private string extExcludeList = ".exe;.dll;.pdb;.sys;.ppt";
+      private string language = Constants.DEFAULT_LANGUAGE;
+      private string extExcludeList = Constants.DEFAULT_EXTENSION_EXCLUDE_LIST;
 
       private int windowLeft = -1;
       private int windowTop = -1;
@@ -68,6 +70,7 @@ namespace AstroGrep.Core
       private int columnLocation = 200;
       private int columnDate = 150;
       private int columnCount = 60;
+      private int columnSize = 80;
 
       private string searchStartPaths = string.Empty;
       private string searchFilters = string.Format("*.*{0}*.txt{0}*.java{0}*.htm, *.html{0}*.jsp, *.asp{0}*.js, *.inc{0}*.htm, *.html, *.jsp, *.asp{0}*.sql{0}*.bas, *.cls, *.vb{0}*.cs{0}*.cpp, *.c, *.h{0}*.asm", Constants.SEARCH_ENTRIES_SEPARATOR);
@@ -287,6 +290,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.columnCount; }
          set { MySettings.columnCount = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the window's file list size column value.
+      /// </summary>
+      static public int WindowFileColumnSizeWidth
+      {
+         get { return MySettings.columnSize; }
+         set { MySettings.columnSize = value; }
       }
 
       /// <summary>

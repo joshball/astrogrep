@@ -66,6 +66,9 @@ private System.Windows.Forms.MenuItem OpenMenuItem;
 private System.Windows.Forms.MenuItem DeleteMenuItem;
 private System.Windows.Forms.MenuItem OpenFolderMenuItem;
 private System.Windows.Forms.MenuItem menuItem2;
+private System.Windows.Forms.MenuItem CopyNameMenuItem;
+private System.Windows.Forms.MenuItem CopyLocatedInMenuItem;
+private System.Windows.Forms.MenuItem CopyLocatedInAndNameMenuItem;
 private Label label2;
 private DateTimePicker dateModEnd;
 private Label label1;
@@ -101,6 +104,7 @@ private TextBox txtMaxSize;
          this.chkCaseSensitive = new System.Windows.Forms.CheckBox();
          this.lnkSearchOptions = new System.Windows.Forms.LinkLabel();
          this.pnlMainSearch = new System.Windows.Forms.Panel();
+         this.picBrowse = new AstroGrep.Windows.Controls.PictureButton();
          this.btnSearch = new System.Windows.Forms.Button();
          this.btnCancel = new System.Windows.Forms.Button();
          this.cboFilePath = new System.Windows.Forms.ComboBox();
@@ -119,6 +123,9 @@ private TextBox txtMaxSize;
          this.menuItem4 = new System.Windows.Forms.MenuItem();
          this.OpenMenuItem = new System.Windows.Forms.MenuItem();
          this.OpenFolderMenuItem = new System.Windows.Forms.MenuItem();
+		 this.CopyNameMenuItem = new System.Windows.Forms.MenuItem();
+		 this.CopyLocatedInMenuItem = new System.Windows.Forms.MenuItem();
+		 this.CopyLocatedInAndNameMenuItem = new System.Windows.Forms.MenuItem();
          this.menuItem2 = new System.Windows.Forms.MenuItem();
          this.DeleteMenuItem = new System.Windows.Forms.MenuItem();
          this.splitLeftRight = new System.Windows.Forms.Splitter();
@@ -143,14 +150,15 @@ private TextBox txtMaxSize;
          this.stbStatus = new System.Windows.Forms.StatusBar();
          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
          this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
-         this.picBrowse = new AstroGrep.Windows.Controls.PictureButton();
+         this.chkSkipHidden = new System.Windows.Forms.CheckBox();
+         this.chkSkipSystem = new System.Windows.Forms.CheckBox();
          this.pnlSearch.SuspendLayout();
          this.pnlSearchOptions.SuspendLayout();
          this.PanelOptionsContainer.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.txtContextLines)).BeginInit();
          this.pnlMainSearch.SuspendLayout();
-         this.pnlRightSide.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.picBrowse)).BeginInit();
+         this.pnlRightSide.SuspendLayout();
          this.SuspendLayout();
          // 
          // pnlSearch
@@ -174,13 +182,15 @@ private TextBox txtMaxSize;
          this.pnlSearchOptions.Controls.Add(this.lnkSearchOptions);
          this.pnlSearchOptions.Location = new System.Drawing.Point(16, 209);
          this.pnlSearchOptions.Name = "pnlSearchOptions";
-         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 400);
+         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 453);
          this.pnlSearchOptions.TabIndex = 1;
          // 
          // PanelOptionsContainer
          // 
          this.PanelOptionsContainer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                      | System.Windows.Forms.AnchorStyles.Right)));
+         this.PanelOptionsContainer.Controls.Add(this.chkSkipSystem);
+         this.PanelOptionsContainer.Controls.Add(this.chkSkipHidden);
          this.PanelOptionsContainer.Controls.Add(this.txtMaxSize);
          this.PanelOptionsContainer.Controls.Add(this.label4);
          this.PanelOptionsContainer.Controls.Add(this.txtMinSize);
@@ -200,7 +210,7 @@ private TextBox txtMaxSize;
          this.PanelOptionsContainer.Controls.Add(this.chkCaseSensitive);
          this.PanelOptionsContainer.Location = new System.Drawing.Point(0, 16);
          this.PanelOptionsContainer.Name = "PanelOptionsContainer";
-         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 382);
+         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 433);
          this.PanelOptionsContainer.TabIndex = 1;
          // 
          // txtMaxSize
@@ -213,6 +223,7 @@ private TextBox txtMaxSize;
          // label4
          // 
          this.label4.AutoSize = true;
+		 this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label4.Location = new System.Drawing.Point(4, 339);
          this.label4.Name = "label4";
          this.label4.Size = new System.Drawing.Size(53, 13);
@@ -229,6 +240,7 @@ private TextBox txtMaxSize;
          // label3
          // 
          this.label3.AutoSize = true;
+		 this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label3.Location = new System.Drawing.Point(4, 300);
          this.label3.Name = "label3";
          this.label3.Size = new System.Drawing.Size(50, 13);
@@ -238,6 +250,7 @@ private TextBox txtMaxSize;
          // label2
          // 
          this.label2.AutoSize = true;
+		 this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label2.Location = new System.Drawing.Point(4, 251);
          this.label2.Name = "label2";
          this.label2.Size = new System.Drawing.Size(84, 13);
@@ -254,6 +267,7 @@ private TextBox txtMaxSize;
          // label1
          // 
          this.label1.AutoSize = true;
+		 this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label1.Location = new System.Drawing.Point(4, 207);
          this.label1.Name = "label1";
          this.label1.Size = new System.Drawing.Size(75, 13);
@@ -271,6 +285,7 @@ private TextBox txtMaxSize;
          // 
          this.lblContextLines.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                      | System.Windows.Forms.AnchorStyles.Right)));
+		 this.lblContextLines.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.lblContextLines.Location = new System.Drawing.Point(56, 175);
          this.lblContextLines.Name = "lblContextLines";
          this.lblContextLines.Size = new System.Drawing.Size(127, 20);
@@ -405,6 +420,18 @@ private TextBox txtMaxSize;
          this.pnlMainSearch.Name = "pnlMainSearch";
          this.pnlMainSearch.Size = new System.Drawing.Size(200, 192);
          this.pnlMainSearch.TabIndex = 0;
+         // 
+         // picBrowse
+         // 
+         this.picBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this.picBrowse.Cursor = System.Windows.Forms.Cursors.Hand;
+         this.picBrowse.Image = ((System.Drawing.Image)(resources.GetObject("picBrowse.Image")));
+         this.picBrowse.Location = new System.Drawing.Point(175, 42);
+         this.picBrowse.Name = "picBrowse";
+         this.picBrowse.Size = new System.Drawing.Size(16, 16);
+         this.picBrowse.TabIndex = 6;
+         this.picBrowse.TabStop = false;
+         this.picBrowse.Click += new System.EventHandler(this.picBrowse_Click);
          // 
          // btnSearch
          // 
@@ -558,6 +585,9 @@ private TextBox txtMaxSize;
          // 
          this.fileLstMnu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.CopyMenuItem,
+			this.CopyNameMenuItem,
+		    this.CopyLocatedInMenuItem,
+		    this.CopyLocatedInAndNameMenuItem,
             this.menuItem4,
             this.OpenMenuItem,
             this.OpenFolderMenuItem,
@@ -569,32 +599,50 @@ private TextBox txtMaxSize;
          this.CopyMenuItem.Index = 0;
          this.CopyMenuItem.Text = "Copy";
          this.CopyMenuItem.Click += new System.EventHandler(this.CopyMenuItem_Click);
+		 // 
+         // CopyNameMenuItem
+         //
+		 this.CopyNameMenuItem.Index = 1;
+		 this.CopyNameMenuItem.Text = "Copy Name";
+         this.CopyNameMenuItem.Click += new System.EventHandler(this.CopyNameMenuItem_Click);
+		 // 
+         // CopyLocatedInMenuItem
+         //
+		 this.CopyLocatedInMenuItem.Index = 2;
+		 this.CopyLocatedInMenuItem.Text = "Copy Located In";
+         this.CopyLocatedInMenuItem.Click += new System.EventHandler(this.CopyLocatedInMenuItem_Click);
+		 // 
+         // CopyLocatedInAndNameMenuItem
+         //
+		 this.CopyLocatedInAndNameMenuItem.Index = 3;
+		 this.CopyLocatedInAndNameMenuItem.Text = "Copy Located In + Name";
+         this.CopyLocatedInAndNameMenuItem.Click += new System.EventHandler(this.CopyLocatedInAndNameMenuItem_Click);
          // 
          // menuItem4
          // 
-         this.menuItem4.Index = 1;
+         this.menuItem4.Index = 4;
          this.menuItem4.Text = "-";
          // 
          // OpenMenuItem
          // 
-         this.OpenMenuItem.Index = 2;
+         this.OpenMenuItem.Index = 5;
          this.OpenMenuItem.Text = "Open File";
          this.OpenMenuItem.Click += new System.EventHandler(this.OpenMenuItem_Click);
          // 
          // OpenFolderMenuItem
          // 
-         this.OpenFolderMenuItem.Index = 3;
+         this.OpenFolderMenuItem.Index = 6;
          this.OpenFolderMenuItem.Text = "Open Directory";
          this.OpenFolderMenuItem.Click += new System.EventHandler(this.OpenFolderMenuItem_Click);
          // 
          // menuItem2
          // 
-         this.menuItem2.Index = 4;
+         this.menuItem2.Index = 7;
          this.menuItem2.Text = "-";
          // 
          // DeleteMenuItem
          // 
-         this.DeleteMenuItem.Index = 5;
+         this.DeleteMenuItem.Index = 8;
          this.DeleteMenuItem.Text = "Delete Item";
          this.DeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
          // 
@@ -747,17 +795,29 @@ private TextBox txtMaxSize;
          this.ListViewImageList.Images.SetKeyName(0, "");
          this.ListViewImageList.Images.SetKeyName(1, "");
          // 
-         // picBrowse
+         // chkSkipHidden
          // 
-         this.picBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-         this.picBrowse.Cursor = System.Windows.Forms.Cursors.Hand;
-         this.picBrowse.Image = ((System.Drawing.Image)(resources.GetObject("picBrowse.Image")));
-         this.picBrowse.Location = new System.Drawing.Point(175, 42);
-         this.picBrowse.Name = "picBrowse";
-         this.picBrowse.Size = new System.Drawing.Size(16, 16);
-         this.picBrowse.TabIndex = 6;
-         this.picBrowse.TabStop = false;
-         this.picBrowse.Click += new System.EventHandler(this.picBrowse_Click);
+         this.chkSkipHidden.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
+         this.chkSkipHidden.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.chkSkipHidden.Location = new System.Drawing.Point(7, 381);
+         this.chkSkipHidden.Name = "chkSkipHidden";
+         this.chkSkipHidden.Size = new System.Drawing.Size(178, 16);
+         this.chkSkipHidden.TabIndex = 22;
+         this.chkSkipHidden.Text = "Skip Hidden Files/Directories";
+         this.toolTip1.SetToolTip(this.chkSkipHidden, "Ignore hidden files/directories");
+         // 
+         // chkSkipSystem
+         // 
+         this.chkSkipSystem.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
+         this.chkSkipSystem.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.chkSkipSystem.Location = new System.Drawing.Point(7, 403);
+         this.chkSkipSystem.Name = "chkSkipSystem";
+         this.chkSkipSystem.Size = new System.Drawing.Size(178, 16);
+         this.chkSkipSystem.TabIndex = 23;
+         this.chkSkipSystem.Text = "Skip System Files/Directories";
+         this.toolTip1.SetToolTip(this.chkSkipSystem, "Ignore system files/directories");
          // 
          // frmMain
          // 
@@ -781,8 +841,8 @@ private TextBox txtMaxSize;
          this.PanelOptionsContainer.PerformLayout();
          ((System.ComponentModel.ISupportInitialize)(this.txtContextLines)).EndInit();
          this.pnlMainSearch.ResumeLayout(false);
-         this.pnlRightSide.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.picBrowse)).EndInit();
+         this.pnlRightSide.ResumeLayout(false);
          this.ResumeLayout(false);
 
 		}
@@ -799,5 +859,8 @@ private TextBox txtMaxSize;
 			}
 			base.Dispose( disposing );
 		}
+
+      private CheckBox chkSkipSystem;
+      private CheckBox chkSkipHidden;
 	}
 }
