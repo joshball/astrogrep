@@ -148,7 +148,7 @@ namespace AstroGrep
          text = text.Replace("%%moddatestart%%", modDateStart);
 
          string modDateEnd = string.Empty;
-         if (grep.FileFilterSpec.DateModifiedEnd < DateTimePicker.MaximumDateTime)
+         if (grep.FileFilterSpec.DateModifiedEnd != DateTimePicker.MaximumDateTime)
          {
             modDateEnd = "Modified Date End: " + grep.FileFilterSpec.DateModifiedEnd + "<br/>";
          }         

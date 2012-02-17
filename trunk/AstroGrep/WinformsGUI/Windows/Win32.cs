@@ -1,6 +1,6 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace AstroGrep.Windows
 {
@@ -10,31 +10,32 @@ namespace AstroGrep.Windows
    public class API
    {
 
-      private API(){}
+      private API() { }
 
       /// <summary>
       /// 
       /// </summary>
-      [Flags] public enum HDI : uint
+      [Flags]
+      public enum HDI : uint
       {
          /// <summary></summary>
-         HEIGHT     = 1,
+         HEIGHT = 1,
          /// <summary></summary>
-         WIDTH      = 1,
+         WIDTH = 1,
          /// <summary></summary>
-         TEXT       = 2,
+         TEXT = 2,
          /// <summary></summary>
-         FORMAT     = 4,
+         FORMAT = 4,
          /// <summary></summary>
-         LPARAM     = 8,
+         LPARAM = 8,
          /// <summary></summary>
-         BITMAP     = 16,
+         BITMAP = 16,
          /// <summary></summary>
-         IMAGE      = 0x20,
+         IMAGE = 0x20,
          /// <summary></summary>
          DI_SETITEM = 0x40,
          /// <summary></summary>
-         ORDER      = 0x80,
+         ORDER = 0x80,
          /// <summary></summary>
          HDI_FILTER = 0x100
       }
@@ -42,39 +43,41 @@ namespace AstroGrep.Windows
       /// <summary>
       /// 
       /// </summary>
-      [Flags] public enum HDF : int
+      [Flags]
+      public enum HDF : int
       {
          /// <summary></summary>
-         LEFT            = 0,
+         LEFT = 0,
          /// <summary></summary>
-         RIGHT           = 1,
+         RIGHT = 1,
          /// <summary></summary>
-         CENTER          = 2,
+         CENTER = 2,
          /// <summary></summary>
-         JUSTIFYMASK     = 3,
+         JUSTIFYMASK = 3,
          /// <summary></summary>
-         RTLREADING      = 4,
+         RTLREADING = 4,
          /// <summary></summary>
-         IMAGE           = 0x800,
+         IMAGE = 0x800,
          /// <summary></summary>
          BITMAP_ON_RIGHT = 0x1000,
          /// <summary></summary>
-         BITMAP          = 0x2000,
+         BITMAP = 0x2000,
          /// <summary></summary>
-         STRING          = 0x4000,
+         STRING = 0x4000,
          /// <summary></summary>
-         OWNERDRAW       = 0x8000
+         OWNERDRAW = 0x8000
       }
 
       /// <summary>
       /// 
       /// </summary>
-      [Flags] public enum HDFT : uint
+      [Flags]
+      public enum HDFT : uint
       {
          /// <summary></summary>
-         ISSTRING   = 0x0000,
+         ISSTRING = 0x0000,
          /// <summary></summary>
-         ISNUMBER   = 0x0001,
+         ISNUMBER = 0x0001,
          /// <summary></summary>
          HASNOVALUE = 0x8000
       }
@@ -82,7 +85,7 @@ namespace AstroGrep.Windows
       /// <summary>
       /// 
       /// </summary>
-      public enum WM : uint{}
+      public enum WM : uint { }
 
       /// <summary>
       /// 
@@ -90,13 +93,13 @@ namespace AstroGrep.Windows
       public enum HDM : uint
       {
          /// <summary></summary>
-         GETITEMCOUNT  = 0x1200,
+         GETITEMCOUNT = 0x1200,
          /// <summary></summary>
-         GETITEM       = 0x120B,
+         GETITEM = 0x120B,
          /// <summary></summary>
-         SETITEM       = 0x120C,
+         SETITEM = 0x120C,
          /// <summary></summary>
-         SETIMAGELIST  = 0x1208
+         SETIMAGELIST = 0x1208
          /* other values omitted */
       }
 
@@ -106,7 +109,7 @@ namespace AstroGrep.Windows
       public enum LVM : uint
       {
          /// <summary></summary>
-         GETHEADER           = 0x101F,
+         GETHEADER = 0x101F,
          /// <summary></summary>
          SETCOLUMNORDERARRAY = 0x103A,
          /// <summary></summary>
@@ -121,28 +124,61 @@ namespace AstroGrep.Windows
       public struct HDITEM
       {
          /// <summary></summary>
-         public HDI    mask;
+         public HDI mask;
          /// <summary></summary>
-         public int    cxy;
+         public int cxy;
          /// <summary></summary>
          public string pszText;
          /// <summary></summary>
          public IntPtr hbm;
          /// <summary></summary>
-         public int    cchTextMax;
+         public int cchTextMax;
          /// <summary></summary>
-         public HDF    fmt;
+         public HDF fmt;
          /// <summary></summary>
-         public int    lParam;
+         public int lParam;
          /// <summary></summary>
-         public int    iImage;
+         public int iImage;
          /// <summary></summary>
-         public int    iOrder;
+         public int iOrder;
          /// <summary></summary>
-         public HDFT   type;
+         public HDFT type;
          /// <summary></summary>
          public IntPtr pvFilter;
       }
+
+      public const int LVM_SETCOLUMN = 4122;
+      public const int LVM_SETSELECTEDCOLUMN = (0x1000 + 140);
+      //For ColumnHeader Images
+      public const int LVM_GETHEADER = 4127;
+      public const int HDM_SETIMAGELIST = 4616;
+      public const int LVCF_FMT = 0x1;
+      public const int LVCF_IMAGE = 0x10;
+      public const int LVCFMT_IMAGE = 2048;
+      public const int LVCF_BITMAP_ON_RIGHT = 4096;
+      public const int LVCF_STRING = 16384;
+
+      [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Auto)]
+      public struct LVCOLUMN
+      {
+         public int mask;
+         public int fmt;
+         public int cx;
+         public IntPtr pszText;
+         public int cchTextMax;
+         public int iSubItem;
+         public int iImage;
+         public int iOrder;
+      }
+
+      [DllImport("user32.dll", CharSet = CharSet.Auto)]
+      public static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, ref LVCOLUMN lParam);
+
+      [DllImport("user32.dll", CharSet = CharSet.Auto)]
+      public static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+      [DllImport("user32.dll", CharSet = CharSet.Auto)]
+      public static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, IntPtr lParam);
 
       /// <summary>
       /// 
@@ -176,7 +212,7 @@ namespace AstroGrep.Windows
       /// <param name="wParam"></param>
       /// <param name="lParam"></param>
       /// <returns></returns>
-      [DllImport("User32.dll",CharSet = CharSet.Auto,SetLastError=true)]
+      [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
       public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
       /// <summary>
@@ -262,7 +298,7 @@ namespace AstroGrep.Windows
          HDITEM rtn = new HDITEM();
 
          rtn.mask = mask;
-         if((mask & HDI.TEXT) == HDI.TEXT)
+         if ((mask & HDI.TEXT) == HDI.TEXT)
          {
             rtn.pszText = new string('\0', 512);
             rtn.cchTextMax = 512;
@@ -350,16 +386,30 @@ namespace AstroGrep.Windows
       /// <param name="showImage">Display image in column (turn on/off image)</param>
       public static void SetHeaderImage(ListView list, int columnIndex, SortOrder order, bool showImage)
       {
-         IntPtr _header;
-         HDITEM _hdItem = new HDITEM();
-         int _iconNumber = 0;
+         SetHeaderImage(list, columnIndex, order, showImage, true);
+      }
+
+      /// <summary>
+      /// Set the Header Column image
+      /// </summary>
+      /// <param name="list">ListView</param>
+      /// <param name="columnIndex">Current column index</param>
+      /// <param name="order">Current sort order</param>
+      /// <param name="showImage">Display image in column (turn on/off image)</param>
+      /// <param name="highlightColumn">Display settle highlight background color for column</param>
+      public static void SetHeaderImage(ListView list, int columnIndex, SortOrder order, bool showImage, bool highlightColumn)
+      {
+         /*IntPtr _header;
+         HDITEM _hdItem = new HDITEM();*/
+         int iconIndex = 0;
 
          //set the image index based on sort order from the smallimagelist property
-         if( order == SortOrder.Ascending )
-            _iconNumber = 0;
+         if (order == SortOrder.Ascending)
+            iconIndex = 0;
          else
-            _iconNumber = 1;
+            iconIndex = 1;
 
+         /*
          //get a handle to the listview header component
          _header = GetHeader(list.Handle);
 
@@ -368,26 +418,60 @@ namespace AstroGrep.Windows
          _hdItem.pszText = list.Columns[columnIndex].Text;
 
          // check to show the indicator image
-         if( showImage )
+         if (showImage)
          {
             _hdItem.fmt = HDF.STRING | HDF.IMAGE | HDF.BITMAP_ON_RIGHT;
-            _hdItem.iImage = _iconNumber;
+            _hdItem.iImage = iconIndex;
          }
          else
             _hdItem.fmt = HDF.STRING;
 
          //modify the header
          SendMessage(_header, HDM.SETITEM, (uint)columnIndex, ref _hdItem);
+         */
+
+         LVCOLUMN col = new LVCOLUMN();
+         //col.mask = LVCF_FMT | LVCF_IMAGE;	// removed to fix hanging sort image
+         col.mask = LVCF_FMT;
+         col.fmt = LVCF_STRING | (0 & LVCF_FMT);
+         col.iImage = iconIndex;
+         col.cchTextMax = 0;
+         col.cx = 0;
+         col.iOrder = 0;
+         col.iSubItem = 0;
+         col.pszText = new IntPtr(0);
+
+         //Set the image if this is the column that was clicked
+         if (showImage)
+         {
+            col.mask = col.mask | LVCF_IMAGE;	// added to fix hanging sort image
+            col.fmt = col.fmt | LVCFMT_IMAGE | LVCF_BITMAP_ON_RIGHT;
+         }
+
+         //Send the LVM_SETCOLUMN message.
+         SendMessage(list.Handle, LVM_SETCOLUMN, columnIndex, ref col);
+
+         //Set the Selected Column (Grey Background)
+         if (showImage && highlightColumn)
+         {
+            SendMessage(list.Handle, LVM_SETSELECTEDCOLUMN, columnIndex, 0);
+         }
       }
 
       /// <summary>
       /// Set the ListView's header's imagelist
       /// </summary>
-      /// <param name="hwndLV">ListView handle</param>
-      /// <param name="hwndIL">ImageList handle</param>
-      public static void SetHeaderImageList(IntPtr hwndLV, IntPtr hwndIL)
+      /// <param name="hwndLV">ListView</param>
+      /// <param name="hwndIL">ImageList</param>
+      //public static void SetHeaderImageList(IntPtr hwndLV, IntPtr hwndIL)
+      public static void SetHeaderImageList(ListView view, ImageList list)
       {
-         SendMessage(GetHeader(hwndLV),HDM.SETIMAGELIST,IntPtr.Zero,hwndIL);
-      }     
+         //SendMessage(GetHeader(hwndLV), HDM.SETIMAGELIST, IntPtr.Zero, hwndIL);
+         //SendMessage(GetHeader(view.Handle), HDM.SETIMAGELIST, IntPtr.Zero, list.Handle);
+
+         IntPtr hwnd = SendMessage(view.Handle, LVM_GETHEADER, 0, 0);
+
+         SendMessage(hwnd, HDM_SETIMAGELIST, 0, list.Handle);
+      }
    }
 }

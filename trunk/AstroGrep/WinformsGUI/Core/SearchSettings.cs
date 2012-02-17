@@ -31,6 +31,7 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]      11/02/2006  Created
    /// [Curtis_Beard]      01/27/2007  ADD: 1561584, skip hidden/system files and directories
    /// [Curtis_Beard]      04/25/2007  FIX: 1700029, always get correct config path
+   /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
    /// </history>
    public sealed class SearchSettings
    {
@@ -52,6 +53,12 @@ namespace AstroGrep.Core
       private int contextLines = 0;
       private bool skipHidden = false;
       private bool skipSystem = false;
+      private string minFileSize = string.Empty;
+      private string maxFileSize = string.Empty;
+      private string minFileSizeType = "byte";
+      private string maxFileSizeType = "byte";
+      private string modifiedStart = string.Empty;
+      private string modifiedEnd = string.Empty;
       #endregion
 
       /// <summary>
@@ -187,6 +194,60 @@ namespace AstroGrep.Core
       {
          get { return MySettings.skipSystem; }
          set { MySettings.skipSystem = value; }
+      }
+
+      /// <summary>
+      /// Minimum file size.
+      /// </summary>
+      static public string MinimumFileSize
+      {
+         get { return MySettings.minFileSize; }
+         set { MySettings.minFileSize = value; }
+      }
+
+      /// <summary>
+      /// Maximum file size.
+      /// </summary>
+      static public string MaximumFileSize
+      {
+         get { return MySettings.maxFileSize; }
+         set { MySettings.maxFileSize = value; }
+      }
+
+      /// <summary>
+      /// Minimum file size type.
+      /// </summary>
+      static public string MinimumFileSizeType
+      {
+         get { return MySettings.minFileSizeType; }
+         set { MySettings.minFileSizeType = value; }
+      }
+
+      /// <summary>
+      /// Maximum file size type.
+      /// </summary>
+      static public string MaximumFileSizeType
+      {
+         get { return MySettings.maxFileSizeType; }
+         set { MySettings.maxFileSizeType = value; }
+      }
+
+      /// <summary>
+      /// Modified date start.
+      /// </summary>
+      static public string ModifiedDateStart
+      {
+         get { return MySettings.modifiedStart; }
+         set { MySettings.modifiedStart = value; }
+      }
+
+      /// <summary>
+      /// Modified date end.
+      /// </summary>
+      static public string ModifiedDateEnd
+      {
+         get { return MySettings.modifiedEnd; }
+         set { MySettings.modifiedEnd = value; }
       }
    }
 }

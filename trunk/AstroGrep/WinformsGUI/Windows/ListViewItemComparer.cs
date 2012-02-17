@@ -31,12 +31,12 @@ namespace AstroGrep.Windows
    /// <history>
    /// [Curtis_Beard]	   02/06/2005	Created
    /// [Curtis_Beard]	   07/07/2006	CHG: add support for count column sorting
+   /// [Curtis_Beard]		02/17/2012	CHG: update listview sorting
    /// </history>
    internal class ListViewItemComparer : IComparer
    {
       private int col;
       private SortOrder order;
-      private bool integerType;
 
       /// <summary>
       /// Initializes a new instance of the ListViewItemComparer class.
@@ -48,7 +48,6 @@ namespace AstroGrep.Windows
       {
          col = 0;
          order = SortOrder.Ascending;
-         integerType = false;
       }
 
       /// <summary>
@@ -63,23 +62,6 @@ namespace AstroGrep.Windows
       {
          col = column;
          order = sort;
-         integerType = false;
-      }
-
-      /// <summary>
-      /// Initializes a new instance of the ListViewItemComparer class.
-      /// </summary>
-      /// <param name="column">Column to sort</param>
-      /// <param name="sort">Sort Order</param>
-      /// <param name="intType">True if integer, False otherwise</param>
-      /// <history>
-      /// [Curtis_Beard]		07/21/2006	Created
-      /// </history>
-      public ListViewItemComparer(int column, SortOrder sort, bool intType)
-      {
-         col = column;
-         order = sort;
-         integerType = intType;
       }
 
       /// <summary>
@@ -90,6 +72,7 @@ namespace AstroGrep.Windows
       /// <returns>The resultant comparison of the given values based on Sort Order.</returns>
       /// <history>
       /// [Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		02/17/2012	CHG: update listview sorting
       /// </history>
       public int Compare(object x, object y)
       {
@@ -100,9 +83,9 @@ namespace AstroGrep.Windows
          // Determine whether the type being compared is a date type.
          try
          {
-            if (integerType)
+            if (col == Constants.COLUMN_INDEX_COUNT)
             {
-               // Parse the two objects passed as a parameter as a DateTime.
+               // Parse the two objects passed as a parameter as a int.
                int firstInt = int.Parse(((ListViewItem)x).SubItems[col].Text);
                int secondInt = int.Parse(((ListViewItem)y).SubItems[col].Text);
 
@@ -114,18 +97,37 @@ namespace AstroGrep.Windows
                else
                   _returnVal = 0;
             }
-            else
+            else if (col == Constants.COLUMN_INDEX_SIZE)
+            {
+               // Parse the two objects passed as a parameter as a long.
+               long firstInt = Convert.ToInt64(((ListViewItem)x).SubItems[col].Tag);
+               long secondInt = Convert.ToInt64(((ListViewItem)y).SubItems[col].Tag);
+
+               // Compare the two integers.
+               if (firstInt < secondInt)
+                  _returnVal = -1;
+               else if (firstInt > secondInt)
+                  _returnVal = 1;
+               else
+                  _returnVal = 0;
+            }
+            else if (col == Constants.COLUMN_INDEX_DATE)
             {
                // Parse the two objects passed as a parameter as a DateTime.
                System.DateTime firstDate = DateTime.Parse(((ListViewItem)x).SubItems[col].Text);
 
                System.DateTime secondDate = DateTime.Parse(((ListViewItem)y).SubItems[col].Text);
-               
+
                // Compare the two dates.
                _returnVal = DateTime.Compare(firstDate, secondDate);
 
                // If neither compared object has a valid date format, 
                // compare as a string.
+            }
+            else
+            {
+               // Compare the two items as a string.
+               _returnVal = string.Compare(((ListViewItem)x).SubItems[col].Text, ((ListViewItem)y).SubItems[col].Text);
             }
          }
          catch

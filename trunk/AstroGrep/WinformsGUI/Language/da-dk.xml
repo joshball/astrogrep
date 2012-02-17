@@ -143,7 +143,7 @@
       <text name="VerifyErrorGeneric" value="Ude af stand til at anvende angivne parametre.  Verificer venligst at de er gyldige." />
       
       <text name="SearchGenericError" value="Der opstod en fejl under søgningen: {0}" />
-      <text name="SearchFileError" value="Der opstod en fejl under søgningen i fil: {0}." />
+      <text name="SearchFileError" value="Der opstod en fejl under søgningen i fil: {0}. ({1})" />
       <text name="SearchCancelled" value="Søgning Annulleret" />
       <text name="SearchFinished" value="Søgning Afsluttet" />
       <text name="SearchStarted" value="Søgning begonnen" />

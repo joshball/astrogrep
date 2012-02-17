@@ -47,7 +47,7 @@ namespace AstroGrep.Core
       private static GeneralSettings __MySettings = null;
       
       private const string VERSION = "1.0";
-      private const int DEFAULT_SEARCH_PANEL_WIDTH = 240;
+      private const int DEFAULT_SEARCH_PANEL_WIDTH = 280;
 
       private string resultsForeColor = string.Format("0{0}0{0}0{0}255", Constants.COLOR_SEPARATOR);
       private string resultsBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);

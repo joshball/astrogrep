@@ -143,7 +143,7 @@
       <text name="VerifyErrorGeneric" value="Die angegebenen Parameter können nicht bestätigt werden. Bitte überprüfen Sie deren Korrektheit."/>
 
       <text name="SearchGenericError" value="Ein Fehler trat während des Suchens auf: {0}"/>
-      <text name="SearchFileError" value="Ein Fehler trat während des Suchens in der Date {0} auf."/>
+      <text name="SearchFileError" value="Ein Fehler trat während des Suchens in der Date {0} auf. ({1})"/>
       <text name="SearchCancelled" value="Suche abbgebrochen"/>
       <text name="SearchFinished" value="Suche beendet"/>
       <text name="SearchStarted" value="Suche begonnen"/>

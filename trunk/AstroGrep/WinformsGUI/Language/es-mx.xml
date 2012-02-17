@@ -143,7 +143,7 @@
       <text name="VerifyErrorGeneric" value="Unable to validate specified parameters.  Please verify they are valid."/>
       
       <text name="SearchGenericError" value="Un error ocurrió buscando: {0}"/>
-      <text name="SearchFileError" value="Un error ocurrió buscando el archivo: {0}."/>
+      <text name="SearchFileError" value="Un error ocurrió buscando el archivo: {0}. ({1})"/>
       <text name="SearchCancelled" value="La búsqueda canceló"/>
       <text name="SearchFinished" value="La búsqueda acabó"/>
       <text name="SearchStarted" value="La búsqueda comenzó"/>
