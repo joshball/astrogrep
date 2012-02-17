@@ -51,7 +51,7 @@ namespace AstroGrep.Windows.Forms
       private int __SortColumn = -1;
       private Grep __Grep = null;
       private string __SearchOptionsText = "Search Options {0}";
-       private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
+      private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
       private readonly System.Collections.Specialized.StringCollection __ErrorCollection = new System.Collections.Specialized.StringCollection();
       #endregion
 
@@ -73,6 +73,7 @@ namespace AstroGrep.Windows.Forms
       /// /// <history>
       /// [Theodore_Ward]     ??/??/????  Created
       /// [Curtis_Beard]      11/02/2006	CHG: Conversion to C#, setup event handlers
+      /// [Curtis_Beard]      02/09/2012	FIX: 3486074, set modification date end to max value
       /// </history>
 		public frmMain()
 		{
@@ -82,6 +83,7 @@ namespace AstroGrep.Windows.Forms
 			InitializeComponent();
 
           dateModBegin.Value = DateTimePicker.MinDateTime;
+          dateModEnd.Value = DateTimePicker.MaxDateTime;
 
              // Attach event handlers
              Resize += frmMain_Resize;
@@ -582,21 +584,38 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]	   02/06/2005	Created
           /// [Curtis_Beard]	   07/07/2006	CHG: add support for count column sorting
           /// [Curtis_Beard]	   10/06/2006	FIX: clear sort indicator propertly
+          /// [Curtis_Beard]		02/17/2012	CHG: update listview sorting
           /// </history>
           private void lstFileNames_ColumnClick(object sender, ColumnClickEventArgs e)
           {
+             int clearColIndex = -1;
+
+             // set to wait cursor
+             lstFileNames.Cursor = Cursors.WaitCursor;
+
              // Determine whether the column is the same as the last column clicked.
              if (e.Column != __SortColumn)
              {
                 // Remove sort indicator
                 if (__SortColumn != -1)
-                   Windows.API.SetHeaderImage(lstFileNames, __SortColumn, SortOrder.Ascending, false);
+                {
+                   clearColIndex = __SortColumn;
+                }
 
                 // Set the sort column to the new column.
                 __SortColumn = e.Column;
 
                 // Set the sort order to ascending by default.
-                lstFileNames.Sorting = SortOrder.Ascending;            
+                if (e.Column == Constants.COLUMN_INDEX_COUNT ||
+                   e.Column == Constants.COLUMN_INDEX_SIZE ||
+                   e.Column == Constants.COLUMN_INDEX_DATE)
+                {
+                   lstFileNames.Sorting = SortOrder.Descending;
+                }
+                else
+                {
+                   lstFileNames.Sorting = SortOrder.Ascending;
+                }
              }
              else
              {
@@ -607,22 +626,19 @@ namespace AstroGrep.Windows.Forms
                    lstFileNames.Sorting = SortOrder.Ascending;
              }
 
-             // set column sort image
-             Windows.API.SetHeaderImage(lstFileNames, e.Column, lstFileNames.Sorting, true);
-
              // Set the ListViewItemSorter property to a new ListViewItemComparer object.
-             ListViewItemComparer comparer;
-
-             // set comparer for integer types if the count column, otherwise try date/string
-             if (e.Column == Constants.COLUMN_INDEX_COUNT || e.Column == Constants.COLUMN_INDEX_SIZE)
-                comparer = new ListViewItemComparer(e.Column, lstFileNames.Sorting, true);
-             else
-                comparer = new ListViewItemComparer(e.Column, lstFileNames.Sorting);
-
+             ListViewItemComparer comparer = new ListViewItemComparer(e.Column, lstFileNames.Sorting);
              lstFileNames.ListViewItemSorter = comparer;
 
              // Call the sort method to manually sort.
              lstFileNames.Sort();
+
+             // Display sort image and highlight sort column
+             Windows.API.SetHeaderImage(lstFileNames, clearColIndex, lstFileNames.Sorting, false, false);
+             Windows.API.SetHeaderImage(lstFileNames, e.Column, lstFileNames.Sorting, true, true);
+
+             // restore to default cursor
+             lstFileNames.Cursor = Cursors.Default;
           }
 
           /// <summary>
@@ -635,7 +651,7 @@ namespace AstroGrep.Windows.Forms
           /// </history>
           private void lstFileNames_HandleCreated(object sender, EventArgs e)
           {
-             //Windows.API.SetHeaderImageList(lstFileNames.Handle, ListViewImageList.Handle);
+             Windows.API.SetHeaderImageList(lstFileNames, ListViewImageList);
           }
 
           /// <summary>
@@ -853,6 +869,8 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]	   01/28/2005	Created
           /// [Curtis_Beard]	   10/10/2006	CHG: Use search settings implementation.
           /// [Curtis_Beard]	   01/31/2012	ADD: 1561584, ability to skip hidden/system files/directories
+          /// [Curtis_Beard]	   02/07/2012	FIX: 3485448, save modified start/end date, min/max file sizes
+          /// [Curtis_Beard]     02/09/2012  ADD: 3424156, size drop down selection
           /// </history>
           private void LoadSearchSettings()
           {
@@ -866,6 +884,19 @@ namespace AstroGrep.Windows.Forms
              chkNegation.Checked = Core.SearchSettings.UseNegation;
              chkSkipHidden.Checked = Core.SearchSettings.SkipHidden;
              chkSkipSystem.Checked = Core.SearchSettings.SkipSystem;
+             txtMinSize.Text = Core.SearchSettings.MinimumFileSize;
+             txtMaxSize.Text = Core.SearchSettings.MaximumFileSize;
+             cboMinSizeType.SelectedItem = Core.SearchSettings.MinimumFileSizeType;
+             cboMaxSizeType.SelectedItem = Core.SearchSettings.MaximumFileSizeType;
+
+             if (!string.IsNullOrEmpty(Core.SearchSettings.ModifiedDateStart))
+             {
+                dateModBegin.Value = DateTime.Parse(Core.SearchSettings.ModifiedDateStart);
+             }
+             if (!string.IsNullOrEmpty(Core.SearchSettings.ModifiedDateEnd))
+             {
+                dateModEnd.Value = DateTime.Parse(Core.SearchSettings.ModifiedDateEnd);
+             }
           }
 
           /// <summary>
@@ -874,6 +905,8 @@ namespace AstroGrep.Windows.Forms
           /// <history>
           /// [Curtis_Beard]	   10/11/2006	Created
           /// [Curtis_Beard]	   01/31/2012	ADD: 1561584, ability to skip hidden/system files/directories
+          /// [Curtis_Beard]	   02/07/2012	FIX: 3485448, save modified start/end date, min/max file sizes
+          /// [Curtis_Beard]     02/09/2012  ADD: 3424156, size drop down selection
           /// </history>
           private void SaveSearchSettings()
           {
@@ -887,6 +920,19 @@ namespace AstroGrep.Windows.Forms
              Core.SearchSettings.UseNegation = chkNegation.Checked;
              Core.SearchSettings.SkipHidden = chkSkipHidden.Checked;
              Core.SearchSettings.SkipSystem = chkSkipSystem.Checked;
+             Core.SearchSettings.MinimumFileSize = txtMinSize.Text;
+             Core.SearchSettings.MaximumFileSize = txtMaxSize.Text;
+             Core.SearchSettings.MinimumFileSizeType = cboMinSizeType.SelectedItem.ToString();
+             Core.SearchSettings.MaximumFileSizeType = cboMaxSizeType.SelectedItem.ToString();
+
+             if (dateModBegin.Value != DateTimePicker.MinimumDateTime)
+             {
+                Core.SearchSettings.ModifiedDateStart = dateModBegin.Value.ToString();
+             }
+             if (dateModEnd.Value != DateTimePicker.MaximumDateTime)
+             {
+                Core.SearchSettings.ModifiedDateEnd = dateModEnd.Value.ToString();
+             }
 
              Core.SearchSettings.Save();
           }
@@ -2080,14 +2126,15 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]		03/14/2006	Created
           /// [Curtis_Beard]		05/28/2007  CHG: use Exception and display error
           /// [Curtis_Beard]		08/07/2007  ADD: 1741735, better search error handling
+          /// [Curtis_Beard]		02/07/2012  CHG: 1741735, report full error message
           /// </history>
           private void ReceiveSearchError(System.IO.FileInfo file, Exception ex)
           {
              string message = string.Empty;
              if (file == null)
-                message = string.Format(Language.GetGenericText("SearchGenericError"), ex.Message);
+                message = string.Format(Language.GetGenericText("SearchGenericError"), ex.ToString());
              else
-                message = string.Format(Language.GetGenericText("SearchFileError"), file.FullName, ex.Message);
+                message = string.Format(Language.GetGenericText("SearchFileError"), file.FullName, ex.ToString());
 
              __ErrorCollection.Add(message);
           }
@@ -2236,6 +2283,7 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]		08/07/2007  ADD: 1741735, better search error handling
           /// [Curtis_Beard]		08/21/2007  FIX: 1778467, make sure file pattern is correct if a '\' is present
           /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
+          /// [Curtis_Beard]		02/07/2012  CHG: 1741735, report full error message
           /// </history>
           private void StartSearch()
           {
@@ -2288,7 +2336,7 @@ namespace AstroGrep.Windows.Forms
              }
              catch (Exception ex)
              {
-                __ErrorCollection.Add(ex.Message);
+                __ErrorCollection.Add(string.Format(Language.GetGenericText("SearchGenericError"), ex.ToString()));
                 DisplaySearchErrors();
              }
           }
@@ -2345,6 +2393,7 @@ namespace AstroGrep.Windows.Forms
           /// <history>
           /// [Andrew_Radford]		13/08/2009  CHG: Now retruns IFileFilterSpec rather than altering global state
           /// [Curtis_Beard]		   01/31/2012  ADD: 1561584, ability to ignore hidden/system files/directories
+          /// [Curtis_Beard]        02/09/2012  ADD: 3424156, size drop down selection
           /// </history>
            private IFileFilterSpec GetFilterSpecFromUI()
            {
@@ -2364,14 +2413,11 @@ namespace AstroGrep.Windows.Forms
                            DateModifiedEnd = dateModEnd.Value
                         };
 
-              long size;
-
-              spec.FileSizeMin = long.TryParse(txtMinSize.Text, out size) ? size : long.MinValue;
-              spec.FileSizeMax = long.TryParse(txtMaxSize.Text, out size) ? size : long.MaxValue;
+              spec.FileSizeMin = GetFileSize(txtMinSize.Text, cboMinSizeType.SelectedItem.ToString(), long.MinValue);
+              spec.FileSizeMax = GetFileSize(txtMaxSize.Text, cboMaxSizeType.SelectedItem.ToString(), long.MaxValue);
 
               return spec;
            }
-
 
           /// <summary>
           /// Sets the grep options
@@ -2424,6 +2470,7 @@ namespace AstroGrep.Windows.Forms
           /// [Curtis_Beard]		12/02/2005	CHG: Add the count column
           /// [Curtis_Beard]		07/07/2006	CHG: Make thread safe
           /// [Curtis_Beard]		09/14/2006	CHG: Update to use date's ToString method
+          /// [Curtis_Beard]		02/17/2012	CHG: update listview sorting
           /// </history>
           private void AddHitToList(FileInfo file, int index)
           {
@@ -2438,7 +2485,12 @@ namespace AstroGrep.Windows.Forms
              var _listItem = new ListViewItem(file.Name);
              _listItem.SubItems.Add(file.DirectoryName);
              _listItem.SubItems.Add(file.LastWriteTime.ToString());
-             _listItem.SubItems.Add(file.Length.ToString());
+             
+             // add explorer style of file size for display but store file size in bytes for comparision
+             ListViewItem.ListViewSubItem subItem = new ListViewItem.ListViewSubItem(_listItem, StrFormatByteSize(file.Length));
+             subItem.Tag = file.Length;
+             _listItem.SubItems.Add(subItem);
+
              _listItem.SubItems.Add("0");
              // must be last
              _listItem.SubItems.Add(index.ToString());
@@ -2448,6 +2500,70 @@ namespace AstroGrep.Windows.Forms
 
              // clear it out
              _listItem = null;
+          }
+
+          /// <summary>
+          /// API declaration to display explorer style of file size.
+          /// </summary>
+          /// <param name="fileSize">File size in bytes</param>
+          /// <param name="buffer">buffer to hold value</param>
+          /// <param name="bufferSize">buffer size</param>
+          /// <returns>explorer style display of file size</returns>
+          [System.Runtime.InteropServices.DllImport("Shlwapi.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+          private static extern long StrFormatByteSize(
+                  long fileSize
+                  , [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)] System.Text.StringBuilder buffer
+                  , int bufferSize);
+
+
+          /// <summary>
+          /// Converts a numeric value into a string that represents the number expressed as a size value in bytes, kilobytes, megabytes, or gigabytes, depending on the size.
+          /// </summary>
+          /// <param name="filelength">The numeric value to be converted.</param>
+          /// <returns>the converted string</returns>
+          private string StrFormatByteSize(long filesize)
+          {
+             System.Text.StringBuilder sb = new System.Text.StringBuilder(11);
+             StrFormatByteSize(filesize, sb, sb.Capacity);
+             return sb.ToString();
+          }
+
+          /// <summary>
+          /// Converts given file size to long for use in comparison of file sizes.
+          /// </summary>
+          /// <param name="textBoxValue">TextBox value entered by user</param>
+          /// <param name="selectedSizeType">The selected size type</param>
+          /// <param name="defaultValue">The default value</param>
+          /// <returns>long representing number of bytes user selected</returns>
+          /// <history>
+          /// [Curtis_Beard]        02/09/2012  ADD: 3424156, size drop down selection
+          /// </history>
+          private long GetFileSize(string textBoxValue, string selectedSizeType, long defaultValue)
+          {
+             long retVal = defaultValue;
+
+             double size;
+             if (double.TryParse(textBoxValue, out size))
+             {
+                switch (selectedSizeType.ToLower())
+                {
+                   case "byte":
+                      break;
+                   case "kb":
+                      size = size * 1024;
+                      break;
+                   case "mb":
+                      size = size * 1024 * 1024;
+                      break;
+                   case "gb":
+                      size = size * 1024 * 1024 * 1024;
+                      break;
+                }
+
+                retVal = (long)size;
+             }
+             
+             return retVal;
           }
           #endregion
     }

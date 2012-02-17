@@ -221,11 +221,12 @@ namespace libAstroGrep
       /// <param name="endText">Text behind searched text</param>
       /// <returns>True - valid, False - otherwise</returns>
       /// <history>
-      /// 	[Curtis_Beard]	   01/27/2005	Created
+      ///   [Curtis_Beard]	   01/27/2005	Created
+      /// 	[Curtis_Beard]	   02/17/2012	CHG: check for valid endswith as well
       /// </history>
       public static bool WholeWordOnly(string beginText, string endText)
       {
-          return (IsValidText(beginText) && IsValidText(endText));
+          return (IsValidText(beginText, true) && IsValidText(endText, false));
       }
       #endregion
 
@@ -808,15 +809,24 @@ namespace libAstroGrep
       /// [Curtis_Beard]		12/06/2005	Created
       /// [Curtis_Beard]		02/09/2007	FIX: 1655533, update whole word matching
       /// [Curtis_Beard]		08/21/2007	ADD: '/' character and Environment.NewLine
-      /// [Andrew_Radford]      09/08/2009  CHG: refactored to use list, combined begin and end text methods
+      /// [Andrew_Radford]    09/08/2009  CHG: refactored to use list, combined begin and end text methods
+      /// [Curtis_Beard]		02/17/2012	CHG: check end text as well
       /// </history>
-      private static bool IsValidText(string text)
+      private static bool IsValidText(string text, bool checkEndText)
       {
           if (string.IsNullOrEmpty(text))   
              return true;
 
           bool found = false;
-          validTexts.ForEach(s => { if (text.StartsWith(s)) found = true; });
+          validTexts.ForEach(s => {
+             if (checkEndText)
+             {
+                if (text.EndsWith(s))
+                   found = true;
+             }
+             else if (text.StartsWith(s)) 
+                found = true; 
+          });
           return found;
       }
 

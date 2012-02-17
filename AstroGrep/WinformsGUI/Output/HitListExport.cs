@@ -201,7 +201,7 @@ namespace AstroGrep.Output
                 {
                    writer.WriteElementString("dateModifiedStart", grep.FileFilterSpec.DateModifiedStart.ToString());
                 }
-                if (grep.FileFilterSpec.DateModifiedEnd < DateTimePicker.MaximumDateTime)
+                if (grep.FileFilterSpec.DateModifiedEnd != DateTimePicker.MaximumDateTime)
                 {
                    writer.WriteElementString("dateModifiedEnd", grep.FileFilterSpec.DateModifiedEnd.ToString());
                 }

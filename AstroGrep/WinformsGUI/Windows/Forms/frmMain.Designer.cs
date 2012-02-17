@@ -77,6 +77,10 @@ private Label label4;
 private TextBox txtMinSize;
 private Label label3;
 private TextBox txtMaxSize;
+private System.Windows.Forms.ComboBox cboMinSizeType;
+private System.Windows.Forms.ComboBox cboMaxSizeType;
+private System.Windows.Forms.CheckBox chkSkipSystem;
+private System.Windows.Forms.CheckBox chkSkipHidden;
 
 	    private void InitializeComponent()
 		{
@@ -152,6 +156,8 @@ private TextBox txtMaxSize;
          this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
          this.chkSkipHidden = new System.Windows.Forms.CheckBox();
          this.chkSkipSystem = new System.Windows.Forms.CheckBox();
+		 this.cboMinSizeType = new System.Windows.Forms.ComboBox();
+		 this.cboMaxSizeType = new System.Windows.Forms.ComboBox();
          this.pnlSearch.SuspendLayout();
          this.pnlSearchOptions.SuspendLayout();
          this.PanelOptionsContainer.SuspendLayout();
@@ -191,8 +197,10 @@ private TextBox txtMaxSize;
                      | System.Windows.Forms.AnchorStyles.Right)));
          this.PanelOptionsContainer.Controls.Add(this.chkSkipSystem);
          this.PanelOptionsContainer.Controls.Add(this.chkSkipHidden);
+		 this.PanelOptionsContainer.Controls.Add(this.cboMaxSizeType);
          this.PanelOptionsContainer.Controls.Add(this.txtMaxSize);
          this.PanelOptionsContainer.Controls.Add(this.label4);
+		 this.PanelOptionsContainer.Controls.Add(this.cboMinSizeType);
          this.PanelOptionsContainer.Controls.Add(this.txtMinSize);
          this.PanelOptionsContainer.Controls.Add(this.label3);
          this.PanelOptionsContainer.Controls.Add(this.label2);
@@ -212,13 +220,27 @@ private TextBox txtMaxSize;
          this.PanelOptionsContainer.Name = "PanelOptionsContainer";
          this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 433);
          this.PanelOptionsContainer.TabIndex = 1;
+		 // 
+         // cboMaxSizeType
+         // 
+		 this.cboMaxSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+		 this.cboMaxSizeType.Items.AddRange(new object[] {
+            "byte",
+            "KB",
+            "MB",
+            "GB"});
+         this.cboMaxSizeType.Location = new System.Drawing.Point(140, 355);
+         this.cboMaxSizeType.Name = "cboMaxSizeType";
+		 this.cboMaxSizeType.SelectedIndex = 0;
+         this.cboMaxSizeType.Size = new System.Drawing.Size(75, 18);
+         this.cboMaxSizeType.TabIndex = 23;
          // 
          // txtMaxSize
          // 
          this.txtMaxSize.Location = new System.Drawing.Point(7, 355);
          this.txtMaxSize.Name = "txtMaxSize";
          this.txtMaxSize.Size = new System.Drawing.Size(129, 20);
-         this.txtMaxSize.TabIndex = 21;
+         this.txtMaxSize.TabIndex = 22;
          // 
          // label4
          // 
@@ -227,8 +249,22 @@ private TextBox txtMaxSize;
          this.label4.Location = new System.Drawing.Point(4, 339);
          this.label4.Name = "label4";
          this.label4.Size = new System.Drawing.Size(53, 13);
-         this.label4.TabIndex = 20;
+         this.label4.TabIndex = 21;
          this.label4.Text = "Max Size:";
+		 // 
+         // cboMinSizeType
+         // 
+		 this.cboMinSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cboMinSizeType.Location = new System.Drawing.Point(140, 316);
+		 this.cboMinSizeType.Items.AddRange(new object[] {
+            "byte",
+            "KB",
+            "MB",
+            "GB"});
+         this.cboMinSizeType.Name = "cboMinSizeType";
+		 this.cboMinSizeType.SelectedIndex = 0;
+         this.cboMinSizeType.Size = new System.Drawing.Size(75, 18);
+         this.cboMinSizeType.TabIndex = 20;
          // 
          // txtMinSize
          // 
@@ -261,7 +297,7 @@ private TextBox txtMaxSize;
          // 
          this.dateModEnd.Location = new System.Drawing.Point(7, 267);
          this.dateModEnd.Name = "dateModEnd";
-         this.dateModEnd.Size = new System.Drawing.Size(132, 20);
+         this.dateModEnd.Size = new System.Drawing.Size(208, 20);
          this.dateModEnd.TabIndex = 16;
          // 
          // label1
@@ -278,7 +314,7 @@ private TextBox txtMaxSize;
          // 
          this.dateModBegin.Location = new System.Drawing.Point(7, 223);
          this.dateModBegin.Name = "dateModBegin";
-         this.dateModBegin.Size = new System.Drawing.Size(132, 20);
+         this.dateModBegin.Size = new System.Drawing.Size(208, 20);
          this.dateModBegin.TabIndex = 14;
          // 
          // lblContextLines
@@ -650,7 +686,7 @@ private TextBox txtMaxSize;
          // 
          this.splitLeftRight.Location = new System.Drawing.Point(240, 0);
          this.splitLeftRight.MinExtra = 100;
-         this.splitLeftRight.MinSize = 240;
+         this.splitLeftRight.MinSize = 280;
          this.splitLeftRight.Name = "splitLeftRight";
          this.splitLeftRight.Size = new System.Drawing.Size(8, 430);
          this.splitLeftRight.TabIndex = 2;
@@ -859,8 +895,5 @@ private TextBox txtMaxSize;
 			}
 			base.Dispose( disposing );
 		}
-
-      private CheckBox chkSkipSystem;
-      private CheckBox chkSkipHidden;
 	}
 }

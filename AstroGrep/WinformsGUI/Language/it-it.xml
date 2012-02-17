@@ -146,7 +146,7 @@
       <text name="VerifyErrorGeneric" value="Impossibile convalidare i parametri specificati.  Verificare che siano validi."/>
       
       <text name="SearchGenericError" value="Errore durante la ricerca: {0}"/>
-      <text name="SearchFileError" value="Errore durante la ricerca del file: {0}."/>
+      <text name="SearchFileError" value="Errore durante la ricerca del file: {0}. ({1})"/>
       <text name="SearchCancelled" value="Ricerca annullata"/>
       <text name="SearchFinished" value="Ricerca terminata"/>
       <text name="SearchStarted" value="Ricerca ha cominciato"/>
