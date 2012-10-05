@@ -15,24 +15,25 @@
       <control name="chkWholeWordOnly" value="&amp;Ganzes Wörter" tooltip="Nur nach ganzen Wörtern suchen (nicht nach Teilworten)" />
       <control name="chkCaseSensitive" value="&amp;Groß-/Kleinschreibung beachten" tooltip="Achtet genau auf groß- und kleingeschriebene Buchstaben" />
       <control name="chkRegularExpressions" value="Reguläre &amp;Ausdrücke" tooltip="Benutzt &quot;Reguläre Ausdrücke&quot; zur Suche" />
-      <control name="chkSkipHidden" value="Overslaan Verborgen bestanden/mappen" tooltip="Ignore files/directories marked as hidden" />
-      <control name="chkSkipSystem" value="Overslaan Systeem bestanden/mappen" tooltip="Ignore files/directories marked as system" />
+      <control name="chkSkipHidden" value="Direkt Versteckt" tooltip="Ignorieren Dateien / Verzeichnisse als versteckt markiert" />
+      <control name="chkSkipSystem" value="Direkt-System" tooltip="Ignorieren von Dateien / Verzeichnisse als System markiert" />
       <control name="lnkSearchOptions" value="Such-Einstellungen {0}" />
       <control name="picBrowse" tooltip="Durchsuchen..." />
-      <control name="label1" value="Gewijzigd na:" />
-      <control name="label2" value="Gewijzigd Voor:" />
-      <control name="label3" value="Min Maat:" />
-      <control name="label4" value="Max Maat:" />
+      <control name="label1" value="Geändert Nach:" />
+      <control name="label2" value="Modifiziert werden, bevor:" />
+      <control name="label3" value="Min. Größe:" />
+      <control name="label4" value="Max. Größe:" />
+      <control name="lnkExclusions" value="Ausschlüsse..." />
       <control name="lstFileNames">
-         <menuitem index="0" value="kopie" />
-         <menuitem index="1" value="kopie naam" />
-         <menuitem index="2" value="exemplaar bevindt zich in" />
-         <menuitem index="3" value="exemplaar bevindt zich in + naam" />
+         <menuitem index="0" value="kopieren Sie" />
+         <menuitem index="1" value="kopieren Namen" />
+         <menuitem index="2" value="Kopieren Liegeplatz" />
+         <menuitem index="3" value="Kopieren Liegeplatz + Namen" />
          <menuitem index="4" value="-" />
-         <menuitem index="5" value="bestand te openen" />
-         <menuitem index="6" value="telefoonboek te openen" />
+         <menuitem index="5" value="öffnen Sie die Datei" />
+         <menuitem index="6" value="Verzeichnis geöffnet" />
          <menuitem index="7" value="-" />
-         <menuitem index="8" value="Item verwijderen" />
+         <menuitem index="8" value="Element löschen" />
       </control>
       
       <menu index="0" value="&amp;Datei">
@@ -56,11 +57,18 @@
       <menu index="3" value="&amp;Hilfe">
          <menuitem index="0" value="&amp;Über..." />
       </menu>
+
+      <!-- status bar items default state-->
+      <control name="sbTotalCountPanel" value="Gesamtmenge: 0"/>
+      <control name="sbFileCountPanel" value="Datei: 0"/>
+      <control name="sbFilterCountPanel" value="Ausschlüsse: 0" tooltip="Doppelklicken Sie auf Ausschlüsse anzuzeigen."/>
+      <control name="sbErrorCountPanel" value="Störung: 0" tooltip="Doppelklicken Sie auf die Anzeige von Fehlern."/>
    </screen>
 
    <screen name="frmAbout" value="Über {0}">
       <control name="lnkHomePage" value="{0} Homepage" />
       <control name="cmdOK" value="&amp;OK" />
+      <control name="lblVersionCheck" value="Suche nach Aktuelles..." />
    </screen>
 
    <screen name="frmAddEditTextEditor" value="Texteditoren">
@@ -73,6 +81,7 @@
       <control name="lblFileType" value="Dateityp" />
       <control name="btnCancel" value="&amp;Abbrechen" />
       <control name="btnOK" value="&amp;OK" />
+      <control name="lblMultiTypes" value="Separate Typen mit | Charakter."/>
    </screen>
 
    <screen name="frmOptions" value="Einstellungen">
@@ -94,8 +103,6 @@
       <control name="tabGeneral" value="Allgemein" />
       <control name="tabTextEditors" value="Texteditoren" />
       <control name="LanguageGroup" value="Sprache"/>
-      <control name="ExtensionExclusionGroup" value="Dateiendung ausschließen"/>
-      <control name="btnRestoreDefaultExtensions" value="Herstellen standaard extensies"/>
       <control name="tabPlugins" value="Erweiterungen"/>
       <control name="chkDesktopShortcut" value="Verknüpfung auf dem &amp;Desktop"/>
       <control name="chkStartMenuShortcut" value="Verknüpfung im Start&amp;menü"/>
@@ -104,6 +111,8 @@
       <control name="lblPluginDetailName" value="Name:"/>
       <control name="lblPluginDetailVersion" value="Version:"/>
       <control name="lblPluginDetailAuthor" value="Author:"/>
+      <control name="btnFindFont" value="&amp;Schriftart suchen"/>
+      <control name="chkShowExclusionErrorMessage" value="&amp;Zeigen Sie eine Eingabeaufforderung, wenn eine Suche liefert Produkte ausgeschlossen oder ein Fehler auftritt."/>
    </screen>
 
    <screen name="frmPrint" value="Drucken">
@@ -112,6 +121,32 @@
       <control name="cmdPageSetup" value="Seitenein&amp;stellung" />
       <control name="cmdPrint" value="&amp;Drucken" />
       <control name="cmdPreview" value="&amp;Vorschau" />
+   </screen>
+
+   <screen name="frmExclusions" value="Ausschlüsse">
+      <control name="btnEdit" value="&amp;Bearbeiten..." />
+      <control name="btnDelete" value="&amp;Löschen" />
+      <control name="btnAdd" value="&amp;Hinzufügen..." />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="Abbre&amp;chen" />
+      <control name="btnRestoreDefaults" value="&amp;Standardeinstellungen wiederherstellen" />
+   </screen>
+
+   <screen name="frmAddEditExclusions" value="Ausschlüsse">
+      <control name="lblType" value="Typ" />
+      <control name="lblOptions" value="Optionen" />
+      <control name="lblValue" value="Wert" />
+      <control name="chkIgnoreCase" value="Fall ignorieren" />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="Abbre&amp;chen" />
+   </screen>
+
+   <screen name="frmCommandLine" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
+   </screen>
+
+   <screen name="frmDisplayMessages" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
    </screen>
 
    <generic>
@@ -140,6 +175,7 @@
       <text name="VerifyErrorNoStartPath" value="Sie müssen eine Pfad angeben in dem die Suche begonnen werden soll."/>
       <text name="VerifyErrorInvalidStartPath" value="'{0}' ist kein gültiger Ordner."/>
       <text name="VerifyErrorNoSearchText" value="Sie müssen einen Suchtext angeben, nach dem gesucht werden soll."/>
+      <text name="VerifyErrorInvalidRegEx" value="Der reguläre Ausdruck Sie ist ungültig ({0}). Bitte überprüfen Sie Ihren Ausdruck."/>
       <text name="VerifyErrorGeneric" value="Die angegebenen Parameter können nicht bestätigt werden. Bitte überprüfen Sie deren Korrektheit."/>
 
       <text name="SearchGenericError" value="Ein Fehler trat während des Suchens auf: {0}"/>
@@ -164,18 +200,51 @@
       <text name="TextEditorsColumnFileType" value="Dateityp"/>
       <text name="TextEditorsColumnLocation" value="Texteditor"/>
       <text name="TextEditorsColumnCmdLine" value="Kommandozeile"/>
-      <text name="TextEditorsErrorNoEditor" value="Definieer een text editor."/>
-      <text name="TextEditorsErrorFileTypeExists" value="Het bestandstype bestaat reeds. Probeer het opnieuw."/>
+      <text name="TextEditorsErrorNoEditor" value="Bitte definieren Sie einen texteditor."/>
+      <text name="TextEditorsErrorFileTypeExists" value="Der Dateityp ist bereits vorhanden. Bitte versuchen Sie es erneut."/>
 
       <text name="ResultsColumnFile" value="Name"/>
       <text name="ResultsColumnLocation" value="Befindet sich in"/>
       <text name="ResultsColumnDate" value="Änderungsdatum"/>
       <text name="ResultsColumnCount" value="Anzahl"/>
-      <text name="ResultsColumnSize" value="Maat"/>
+      <text name="ResultsColumnSize" value="Größe"/>
+
+      <text name="ResultsStatusTotalCount" value="Gesamtmenge: {0}"/>
+      <text name="ResultsStatusFileCount" value="Datei: {0}"/>
+      <text name="ResultsStatusFilterCount" value="Ausschlüsse: {0}"/>
+      <text name="ResultsStatusErrorCount" value="Störung: {0}"/>
 
       <text name="PluginsColumnEnabled" value="Aktiv"/>
       <text name="PluginsColumnName" value="Name"/>
       <text name="PluginsColumnExtensions" value="Endungen"/>
+
+      <text name="Update.Current" value="{0} ist auf dem neuesten Stand ({1})"/>
+      <text name="Update.Latest" value="Laden Sie {0} aktualisieren {1}"/>
+      <text name="Update.Error" value="Aktualisieren Sie überprüfen gescheitert: {0}"/>
+
+      <text name="Exclusions.Type" value="Typ"/>
+      <text name="Exclusions.Value" value="Wert"/>
+      <text name="Exclusions.Option" value="Optionen"/>
+
+      <text name="Exclusions.FileExtension" value="Dateierweiterung"/>
+      <text name="Exclusions.FileName" value="Dateiname"/>
+      <text name="Exclusions.FilePath" value="Dateipfad"/>
+      <text name="Exclusions.DirectoryName" value="Verzeichnisnamen"/>
+      <text name="Exclusions.DirectoryPath" value="Verzeichnispfad"/>
+
+      <text name="Exclusions.None" value=""/>
+      <text name="Exclusions.Equals" value="Gleichen"/>
+      <text name="Exclusions.Contains" value="enthält"/>
+      <text name="Exclusions.StartsWith" value="beginnt mit"/>
+      <text name="Exclusions.EndsWith" value="endet mit"/>
+      <text name="Exclusions.IgnoreCase" value=" (Fall ignorieren)"/>
+
+      <text name="Exclusions.Error.NoType" value="Bitte wählen Sie einen Typ."/>
+      <text name="Exclusions.Error.NoValue" value="Bitte geben Sie einen Wert."/>
+      <text name="Exclusions.Error.InvalidExtensionFormat" value="Ungültige Datei-Endung-Format. Das Format ist .xxx"/>
+      <text name="Exclusions.Error.InvalidOptions" value="Bitte wählen Sie eine gültige Optionen Wert."/>
+
+      <text name="ExclusionErrorMessageText" value="Ihre Suche ergab Elemente, die entweder ausgeschlossen wurden oder einen Fehler verursacht. &#xA;Sie können diese Elemente durch Doppelklick auf das zugehörige Statusleiste Element in der unteren rechten Ecke zu sehen. &#xA;&#xA;Sie können diese Meldung in den Optionen deaktivieren."/>
    </generic>
 
 </language>

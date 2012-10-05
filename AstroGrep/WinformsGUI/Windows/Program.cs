@@ -43,15 +43,35 @@ namespace AstroGrep.Windows
 		/// [Curtis_Beard]	   10/14/2005	Created
 		/// [Curtis_Beard]	   07/21/2006	CHG: Use a try/catch block for any erroneous errors
 		/// [Curtis_Beard]	   10/11/2006	CHG: Remove setting reference to frmMain in Common class
+      /// [Curtis_Beard]		09/26/2012	CHG: 3572487, detect command line arg for displaying help and show dialog with options
 		/// </history>
 		[STAThread]
 		static void Main()
 		{
 			try
 			{
-				Application.EnableVisualStyles();
-				Application.DoEvents();
-				Application.Run(new Windows.Forms.frmMain());
+            Application.EnableVisualStyles();
+            Application.DoEvents();
+
+            // Parse command line, must be done before any use of user settings and form creation in case of help
+				CommandLineProcessing.CommandLineArguments args = CommandLineProcessing.Process(Environment.GetCommandLineArgs());
+
+            Legacy.ConvertLanguageValue();
+            Language.Load(AstroGrep.Core.GeneralSettings.Language);
+
+            if (args.AnyArguments && args.DisplayHelp)
+            {
+               // display command line options
+               Application.Run(new Windows.Forms.frmCommandLine());
+            }
+            else
+            {
+               // display main form
+               Windows.Forms.frmMain mainForm = new AstroGrep.Windows.Forms.frmMain();
+               mainForm.CommandLineArgs = args;
+
+               Application.Run(mainForm);
+            }
 			}
 			catch (Exception ex)
 			{

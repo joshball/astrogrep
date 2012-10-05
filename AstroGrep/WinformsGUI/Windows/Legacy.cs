@@ -93,6 +93,7 @@ namespace AstroGrep.Windows
       /// </remarks>
       /// <history>
       /// [Curtis_Beard]		10/10/2006	Created
+      /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// </history>
       public static void ConvertSearchSettings()
       {
@@ -147,6 +148,25 @@ namespace AstroGrep.Windows
             Registry.DeleteStartupSetting("NUM_CONTEXT_LINES");
          }
 
+         // old list to new search option
+         if (!string.IsNullOrEmpty(Core.GeneralSettings.ExtensionExcludeList))
+         {
+            var extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
+            var exclusions = new System.Collections.Generic.List<libAstroGrep.ExclusionItem>();
+
+            foreach (var ext in extensions)
+            {
+               libAstroGrep.ExclusionItem item = new libAstroGrep.ExclusionItem(libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension, ext, libAstroGrep.ExclusionItem.OptionsTypes.None, false);
+               exclusions.Add(item);
+            }
+
+            // set extension exclude to list to empty
+            Core.GeneralSettings.ExtensionExcludeList = string.Empty;
+
+            // set exclusions list to default
+            Core.SearchSettings.Exclusions = libAstroGrep.ExclusionItem.ConvertExclusionsToString(exclusions);
+         }
+
          AstroGrep.Core.SearchSettings.Save();
       }
 
@@ -186,7 +206,7 @@ namespace AstroGrep.Windows
          // exclude list
          if (Registry.CheckStartupSetting("ExtensionExcludeList"))
          {
-            AstroGrep.Core.GeneralSettings.ExtensionExcludeList = Registry.GetStartupSetting("ExtensionExcludeList", Constants.DEFAULT_EXTENSION_EXCLUDE_LIST);
+            AstroGrep.Core.GeneralSettings.ExtensionExcludeList = Registry.GetStartupSetting("ExtensionExcludeList", string.Empty);
             Registry.DeleteStartupSetting("ExtensionExcludeList");
          }
 

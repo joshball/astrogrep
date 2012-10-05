@@ -34,6 +34,10 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]      08/10/2007  CHG: use 800x600 for default size
    /// [Curtis_Beard]	   01/31/2012	ADD: size column width
    /// [Curtis_Beard]	   01/31/2012	CHG: 1947760, update default exclude list to exclude images (bmp,gif,jpg,jpeg,png)
+   /// [Curtis_Beard]	   02/24/2012	CHG: 3489693, save state of search options
+   /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+   /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions, empty out exclude list to use search options value instead
+   /// [Curtis_Beard]	   10/05/2012	ADD: 1741935, option to show/hide exclusion/error dialog message to user
    /// </history>
    public sealed class GeneralSettings
    {
@@ -53,10 +57,11 @@ namespace AstroGrep.Core
       private string resultsBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
       private string matchForeColor = string.Format("251{0}127{0}6{0}255", Constants.COLOR_SEPARATOR);
       private string matchBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
+      private string resultsFont = string.Format("Lucida Console{0}9.75{0}Regular", Constants.FONT_SEPARATOR);
       private int mruListCount = 15;
 
       private string language = Constants.DEFAULT_LANGUAGE;
-      private string extExcludeList = Constants.DEFAULT_EXTENSION_EXCLUDE_LIST;
+      private string extExcludeList = string.Empty;
 
       private int windowLeft = -1;
       private int windowTop = -1;
@@ -77,6 +82,10 @@ namespace AstroGrep.Core
       private string searchTexts = string.Empty;
 
       private string textEditors = string.Format("notepad{0}%1{0}*", Constants.TEXT_EDITOR_ARGS_SEPARATOR);
+
+      private bool showSearchOptions = false;
+
+      private bool showExclusionErrorMessage = true;
       #endregion
       
       /// <summary>
@@ -179,7 +188,7 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
-      /// Gets/Sets the extension exclusion list.
+      /// Gets/Sets the extension exclusion list (NO LONGER USED).
       /// </summary>
       static public string ExtensionExcludeList
       {
@@ -335,6 +344,33 @@ namespace AstroGrep.Core
       {
          get { return MySettings.textEditors; }
          set { MySettings.textEditors = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets display of search options.
+      /// </summary>
+      static public bool ShowSearchOptions
+      {
+         get { return MySettings.showSearchOptions; }
+         set { MySettings.showSearchOptions = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets results font.
+      /// </summary>
+      static public string ResultsFont
+      {
+         get { return MySettings.resultsFont; }
+         set { MySettings.resultsFont = value; }
+      }
+
+      /// <summary>
+      /// Gets/sets whether to show the exclusion/error message.
+      /// </summary>
+      static public bool ShowExclusionErrorMessage
+      {
+         get { return MySettings.showExclusionErrorMessage; }
+         set { MySettings.showExclusionErrorMessage = value; }
       }
    }
 }

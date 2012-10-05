@@ -31,6 +31,7 @@ namespace AstroGrep.Windows.Forms
    /// [Curtis_Beard]		07/21/2006	Created
    /// [Justin_Dearing]    11/01/2007	REMOVE: Unneccessary global variable
    /// [Andrew_Radford]    17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
+   /// [Curtis_Beard]      09/28/2012  CHG: 3553474, support multiple file types per editor (display message)
    /// </history>
 	public partial class frmAddEditTextEditor : Form
 	{

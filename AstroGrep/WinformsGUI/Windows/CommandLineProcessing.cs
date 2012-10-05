@@ -23,6 +23,7 @@ namespace AstroGrep.Windows
    /// [/sh]                  - Skip hidden files and folders
    /// [/ss]                  - Skip system files and directories
    /// [/s]                   - Start searching immediately
+   /// [/?, /h, /help]        - Display command line arguments
    /// </summary>
    /// <remarks>
    ///   AstroGrep File Searching Utility. Written by Theodore L. Ward
@@ -55,6 +56,7 @@ namespace AstroGrep.Windows
       /// </summary>
       /// <history>
       /// [Curtis_Beard]		07/26/2006	Created
+      /// [Curtis_Beard]		09/26/2012	ADD: display help option
       /// </history>
       public struct CommandLineArguments
       {
@@ -105,6 +107,9 @@ namespace AstroGrep.Windows
 
          /// <summary></summary>
          public bool StoreDataLocal;
+
+         /// <summary></summary>
+         public bool DisplayHelp;
       }
 
       /// <summary>
@@ -174,6 +179,7 @@ namespace AstroGrep.Windows
       /// <param name="args">CommandLineArguments to initialize</param>
       /// <history>
       /// [Curtis_Beard]		07/26/2006	Created
+      /// [Curtis_Beard]		09/26/2012	ADD: display help option
       /// </history>
       private static void InitializeArgs(ref CommandLineArguments args)
       {
@@ -206,6 +212,8 @@ namespace AstroGrep.Windows
          args.SkipSystem = false;
 
          args.StoreDataLocal = false;
+
+         args.DisplayHelp = false;
       }
 
       /// <summary>
@@ -216,6 +224,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]		07/26/2006	Created
       /// [Curtis_Beard]		05/18/2007	CHG: use new command line arguments
+      /// [Curtis_Beard]		09/26/2012	ADD: display help option
       /// </history>
       private static void ProcessFlags(Arguments myArgs, ref CommandLineArguments args)
       {
@@ -286,6 +295,11 @@ namespace AstroGrep.Windows
          {
             args.StoreDataLocal = true;
             Core.Common.StoreDataLocal = true;
+         }
+
+         if (myArgs["h"] != null || myArgs["?"] != null || myArgs["help"] != null)
+         {
+            args.DisplayHelp = true;
          }
       }
    }

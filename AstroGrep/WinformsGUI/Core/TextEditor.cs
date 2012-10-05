@@ -89,7 +89,7 @@ namespace AstroGrep
       /// Contains the file type.
       /// </summary>
       /// <history>
-      /// 	[Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		07/21/2006	Created
       /// </history>
       public string FileType
       {
@@ -101,7 +101,7 @@ namespace AstroGrep
       /// Contains the location.
       /// </summary>
       /// <history>
-      /// 	[Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		07/21/2006	Created
       /// </history>
       public string Editor
       {
@@ -113,7 +113,7 @@ namespace AstroGrep
       /// Contains the command line arguments.
       /// </summary>
       /// <history>
-      /// 	[Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		07/21/2006	Created
       /// </history>
       public string Arguments
       {
@@ -128,7 +128,7 @@ namespace AstroGrep
       /// </summary>
       /// <returns></returns>
       /// <history>
-      /// 	[Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		07/21/2006	Created
       /// </history>
       public override string ToString()
       {
@@ -140,7 +140,7 @@ namespace AstroGrep
       /// </summary>
       /// <param name="classAsString">The string representation of this class</param>
       /// <history>
-      /// 	[Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		07/21/2006	Created
       /// </history>
       public void FromString(string classAsString)
       {

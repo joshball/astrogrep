@@ -292,6 +292,7 @@ namespace Plugin.MicrosoftWord
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="file">FileInfo object</param>
+      /// <param name="searchSpec">ISearchSpec interface value</param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null if on error</returns>
 		/// <history>
@@ -309,6 +310,7 @@ namespace Plugin.MicrosoftWord
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="path">Fully qualified file path</param>
+      /// <param name="searchSpec">ISearchSpec interface value</param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null on error</returns>
 		/// <history>

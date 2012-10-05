@@ -26,8 +26,14 @@ private System.Windows.Forms.Label lblSearchHeading;
 private System.Windows.Forms.Splitter splitUpDown;
 private System.Windows.Forms.Splitter splitLeftRight;
 private System.Windows.Forms.Panel pnlRightSide;
-private System.Windows.Forms.StatusBar stbStatus;
+private System.Windows.Forms.StatusStrip stbStatus;
+private System.Windows.Forms.ToolStripStatusLabel sbStatusPanel;
+private System.Windows.Forms.ToolStripStatusLabel sbTotalCountPanel;
+private System.Windows.Forms.ToolStripStatusLabel sbFileCountPanel;
+private System.Windows.Forms.ToolStripStatusLabel sbFilterCountPanel;
+private System.Windows.Forms.ToolStripStatusLabel sbErrorCountPanel;
 private System.Windows.Forms.LinkLabel lnkSearchOptions;
+private System.Windows.Forms.LinkLabel lnkExclusions;
 private System.Windows.Forms.ToolTip toolTip1;
 private System.Windows.Forms.Panel PanelOptionsContainer;
 private System.Windows.Forms.CheckBox chkNegation;
@@ -107,6 +113,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.chkRecurse = new System.Windows.Forms.CheckBox();
          this.chkCaseSensitive = new System.Windows.Forms.CheckBox();
          this.lnkSearchOptions = new System.Windows.Forms.LinkLabel();
+		 this.lnkExclusions = new System.Windows.Forms.LinkLabel();
          this.pnlMainSearch = new System.Windows.Forms.Panel();
          this.picBrowse = new AstroGrep.Windows.Controls.PictureButton();
          this.btnSearch = new System.Windows.Forms.Button();
@@ -151,7 +158,12 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.mnuOptions = new System.Windows.Forms.MenuItem();
          this.mnuHelp = new System.Windows.Forms.MenuItem();
          this.mnuAbout = new System.Windows.Forms.MenuItem();
-         this.stbStatus = new System.Windows.Forms.StatusBar();
+         this.stbStatus = new System.Windows.Forms.StatusStrip();
+         this.sbStatusPanel = new System.Windows.Forms.ToolStripStatusLabel();
+         this.sbTotalCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
+         this.sbFileCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
+         this.sbFilterCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
+         this.sbErrorCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
          this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
          this.chkSkipHidden = new System.Windows.Forms.CheckBox();
@@ -160,6 +172,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
 		 this.cboMaxSizeType = new System.Windows.Forms.ComboBox();
          this.pnlSearch.SuspendLayout();
          this.pnlSearchOptions.SuspendLayout();
+
          this.PanelOptionsContainer.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.txtContextLines)).BeginInit();
          this.pnlMainSearch.SuspendLayout();
@@ -188,13 +201,14 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.pnlSearchOptions.Controls.Add(this.lnkSearchOptions);
          this.pnlSearchOptions.Location = new System.Drawing.Point(16, 209);
          this.pnlSearchOptions.Name = "pnlSearchOptions";
-         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 453);
+         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 473);
          this.pnlSearchOptions.TabIndex = 1;
          // 
          // PanelOptionsContainer
          // 
          this.PanelOptionsContainer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                      | System.Windows.Forms.AnchorStyles.Right)));
+		 this.PanelOptionsContainer.Controls.Add(this.lnkExclusions);
          this.PanelOptionsContainer.Controls.Add(this.chkSkipSystem);
          this.PanelOptionsContainer.Controls.Add(this.chkSkipHidden);
 		 this.PanelOptionsContainer.Controls.Add(this.cboMaxSizeType);
@@ -218,7 +232,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.PanelOptionsContainer.Controls.Add(this.chkCaseSensitive);
          this.PanelOptionsContainer.Location = new System.Drawing.Point(0, 16);
          this.PanelOptionsContainer.Name = "PanelOptionsContainer";
-         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 433);
+         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 453);
          this.PanelOptionsContainer.TabIndex = 1;
 		 // 
          // cboMaxSizeType
@@ -246,7 +260,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // 
          this.label4.AutoSize = true;
 		 this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label4.Location = new System.Drawing.Point(4, 339);
+         this.label4.Location = new System.Drawing.Point(7, 339);
          this.label4.Name = "label4";
          this.label4.Size = new System.Drawing.Size(53, 13);
          this.label4.TabIndex = 21;
@@ -277,7 +291,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // 
          this.label3.AutoSize = true;
 		 this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label3.Location = new System.Drawing.Point(4, 300);
+         this.label3.Location = new System.Drawing.Point(7, 300);
          this.label3.Name = "label3";
          this.label3.Size = new System.Drawing.Size(50, 13);
          this.label3.TabIndex = 18;
@@ -287,7 +301,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // 
          this.label2.AutoSize = true;
 		 this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label2.Location = new System.Drawing.Point(4, 251);
+         this.label2.Location = new System.Drawing.Point(7, 251);
          this.label2.Name = "label2";
          this.label2.Size = new System.Drawing.Size(84, 13);
          this.label2.TabIndex = 17;
@@ -304,7 +318,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // 
          this.label1.AutoSize = true;
 		 this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label1.Location = new System.Drawing.Point(4, 207);
+         this.label1.Location = new System.Drawing.Point(7, 207);
          this.label1.Name = "label1";
          this.label1.Size = new System.Drawing.Size(75, 13);
          this.label1.TabIndex = 15;
@@ -437,6 +451,20 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.lnkSearchOptions.Text = "Search Options >>";
          this.lnkSearchOptions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
          this.lnkSearchOptions.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkSearchOptions_LinkClicked);
+		 // 
+         // lnkExclusions
+         // 
+         this.lnkExclusions.ActiveLinkColor = System.Drawing.SystemColors.ActiveCaption;
+         this.lnkExclusions.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.lnkExclusions.LinkColor = System.Drawing.SystemColors.ActiveCaption;
+         this.lnkExclusions.Location = new System.Drawing.Point(5, 426);
+         this.lnkExclusions.Name = "lnkExclusions";
+         this.lnkExclusions.Size = new System.Drawing.Size(150, 16);
+         this.lnkExclusions.TabIndex = 24;
+         this.lnkExclusions.TabStop = true;
+         this.lnkExclusions.Text = "Exclusions...";
+         this.lnkExclusions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+         this.lnkExclusions.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkExclusions_LinkClicked);
          // 
          // pnlMainSearch
          // 
@@ -616,6 +644,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.lstFileNames.View = System.Windows.Forms.View.Details;
          this.lstFileNames.SelectedIndexChanged += new System.EventHandler(this.lstFileNames_SelectedIndexChanged);
          this.lstFileNames.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstFileNames_KeyDown);
+		 this.lstFileNames.SmallImageList = ListViewImageList;
          // 
          // fileLstMnu
          // 
@@ -819,10 +848,60 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // 
          // stbStatus
          // 
-         this.stbStatus.Location = new System.Drawing.Point(0, 430);
+         this.stbStatus.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sbStatusPanel,
+            this.sbTotalCountPanel,
+            this.sbFileCountPanel,
+            this.sbFilterCountPanel,
+            this.sbErrorCountPanel});
+         this.stbStatus.Location = new System.Drawing.Point(0, 609);
          this.stbStatus.Name = "stbStatus";
-         this.stbStatus.Size = new System.Drawing.Size(784, 26);
-         this.stbStatus.TabIndex = 3;
+         this.stbStatus.Size = new System.Drawing.Size(795, 22);
+         this.stbStatus.TabIndex = 1;
+         this.stbStatus.ShowItemToolTips = true;
+         // 
+         // sbStatusPanel
+         // 
+         this.sbStatusPanel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+         this.sbStatusPanel.Name = "sbStatusPanel";
+         this.sbStatusPanel.Size = new System.Drawing.Size(648, 17);
+         this.sbStatusPanel.Spring = true;
+         this.sbStatusPanel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+         // 
+         // sbTotalCountPanel
+         // 
+         this.sbTotalCountPanel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)));
+         this.sbTotalCountPanel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+         this.sbTotalCountPanel.Name = "sbTotalCountPanel";
+         this.sbTotalCountPanel.Size = new System.Drawing.Size(48, 17);
+         this.sbTotalCountPanel.Text = "Total: 0";
+         // 
+         // sbFileCountPanel
+         // 
+         this.sbFileCountPanel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+         this.sbFileCountPanel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+         this.sbFileCountPanel.Name = "sbFileCountPanel";
+         this.sbFileCountPanel.Size = new System.Drawing.Size(40, 17);
+         this.sbFileCountPanel.Text = "File: 0";
+         // 
+         // sbFilterCountPanel
+         // 
+         this.sbFilterCountPanel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+         this.sbFilterCountPanel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+         this.sbFilterCountPanel.Name = "sbFilterCountPanel";
+         this.sbFilterCountPanel.Size = new System.Drawing.Size(47, 17);
+         this.sbFilterCountPanel.Text = "Exclusions: 0";
+         this.sbFilterCountPanel.DoubleClickEnabled = true;
+         this.sbFilterCountPanel.ToolTipText = "Double click to display exclusions.";
+         // 
+         // sbErrorCountPanel
+         // 
+         this.sbErrorCountPanel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+         this.sbErrorCountPanel.Name = "sbErrorCountPanel";
+         this.sbErrorCountPanel.Size = new System.Drawing.Size(44, 17);
+         this.sbErrorCountPanel.Text = "Error: 0";
+         this.sbErrorCountPanel.DoubleClickEnabled = true;
+         this.sbErrorCountPanel.ToolTipText = "Double click to display errors.";
          // 
          // ListViewImageList
          // 
@@ -884,6 +963,10 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
 		}
 		#endregion
 
+      /// <summary>
+      /// Dispose form.
+      /// </summary>
+      /// <param name="disposing">system parameter</param>
 		protected override void Dispose( bool disposing )
 		{
 			if( disposing )

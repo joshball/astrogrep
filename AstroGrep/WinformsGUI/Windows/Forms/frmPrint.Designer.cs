@@ -110,6 +110,10 @@ private System.ComponentModel.Container components = null;
       }
 		#endregion
 
+      /// <summary>
+      /// Dispose form.
+      /// </summary>
+      /// <param name="disposing">system parameter</param>
 		protected override void Dispose( bool disposing )
       {
          if( disposing )

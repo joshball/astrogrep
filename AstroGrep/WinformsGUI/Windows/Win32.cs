@@ -147,36 +147,80 @@ namespace AstroGrep.Windows
          public IntPtr pvFilter;
       }
 
+      /// <summary></summary>
       public const int LVM_SETCOLUMN = 4122;
+      /// <summary></summary>
       public const int LVM_SETSELECTEDCOLUMN = (0x1000 + 140);
       //For ColumnHeader Images
+      /// <summary></summary>
       public const int LVM_GETHEADER = 4127;
+      /// <summary></summary>
       public const int HDM_SETIMAGELIST = 4616;
+      /// <summary></summary>
       public const int LVCF_FMT = 0x1;
+      /// <summary></summary>
       public const int LVCF_IMAGE = 0x10;
+      /// <summary></summary>
       public const int LVCFMT_IMAGE = 2048;
+      /// <summary></summary>
       public const int LVCF_BITMAP_ON_RIGHT = 4096;
+      /// <summary></summary>
       public const int LVCF_STRING = 16384;
 
+      /// <summary>
+      /// 
+      /// </summary>
       [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Auto)]
       public struct LVCOLUMN
       {
+         /// <summary></summary>
          public int mask;
+         /// <summary></summary>
          public int fmt;
+         /// <summary></summary>
          public int cx;
+         /// <summary></summary>
          public IntPtr pszText;
+         /// <summary></summary>
          public int cchTextMax;
+         /// <summary></summary>
          public int iSubItem;
+         /// <summary></summary>
          public int iImage;
+         /// <summary></summary>
          public int iOrder;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="hWnd"></param>
+      /// <param name="msg"></param>
+      /// <param name="wParam"></param>
+      /// <param name="lParam"></param>
+      /// <returns></returns>
       [DllImport("user32.dll", CharSet = CharSet.Auto)]
       public static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, ref LVCOLUMN lParam);
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="hWnd"></param>
+      /// <param name="msg"></param>
+      /// <param name="wParam"></param>
+      /// <param name="lParam"></param>
+      /// <returns></returns>
       [DllImport("user32.dll", CharSet = CharSet.Auto)]
       public static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="hWnd"></param>
+      /// <param name="msg"></param>
+      /// <param name="wParam"></param>
+      /// <param name="lParam"></param>
+      /// <returns></returns>
       [DllImport("user32.dll", CharSet = CharSet.Auto)]
       public static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, IntPtr lParam);
 
@@ -461,8 +505,8 @@ namespace AstroGrep.Windows
       /// <summary>
       /// Set the ListView's header's imagelist
       /// </summary>
-      /// <param name="hwndLV">ListView</param>
-      /// <param name="hwndIL">ImageList</param>
+      /// <param name="view">ListView</param>
+      /// <param name="list">ImageList</param>
       //public static void SetHeaderImageList(IntPtr hwndLV, IntPtr hwndIL)
       public static void SetHeaderImageList(ListView view, ImageList list)
       {

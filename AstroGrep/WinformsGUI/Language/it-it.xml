@@ -15,14 +15,15 @@
       <control name="chkWholeWordOnly" value="&amp;Solo parole intere" tooltip="Ricerca solo parole intere, non porzioni di termini" />
       <control name="chkCaseSensitive" value="&amp;Maiuscole/minuscole" tooltip="Attiva la distinzione tra maiuscole e minuscole durante la ricerca" />
       <control name="chkRegularExpressions" value="Espressione &amp;regolare" tooltip="Esegue una ricerca per &apos;espressioni regolari&apos;" />
-      <control name="chkSkipHidden" value="Ignora file nascosti/directory" tooltip="Ignore files/directories marked as hidden" />
-      <control name="chkSkipSystem" value="Ignora file di sistema/directory" tooltip="Ignore files/directories marked as system" />
+      <control name="chkSkipHidden" value="Ignora file nascosti/directory" tooltip="Ignora i file / directory contrassegnate come nascoste" />
+      <control name="chkSkipSystem" value="Ignora file di sistema/directory" tooltip="Ignora i file / directory contrassegnati come sistema" />
       <control name="lnkSearchOptions" value="Opzioni di ricerca  {0}" />
       <control name="picBrowse" tooltip="Sfoglia..." />
       <control name="label1" value="Dopo aver modificato:" />
       <control name="label2" value="Prima della modifica:" />
       <control name="label3" value="Dimensione minima:" />
       <control name="label4" value="Dimensione massima:" />
+      <control name="lnkExclusions" value="Esclusioni..." />
       <control name="lstFileNames">
          <menuitem index="0" value="copia" />
          <menuitem index="1" value="copia nome" />
@@ -56,11 +57,18 @@
       <menu index="3" value="&amp;Guida">
          <menuitem index="0" value="&amp;Informazioni su..." />
       </menu>
+
+      <!-- status bar items default state-->
+      <control name="sbTotalCountPanel" value="Totale: 0"/>
+      <control name="sbFileCountPanel" value="Lima: 0"/>
+      <control name="sbFilterCountPanel" value="Esclusioni: 0" tooltip="Fare doppio clic per visualizzare le esclusioni."/>
+      <control name="sbErrorCountPanel" value="Errore: 0" tooltip="Fare doppio clic per visualizzare gli errori."/>
    </screen>
    
    <screen name="frmAbout" value="Informazioni su {0}">
       <control name="lnkHomePage" value="{0} Pagina principale" />
       <control name="cmdOK" value="&amp;OK" />
+      <control name="lblVersionCheck" value="Il controllo degli aggiornamenti..." />
    </screen>
    
    <screen name="frmAddEditTextEditor" value="Editor di testo">
@@ -76,6 +84,7 @@
       <control name="lblFileType" value="Tipo file" />
       <control name="btnCancel" value="&amp;Annulla" />
       <control name="btnOK" value="&amp;OK" />
+      <control name="lblMultiTypes" value="Tipi separate con | carattere."/>
    </screen>
    
    <screen name="frmOptions" value="Opzioni">
@@ -97,8 +106,6 @@
       <control name="tabGeneral" value="Generale" />
       <control name="tabTextEditors" value="Editor di testo" />
       <control name="LanguageGroup" value="Lingua"/>
-      <control name="ExtensionExclusionGroup" value="Estensioni file escluse"/>
-      <control name="btnRestoreDefaultExtensions" value="Ripristina estensioni di default"/>
       <control name="tabPlugins" value="Plugin"/>
       <control name="chkDesktopShortcut" value="Collegamenti sul &amp;desktop"/>
       <control name="chkStartMenuShortcut" value="Collegamenti del &amp;menu di avvio"/>
@@ -107,6 +114,8 @@
       <control name="lblPluginDetailName" value="Nome:"/>
       <control name="lblPluginDetailVersion" value="Versione:"/>
       <control name="lblPluginDetailAuthor" value="Autore:"/>
+      <control name="btnFindFont" value="&amp;Trova font"/>
+      <control name="chkShowExclusionErrorMessage" value="Mostra un messaggio &amp;quando un elementi di ricerca rese essere esclusi o si verifica un errore."/>
    </screen>
    
    <screen name="frmPrint" value="Stampa">
@@ -115,6 +124,32 @@
       <control name="cmdPageSetup" value="&amp;Impostazioni pagina" />
       <control name="cmdPrint" value="&amp;Stampa" />
       <control name="cmdPreview" value="A&amp;nteprima" />
+   </screen>
+
+   <screen name="frmExclusions" value="Esclusioni">
+      <control name="btnEdit" value="&amp;Modifica..." />
+      <control name="btnDelete" value="&amp;Cancella" />
+      <control name="btnAdd" value="&amp;Aggiungi..." />
+      <control name="btnCancel" value="&amp;Annulla" />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnRestoreDefaults" value="&amp;Ripristina" />
+   </screen>
+
+   <screen name="frmAddEditExclusions" value="Esclusioni">
+      <control name="lblType" value="tipo" />
+      <control name="lblOptions" value="opzioni" />
+      <control name="lblValue" value="valore" />
+      <control name="chkIgnoreCase" value="maiuscole e minuscole" />
+      <control name="btnCancel" value="&amp;Annulla" />
+      <control name="btnOK" value="&amp;OK" />
+   </screen>
+
+   <screen name="frmCommandLine" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
+   </screen>
+
+   <screen name="frmDisplayMessages" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
    </screen>
    
    <generic>
@@ -143,6 +178,7 @@
       <text name="VerifyErrorNoStartPath" value="Specificare il percorso iniziale della ricerca."/>
       <text name="VerifyErrorInvalidStartPath" value="'{0} non è una cartella valida."/>
       <text name="VerifyErrorNoSearchText" value="Specificare il testo da ricercare."/>
+      <text name="VerifyErrorInvalidRegEx" value="L'espressione regolare è fornito non è valido ({0}). Si prega di verificare la vostra espressione."/>
       <text name="VerifyErrorGeneric" value="Impossibile convalidare i parametri specificati.  Verificare che siano validi."/>
       
       <text name="SearchGenericError" value="Errore durante la ricerca: {0}"/>
@@ -178,10 +214,43 @@ Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="ResultsColumnDate" value="Data di modifica"/>
       <text name="ResultsColumnCount" value="Conteggio"/>
       <text name="ResultsColumnSize" value="Dimensione"/>
+
+      <text name="ResultsStatusTotalCount" value="Totale: {0}"/>
+      <text name="ResultsStatusFileCount" value="Lima: {0}"/>
+      <text name="ResultsStatusFilterCount" value="Esclusioni: {0}"/>
+      <text name="ResultsStatusErrorCount" value="Errore: {0}"/>
       
       <text name="PluginsColumnEnabled" value="Attivato"/>
       <text name="PluginsColumnName" value="Nome"/>
       <text name="PluginsColumnExtensions" value="Estensioni"/>
+
+      <text name="Update.Current" value="{0} è aggiornato ({1})"/>
+      <text name="Update.Latest" value="Scarica {0} aggiornamento {1}"/>
+      <text name="Update.Error" value="Aggiornamento non riuscito: {0}"/>
+
+      <text name="Exclusions.Type" value="tipo"/>
+      <text name="Exclusions.Value" value="valore"/>
+      <text name="Exclusions.Option" value="opzioni"/>
+
+      <text name="Exclusions.FileExtension" value="estensione del file"/>
+      <text name="Exclusions.FileName" value="Nome del file"/>
+      <text name="Exclusions.FilePath" value="percorso file"/>
+      <text name="Exclusions.DirectoryName" value="il nome della directory"/>
+      <text name="Exclusions.DirectoryPath" value="diretory percorso"/>
+
+      <text name="Exclusions.None" value=""/>
+      <text name="Exclusions.Equals" value="es igual a"/>
+      <text name="Exclusions.Contains" value="contiene"/>
+      <text name="Exclusions.StartsWith" value="comienza con"/>
+      <text name="Exclusions.EndsWith" value="extremos con"/>
+      <text name="Exclusions.IgnoreCase" value=" (maiuscole e minuscole)"/>
+
+      <text name="Exclusions.Error.NoType" value="Por favor, seleccione un tipo."/>
+      <text name="Exclusions.Error.NoValue" value="Por favor, introduzca un valor."/>
+      <text name="Exclusions.Error.InvalidExtensionFormat" value="Archivo no válido formato de extensión. El formato es .xxx"/>
+      <text name="Exclusions.Error.InvalidOptions" value="Por favor, seleccione un valor de las opciones válidas."/>
+
+      <text name="ExclusionErrorMessageText" value="La ricerca ha prodotto elementi che sono stati esclusi sia o ha causato un errore. &#xA;È possibile visualizzare questi elementi con un doppio clic sulla voce relativa barra di stato in basso a destra. &#xA;&#xA;È possibile disattivare questo messaggio nelle opzioni."/>
    </generic>
    
 </language>
