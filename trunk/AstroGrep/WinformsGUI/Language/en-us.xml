@@ -23,6 +23,7 @@
       <control name="label2" value="Modified Before:" />
       <control name="label3" value="Min Size:" />
       <control name="label4" value="Max Size:" />
+      <control name="lnkExclusions" value="Exclusions..." />
       <control name="lstFileNames">
          <menuitem index="0" value="Copy" />
          <menuitem index="1" value="Copy Name" />
@@ -56,11 +57,18 @@
       <menu index="3" value="&amp;Help">
          <menuitem index="0" value="&amp;About..." />
       </menu>
+      
+      <!-- status bar items default state-->
+      <control name="sbTotalCountPanel" value="Total: 0"/>
+      <control name="sbFileCountPanel" value="File: 0"/>
+      <control name="sbFilterCountPanel" value="Exclusions: 0" tooltip="Double click to display exclusions."/>
+      <control name="sbErrorCountPanel" value="Error: 0" tooltip="Double click to display errors."/>
    </screen>
    
    <screen name="frmAbout" value="About {0}">
       <control name="lnkHomePage" value="{0} Home Page" />
       <control name="cmdOK" value="&amp;OK" />
+      <control name="lblVersionCheck" value="Checking for updates..." />
    </screen>
    
    <screen name="frmAddEditTextEditor" value="Text Editors">
@@ -73,6 +81,7 @@
       <control name="lblFileType" value="File Type" />
       <control name="btnCancel" value="&amp;Cancel" />
       <control name="btnOK" value="&amp;OK" />
+      <control name="lblMultiTypes" value="Separate types with | character."/>
    </screen>
    
    <screen name="frmOptions" value="Options">
@@ -94,8 +103,6 @@
       <control name="tabGeneral" value="General" />
       <control name="tabTextEditors" value="Text Editors" />
       <control name="LanguageGroup" value="Language"/>
-      <control name="ExtensionExclusionGroup" value="Exclude File Extensions"/>
-      <control name="btnRestoreDefaultExtensions" value="Restore Default Extensions"/>
       <control name="tabPlugins" value="Plugins"/>
       <control name="chkDesktopShortcut" value="&amp;Desktop Shortcut"/>
       <control name="chkStartMenuShortcut" value="Start &amp;Menu Shortcut"/>
@@ -104,6 +111,8 @@
       <control name="lblPluginDetailName" value="Name:"/>
       <control name="lblPluginDetailVersion" value="Version:"/>
       <control name="lblPluginDetailAuthor" value="Author:"/>
+      <control name="btnFindFont" value="&amp;Find Font"/>
+      <control name="chkShowExclusionErrorMessage" value="Show a &amp;prompt when a search yields items being excluded or an error occurs."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -112,6 +121,32 @@
       <control name="cmdPageSetup" value="Page &amp;Setup" />
       <control name="cmdPrint" value="&amp;Print" />
       <control name="cmdPreview" value="Pre&amp;view" />
+   </screen>
+
+   <screen name="frmExclusions" value="Exclusions">
+      <control name="btnEdit" value="&amp;Edit..." />
+      <control name="btnDelete" value="&amp;Delete" />
+      <control name="btnAdd" value="&amp;Add..." />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="&amp;Cancel" />
+      <control name="btnRestoreDefaults" value="&amp;Restore Defaults" />
+   </screen>
+
+   <screen name="frmAddEditExclusions" value="Exclusions">
+      <control name="lblType" value="Type" />
+      <control name="lblOptions" value="Options" />
+      <control name="lblValue" value="Value" />
+      <control name="chkIgnoreCase" value="Ignore Case" />
+      <control name="btnCancel" value="&amp;Cancel" />
+      <control name="btnOK" value="&amp;OK" />
+   </screen>
+
+   <screen name="frmCommandLine" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
+   </screen>
+
+   <screen name="frmDisplayMessages" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
    </screen>
    
    <generic>
@@ -140,6 +175,7 @@
       <text name="VerifyErrorNoStartPath" value="You must supply the path to begin the search."/>
       <text name="VerifyErrorInvalidStartPath" value="'{0}' is not a valid folder."/>
       <text name="VerifyErrorNoSearchText" value="You must supply text for which to search."/>
+      <text name="VerifyErrorInvalidRegEx" value="The regular expression you supplied is invalid ({0}).  Please verify your expression."/>
       <text name="VerifyErrorGeneric" value="Unable to validate specified parameters.  Please verify they are valid."/>
       
       <text name="SearchGenericError" value="An error occurred searching: {0}"/>
@@ -173,9 +209,42 @@
       <text name="ResultsColumnCount" value="Count"/>
       <text name="ResultsColumnSize" value="Size"/>
       
+      <text name="ResultsStatusTotalCount" value="Total: {0}"/>
+      <text name="ResultsStatusFileCount" value="File: {0}"/>
+      <text name="ResultsStatusFilterCount" value="Exclusions: {0}"/>
+      <text name="ResultsStatusErrorCount" value="Error: {0}"/>
+      
       <text name="PluginsColumnEnabled" value="Enabled"/>
       <text name="PluginsColumnName" value="Name"/>
       <text name="PluginsColumnExtensions" value="Extensions"/>
+
+      <text name="Update.Current" value="{0} is up to date ({1})"/>
+      <text name="Update.Latest" value="Download {0} update {1}"/>
+      <text name="Update.Error" value="Update check failed: {0}"/>
+
+      <text name="Exclusions.Type" value="Type"/>
+      <text name="Exclusions.Value" value="Value"/>
+      <text name="Exclusions.Option" value="Options"/>
+
+      <text name="Exclusions.FileExtension" value="File Extension"/>
+      <text name="Exclusions.FileName" value="File Name"/>
+      <text name="Exclusions.FilePath" value="File Path"/>
+      <text name="Exclusions.DirectoryName" value="Directory Name"/>
+      <text name="Exclusions.DirectoryPath" value="Directory Path"/>
+
+      <text name="Exclusions.None" value=""/>
+      <text name="Exclusions.Equals" value="Equals"/>
+      <text name="Exclusions.Contains" value="Contains"/>
+      <text name="Exclusions.StartsWith" value="Starts With"/>
+      <text name="Exclusions.EndsWith" value="Ends With"/>
+      <text name="Exclusions.IgnoreCase" value=" (ignore case)"/>
+
+      <text name="Exclusions.Error.NoType" value="Please select a type."/>
+      <text name="Exclusions.Error.NoValue" value="Please enter a value."/>
+      <text name="Exclusions.Error.InvalidExtensionFormat" value="Invalid file extension format. The format is .xxx"/>
+      <text name="Exclusions.Error.InvalidOptions" value="Please select a valid options value."/>
+
+      <text name="ExclusionErrorMessageText" value="Your search yielded items that were either excluded or caused an error.  &#xA;You can view these items by double clicking the associated status bar item in the bottom right corner. &#xA;&#xA;You can disable this message in the Options."/>
    </generic>
    
 </language>

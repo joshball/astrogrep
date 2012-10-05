@@ -231,6 +231,45 @@ namespace AstroGrep.Windows
       }
 
       /// <summary>
+      /// Sets the given control's text and tooltip.
+      /// </summary>
+      /// <param name="control">ToolStripItem to set text/tooltip for.</param>
+      /// <param name="tip">ToolTip object</param>
+      /// <history>
+      /// [Curtis_Beard]		09/27/2012	Initial: 1741735, support ToolStripItem
+      /// </history>
+      public static void SetToolStripItemText(ToolStripItem control, ToolTip tip)
+      {
+         if (__RootNode != null)
+         {
+            string formName = control.Owner.FindForm().Name;
+            XmlNode node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']");
+            XmlNode controlNode;
+
+            if (node != null)
+            {
+               //node found, find control
+               controlNode = node.SelectSingleNode("control[@name='" + control.Name + "']");
+
+               if (controlNode != null)
+               {
+                  //found control node
+
+                  //text
+                  if (controlNode.Attributes["value"] != null)
+                     control.Text = controlNode.Attributes["value"].Value;
+
+                  //tooltip
+                  if (tip != null && controlNode.Attributes["tooltip"] != null)
+                  {
+                     control.ToolTipText = controlNode.Attributes["tooltip"].Value;
+                  }
+               }
+            }
+         }
+      }
+
+      /// <summary>
       /// Retrieve the control's text value in the loaded language file.
       /// </summary>
       /// <param name="control">Control to set</param>
@@ -393,7 +432,12 @@ namespace AstroGrep.Windows
 
             //process controls on form
             foreach (Control control in frm.Controls)
-               ProcessControl(control, tip);
+            {
+               if (control.GetType() == typeof(ToolStrip) || control.GetType() == typeof(StatusStrip))
+                  ProcessToolStrip((ToolStrip)control, tip);
+               else
+                  ProcessControl(control, tip);
+            }
 
             //process menu items on form
             if (frm.Menu != null)
@@ -508,6 +552,35 @@ namespace AstroGrep.Windows
 
             SetControlText(control, tip);
          }
+      }
+
+      /// <summary>
+      /// Process each ToolStripItem in the ToolStrip
+      /// </summary>
+      /// <param name="control">ToolStrip to process</param>
+      /// <param name="tip">ToolTip object</param>
+      /// <history>
+      /// [Curtis_Beard]		09/27/2012	Initial: 1741735, support ToolStripItem
+      /// </history>
+      private static void ProcessToolStrip(ToolStrip control, ToolTip tip)
+      {
+         foreach (ToolStripItem child in control.Items)
+         {
+            ProcessToolStripItem(child, tip);
+         }
+      }
+
+      /// <summary>
+      /// Process each ToolStripItem.
+      /// </summary>
+      /// <param name="control">ToolStripItem to process</param>
+      /// <param name="tip">ToolTip object</param>
+      /// <history>
+      /// [Curtis_Beard]		09/27/2012	Initial: 1741735, support ToolStripItem
+      /// </history>
+      private static void ProcessToolStripItem(ToolStripItem control, ToolTip tip)
+      {
+         SetToolStripItemText(control, tip);
       }
 
       /// <summary>

@@ -15,14 +15,15 @@
       <control name="chkWholeWordOnly" value="&amp;Hele Ord" tooltip="Match kun hele ord" />
       <control name="chkCaseSensitive" value="&amp;Case sensitiv" tooltip="Match store og små bogstave præcist" />
       <control name="chkRegularExpressions" value="Regular &amp;Expressions" tooltip="Anvend regular expression matching" />
-      <control name="chkSkipHidden" value="Spring skjulte filer / mapper" tooltip="Ignore files/directories marked as hidden" />
-      <control name="chkSkipSystem" value="Spring System filer / mapper" tooltip="Ignore files/directories marked as system" />
+      <control name="chkSkipHidden" value="Spring skjulte filer / mapper" tooltip="Ignorer filer / mapper er markeret som skjult" />
+      <control name="chkSkipSystem" value="Spring System filer / mapper" tooltip="Ignorer filer / mapper markeret som system" />
       <control name="lnkSearchOptions" value="Søgeparametre {0}" />
       <control name="picBrowse" tooltip="Browse..." />
       <control name="label1" value="Modificeret efter:" />
       <control name="label2" value="Ændret Før:" />
       <control name="label3" value="Min størrelse:" />
       <control name="label4" value="Max størrelse:" />
+      <control name="lnkExclusions" value="udelukkelser..." />
       <control name="lstFileNames">
          <menuitem index="0" value="kopi" />
          <menuitem index="1" value="kopiere navn" />
@@ -56,11 +57,18 @@
       <menu index="3" value="&amp;Hjælp">
          <menuitem index="0" value="&amp;Om..." />
       </menu>
+
+      <!-- status bar items default state-->
+      <control name="sbTotalCountPanel" value="Total: 0"/>
+      <control name="sbFileCountPanel" value="Fil: 0"/>
+      <control name="sbFilterCountPanel" value="Udelukkelser: 0" tooltip="Dobbeltklik for at vise undtagelser."/>
+      <control name="sbErrorCountPanel" value="Fejl: 0" tooltip="Dobbeltklik for at vise fejl."/>
    </screen>
    
    <screen name="frmAbout" value="Om {0}">
       <control name="lnkHomePage" value="{0} Hjemmeside" />
       <control name="cmdOK" value="&amp;OK" />
+      <control name="lblVersionCheck" value="Kontrol for opdateringer..." />
    </screen>
    
    <screen name="frmAddEditTextEditor" value="Tekst Editorer">
@@ -73,6 +81,7 @@
       <control name="lblFileType" value="Fil Type" />
       <control name="btnCancel" value="&amp;Annuller" />
       <control name="btnOK" value="&amp;OK" />
+      <control name="lblMultiTypes" value="Separate typer med | karakter."/>
    </screen>
    
    <screen name="frmOptions" value="Indstillinger">
@@ -94,8 +103,6 @@
       <control name="tabGeneral" value="Generelt" />
       <control name="tabTextEditors" value="Tekst Editorer" />
       <control name="LanguageGroup" value="Sprog" />
-      <control name="ExtensionExclusionGroup" value="Udeladte Fil Typer" />
-      <control name="btnRestoreDefaultExtensions" value="Gendanne standard udvidelser"/>
       <control name="tabPlugins" value="Udvidelser" />
       <control name="chkDesktopShortcut" value="&amp;Skrivebords Genvej" />
       <control name="chkStartMenuShortcut" value="Start &amp;Menu Genvej" />
@@ -104,14 +111,42 @@
       <control name="lblPluginDetailName" value="Navn:" />
       <control name="lblPluginDetailVersion" value="Version:" />
       <control name="lblPluginDetailAuthor" value="Forfatter:" />
+      <control name="btnFindFont" value="&amp;Find skrift"/>
+      <control name="chkShowExclusionErrorMessage" value="&amp;Vis en meddelelse, når en søgning udbytter poster bliver udelukket eller der opstår en fejl."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
       <control name="cmdCancel" value="&amp;Annuler" />
       <control name="lblSelect" value="Angiv typen af udkrift:" />
       <control name="cmdPageSetup" value="SideOpsætning" />
-      <control name="cmdPrint" value="&amp;Print" />
-      <control name="cmdPreview" value="&amp;Preview" />
+      <control name="cmdPrint" value="&amp;udskrive" />
+      <control name="cmdPreview" value="&amp;forhåndsvisning" />
+   </screen>
+
+   <screen name="frmExclusions" value="udelukkelser">
+      <control name="btnEdit" value="&amp;Rediger..." />
+      <control name="btnDelete" value="&amp;Slet" />
+      <control name="btnAdd" value="&amp;Tilføj..." />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="&amp;Annuller" />
+      <control name="btnRestoreDefaults" value="&amp;gendanne standardindstillingerne" />
+   </screen>
+
+   <screen name="frmAddEditExclusions" value="udelukkelser">
+      <control name="lblType" value="typen" />
+      <control name="lblOptions" value="optioner" />
+      <control name="lblValue" value="værdi" />
+      <control name="chkIgnoreCase" value="ignorere sagen" />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="&amp;Annuller" />
+   </screen>
+
+   <screen name="frmCommandLine" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
+   </screen>
+
+   <screen name="frmDisplayMessages" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
    </screen>
    
    <generic>
@@ -140,6 +175,7 @@
       <text name="VerifyErrorNoStartPath" value="Du skal angive en søgesti før søgningen kan begynde." />
       <text name="VerifyErrorInvalidStartPath" value="'{0}' er ikke en gyldig søgesti." />
       <text name="VerifyErrorNoSearchText" value="Angiv den tekst der skal søges efter." />
+      <text name="VerifyErrorInvalidRegEx" value="Det regulære udtryk, du har angivet, er ugyldig ({0}). Bekræft venligst din udtryk."/>
       <text name="VerifyErrorGeneric" value="Ude af stand til at anvende angivne parametre.  Verificer venligst at de er gyldige." />
       
       <text name="SearchGenericError" value="Der opstod en fejl under søgningen: {0}" />
@@ -172,9 +208,42 @@
       <text name="ResultsColumnDate" value="Sidst Ændret" />
       <text name="ResultsColumnCount" value="Antal" />
       <text name="ResultsColumnSize" value="Størrelse"/>
+
+      <text name="ResultsStatusTotalCount" value="Total: {0}"/>
+      <text name="ResultsStatusFileCount" value="Fil: {0}"/>
+      <text name="ResultsStatusFilterCount" value="Udelukkelser: {0}"/>
+      <text name="ResultsStatusErrorCount" value="Fejl: {0}"/>
       
       <text name="PluginsColumnEnabled" value="I kraft" />
       <text name="PluginsColumnName" value="Navn" />
       <text name="PluginsColumnExtensions" value="Udvidelser" />
+
+      <text name="Update.Current" value="{0} er opdateret ({1})"/>
+      <text name="Update.Latest" value="Hent {0} opdatering {1}"/>
+      <text name="Update.Error" value="Opdater mislykkedes: {0}"/>
+
+      <text name="Exclusions.Type" value="typen"/>
+      <text name="Exclusions.Value" value="værdi"/>
+      <text name="Exclusions.Option" value="optioner"/>
+
+      <text name="Exclusions.FileExtension" value="filtypenavn"/>
+      <text name="Exclusions.FileName" value="filnavn"/>
+      <text name="Exclusions.FilePath" value="filsti"/>
+      <text name="Exclusions.DirectoryName" value="mappenavn"/>
+      <text name="Exclusions.DirectoryPath" value="bibliotekssti"/>
+
+      <text name="Exclusions.None" value=""/>
+      <text name="Exclusions.Equals" value="lig"/>
+      <text name="Exclusions.Contains" value="indeholder"/>
+      <text name="Exclusions.StartsWith" value="begynder med"/>
+      <text name="Exclusions.EndsWith" value="ender med"/>
+      <text name="Exclusions.IgnoreCase" value=" (ignorere sagen)"/>
+
+      <text name="Exclusions.Error.NoType" value="Vælg en type."/>
+      <text name="Exclusions.Error.NoValue" value="Angiv en værdi."/>
+      <text name="Exclusions.Error.InvalidExtensionFormat" value="Ugyldigt filtypenavn format. Formatet er .xxx"/>
+      <text name="Exclusions.Error.InvalidOptions" value="Vælg en gyldig indstillinger værdi."/>
+
+      <text name="ExclusionErrorMessageText" value="Din søgning gav elementer, der enten blev udelukket eller forårsaget en fejl. &#xA;Du kan se disse elementer ved at dobbeltklikke på det tilknyttede statuslinjen emne i nederste højre hjørne. &#xA;&#xA;Du kan deaktivere denne besked i Indstillinger."/>
    </generic>
 </language>

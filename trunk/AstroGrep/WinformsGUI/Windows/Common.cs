@@ -36,6 +36,7 @@ namespace AstroGrep.Windows
    /// [Curtis_Beard]	   07/20/2006	ADD: Load/Save TextEditor array, 
    ///                                 Created legacy,registry,and constants classes
    /// [Curtis_Beard] 	   05/29/2007	ADD: property for help file location
+   /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
    /// </history>
 	public class Common
 	{
@@ -44,6 +45,7 @@ namespace AstroGrep.Windows
 
       /// <summary>AstroGrep Color</summary>
       public static System.Drawing.Color ASTROGREP_ORANGE = System.Drawing.Color.FromArgb(251, 127, 6);
+
       private static TextEditor[] TextEditors;
 
       /// <summary>
@@ -67,6 +69,7 @@ namespace AstroGrep.Windows
       /// [Curtis_Beard]	   06/13/2005	CHG: Used new cmd line arg specification
       /// [Curtis_Beard]	   07/20/2006	CHG: Run the text editor associated with the file's extension
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
+      /// [Curtis_Beard]      09/28/2012  CHG: 3553474, support multiple file types per editor
       /// </history>
       public static void EditFile(string path, int line, int column)
       {
@@ -81,12 +84,32 @@ namespace AstroGrep.Windows
             {
                foreach (TextEditor editor in TextEditors)
                {
-                  if (editor.FileType.IndexOf(file.Extension) > -1)
+                  // handle multiple types for one editor
+                  string[] types = new string[1] { editor.FileType };
+                  if (editor.FileType.Contains(Constants.TEXT_EDITOR_TYPE_SEPARATOR))
                   {
-                     // use this editor
-                     editorToUse = editor;
-                     break;
+                     types = editor.FileType.Split(Constants.TEXT_EDITOR_TYPE_SEPARATOR.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                   }
+
+                  // loop through all types defined for this editor
+                  foreach (string type in types)
+                  {
+                     string currentType = type;
+
+                     // add missing start . if file type has it and the user didn't add it.
+                     if (currentType != Constants.ALL_FILE_TYPES && !currentType.StartsWith(".") && file.Extension.StartsWith("."))
+                        currentType = string.Format(".{0}", currentType);
+
+                     if (currentType.IndexOf(file.Extension, StringComparison.InvariantCultureIgnoreCase) > -1)
+                     {
+                        // use this editor
+                        editorToUse = editor;
+                        break;
+                     }
+                  }
+
+                  if (editorToUse != null)
+                     break;
                }
 
                // try finding default for all types (*)
@@ -428,6 +451,34 @@ namespace AstroGrep.Windows
          catch {}
 
          return false;
+      }
+
+      /// <summary>
+      /// Converts a font to a string.
+      /// </summary>
+      /// <param name="font">Font</param>
+      /// <returns>font values as a string</returns>
+      /// <history>
+      /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// </history>
+      public static string ConvertFontToString(System.Drawing.Font font)
+      {
+         return string.Format("{0}{3}{1}{3}{2}", font.Name, font.Size.ToString(), font.Style.ToString(), Constants.FONT_SEPARATOR);
+      }
+
+      /// <summary>
+      /// Converts a string to a Font.
+      /// </summary>
+      /// <param name="font">font values as a string</param>
+      /// <returns>Font</returns>
+      /// <history>
+      /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// </history>
+      public static System.Drawing.Font ConvertStringToFont(string font)
+      {
+         string[] fontValues = Core.Common.SplitByString(font, Constants.FONT_SEPARATOR);
+
+         return new System.Drawing.Font(fontValues[0], float.Parse(fontValues[1]), (System.Drawing.FontStyle)Enum.Parse(typeof(System.Drawing.FontStyle), fontValues[2], true));
       }
       #endregion
 

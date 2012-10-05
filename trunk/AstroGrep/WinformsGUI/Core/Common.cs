@@ -29,6 +29,7 @@ namespace AstroGrep.Core
    /// <history>
    /// [Curtis_Beard]	   11/03/2006	Created
    /// [Curtis_Beard] 	   05/18/2007	ADD: StoreDataLocal variable
+   /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
    /// </history>
 	public class Common
 	{

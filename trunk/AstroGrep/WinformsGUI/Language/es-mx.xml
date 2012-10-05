@@ -15,14 +15,15 @@
       <control name="chkWholeWordOnly" value="&amp;Palabra entera" tooltip="Solamente palabras enteras del fósforo (no piezas de palabras)" />
       <control name="chkCaseSensitive" value="Cas&amp;o sensible" tooltip="La mayúscula y minúscula del fósforo pone letras exactamente" />
       <control name="chkRegularExpressions" value="&amp;Expresiones regulares" tooltip="Utilizar emparejar regular de la expresión" />
-      <control name="chkSkipHidden" value="Omitir archivos ocultos/Directorios" tooltip="Ignore files/directories marked as hidden" />
-      <control name="chkSkipSystem" value="Omitir archivos del sistema/Directorios" tooltip="Ignore files/directories marked as system" />
+      <control name="chkSkipHidden" value="Omitir archivos ocultos/Directorios" tooltip="Ignore ficheros o directorios marcados como ocultos" />
+      <control name="chkSkipSystem" value="Omitir archivos del sistema/Directorios" tooltip="Ignore ficheros o directorios marcados como sistema de" />
       <control name="lnkSearchOptions" value="Opciones de la búsqueda {0}" />
       <control name="picBrowse" tooltip="Hojear..." />
       <control name="label1" value="Después de modificar:" />
       <control name="label2" value="Antes de modificar:" />
       <control name="label3" value="Tamaño mínimo:" />
       <control name="label4" value="Tamaño máximo:" />
+      <control name="lnkExclusions" value="Exclusiones..." />
       <control name="lstFileNames">
          <menuitem index="0" value="copia" />
          <menuitem index="1" value="copiar el nombre" />
@@ -56,11 +57,18 @@
       <menu index="3" value="A&amp;yuda">
          <menuitem index="0" value="&amp;Sobre..." />
       </menu>
+
+      <!-- status bar items default state-->
+      <control name="sbTotalCountPanel" value="Total: 0"/>
+      <control name="sbFileCountPanel" value="Archivo: 0"/>
+      <control name="sbFilterCountPanel" value="Exclusiones: 0" tooltip="Haga doble clic para mostrar exclusiones."/>
+      <control name="sbErrorCountPanel" value="Error: 0" tooltip="Haga doble clic para mostrar errores."/>
    </screen>
    
    <screen name="frmAbout" value="Sobre {0}">
       <control name="lnkHomePage" value="{0} Home Page" />
       <control name="cmdOK" value="&amp;Autorización" />
+      <control name="lblVersionCheck" value="Comprobación de las actualizaciones..." />
    </screen>
    
    <screen name="frmAddEditTextEditor" value="Editores de textos">
@@ -73,6 +81,7 @@
       <control name="lblFileType" value="Tipo del archivo" />
       <control name="btnCancel" value="&amp;Cancelación" />
       <control name="btnOK" value="&amp;Autorización" />
+      <control name="lblMultiTypes" value="Tipos separadas con carácter |."/>
    </screen>
    
    <screen name="frmOptions" value="Opciones">
@@ -94,8 +103,6 @@
       <control name="tabGeneral" value="General" />
       <control name="tabTextEditors" value="Editores de textos" />
       <control name="LanguageGroup" value="Lengua"/>
-      <control name="ExtensionExclusionGroup" value="Excluir las extensiones de archivo"/>
-      <control name="btnRestoreDefaultExtensions" value="Restaurar las extensiones por defecto"/>
       <control name="tabPlugins" value="Plugins"/>
       <control name="chkDesktopShortcut" value="Ata&amp;jo de escritorio"/>
       <control name="chkStartMenuShortcut" value="Encender el atajo del &amp;menú"/>
@@ -104,6 +111,8 @@
       <control name="lblPluginDetailName" value="Nombre:"/>
       <control name="lblPluginDetailVersion" value="Versión:"/>
       <control name="lblPluginDetailAuthor" value="Autor:"/>
+      <control name="btnFindFont" value="&amp;Buscar fuente"/>
+      <control name="chkShowExclusionErrorMessage" value="Mostrar un mensaje cuando un &amp;rendimiento de búsqueda los artículos que son excluidos o se produce un error."/>
    </screen>
    
    <screen name="frmPrint" value="Impresión">
@@ -112,6 +121,32 @@
       <control name="cmdPageSetup" value="&amp;Disposición" />
       <control name="cmdPrint" value="&amp;Impresión" />
       <control name="cmdPreview" value="&amp;Muestra" />
+   </screen>
+
+   <screen name="frmExclusions" value="Exclusiones">
+      <control name="btnEdit" value="Correg&amp;ir..." />
+      <control name="btnDelete" value="&amp;Quitar" />
+      <control name="btnAdd" value="A&amp;gregar..." />
+      <control name="btnOK" value="&amp;Autorización" />
+      <control name="btnCancel" value="&amp;Cancelación" />
+      <control name="btnRestoreDefaults" value="&amp;Restaurar valores predeterminados" />
+   </screen>
+
+   <screen name="frmAddEditExclusions" value="Exclusiones">
+      <control name="lblType" value="tipo" />
+      <control name="lblOptions" value="Opciones" />
+      <control name="lblValue" value="valor" />
+      <control name="chkIgnoreCase" value="ignorar el asunto" />
+      <control name="btnOK" value="&amp;Autorización" />
+      <control name="btnCancel" value="&amp;Cancelación" />
+   </screen>
+
+   <screen name="frmCommandLine" value="AstroGrep">
+      <control name="btnOK" value="&amp;Autorización"/>
+   </screen>
+
+   <screen name="frmDisplayMessages" value="AstroGrep">
+      <control name="btnOK" value="&amp;Autorización"/>
    </screen>
    
    <generic>
@@ -140,6 +175,7 @@
       <text name="VerifyErrorNoStartPath" value="You must supply the path to begin the search."/>
       <text name="VerifyErrorInvalidStartPath" value="'{0}' is not a valid folder."/>
       <text name="VerifyErrorNoSearchText" value="You must supply text for which to search."/>
+      <text name="VerifyErrorInvalidRegEx" value="La expresión regular que ha proporcionado no es válido ({0}). Verifique por favor su expresión."/>
       <text name="VerifyErrorGeneric" value="Unable to validate specified parameters.  Please verify they are valid."/>
       
       <text name="SearchGenericError" value="Un error ocurrió buscando: {0}"/>
@@ -173,9 +209,42 @@
       <text name="ResultsColumnCount" value="Cuenta"/>
       <text name="ResultsColumnSize" value="Tamaño"/>
       
+      <text name="ResultsStatusTotalCount" value="Total: {0}"/>
+      <text name="ResultsStatusFileCount" value="Archivo: {0}"/>
+      <text name="ResultsStatusFilterCount" value="Exclusiones: {0}"/>
+      <text name="ResultsStatusErrorCount" value="Error: {0}"/>
+      
       <text name="PluginsColumnEnabled" value="Permitido"/>
       <text name="PluginsColumnName" value="Nombre"/>
       <text name="PluginsColumnExtensions" value="Extensiones"/>
+
+      <text name="Update.Current" value="{0} está al día ({1})"/>
+      <text name="Update.Latest" value="Descargar {0} actualización {1}"/>
+      <text name="Update.Error" value="Actualizar Error en la comprobación: {0}"/>
+
+      <text name="Exclusions.Type" value="tipo"/>
+      <text name="Exclusions.Value" value="valor"/>
+      <text name="Exclusions.Option" value="Opciones"/>
+
+      <text name="Exclusions.FileExtension" value="Extensión de archivo"/>
+      <text name="Exclusions.FileName" value="Nombre de archivo"/>
+      <text name="Exclusions.FilePath" value="Ruta del Archivo"/>
+      <text name="Exclusions.DirectoryName" value="Nombre de directorio"/>
+      <text name="Exclusions.DirectoryPath" value="Ruta del directorio"/>
+
+      <text name="Exclusions.None" value=""/>
+      <text name="Exclusions.Equals" value="Igual"/>
+      <text name="Exclusions.Contains" value="contiene"/>
+      <text name="Exclusions.StartsWith" value="empieza con"/>
+      <text name="Exclusions.EndsWith" value="Termina con"/>
+      <text name="Exclusions.IgnoreCase" value=" (ignorar mayúsculas)"/>
+
+      <text name="Exclusions.Error.NoType" value="Por favor, seleccione un tipo."/>
+      <text name="Exclusions.Error.NoValue" value="Por favor, introduzca un valor."/>
+      <text name="Exclusions.Error.InvalidExtensionFormat" value="Archivo no válido formato de extensión. El formato es .xxx"/>
+      <text name="Exclusions.Error.InvalidOptions" value="Por favor, seleccione un valor de las opciones válidas."/>
+
+      <text name="ExclusionErrorMessageText" value="Su búsqueda ha dado los artículos que fueron excluidos o causado un error. &#xA;Usted puede ver estos elementos haciendo doble clic en el elemento de barra de estado asociado en la esquina inferior derecha. &#xA;&#xA;Puede deshabilitar este mensaje en las Opciones."/>
    </generic>
    
 </language>

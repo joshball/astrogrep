@@ -32,6 +32,7 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]      01/27/2007  ADD: 1561584, skip hidden/system files and directories
    /// [Curtis_Beard]      04/25/2007  FIX: 1700029, always get correct config path
    /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
+   /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
    /// </history>
    public sealed class SearchSettings
    {
@@ -59,6 +60,7 @@ namespace AstroGrep.Core
       private string maxFileSizeType = "byte";
       private string modifiedStart = string.Empty;
       private string modifiedEnd = string.Empty;
+      private string exclusions = Constants.DefaultExclusions;
       #endregion
 
       /// <summary>
@@ -248,6 +250,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.modifiedEnd; }
          set { MySettings.modifiedEnd = value; }
+      }
+
+      /// <summary>
+      /// Search exlusions.
+      /// </summary>
+      static public string Exclusions
+      {
+         get { return MySettings.exclusions; }
+         set { MySettings.exclusions = value; }
       }
    }
 }

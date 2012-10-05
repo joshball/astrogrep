@@ -138,6 +138,11 @@
     <Compile Include="Plugin.MicrosoftWord\MicrosoftWordPlugin.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Windows\CommandLineProcessing.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -162,6 +167,30 @@
     <Compile Include="Windows\Forms\frmAddEditTextEditor.Designer.cs">
       <DependentUpon>frmAddEditTextEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Windows\Forms\frmAddEditExclusions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmAddEditExclusions.Designer.cs">
+      <DependentUpon>frmAddEditExclusions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Forms\frmCommandLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmCommandLine.Designer.cs">
+      <DependentUpon>frmCommandLine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Forms\frmDisplayMessages.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmDisplayMessages.Designer.cs">
+      <DependentUpon>frmDisplayMessages.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Forms\frmExclusions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmExclusions.Designer.cs">
+      <DependentUpon>frmExclusions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Forms\frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -183,6 +212,7 @@
     <Compile Include="Windows\Legacy.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Windows\ListViewImageManager.cs" />
     <Compile Include="Windows\ListViewItemComparer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -210,6 +240,11 @@
     <EmbeddedResource Include="Output\Output-fileNameOnly.html" />
     <EmbeddedResource Include="Output\Output.css" />
     <EmbeddedResource Include="Output\Output.html" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Controls\ColorButton.resx">
       <DependentUpon>ColorButton.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -220,6 +255,22 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmAddEditTextEditor.resx">
       <DependentUpon>frmAddEditTextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmAddEditExclusions.resx">
+      <DependentUpon>frmAddEditExclusions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmCommandLine.resx">
+      <DependentUpon>frmCommandLine.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmDisplayMessages.resx">
+      <DependentUpon>frmDisplayMessages.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmExclusions.resx">
+      <DependentUpon>frmExclusions.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmMain.resx">
