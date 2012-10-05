@@ -35,5 +35,10 @@ namespace libAstroGrep
       /// Maximum file size
       /// </summary>
       long FileSizeMax { get; }
+
+      /// <summary>
+      /// List of ExclusionItem objects to exclude certain files/folders.
+      /// </summary>
+      System.Collections.Generic.List<ExclusionItem> ExclusionItems { get; }
    }
 }

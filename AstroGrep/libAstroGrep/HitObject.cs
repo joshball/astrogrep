@@ -210,7 +210,7 @@ namespace libAstroGrep
       /// </history>
       public string RetrieveLine(int index)
       {
-         if (index > __lines.Count)
+         if (index >= __lines.Count)
             return string.Empty;
 
          return __lines[index];
@@ -226,7 +226,7 @@ namespace libAstroGrep
       /// </history>
       public int RetrieveLineNumber(int index)
       {
-         if (index > __lineNumbers.Count)
+         if (index >= __lineNumbers.Count)
             return 0;
 
          return __lineNumbers[index];
@@ -242,7 +242,7 @@ namespace libAstroGrep
       /// </history>
       public int RetrieveColumn(int index)
       {
-         if (index > __columns.Count)
+         if (index >= __columns.Count)
             return 0;
 
          return __columns[index];
