@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("AstroGrep Grep Utility")]
+[assembly: AssemblyTitle("AstroGrep")]
 [assembly: AssemblyDescription("This application and its source code are freely distributable.")]
 [assembly: AssemblyCompany("AstroComma Inc.")]
 [assembly: AssemblyProduct("AstroGrep")]
@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("4.2.4.0")]
+[assembly: AssemblyVersion("4.2.5.0")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

@@ -460,10 +460,11 @@ namespace AstroGrep.Windows
       /// <returns>font values as a string</returns>
       /// <history>
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]		10/22/2012	FIX: 36, use invariant culture to always have same float decimal separator
       /// </history>
       public static string ConvertFontToString(System.Drawing.Font font)
       {
-         return string.Format("{0}{3}{1}{3}{2}", font.Name, font.Size.ToString(), font.Style.ToString(), Constants.FONT_SEPARATOR);
+         return string.Format("{0}{3}{1}{3}{2}", font.Name, font.Size.ToString(System.Globalization.CultureInfo.InvariantCulture), font.Style.ToString(), Constants.FONT_SEPARATOR);
       }
 
       /// <summary>
@@ -473,12 +474,13 @@ namespace AstroGrep.Windows
       /// <returns>Font</returns>
       /// <history>
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]		10/22/2012	FIX: 36, use invariant culture to always have same float decimal separator
       /// </history>
       public static System.Drawing.Font ConvertStringToFont(string font)
       {
          string[] fontValues = Core.Common.SplitByString(font, Constants.FONT_SEPARATOR);
 
-         return new System.Drawing.Font(fontValues[0], float.Parse(fontValues[1]), (System.Drawing.FontStyle)Enum.Parse(typeof(System.Drawing.FontStyle), fontValues[2], true));
+         return new System.Drawing.Font(fontValues[0], float.Parse(fontValues[1], System.Globalization.CultureInfo.InvariantCulture), (System.Drawing.FontStyle)Enum.Parse(typeof(System.Drawing.FontStyle), fontValues[2], true));
       }
       #endregion
 

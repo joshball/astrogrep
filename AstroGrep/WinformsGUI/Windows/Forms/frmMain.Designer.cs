@@ -454,10 +454,11 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
 		 // 
          // lnkExclusions
          // 
-         this.lnkExclusions.ActiveLinkColor = System.Drawing.SystemColors.ActiveCaption;
+         this.lnkExclusions.ActiveLinkColor = System.Drawing.SystemColors.HotTrack;
          this.lnkExclusions.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.lnkExclusions.LinkColor = System.Drawing.SystemColors.ActiveCaption;
+         this.lnkExclusions.LinkColor = System.Drawing.SystemColors.HotTrack;
          this.lnkExclusions.Location = new System.Drawing.Point(5, 426);
+         this.lnkExclusions.LinkBehavior = LinkBehavior.AlwaysUnderline;
          this.lnkExclusions.Name = "lnkExclusions";
          this.lnkExclusions.Size = new System.Drawing.Size(150, 16);
          this.lnkExclusions.TabIndex = 24;
@@ -465,6 +466,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.lnkExclusions.Text = "Exclusions...";
          this.lnkExclusions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
          this.lnkExclusions.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkExclusions_LinkClicked);
+         this.lnkExclusions.BackColor = SystemColors.Window;
          // 
          // pnlMainSearch
          // 

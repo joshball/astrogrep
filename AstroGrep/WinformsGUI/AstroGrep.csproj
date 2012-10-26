@@ -138,11 +138,6 @@
     <Compile Include="Plugin.MicrosoftWord\MicrosoftWordPlugin.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Windows\CommandLineProcessing.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -240,11 +235,6 @@
     <EmbeddedResource Include="Output\Output-fileNameOnly.html" />
     <EmbeddedResource Include="Output\Output.css" />
     <EmbeddedResource Include="Output\Output.html" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Controls\ColorButton.resx">
       <DependentUpon>ColorButton.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -312,6 +302,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Mono\Bundle.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

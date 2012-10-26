@@ -48,7 +48,7 @@ namespace Plugin.MicrosoftWord
 		private object __WordSelection;
 
 		private const string PLUGIN_NAME = "Microsoft Word";
-		private const string PLUGIN_VERSION = "1.1.1";
+		private const string PLUGIN_VERSION = "1.1.2";
 		private const string PLUGIN_AUTHOR = "The AstroGrep Team";
 		private const string PLUGIN_DESCRIPTION = "Searches Microsoft Word documents for specified text.  Line numbers are shown as (Line,Page).  Currently doesn't support Regular Expressions or Context lines.";
 		private const string PLUGIN_EXTENSIONS = ".doc,.docx";
@@ -159,9 +159,6 @@ namespace Plugin.MicrosoftWord
 		{
 			get { return PLUGIN_EXTENSIONS; }
 		}
-
-
-	
 
 	    /// <summary>
 		/// Checks to see if the plugin is available on this system.
@@ -292,7 +289,7 @@ namespace Plugin.MicrosoftWord
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="file">FileInfo object</param>
-      /// <param name="searchSpec">ISearchSpec interface value</param>
+		/// <param name="searchSpec">ISearchSpec interface value</param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null if on error</returns>
 		/// <history>
@@ -310,7 +307,7 @@ namespace Plugin.MicrosoftWord
 		/// Searches the given file for the given search text.
 		/// </summary>
 		/// <param name="path">Fully qualified file path</param>
-      /// <param name="searchSpec">ISearchSpec interface value</param>
+		/// <param name="searchSpec">ISearchSpec interface value</param>
 		/// <param name="ex">Exception holder if error occurs</param>
 		/// <returns>Hitobject containing grep results, null on error</returns>
 		/// <history>
@@ -334,15 +331,15 @@ namespace Plugin.MicrosoftWord
 						int prevLine = 0;
 						int prevPage = 0;
 						string _spacer = new string(' ', MARGINSIZE);
-						string _contextSpacer = string.Empty;
+						//string _contextSpacer = string.Empty;
 
-                        if (searchSpec.ContextLines > 0)
-						{
-							_contextSpacer = new string(' ', MARGINSIZE);
-							_spacer = _contextSpacer.Substring(_contextSpacer.Length - MARGINSIZE - 2) + "> ";
-						}
-						else
-							_spacer = new string(' ', MARGINSIZE);
+                        //if (searchSpec.ContextLines > 0)
+						//{
+						//	_contextSpacer = new string(' ', MARGINSIZE);
+						//	_spacer = _contextSpacer.Substring(_contextSpacer.Length - MARGINSIZE - 2) + "> ";
+						//}
+						//else
+						//	_spacer = new string(' ', MARGINSIZE);
 
 						// Open a given Word document as readonly
 						object wordDocument = OpenDocument(path, true);
@@ -400,7 +397,7 @@ namespace Plugin.MicrosoftWord
 										_spacer = _spacer + new string(' ', 6 - _spacer.Length);
 									}
 									_spacer = _spacer + ") ";
-									_contextSpacer = "(" + new string(' ', _spacer.Length - 3) + ") ";
+									//_contextSpacer = "(" + new string(' ', _spacer.Length - 3) + ") ";
 								}
 
 								//  remove any odd characters from the text

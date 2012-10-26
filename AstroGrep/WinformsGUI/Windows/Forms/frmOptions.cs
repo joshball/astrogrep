@@ -89,6 +89,7 @@ namespace AstroGrep.Windows.Forms
       private Button btnFindFont;
       private CheckBox chkShowExclusionErrorMessage;
 
+      private CheckBox chkSaveSearchOptions;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -137,6 +138,7 @@ namespace AstroGrep.Windows.Forms
 		{
          this.tbcOptions = new System.Windows.Forms.TabControl();
          this.tabGeneral = new System.Windows.Forms.TabPage();
+         this.chkSaveSearchOptions = new System.Windows.Forms.CheckBox();
          this.ShortcutGroup = new System.Windows.Forms.GroupBox();
          this.chkStartMenuShortcut = new System.Windows.Forms.CheckBox();
          this.chkDesktopShortcut = new System.Windows.Forms.CheckBox();
@@ -214,6 +216,7 @@ namespace AstroGrep.Windows.Forms
          // 
          // tabGeneral
          // 
+         this.tabGeneral.Controls.Add(this.chkSaveSearchOptions);
          this.tabGeneral.Controls.Add(this.chkShowExclusionErrorMessage);
          this.tabGeneral.Controls.Add(this.ShortcutGroup);
          this.tabGeneral.Controls.Add(this.LanguageGroup);
@@ -225,6 +228,16 @@ namespace AstroGrep.Windows.Forms
          this.tabGeneral.TabIndex = 0;
          this.tabGeneral.Text = "General";
          this.tabGeneral.UseVisualStyleBackColor = true;
+         // 
+         // chkSaveSearchOptions
+         // 
+         this.chkSaveSearchOptions.AutoSize = true;
+         this.chkSaveSearchOptions.Location = new System.Drawing.Point(8, 190);
+         this.chkSaveSearchOptions.Name = "chkSaveSearchOptions";
+         this.chkSaveSearchOptions.Size = new System.Drawing.Size(160, 17);
+         this.chkSaveSearchOptions.TabIndex = 37;
+         this.chkSaveSearchOptions.Text = "Save search options on exit.";
+         this.chkSaveSearchOptions.UseVisualStyleBackColor = true;
          // 
          // ShortcutGroup
          // 
@@ -723,7 +736,7 @@ namespace AstroGrep.Windows.Forms
          // chkShowExclusionErrorMessage
          // 
          this.chkShowExclusionErrorMessage.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-         this.chkShowExclusionErrorMessage.Location = new System.Drawing.Point(8, 190);
+         this.chkShowExclusionErrorMessage.Location = new System.Drawing.Point(8, 213);
          this.chkShowExclusionErrorMessage.Name = "chkShowExclusionErrorMessage";
          this.chkShowExclusionErrorMessage.Size = new System.Drawing.Size(472, 35);
          this.chkShowExclusionErrorMessage.TabIndex = 36;
@@ -787,6 +800,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
       /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
       /// </history>
       private void frmOptions_Load(object sender, System.EventArgs e)
       {
@@ -796,6 +810,7 @@ namespace AstroGrep.Windows.Forms
          chkDesktopShortcut.Checked = Common.IsDesktopShortcut();
          chkStartMenuShortcut.Checked = Common.IsStartMenuShortcut();
          chkShowExclusionErrorMessage.Checked = Core.GeneralSettings.ShowExclusionErrorMessage;
+         chkSaveSearchOptions.Checked = Core.GeneralSettings.SaveSearchOptionsOnExit;
 
          // ColorButton init
          ForeColorButton.SelectedColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
@@ -805,7 +820,7 @@ namespace AstroGrep.Windows.Forms
 
          // font
          rtxtResultsPreview.Font = Common.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
-         lblCurrentFont.Text = string.Format("{0}, {1}, {2}", rtxtResultsPreview.Font.Name, rtxtResultsPreview.Font.SizeInPoints, rtxtResultsPreview.Font.Style.ToString());
+         DisplayFont(rtxtResultsPreview.Font, lblCurrentFont);
 
          tbcOptions.SelectedTab = tabGeneral;
 
@@ -1052,6 +1067,19 @@ namespace AstroGrep.Windows.Forms
 
          return types;
       }
+
+      /// <summary>
+      /// Displays the given font as a string on the given label.
+      /// </summary>
+      /// <param name="fnt">Font to display</param>
+      /// <param name="lbl">Label to show font</param>
+      /// <history>
+      /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
+      /// </history>
+      private void DisplayFont(Font fnt, Label lbl)
+      {
+         lbl.Text = string.Format("{0}, {1}, {2}", fnt.Name, fnt.SizeInPoints, fnt.Style.ToString());
+      }
       #endregion
 
       #region Control Events
@@ -1070,6 +1098,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
       /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
       /// </history>
       private void btnOK_Click(object sender, System.EventArgs e)
       {
@@ -1081,6 +1110,7 @@ namespace AstroGrep.Windows.Forms
          Core.GeneralSettings.ResultsBackColor = Common.ConvertColorToString(btnResultsWindowBackColor.SelectedColor);
          Core.GeneralSettings.ResultsFont = Common.ConvertFontToString(rtxtResultsPreview.Font);
          Core.GeneralSettings.ShowExclusionErrorMessage = chkShowExclusionErrorMessage.Checked;
+         Core.GeneralSettings.SaveSearchOptionsOnExit = chkSaveSearchOptions.Checked;
 
          // Only load new language on a change
 			LanguageItem item = (LanguageItem)cboLanguage.SelectedItem;
@@ -1270,22 +1300,12 @@ namespace AstroGrep.Windows.Forms
             }
          }
       }
-
-      ///// <summary>
-      ///// Set the file extension exclude list to the default values.
-      ///// </summary>
-      ///// <param name="sender">system parameter</param>
-      ///// <param name="e">system parameter</param>
-      //private void btnRestoreDefaultExtensions_Click(object sender, EventArgs e)
-      //{
-      //   txtExcludeList.Text = Constants.DEFAULT_EXTENSION_EXCLUDE_LIST;
-      //}
-
+      
       /// <summary>
-      /// 
+      /// Show font selection dialog.
       /// </summary>
-      /// <param name="sender"></param>
-      /// <param name="e"></param>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
       /// </history>
@@ -1302,7 +1322,7 @@ namespace AstroGrep.Windows.Forms
          var result = dlg.ShowDialog(this);
          if (result == DialogResult.OK)
          {
-            lblCurrentFont.Text = string.Format("{0}, {1}, {2}", dlg.Font.Name, dlg.Font.SizeInPoints, dlg.Font.Style.ToString());
+            DisplayFont(dlg.Font, lblCurrentFont);
             rtxtResultsPreview.Font = dlg.Font;
          }
       }

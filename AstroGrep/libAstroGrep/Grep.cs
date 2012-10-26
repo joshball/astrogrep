@@ -275,6 +275,7 @@ namespace libAstroGrep
       /// [Ed_Jakubowski]     05/20/2009  ADD: When a blank searchText is given only list files
       /// [Andrew_Radford]    13/08/2009  CHG: Remove searchtext param
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   10/10/2012	CHG: 3131609, signal when directories are filtered out due to system/hidden flag
       /// </history>
       private void Execute(DirectoryInfo sourceDirectory, string sourceDirectoryFilter, string sourceFileFilter)
       {
@@ -350,9 +351,16 @@ namespace libAstroGrep
                try
                {
                   if (FileFilterSpec.SkipSystemFiles && (sourceSubDirectory.Attributes & FileAttributes.System) == FileAttributes.System)
+                  {
+                     OnDirectoryFiltered(sourceSubDirectory, "System");
                      continue;
+                  }
+                  
                   if (FileFilterSpec.SkipHiddenFiles && (sourceSubDirectory.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                  {
+                     OnDirectoryFiltered(sourceSubDirectory, "Hidden");
                      continue;
+                  }
 
                   Execute(sourceSubDirectory, sourceDirectoryFilter, sourceFileFilter);
                }
@@ -450,6 +458,8 @@ namespace libAstroGrep
       /// [Curtis_Beard]		05/18/2006	FIX: 1723815, use correct whole word matching regex
       /// [Curtis_Beard]		06/26/2007	FIX: correctly detect plugin extension support
       /// [Curtis_Beard]		06/26/2007	FIX: 1779270, increase array size holding context lines
+      /// [Curtis_Beard]		10/09/2012	FIX: don't overwrite position when getting context lines
+      /// [Curtis_Beard]		10/12/2012	FIX: get correct position when using whole word option
       /// </history>
       private void SearchFile(FileInfo file, string searchText)
       {
@@ -474,7 +484,8 @@ namespace libAstroGrep
 
          try
          {
-            // Process plugins
+            #region Plugin Processing
+
             if (Plugins != null)
             {
                for (int i = 0; i < Plugins.Count; i++)
@@ -493,7 +504,13 @@ namespace libAstroGrep
 
                      // load plugin and perform grep
                      if (Plugins[i].Plugin.Load())
+                     {
                         _grepHit = Plugins[i].Plugin.Grep(file, SearchSpec, ref pluginEx);
+                     }
+                     else
+                     {
+                        OnSearchError(file, new Exception(string.Format("Plugin {0} failed to load.", Plugins[i].Plugin.Name)));
+                     }
 
                      Plugins[i].Plugin.Unload();
 
@@ -534,6 +551,7 @@ namespace libAstroGrep
                   }
                }
             }
+            #endregion
 
             _stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             _reader = new StreamReader(_stream, System.Text.Encoding.Default);
@@ -597,7 +615,7 @@ namespace libAstroGrep
                   else
                   {
                      if (SearchSpec.UseCaseSensitivity)
-
+                     {
                         // Need to escape these characters in SearchText:
                         // < $ + * [ { ( ) .
                         // with a preceeding \
@@ -606,12 +624,13 @@ namespace libAstroGrep
                         if (SearchSpec.UseWholeWordMatching)
                         {
                            _regularExp = new Regex("\\b" + searchText + "\\b");
-                           if (_regularExp.IsMatch(textLine))
+                           Match mtc = _regularExp.Match(textLine);
+                           if (mtc != null && mtc.Success)
                            {
                               if (SearchSpec.UseNegation)
                                  _hitOccurred = true;
 
-                              _posInStr = 1;
+                              _posInStr = mtc.Index;
                            }
                            else
                               _posInStr = -1;
@@ -623,18 +642,20 @@ namespace libAstroGrep
                            if (SearchSpec.UseNegation && _posInStr > -1)
                               _hitOccurred = true;
                         }
+                     }
                      else
                      {
                         // If we are looking for whole worlds only, perform the check.
                         if (SearchSpec.UseWholeWordMatching)
                         {
                            _regularExp = new Regex("\\b" + searchText + "\\b", RegexOptions.IgnoreCase);
-                           if (_regularExp.IsMatch(textLine))
+                           Match mtc = _regularExp.Match(textLine);
+                           if (mtc != null && mtc.Success)
                            {
                               if (SearchSpec.UseNegation)
                                  _hitOccurred = true;
 
-                              _posInStr = 1;
+                              _posInStr = mtc.Index;
                            }
                            else
                               _posInStr = -1;
@@ -700,7 +721,8 @@ namespace libAstroGrep
                         }
 
                         // Display preceeding n context lines before the hit.
-                        for (_posInStr = SearchSpec.ContextLines; _posInStr >= 1; _posInStr--)
+                        int tempPosInStr = _posInStr;
+                        for (tempPosInStr = SearchSpec.ContextLines; tempPosInStr >= 1; tempPosInStr--)
                         {
                            _contextIndex = _contextIndex + 1;
                            if (_contextIndex > SearchSpec.ContextLines)
@@ -708,10 +730,10 @@ namespace libAstroGrep
 
                            // If there is a match in the first one or two lines,
                            // the entire preceeding context may not be available.
-                           if (_lineNumber > _posInStr)
+                           if (_lineNumber > tempPosInStr)
                            {
                               // Add the context line.
-                              int _pos = _grepHit.Add(_contextSpacer + _context[_contextIndex] + Environment.NewLine, _lineNumber - _posInStr);
+                              int _pos = _grepHit.Add(_contextSpacer + _context[_contextIndex] + Environment.NewLine, _lineNumber - tempPosInStr);
                               OnLineHit(_grepHit, _pos);
                            }
                         }
@@ -732,7 +754,9 @@ namespace libAstroGrep
                      int _index = _grepHit.Add(_spacer + textLine + Environment.NewLine, _lineNumber, _posInStr);
 
                      if (SearchSpec.UseRegularExpressions)
+                     {
                         _grepHit.SetHitCount(_regularExpCol.Count);
+                     }
                      else
                      {
                         //determine number of hits
@@ -909,7 +933,7 @@ namespace libAstroGrep
       /// <history>
       /// [Curtis_Beard]		09/05/2007	Created
       /// </history>
-      static public bool IsInList(string value, string list, char separator)
+      static private bool IsInList(string value, string list, char separator)
       {
          string[] items = list.ToLower().Split(separator);
          value = value.ToLower();

@@ -113,6 +113,7 @@
       <control name="lblPluginDetailAuthor" value="Author:"/>
       <control name="btnFindFont" value="&amp;Find Font"/>
       <control name="chkShowExclusionErrorMessage" value="Show a &amp;prompt when a search yields items being excluded or an error occurs."/>
+      <control name="chkSaveSearchOptions" value="Save search options on exit."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -220,7 +221,7 @@
 
       <text name="Update.Current" value="{0} is up to date ({1})"/>
       <text name="Update.Latest" value="Download {0} update {1}"/>
-      <text name="Update.Error" value="Update check failed: {0}"/>
+      <text name="Update.Error" value="Update check failed"/>
 
       <text name="Exclusions.Type" value="Type"/>
       <text name="Exclusions.Value" value="Value"/>
