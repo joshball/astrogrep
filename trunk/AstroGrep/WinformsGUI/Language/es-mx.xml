@@ -113,6 +113,7 @@
       <control name="lblPluginDetailAuthor" value="Autor:"/>
       <control name="btnFindFont" value="&amp;Buscar fuente"/>
       <control name="chkShowExclusionErrorMessage" value="Mostrar un mensaje cuando un &amp;rendimiento de búsqueda los artículos que son excluidos o se produce un error."/>
+      <control name="chkSaveSearchOptions" value="Guardar las opciones de búsqueda a la salida."/>
    </screen>
    
    <screen name="frmPrint" value="Impresión">
@@ -220,7 +221,7 @@
 
       <text name="Update.Current" value="{0} está al día ({1})"/>
       <text name="Update.Latest" value="Descargar {0} actualización {1}"/>
-      <text name="Update.Error" value="Actualizar Error en la comprobación: {0}"/>
+      <text name="Update.Error" value="Actualizar Error en la comprobación"/>
 
       <text name="Exclusions.Type" value="tipo"/>
       <text name="Exclusions.Value" value="valor"/>

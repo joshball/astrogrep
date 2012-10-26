@@ -113,6 +113,7 @@
       <control name="lblPluginDetailAuthor" value="Forfatter:" />
       <control name="btnFindFont" value="&amp;Find skrift"/>
       <control name="chkShowExclusionErrorMessage" value="&amp;Vis en meddelelse, når en søgning udbytter poster bliver udelukket eller der opstår en fejl."/>
+      <control name="chkSaveSearchOptions" value="Gem søgeindstillinger på exit."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -220,7 +221,7 @@
 
       <text name="Update.Current" value="{0} er opdateret ({1})"/>
       <text name="Update.Latest" value="Hent {0} opdatering {1}"/>
-      <text name="Update.Error" value="Opdater mislykkedes: {0}"/>
+      <text name="Update.Error" value="Opdater mislykkedes"/>
 
       <text name="Exclusions.Type" value="typen"/>
       <text name="Exclusions.Value" value="værdi"/>

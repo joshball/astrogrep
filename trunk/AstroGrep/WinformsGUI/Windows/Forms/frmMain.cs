@@ -162,8 +162,6 @@ namespace AstroGrep.Windows.Forms
 
          // Load language
          //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
-         //Legacy.ConvertLanguageValue();
-         //Language.Load(AstroGrep.Core.GeneralSettings.Language);
          Language.ProcessForm(this, this.toolTip1);
 
          // set member to hold language specified text
@@ -226,10 +224,17 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   01/11/2005	.Net Conversion
       /// [Curtis_Beard]	   10/11/2006	CHG: Use common function to remove Browse..., call SaveSettings
       /// [Curtis_Beard]	   11/22/2006	CHG: Remove use of browse in combobox
+      /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
       /// </history>
       private void frmMain_Closed(object sender, EventArgs e)
       {
          SaveSettings();
+
+         if (Core.GeneralSettings.SaveSearchOptionsOnExit)
+         {
+            SaveSearchSettings();
+         }
+
          Application.Exit();
       }
       #endregion
@@ -583,7 +588,7 @@ namespace AstroGrep.Windows.Forms
             // Retrieve the filename
             string path = hit.FilePath;
 
-            // Open the default editor.
+            // open the default editor
             Common.EditFile(path, hit.RetrieveLineNumber(0), hit.RetrieveColumn(0));
          }
       }
@@ -781,7 +786,9 @@ namespace AstroGrep.Windows.Forms
       {
          //  Only load up to the desired number of paths.
          if (AstroGrep.Core.GeneralSettings.MaximumMRUPaths < 0 || AstroGrep.Core.GeneralSettings.MaximumMRUPaths > Constants.MAX_STORED_PATHS)
+         {
             AstroGrep.Core.GeneralSettings.MaximumMRUPaths = Constants.MAX_STORED_PATHS;
+         }
 
          LoadComboBoxEntry(cboFilePath, AstroGrep.Core.GeneralSettings.SearchStarts);
          LoadComboBoxEntry(cboFileName, AstroGrep.Core.GeneralSettings.SearchFilters);
@@ -789,7 +796,9 @@ namespace AstroGrep.Windows.Forms
 
          // Path
          if (cboFilePath.Items.Count > 0 && cboFilePath.Items.Count != 1)
+         {
             cboFilePath.SelectedIndex = 0;
+         }
 
          // Filter
          if (cboFileName.Items.Count == 0)
@@ -801,9 +810,11 @@ namespace AstroGrep.Windows.Forms
 
          // Search
          if (cboSearchForText.Items.Count > 0)
+         {
             cboSearchForText.SelectedIndex = 0;
+         }
 
-         // Result Window Colors
+         // Results Window
          txtHits.ForeColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
          txtHits.BackColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
          txtHits.Font = Common.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
@@ -1069,9 +1080,6 @@ namespace AstroGrep.Windows.Forms
 
          Core.GeneralSettings.ShowSearchOptions = __OptionsShow;
       }
-
-
-
 
       /// <summary>
       /// Sets the file list's columns' text to the correct language.
@@ -1889,7 +1897,7 @@ namespace AstroGrep.Windows.Forms
             path = hit.FilePath;
 
             // open the default editor
-            Common.EditFile(path, 1, 1);
+            Common.EditFile(path, hit.RetrieveLineNumber(0), hit.RetrieveColumn(0));
          }
       }
 

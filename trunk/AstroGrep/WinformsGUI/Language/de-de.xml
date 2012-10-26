@@ -113,6 +113,7 @@
       <control name="lblPluginDetailAuthor" value="Author:"/>
       <control name="btnFindFont" value="&amp;Schriftart suchen"/>
       <control name="chkShowExclusionErrorMessage" value="&amp;Zeigen Sie eine Eingabeaufforderung, wenn eine Suche liefert Produkte ausgeschlossen oder ein Fehler auftritt."/>
+      <control name="chkSaveSearchOptions" value="Suche speichern Optionen auf Exit."/>
    </screen>
 
    <screen name="frmPrint" value="Drucken">
@@ -220,7 +221,7 @@
 
       <text name="Update.Current" value="{0} ist auf dem neuesten Stand ({1})"/>
       <text name="Update.Latest" value="Laden Sie {0} aktualisieren {1}"/>
-      <text name="Update.Error" value="Aktualisieren Sie überprüfen gescheitert: {0}"/>
+      <text name="Update.Error" value="Aktualisieren Sie überprüfen gescheitert"/>
 
       <text name="Exclusions.Type" value="Typ"/>
       <text name="Exclusions.Value" value="Wert"/>

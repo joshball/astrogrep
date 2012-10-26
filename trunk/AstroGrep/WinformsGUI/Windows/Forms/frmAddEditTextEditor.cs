@@ -195,7 +195,7 @@ namespace AstroGrep.Windows.Forms
          {
             foreach (string fileType in ExistingFileTypes)
             {
-               if (fileType.Equals(txtFileType.Text))
+               if (fileType.ToLower().Equals(txtFileType.Text.ToLower()))
                {
                   exists = true;
                   break;

@@ -227,9 +227,9 @@ namespace AstroGrep.Windows.Forms
                }
             }
          }
-         catch (Exception ex)
+         catch
          {
-            UpdateMessage(string.Format(Language.GetGenericText("Update.Error"), ex.Message), string.Empty);
+            UpdateMessage(Language.GetGenericText("Update.Error"), string.Empty);
          }
       }
 

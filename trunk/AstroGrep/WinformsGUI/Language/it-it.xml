@@ -116,6 +116,7 @@
       <control name="lblPluginDetailAuthor" value="Autore:"/>
       <control name="btnFindFont" value="&amp;Trova font"/>
       <control name="chkShowExclusionErrorMessage" value="Mostra un messaggio &amp;quando un elementi di ricerca rese essere esclusi o si verifica un errore."/>
+      <control name="chkSaveSearchOptions" value="Salva le opzioni di ricerca in uscita."/>
    </screen>
    
    <screen name="frmPrint" value="Stampa">
@@ -226,7 +227,7 @@ Definire un editor di testo in Strumenti->Opzioni"/>
 
       <text name="Update.Current" value="{0} è aggiornato ({1})"/>
       <text name="Update.Latest" value="Scarica {0} aggiornamento {1}"/>
-      <text name="Update.Error" value="Aggiornamento non riuscito: {0}"/>
+      <text name="Update.Error" value="Aggiornamento non riuscito"/>
 
       <text name="Exclusions.Type" value="tipo"/>
       <text name="Exclusions.Value" value="valore"/>

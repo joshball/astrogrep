@@ -38,6 +38,7 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions, empty out exclude list to use search options value instead
    /// [Curtis_Beard]	   10/05/2012	ADD: 1741935, option to show/hide exclusion/error dialog message to user
+   /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
    /// </history>
    public sealed class GeneralSettings
    {
@@ -55,8 +56,8 @@ namespace AstroGrep.Core
 
       private string resultsForeColor = string.Format("0{0}0{0}0{0}255", Constants.COLOR_SEPARATOR);
       private string resultsBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
-      private string matchForeColor = string.Format("251{0}127{0}6{0}255", Constants.COLOR_SEPARATOR);
-      private string matchBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
+      private string matchForeColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
+      private string matchBackColor = string.Format("251{0}127{0}6{0}255", Constants.COLOR_SEPARATOR);
       private string resultsFont = string.Format("Lucida Console{0}9.75{0}Regular", Constants.FONT_SEPARATOR);
       private int mruListCount = 15;
 
@@ -86,6 +87,7 @@ namespace AstroGrep.Core
       private bool showSearchOptions = false;
 
       private bool showExclusionErrorMessage = true;
+      private bool saveSearchOptionsOnExit = true;
       #endregion
       
       /// <summary>
@@ -371,6 +373,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.showExclusionErrorMessage; }
          set { MySettings.showExclusionErrorMessage = value; }
+      }
+
+      /// <summary>
+      /// Gets/sets whether to save search options on exit.
+      /// </summary>
+      static public bool SaveSearchOptionsOnExit
+      {
+         get { return MySettings.saveSearchOptionsOnExit; }
+         set { MySettings.saveSearchOptionsOnExit = value; }
       }
    }
 }
