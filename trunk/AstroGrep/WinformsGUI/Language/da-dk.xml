@@ -5,7 +5,6 @@
       <control name="lblSearchText" value="Søge Tekst" />
       <control name="lblFileTypes" value="Fil Typer" />
       <control name="btnCancel" value="&amp;Afbryd" />
-      <control name="btnSearch" value="&amp;Søg" />
       <control name="lblSearchPath" value="Søge Sti" />
       <control name="lblContextLines" value="Kontekst Linier" tooltip="Vis linerne over og under fundne match" />
       <control name="chkLineNumbers" value="&amp;Linienumre" tooltip="Vis linienumre ved hvert match" />
@@ -34,6 +33,9 @@
          <menuitem index="6" value="åben vejviser" />
          <menuitem index="7" value="-" />
          <menuitem index="8" value="slet element" />
+      </control>
+      <control name="btnSearch" value="&amp;Søg">
+         <menuitem index="0" value="Søg i resultater"/>
       </control>
       
       <menu index="0" value="&amp;Filer">
@@ -82,6 +84,7 @@
       <control name="btnCancel" value="&amp;Annuller" />
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Separate typer med | karakter."/>
+      <control name="lblTabSize" value="fanen størrelse" />
    </screen>
    
    <screen name="frmOptions" value="Indstillinger">
@@ -111,9 +114,11 @@
       <control name="lblPluginDetailName" value="Navn:" />
       <control name="lblPluginDetailVersion" value="Version:" />
       <control name="lblPluginDetailAuthor" value="Forfatter:" />
-      <control name="btnFindFont" value="&amp;Find skrift"/>
+      <control name="btnFindFont" value="&amp;Find skrift..."/>
       <control name="chkShowExclusionErrorMessage" value="&amp;Vis en meddelelse, når en søgning udbytter poster bliver udelukket eller der opstår en fejl."/>
       <control name="chkSaveSearchOptions" value="Gem søgeindstillinger på exit."/>
+      <control name="grpFileList" value="Filliste" />
+      <control name="btnFileFindFont" value="Find skrift..."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -185,6 +190,7 @@
       <text name="SearchFinished" value="Søgning Afsluttet" />
       <text name="SearchStarted" value="Søgning begonnen" />
       <text name="SearchSearching" value="Søger {0}" />
+      <text name="SearchSearchingByPlugin" value="Plugin {0} blev anvendt til at søge i filen." />
       <text name="SearchExplorerItem" value="Søger med {0}..." />
       
       <text name="ResultsPreviewText" value="(21)  Eksempel på et resultat - linie og, søgematch, vises" />
@@ -201,6 +207,7 @@
       <text name="TextEditorsColumnFileType" value="Fil Type" />
       <text name="TextEditorsColumnLocation" value="Teksteditor" />
       <text name="TextEditorsColumnCmdLine" value="Kommandolinie" />
+      <text name="TextEditorsColumnTabSize" value="fanen størrelse"/>
       <text name="TextEditorsErrorNoEditor" value="Venligst definere en tekst editor." />
       <text name="TextEditorsErrorFileTypeExists" value="Filtypen findes allerede. Prøv venligst igen." />
       
@@ -214,6 +221,9 @@
       <text name="ResultsStatusFileCount" value="Fil: {0}"/>
       <text name="ResultsStatusFilterCount" value="Udelukkelser: {0}"/>
       <text name="ResultsStatusErrorCount" value="Fejl: {0}"/>
+
+      <text name="ResultsContextMenu.Copy" value="Kopiér"/>
+      <text name="ResultsContextMenu.SelectAll" value="Vælg alt"/>
       
       <text name="PluginsColumnEnabled" value="I kraft" />
       <text name="PluginsColumnName" value="Navn" />

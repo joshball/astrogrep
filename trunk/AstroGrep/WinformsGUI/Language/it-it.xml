@@ -5,7 +5,6 @@
       <control name="lblSearchText" value="Testo di ricerca" />
       <control name="lblFileTypes" value="Tipi di file" />
       <control name="btnCancel" value="&amp;Annulla" />
-      <control name="btnSearch" value="&amp;Cerca" />
       <control name="lblSearchPath" value="Percorso di ricerca" />
       <control name="lblContextLines" value="Righe di contesto" tooltip="Numero di righe da visualizzare sopra e sotto la parola trovata" />
       <control name="chkLineNumbers" value="&amp;Numero riga" tooltip="Visualizza il numero di riga prima di ogni corripondenza" />
@@ -34,6 +33,9 @@
          <menuitem index="6" value="elenco aperto" />
          <menuitem index="7" value="-" />
          <menuitem index="8" value="cancellare voce" />
+      </control>
+      <control name="btnSearch" value="&amp;Cerca">
+         <menuitem index="0" value="Cerca nei risultati" />
       </control>
       
       <menu index="0" value="&amp;File">
@@ -85,6 +87,7 @@
       <control name="btnCancel" value="&amp;Annulla" />
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Tipi separate con | carattere."/>
+      <control name="lblTabSize" value="scheda Dimensioni" />
    </screen>
    
    <screen name="frmOptions" value="Opzioni">
@@ -114,9 +117,11 @@
       <control name="lblPluginDetailName" value="Nome:"/>
       <control name="lblPluginDetailVersion" value="Versione:"/>
       <control name="lblPluginDetailAuthor" value="Autore:"/>
-      <control name="btnFindFont" value="&amp;Trova font"/>
+      <control name="btnFindFont" value="&amp;Trova font..."/>
       <control name="chkShowExclusionErrorMessage" value="Mostra un messaggio &amp;quando un elementi di ricerca rese essere esclusi o si verifica un errore."/>
       <control name="chkSaveSearchOptions" value="Salva le opzioni di ricerca in uscita."/>
+      <control name="grpFileList" value="Elenco dei file" />
+      <control name="btnFileFindFont" value="Trova font..."/>
    </screen>
    
    <screen name="frmPrint" value="Stampa">
@@ -188,6 +193,7 @@
       <text name="SearchFinished" value="Ricerca terminata"/>
       <text name="SearchStarted" value="Ricerca ha cominciato"/>
       <text name="SearchSearching" value="Ricerca {0}"/>
+      <text name="SearchSearchingByPlugin" value="Plugin {0} è stato utilizzato per cercare il file." />
       <text name="SearchExplorerItem" value="Ricerca con {0}..."/>
       
       <text name="ResultsPreviewText" value="(21)  Esempio di visualizzazione della riga e della corrispondenza trovata"/>
@@ -207,6 +213,7 @@ Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="TextEditorsColumnFileType" value="Tipo file"/>
       <text name="TextEditorsColumnLocation" value="Editor di testo"/>
       <text name="TextEditorsColumnCmdLine" value="Riga di comando"/>
+      <text name="TextEditorsColumnTabSize" value="scheda Dimensioni"/>
       <text name="TextEditorsErrorNoEditor" value="Si prega di definire un editor di testo."/>
       <text name="TextEditorsErrorFileTypeExists" value="Il tipo di file esiste già. Si prega di riprovare."/>
       
@@ -220,6 +227,9 @@ Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="ResultsStatusFileCount" value="Lima: {0}"/>
       <text name="ResultsStatusFilterCount" value="Esclusioni: {0}"/>
       <text name="ResultsStatusErrorCount" value="Errore: {0}"/>
+
+      <text name="ResultsContextMenu.Copy" value="Copiare"/>
+      <text name="ResultsContextMenu.SelectAll" value="Seleziona tutto"/>
       
       <text name="PluginsColumnEnabled" value="Attivato"/>
       <text name="PluginsColumnName" value="Nome"/>

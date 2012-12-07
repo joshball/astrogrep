@@ -5,7 +5,6 @@
       <control name="lblSearchText" value="Search Text" />
       <control name="lblFileTypes" value="File Types" />
       <control name="btnCancel" value="&amp;Cancel" />
-      <control name="btnSearch" value="&amp;Search" />
       <control name="lblSearchPath" value="Search Path" />
       <control name="lblContextLines" value="Context Lines" tooltip="Show lines above and below the word matched" />
       <control name="chkLineNumbers" value="&amp;Line Numbers" tooltip="Include line numbers before each match" />
@@ -34,6 +33,9 @@
          <menuitem index="6" value="Open Directory" />
          <menuitem index="7" value="-" />
          <menuitem index="8" value="Delete Item" />
+      </control>
+      <control name="btnSearch" value="&amp;Search">
+         <menuitem index="0" value="Search in results"/>
       </control>
 
       <menu index="0" value="&amp;File">
@@ -82,6 +84,7 @@
       <control name="btnCancel" value="&amp;Cancel" />
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Separate types with | character."/>
+      <control name="lblTabSize" value="Tab Size" />
    </screen>
    
    <screen name="frmOptions" value="Options">
@@ -111,9 +114,11 @@
       <control name="lblPluginDetailName" value="Name:"/>
       <control name="lblPluginDetailVersion" value="Version:"/>
       <control name="lblPluginDetailAuthor" value="Author:"/>
-      <control name="btnFindFont" value="&amp;Find Font"/>
+      <control name="btnFindFont" value="&amp;Find Font..."/>
       <control name="chkShowExclusionErrorMessage" value="Show a &amp;prompt when a search yields items being excluded or an error occurs."/>
       <control name="chkSaveSearchOptions" value="Save search options on exit."/>
+      <control name="grpFileList" value="File List" />
+      <control name="btnFileFindFont" value="Find Font..."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -185,6 +190,7 @@
       <text name="SearchFinished" value="Search Finished"/>
       <text name="SearchStarted" value="Search Started"/>
       <text name="SearchSearching" value="Searching {0}"/>
+      <text name="SearchSearchingByPlugin" value="Plugin {0} was used to search the file." />
       <text name="SearchExplorerItem" value="Search using {0}..."/>
       
       <text name="ResultsPreviewText" value="(21)  Example results line and, match, displayed"/>
@@ -201,6 +207,7 @@
       <text name="TextEditorsColumnFileType" value="File Type"/>
       <text name="TextEditorsColumnLocation" value="Text Editor"/>
       <text name="TextEditorsColumnCmdLine" value="Command Line"/>
+      <text name="TextEditorsColumnTabSize" value="Tab Size"/>
       <text name="TextEditorsErrorNoEditor" value="Please define a text editor."/>
       <text name="TextEditorsErrorFileTypeExists" value="The file type already exists.  Please try again."/>
       
@@ -214,6 +221,9 @@
       <text name="ResultsStatusFileCount" value="File: {0}"/>
       <text name="ResultsStatusFilterCount" value="Exclusions: {0}"/>
       <text name="ResultsStatusErrorCount" value="Error: {0}"/>
+
+      <text name="ResultsContextMenu.Copy" value="Copy"/>
+      <text name="ResultsContextMenu.SelectAll" value="Select All"/>
       
       <text name="PluginsColumnEnabled" value="Enabled"/>
       <text name="PluginsColumnName" value="Name"/>

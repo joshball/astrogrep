@@ -113,9 +113,11 @@
     <Compile Include="Core\Constants.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\Convertors.cs" />
     <Compile Include="Core\GeneralSettings.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\LogItem.cs" />
     <Compile Include="Core\PluginManager.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -128,26 +130,31 @@
     <Compile Include="Core\SettingsIO.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\Shortcuts.cs" />
     <Compile Include="Core\TextEditor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\TextEditors.cs" />
     <Compile Include="Output\HitListExport.cs" />
     <Compile Include="Output\HTMLHelper.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Output\JSONHelper.cs" />
+    <Compile Include="Plugin.IFilter\IFilter.Win32.cs" />
+    <Compile Include="Plugin.IFilter\IFilterPlugin.cs" />
     <Compile Include="Plugin.MicrosoftWord\MicrosoftWordPlugin.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Windows\CommandLineProcessing.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Windows\Common.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Windows\Controls\ColorButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Windows\Controls\PictureButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\SplitButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Windows\Forms\frmAbout.cs">
@@ -185,6 +192,12 @@
     </Compile>
     <Compile Include="Windows\Forms\frmExclusions.Designer.cs">
       <DependentUpon>frmExclusions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Forms\frmLogDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmLogDisplay.Designer.cs">
+      <DependentUpon>frmLogDisplay.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\Forms\frmMain.cs">
       <SubType>Form</SubType>
@@ -261,6 +274,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmExclusions.resx">
       <DependentUpon>frmExclusions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmLogDisplay.resx">
+      <DependentUpon>frmLogDisplay.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmMain.resx">

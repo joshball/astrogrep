@@ -57,6 +57,8 @@ namespace AstroGrep.Windows.Forms
          InitializeComponent();
 
          exclusionItems = items;
+
+         API.ListViewExtensions.SetTheme(lstExclusions);
       }
 
       /// <summary>

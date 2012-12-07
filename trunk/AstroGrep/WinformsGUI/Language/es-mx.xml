@@ -5,7 +5,6 @@
       <control name="lblSearchText" value="Texto de la búsqueda" />
       <control name="lblFileTypes" value="Tipos del archivo" />
       <control name="btnCancel" value="&amp;Cancelación" />
-      <control name="btnSearch" value="&amp;Búsqueda" />
       <control name="lblSearchPath" value="Camino de búsqueda en un fichero" />
       <control name="lblContextLines" value="Líneas del contexto" tooltip="Demostrar las líneas sobre y debajo de la palabra emparejada" />
       <control name="chkLineNumbers" value="&amp;Línea números" tooltip="Incluir la línea números antes de cada fósforo" />
@@ -34,6 +33,9 @@
          <menuitem index="6" value="directorio abierto" />
          <menuitem index="7" value="-" />
          <menuitem index="8" value="suprimir el punto" />
+      </control>
+      <control name="btnSearch" value="&amp;Búsqueda">
+         <menuitem index="0" value="Buscar en los resultados" />
       </control>
       
       <menu index="0" value="&amp;Archivo">
@@ -82,6 +84,7 @@
       <control name="btnCancel" value="&amp;Cancelación" />
       <control name="btnOK" value="&amp;Autorización" />
       <control name="lblMultiTypes" value="Tipos separadas con carácter |."/>
+      <control name="lblTabSize" value="ficha tamaño" />
    </screen>
    
    <screen name="frmOptions" value="Opciones">
@@ -111,9 +114,11 @@
       <control name="lblPluginDetailName" value="Nombre:"/>
       <control name="lblPluginDetailVersion" value="Versión:"/>
       <control name="lblPluginDetailAuthor" value="Autor:"/>
-      <control name="btnFindFont" value="&amp;Buscar fuente"/>
+      <control name="btnFindFont" value="&amp;Buscar fuente..."/>
       <control name="chkShowExclusionErrorMessage" value="Mostrar un mensaje cuando un &amp;rendimiento de búsqueda los artículos que son excluidos o se produce un error."/>
       <control name="chkSaveSearchOptions" value="Guardar las opciones de búsqueda a la salida."/>
+      <control name="grpFileList" value="Lista de archivos" />
+      <control name="btnFileFindFont" value="Buscar fuente..."/>
    </screen>
    
    <screen name="frmPrint" value="Impresión">
@@ -185,6 +190,7 @@
       <text name="SearchFinished" value="La búsqueda acabó"/>
       <text name="SearchStarted" value="La búsqueda comenzó"/>
       <text name="SearchSearching" value="El buscar {0}"/>
+      <text name="SearchSearchingByPlugin" value="Complemento {0} se utiliza para buscar el archivo." />
       <text name="SearchExplorerItem" value="Búsqueda usando {0}..."/>
       
       <text name="ResultsPreviewText" value="(21)  Los resultados del ejemplo alinean y, fósforo, exhibieron"/>
@@ -201,6 +207,7 @@
       <text name="TextEditorsColumnFileType" value="Tipo del archivo"/>
       <text name="TextEditorsColumnLocation" value="Editor de textos"/>
       <text name="TextEditorsColumnCmdLine" value="Línea de comando"/>
+      <text name="TextEditorsColumnTabSize" value="ficha tamaño"/>
       <text name="TextEditorsErrorNoEditor" value="Por favor, defina un editor de texto."/>
       <text name="TextEditorsErrorFileTypeExists" value="El tipo de archivo ya existe. Por favor, inténtalo de nuevo."/>
       
@@ -214,6 +221,9 @@
       <text name="ResultsStatusFileCount" value="Archivo: {0}"/>
       <text name="ResultsStatusFilterCount" value="Exclusiones: {0}"/>
       <text name="ResultsStatusErrorCount" value="Error: {0}"/>
+
+      <text name="ResultsContextMenu.Copy" value="Copiar"/>
+      <text name="ResultsContextMenu.SelectAll" value="Seleccionar todo"/>
       
       <text name="PluginsColumnEnabled" value="Permitido"/>
       <text name="PluginsColumnName" value="Nombre"/>

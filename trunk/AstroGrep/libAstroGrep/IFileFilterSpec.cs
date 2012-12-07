@@ -40,5 +40,10 @@ namespace libAstroGrep
       /// List of ExclusionItem objects to exclude certain files/folders.
       /// </summary>
       System.Collections.Generic.List<ExclusionItem> ExclusionItems { get; }
+
+      /// <summary>
+      /// Sets the number of hits that must occur in a file before being displayed to user.
+      /// </summary>
+      int FileHitCount { get; }
    }
 }

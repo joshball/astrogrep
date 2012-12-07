@@ -98,6 +98,12 @@ namespace libAstroGrep
       public delegate void DirectoryFilteredOut(DirectoryInfo dir, string type);
       /// <summary>Directory being filtered</summary>
       public event DirectoryFilteredOut DirectoryFiltered;
+
+      /// <summary>The current file is being searched by a plugin</summary>
+      /// <param name="pluginName">Name of plugin</param>
+      public delegate void SearchingFileByPluginHandler(string pluginName);
+      /// <summary>File being searched by a plugin</summary>
+      public event SearchingFileByPluginHandler SearchingFileByPlugin;
       #endregion
 
       #region Public Properties
@@ -106,7 +112,7 @@ namespace libAstroGrep
       public IList<HitObject> Greps { get; private set; }
 
       /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
-      public PluginCollection Plugins { get; set; }
+      public List<PluginWrapper> Plugins { get; set; }
 
       /// <summary>The File filter specification.</summary>
       public IFileFilterSpec FileFilterSpec { get; private set; }
@@ -170,23 +176,33 @@ namespace libAstroGrep
       /// </history>
       public void Execute()
       {
-         if (string.IsNullOrEmpty(FileFilterSpec.FileFilter))
-         {
-            foreach (var dir in SearchSpec.StartDirectories)
-            {
-               Execute(new DirectoryInfo(dir), null, null);
-            }
-         }
-         else
-         {
-            foreach (var _filter in FileFilterSpec.FileFilter.Split(char.Parse(",")))
-            {
-               foreach (var dir in SearchSpec.StartDirectories)
-               {
-                  Execute(new DirectoryInfo(dir), null, _filter);
-               }
-            }
-         }
+          if (SearchSpec.StartFilePaths != null && SearchSpec.StartFilePaths.Length > 0)
+          {
+              foreach (string path in SearchSpec.StartFilePaths)
+              {
+                  SearchFile(new FileInfo(path));
+              }
+          }
+          else
+          {
+              if (string.IsNullOrEmpty(FileFilterSpec.FileFilter))
+              {
+                  foreach (var dir in SearchSpec.StartDirectories)
+                  {
+                      Execute(new DirectoryInfo(dir), null, null);
+                  }
+              }
+              else
+              {
+                  foreach (var _filter in FileFilterSpec.FileFilter.Split(char.Parse(",")))
+                  {
+                      foreach (var dir in SearchSpec.StartDirectories)
+                      {
+                          Execute(new DirectoryInfo(dir), null, _filter);
+                      }
+                  }
+              }
+          }
       }
 
       /// <summary>
@@ -310,37 +326,7 @@ namespace libAstroGrep
          //Search Every File for search text
          foreach (FileInfo SourceFile in SourceFiles)
          {
-            try
-            {
-               // skip any files that are filtered out
-               string filterType = string.Empty;
-               if (ShouldFilterOut(SourceFile, FileFilterSpec, out filterType))
-               {
-                  OnFileFiltered(SourceFile, filterType);
-                  continue;
-               }
-
-               // return a 'file hit' if the search text is empty
-               if (string.IsNullOrEmpty(SearchSpec.SearchText))
-               {
-                  var _grepHit = new HitObject(SourceFile) { Index = Greps.Count };
-                  _grepHit.Add(Environment.NewLine, 0);
-                  Greps.Add(_grepHit);
-                  OnFileHit(SourceFile, _grepHit.Index);
-               }
-               else
-               {
-                  SearchFile(SourceFile, SearchSpec.SearchText);
-               }
-            }
-            catch (ThreadAbortException)
-            {
-               UnloadPlugins();
-            }
-            catch (Exception ex)
-            {
-               OnSearchError(SourceFile, ex);
-            }
+             SearchFile(SourceFile);
          }
 
          if (SearchSpec.SearchInSubfolders)
@@ -370,6 +356,43 @@ namespace libAstroGrep
                }
             }
          }
+      }
+
+      /// <summary>
+      /// Search the given file.
+      /// </summary>
+      /// <param name="SourceFile">FileInfo object to be searched</param>
+      private void SearchFile(FileInfo SourceFile)
+      {
+          try
+          {
+              // skip any files that are filtered out
+              string filterType = string.Empty;
+              if (ShouldFilterOut(SourceFile, FileFilterSpec, out filterType))
+              {
+                  OnFileFiltered(SourceFile, filterType);
+              }
+              else if (string.IsNullOrEmpty(SearchSpec.SearchText))
+              {
+                  // return a 'file hit' if the search text is empty
+                  var _grepHit = new HitObject(SourceFile) { Index = Greps.Count };
+                  _grepHit.Add(Environment.NewLine, 0);
+                  Greps.Add(_grepHit);
+                  OnFileHit(SourceFile, _grepHit.Index);
+              }
+              else
+              {
+                  SearchFileContents(SourceFile);
+              }
+          }
+          catch (ThreadAbortException)
+          {
+              UnloadPlugins();
+          }
+          catch (Exception ex)
+          {
+              OnSearchError(SourceFile, ex);
+          }
       }
 
       /// <summary>
@@ -441,7 +464,6 @@ namespace libAstroGrep
       /// Search a given file for the searchText.
       /// </summary>
       /// <param name="file">FileInfo object for file to search for searchText</param>
-      /// <param name="searchText">Text to find in file</param>
       /// <history>
       /// [Curtis_Beard]		09/08/2005	Created
       /// [Curtis_Beard]		11/21/2005	ADD: update hit count when actual line added
@@ -460,8 +482,10 @@ namespace libAstroGrep
       /// [Curtis_Beard]		06/26/2007	FIX: 1779270, increase array size holding context lines
       /// [Curtis_Beard]		10/09/2012	FIX: don't overwrite position when getting context lines
       /// [Curtis_Beard]		10/12/2012	FIX: get correct position when using whole word option
+      /// [Curtis_Beard]		10/12/2012	CHG: 32, implement a hit count filter
+      /// [Curtis_Beard]		10/31/2012	CHG: renamed to SearchFileContents, remove parameter searchText
       /// </history>
-      private void SearchFile(FileInfo file, string searchText)
+      private void SearchFileContents(FileInfo file)
       {
          const int MARGINSIZE = 4;
 
@@ -494,7 +518,8 @@ namespace libAstroGrep
                   if (Plugins[i].Enabled && Plugins[i].Plugin.IsAvailable)
                   {
                      // detect if plugin supports extension
-                     bool isFound = IsInList(file.Extension, Plugins[i].Plugin.Extensions, ',');
+                     //bool isFound = IsInList(file.Extension, Plugins[i].Plugin.Extensions, ',');
+                     bool isFound = Plugins[i].Plugin.IsFileSupported(file);
 
                      // if extension not supported try another plugin
                      if (!isFound)
@@ -505,6 +530,7 @@ namespace libAstroGrep
                      // load plugin and perform grep
                      if (Plugins[i].Plugin.Load())
                      {
+                        OnSearchingFileByPlugin(Plugins[i].Plugin.Name);
                         _grepHit = Plugins[i].Plugin.Grep(file, SearchSpec, ref pluginEx);
                      }
                      else
@@ -523,14 +549,17 @@ namespace libAstroGrep
                            // only perform is not using negation
                            if (!SearchSpec.UseNegation)
                            {
-                              _grepHit.Index = Greps.Count;
-                              Greps.Add(_grepHit);
-                              OnFileHit(file, _grepHit.Index);
+                              if (DoesPassHitCountCheck(_grepHit))
+                              {
+                                 _grepHit.Index = Greps.Count;
+                                 Greps.Add(_grepHit);
+                                 OnFileHit(file, _grepHit.Index);
 
-                              if (SearchSpec.ReturnOnlyFileNames)
-                                 _grepHit.SetHitCount();
+                                 if (SearchSpec.ReturnOnlyFileNames)
+                                    _grepHit.SetHitCount();
 
-                              OnLineHit(_grepHit, _grepHit.Index);
+                                 OnLineHit(_grepHit, _grepHit.Index);
+                              }
                            }
                         }
                         else if (SearchSpec.UseNegation)
@@ -584,22 +613,22 @@ namespace libAstroGrep
                      {
                         if (SearchSpec.UseCaseSensitivity && SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b");
+                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b");
                            _regularExpCol = _regularExp.Matches(textLine);
                         }
                         else if (SearchSpec.UseCaseSensitivity)
                         {
-                           _regularExp = new Regex(searchText);
+                           _regularExp = new Regex(SearchSpec.SearchText);
                            _regularExpCol = _regularExp.Matches(textLine);
                         }
                         else if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b", RegexOptions.IgnoreCase);
+                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
                            _regularExpCol = _regularExp.Matches(textLine);
                         }
                         else
                         {
-                           _regularExp = new Regex(searchText, RegexOptions.IgnoreCase);
+                           _regularExp = new Regex(SearchSpec.SearchText, RegexOptions.IgnoreCase);
                            _regularExpCol = _regularExp.Matches(textLine);
                         }
 
@@ -623,7 +652,7 @@ namespace libAstroGrep
                         // If we are looking for whole worlds only, perform the check.
                         if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b");
+                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b");
                            Match mtc = _regularExp.Match(textLine);
                            if (mtc != null && mtc.Success)
                            {
@@ -637,7 +666,7 @@ namespace libAstroGrep
                         }
                         else
                         {
-                           _posInStr = textLine.IndexOf(searchText);
+                           _posInStr = textLine.IndexOf(SearchSpec.SearchText);
 
                            if (SearchSpec.UseNegation && _posInStr > -1)
                               _hitOccurred = true;
@@ -648,7 +677,7 @@ namespace libAstroGrep
                         // If we are looking for whole worlds only, perform the check.
                         if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + searchText + "\\b", RegexOptions.IgnoreCase);
+                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
                            Match mtc = _regularExp.Match(textLine);
                            if (mtc != null && mtc.Success)
                            {
@@ -662,7 +691,7 @@ namespace libAstroGrep
                         }
                         else
                         {
-                           _posInStr = textLine.ToLower().IndexOf(searchText.ToLower());
+                           _posInStr = textLine.ToLower().IndexOf(SearchSpec.SearchText.ToLower());
 
                            if (SearchSpec.UseNegation && _posInStr > -1)
                               _hitOccurred = true;
@@ -679,11 +708,16 @@ namespace libAstroGrep
                      if (SearchSpec.UseNegation)
                         break;
 
-                     if (!_fileNameDisplayed)
+                     // create new hit and add to collection
+                     if (_grepHit == null)
                      {
                         _grepHit = new HitObject(file) { Index = Greps.Count };
                         Greps.Add(_grepHit);
+                     }
 
+                     // don't show until passes count check
+                     if (!_fileNameDisplayed && DoesPassHitCountCheck(_grepHit))
+                     {
                         OnFileHit(file, _grepHit.Index);
 
                         _fileNameDisplayed = true;
@@ -692,6 +726,13 @@ namespace libAstroGrep
                      // If we are only showing filenames, go to the next file.
                      if (SearchSpec.ReturnOnlyFileNames)
                      {
+                        if (!_fileNameDisplayed)
+                        {
+                           OnFileHit(file, _grepHit.Index);
+
+                           _fileNameDisplayed = true;
+                        }
+
                         //notify that at least 1 hit is in file
                         _grepHit.SetHitCount();
                         OnLineHit(_grepHit, _grepHit.Index);
@@ -717,7 +758,11 @@ namespace libAstroGrep
                         {
                            // Insert a blank space before the context lines.
                            int _pos = _grepHit.Add(Environment.NewLine, -1);
-                           OnLineHit(_grepHit, _pos);
+
+                           if (DoesPassHitCountCheck(_grepHit))
+                           {
+                              OnLineHit(_grepHit, _pos);
+                           }
                         }
 
                         // Display preceeding n context lines before the hit.
@@ -734,7 +779,11 @@ namespace libAstroGrep
                            {
                               // Add the context line.
                               int _pos = _grepHit.Add(_contextSpacer + _context[_contextIndex] + Environment.NewLine, _lineNumber - tempPosInStr);
-                              OnLineHit(_grepHit, _pos);
+
+                              if (DoesPassHitCountCheck(_grepHit))
+                              {
+                                 OnLineHit(_grepHit, _pos);
+                              }
                            }
                         }
                      }
@@ -759,11 +808,14 @@ namespace libAstroGrep
                      }
                      else
                      {
-                        //determine number of hits
-                        _grepHit.SetHitCount(RetrieveLineHitCount(textLine, searchText));
+                        //determine number of hits in single line
+                        _grepHit.SetHitCount(RetrieveLineHitCount(textLine, SearchSpec.SearchText));
                      }
 
-                     OnLineHit(_grepHit, _index);
+                     if (DoesPassHitCountCheck(_grepHit))
+                     {
+                        OnLineHit(_grepHit, _index);
+                     }
                   }
                   else if (_lastHit > 0 && SearchSpec.ContextLines > 0)
                   {
@@ -772,7 +824,11 @@ namespace libAstroGrep
                      // need to display this context line.
                      //***************************************************
                      int _index = _grepHit.Add(_contextSpacer + textLine + Environment.NewLine, _lineNumber);
-                     OnLineHit(_grepHit, _index);
+
+                     if (DoesPassHitCountCheck(_grepHit))
+                     {
+                        OnLineHit(_grepHit, _index);
+                     }
                      _lastHit -= 1;
 
                   } // Found a hit or not.
@@ -790,6 +846,27 @@ namespace libAstroGrep
                }
             }
             while (true);
+
+            // send event file/line hit if we haven't yet but it should be
+            if (!_fileNameDisplayed && _grepHit != null && DoesPassHitCountCheck(_grepHit))
+            {
+               // need to display it
+               OnFileHit(file, _grepHit.Index);
+               OnLineHit(_grepHit, _grepHit.Index);
+            }
+
+            // send event for file filtered if it fails the file hit count filter
+            if (!SearchSpec.UseNegation && !SearchSpec.ReturnOnlyFileNames && _grepHit != null && !DoesPassHitCountCheck(_grepHit))
+            {
+               // remove from grep collection only if
+               // not negation
+               // not filenames only
+               // actually have a hit
+               // doesn't pass the hit count filter
+               Greps.RemoveAt(Greps.Count - 1);
+
+               OnFileFiltered(file, string.Format("FileCount: {0}, Limit: {1}", _grepHit.HitCount, FileFilterSpec.FileHitCount));
+            }
 
             //
             // Check for no hits through out the file
@@ -921,6 +998,27 @@ namespace libAstroGrep
                   Plugins[i].Plugin.Unload();
             }
          }
+      }
+
+      /// <summary>
+      /// Determines if current hit count passes the file hit count filter.
+      /// </summary>
+      /// <param name="hit">Current HitObject</param>
+      /// <returns>true if hit count valid, false if not</returns>
+      /// <history>
+      /// [Curtis_Beard]      10/12/2012  Created: 32, implement file hit count
+      /// </history>
+      private bool DoesPassHitCountCheck(HitObject hit)
+      {
+         // disabled
+         if (FileFilterSpec.FileHitCount == 0)
+            return true;
+
+         // turned on, only passes if current count is more than specified
+         if (FileFilterSpec.FileHitCount > 0 && (hit != null && hit.HitCount >= FileFilterSpec.FileHitCount))
+            return true;
+
+         return false;
       }
 
       /// <summary>
@@ -1069,6 +1167,21 @@ namespace libAstroGrep
          if (DirectoryFiltered != null)
          {
             DirectoryFiltered(dir, type);
+         }
+      }
+
+      /// <summary>
+      /// Raise searching file by plugin event.
+      /// </summary>
+      /// <param name="pluginName">Name of plugin</param>
+      /// <history>
+      /// [Curtis_Beard]	   10/16/2012	Initial
+      /// </history>
+      protected virtual void OnSearchingFileByPlugin(string pluginName)
+      {
+         if (SearchingFileByPlugin != null)
+         {
+            SearchingFileByPlugin(pluginName);
          }
       }
       #endregion

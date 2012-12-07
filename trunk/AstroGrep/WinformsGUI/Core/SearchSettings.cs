@@ -61,6 +61,7 @@ namespace AstroGrep.Core
       private string modifiedStart = string.Empty;
       private string modifiedEnd = string.Empty;
       private string exclusions = Constants.DefaultExclusions;
+      private int minimumFileCount = 0;
       #endregion
 
       /// <summary>
@@ -259,6 +260,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.exclusions; }
          set { MySettings.exclusions = value; }
+      }
+
+      /// <summary>
+      /// Minimum File Count.
+      /// </summary>
+      static public int MinimumFileCount
+      {
+         get { return MySettings.minimumFileCount; }
+         set { MySettings.minimumFileCount = value; }
       }
    }
 }

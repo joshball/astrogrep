@@ -5,7 +5,7 @@ using System.Text;
 
 namespace libAstroGrep
 {
-	/// <summary>
+   /// <summary>
    /// A HitObject contains the information of one instance of a file that contains
    /// the search text in a Grep search.  It contains every instance of the search text
    /// in a file.  This is done by creating an object and then calling Add passing in the
@@ -13,7 +13,7 @@ namespace libAstroGrep
    /// file name, full path, holding directory, file last write time, total count, and all 
    /// lines.  It is also possible to retrieve a specific line or line number based on 
    /// the index into the contained collection.
-	/// </summary>
+   /// </summary>
    /// <remarks>
    ///   AstroGrep File Searching Utility. Written by Theodore L. Ward
    ///   Copyright (C) 2002 AstroComma Incorporated.
@@ -36,29 +36,32 @@ namespace libAstroGrep
    ///   ted@astrocomma.com or curtismbeard@gmail.com
    /// </remarks>
    /// <history>
-   /// 	[Curtis_Beard]    09/08/2005	Created
-   ///   [Curtis_Beard]	   11/21/2005	ADD: support for total hit count
-   ///   [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
-   ///   [Curtis_Beard]    09/12/2006  CHG: Converted to C#
-   ///  [Andrew_Radford]   05/08/2009  CHG: Update to C# 3.5, Generic Collections
+   /// [Curtis_Beard]      09/08/2005	Created
+   /// [Curtis_Beard]	   11/21/2005	ADD: support for total hit count
+   /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
+   /// [Curtis_Beard]      09/12/2006  CHG: Converted to C#
+   /// [Andrew_Radford]    05/08/2009  CHG: Update to C# 3.5, Generic Collections
+   /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
    /// </history>
-	public class HitObject
-	{
+   public class HitObject
+   {
       #region Declarations
-	    private readonly List<string> __lines  = new List<string>();
-	    private readonly List<int> __lineNumbers = new List<int>();
-        private readonly List<int> __columns= new List<int>();
+
+      private FileInfo __File = null;
+      private readonly List<HitObjectStorage> __storage = new List<HitObjectStorage>();
+
       #endregion
 
       #region Constructors
+
       /// <summary>
       /// Initializes a new instance of the HitObject class.
       /// </summary>
       /// <param name="file">FileInfo object</param>
       public HitObject(FileInfo file)
       {
-          HitCount = 0;
-          File = file;
+         HitCount = 0;
+         __File = file;
       }
 
       /// <summary>
@@ -67,24 +70,25 @@ namespace libAstroGrep
       /// <param name="path">File path</param>
       public HitObject(string path)
       {
-          HitCount = 0;
-          File = new FileInfo(path);
+         HitCount = 0;
+         __File = new FileInfo(path);
       }
       #endregion
 
       #region Public Properties
+
       /// <summary>
       /// Retrieve the name of the file
       /// </summary>
       /// <value>Name of file</value>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]    09/09/2005	Created
       /// </history>
       public string FileName
       {
-         get 
+         get
          {
-            return File.Name;
+            return __File.Name;
          }
       }
 
@@ -93,13 +97,13 @@ namespace libAstroGrep
       /// </summary>
       /// <value>Full path to file</value>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]    09/09/2005	Created
       /// </history>
       public string FilePath
       {
-         get 
+         get
          {
-            return File.FullName;
+            return __File.FullName;
          }
       }
 
@@ -108,13 +112,13 @@ namespace libAstroGrep
       /// </summary>
       /// <value>Holding directory of file</value>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]    09/09/2005	Created
       /// </history>
       public string FileDirectory
       {
-         get 
+         get
          {
-            return File.DirectoryName;
+            return __File.DirectoryName;
          }
       }
 
@@ -123,42 +127,35 @@ namespace libAstroGrep
       /// </summary>
       /// <value>Last Write Time of file</value>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]    09/09/2005	Created
       /// </history>
       public DateTime FileModifiedDate
       {
-         get 
+         get
          {
-            return File.LastWriteTime;
+            return __File.LastWriteTime;
          }
       }
 
-	    /// <summary>
-	    /// Retrieve the FileInfo object of this object.
-	    /// </summary>
-	    /// <value>FileInfo object</value>
-	    /// <history>
-	    /// 	[Curtis_Beard]		07/27/2006	Created
-	    /// </history>
-	    public FileInfo File { get; private set; }
-
-	    /// <summary>
+      /// <summary>
       /// Retrieve all lines containing the search text
       /// </summary>
       /// <value>All lines</value>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]      09/09/2005	Created
+      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
       /// </history>
       public string Lines
       {
-         get 
+         get
          {
-            var _lines = new StringBuilder(__lines.Count);
+            var lines = new StringBuilder(__storage.Count);
+            foreach (var item in __storage)
+            {
+               lines.Append(item.Line);
+            }
 
-            foreach (string _line in __lines)
-               _lines.Append(_line);
-
-            return _lines.ToString();
+            return lines.ToString();
          }
       }
 
@@ -167,37 +164,38 @@ namespace libAstroGrep
       /// </summary>
       /// <value>Total number of lines</value>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]      09/09/2005	Created
+      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
       /// </history>
       public int LineCount
       {
-         get 
+         get
          {
-            return __lines.Count;
+            return __storage.Count;
          }
       }
 
-	    /// <summary>
-	    /// get {/Set the Index of the hit in the collection
-	    /// </summary>
-	    /// <value>Index position in collection</value>
-	    /// <returns>Index position in collection</returns>
-	    /// <history>
-	    /// 	[Curtis_Beard]    09/09/2005	Created
-	    /// </history>
-	    public int Index { get; set; }
+      /// <summary>
+      /// Gets/Sets the Index of the hit in the collection
+      /// </summary>
+      /// <value>Index position in collection</value>
+      /// <returns>Index position in collection</returns>
+      /// <history>
+      /// [Curtis_Beard]      09/09/2005	Created
+      /// </history>
+      public int Index { get; set; }
 
-	    /// <summary>
-	    /// get {s the total hit count in the object
-	    /// </summary>
-	    /// <value>Total Hit Count</value>
-	    /// <returns>Total Hit Count</returns>
-	    /// <history>
-	    ///   [Curtis_Beard]	   11/21/2005	Created
-	    /// </history>
-	    public int HitCount { get; private set; }
+      /// <summary>
+      /// Gets the total hit count in the object
+      /// </summary>
+      /// <value>Total Hit Count</value>
+      /// <returns>Total Hit Count</returns>
+      /// <history>
+      /// [Curtis_Beard]	   11/21/2005	Created
+      /// </history>
+      public int HitCount { get; private set; }
 
-	    #endregion
+      #endregion
 
       #region Public Methods
       /// <summary>
@@ -206,14 +204,15 @@ namespace libAstroGrep
       /// <param name="index">line to retrieve</param>
       /// <returns>String.Empty if index is greater than total, line of text otherwise</returns>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]      09/09/2005	Created
+      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
       /// </history>
       public string RetrieveLine(int index)
       {
-         if (index >= __lines.Count)
+         if (index >= __storage.Count)
             return string.Empty;
 
-         return __lines[index];
+         return __storage[index].Line;
       }
 
       /// <summary>
@@ -222,14 +221,15 @@ namespace libAstroGrep
       /// <param name="index">line number to retrieve</param>
       /// <returns>0 if index is greater than total, line number otherwise</returns>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
+      /// [Curtis_Beard]      09/09/2005	Created
+      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
       /// </history>
       public int RetrieveLineNumber(int index)
       {
-         if (index >= __lineNumbers.Count)
+         if (index >= __storage.Count)
             return 0;
 
-         return __lineNumbers[index];
+         return __storage[index].LineNumber;
       }
 
       /// <summary>
@@ -238,14 +238,35 @@ namespace libAstroGrep
       /// <param name="index">line number to retrieve</param>
       /// <returns>0 if index is greater than total, column position otherwise</returns>
       /// <history>
-      /// 	[Curtis_Beard]		07/26/2006	ADD: 1512026, save column position
+      /// [Curtis_Beard]		07/26/2006	ADD: 1512026, save column position
+      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
       /// </history>
       public int RetrieveColumn(int index)
       {
-         if (index >= __columns.Count)
+         if (index >= __storage.Count)
             return 0;
 
-         return __columns[index];
+         return __storage[index].ColumnNumber;
+      }
+
+      /// <summary>
+      /// Retrieve the first actual hit's index.
+      /// </summary>
+      /// <returns>Index position or 0 if not found</returns>
+      /// <history>
+      /// [Curtis_Beard]      10/13/2012	ADD: use class instead of 3 lists
+      /// </history>
+      public int RetrieveFirstHitIndex()
+      {
+         for (int i = 0; i < __storage.Count; i++)
+         {
+            if (__storage[i].IsHit)
+            {
+               return i;
+            }
+         }
+
+         return 0;
       }
 
       /// <summary>
@@ -255,16 +276,20 @@ namespace libAstroGrep
       /// <param name="lineNumber">line number of line in file</param>
       /// <returns>position of added item in collection</returns>
       /// <history>
-      /// 	[Curtis_Beard]    09/09/2005	Created
-      /// 	[Curtis_Beard]    07/26/2006	ADD: 1512026, save column position
+      /// [Curtis_Beard]      09/09/2005	Created
+      /// [Curtis_Beard]      07/26/2006	ADD: 1512026, save column position
+      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
       /// </history>
       public int Add(string line, int lineNumber)
       {
-         __lines.Add(line);
-         __lineNumbers.Add(lineNumber);
-         __columns.Add(1);
+         var item = new HitObjectStorage();
+         item.Line = line;
+         item.LineNumber = lineNumber;
+         item.ColumnNumber = 1;
+         item.IsHit = false;
+         __storage.Add(item);
 
-         return __lines.Count - 1;
+         return __storage.Count - 1;
       }
 
       /// <summary>
@@ -275,39 +300,79 @@ namespace libAstroGrep
       /// <param name="column">column position of first hit in line</param>
       /// <returns>position of added item in collection</returns>
       /// <history>
-      /// 	[Curtis_Beard]		07/26/2006	ADD: 1512026, save column position
+      /// [Curtis_Beard]		07/26/2006	ADD: 1512026, save column position
+      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
       /// </history>
       public int Add(string line, int lineNumber, int column)
       {
-         __lines.Add(line);
-         __lineNumbers.Add(lineNumber);
-         __columns.Add(column);
+         var item = new HitObjectStorage();
+         item.Line = line;
+         item.LineNumber = lineNumber;
+         item.ColumnNumber = column;
+         item.IsHit = true;
+         __storage.Add(item);
 
-         return __lines.Count - 1;
+         return __storage.Count - 1;
       }
 
       /// <summary>
       /// Updates the total hit count
       /// </summary>
       /// <history>
-      ///   [Curtis_Beard]	   11/21/2005	Created
+      /// [Curtis_Beard]	   11/21/2005	Created
       /// </history>
       public void SetHitCount()
       {
          HitCount += 1;
       }
-      
+
       /// <summary>
       /// Updates the total hit count
       /// </summary>
       /// <param name="count">Value to add count to total</param>
       /// <history>
-      ///   [Curtis_Beard]	   11/21/2005	Created
+      /// [Curtis_Beard]	   11/21/2005	Created
       /// </history>
       public void SetHitCount(int count)
       {
          HitCount += count;
       }
+
       #endregion
-	}
+
+      /// <summary>
+      /// Storage class for each hit.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]      10/13/2012	ADD: use class instead of 3 lists
+      /// </history>
+      internal class HitObjectStorage
+      {
+         /// <summary>Current line</summary>
+         public string Line { get; set; }
+
+         /// <summary>Current line number</summary>
+         public int LineNumber { get; set; }
+
+         /// <summary>Current column number</summary>
+         public int ColumnNumber { get; set; }
+
+         /// <summary>Determines if this is a hit or context line</summary>
+         public bool IsHit { get; set; }
+
+         /// <summary>
+         /// Initializes this class.
+         /// </summary>
+         /// <history>
+         /// [Curtis_Beard]      10/13/2012	ADD: use class instead of 3 lists
+         /// </history>
+         public HitObjectStorage()
+         {
+            Line = string.Empty;
+            LineNumber = 1;
+            ColumnNumber = 1;
+            IsHit = false;
+         }
+      }
+   }
 }
