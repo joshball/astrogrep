@@ -1,5 +1,7 @@
 using System;
 
+using AstroGrep.Core;
+
 namespace AstroGrep.Windows
 {
    /// <summary>
@@ -480,22 +482,22 @@ namespace AstroGrep.Windows
       {
          if (Registry.CheckStartupSetting("HighlightForeColor"))
          {
-            AstroGrep.Core.GeneralSettings.HighlightForeColor = Common.ConvertColorToString(Registry.GetStartupSetting("HighlightForeColor", Common.ASTROGREP_ORANGE));
+            AstroGrep.Core.GeneralSettings.HighlightForeColor = Convertors.ConvertColorToString(Registry.GetStartupSetting("HighlightForeColor", Core.Common.ASTROGREP_ORANGE));
             Registry.DeleteStartupSetting("HighlightForeColor");
          }
          if (Registry.CheckStartupSetting("HighlightBackColor"))
          {
-            AstroGrep.Core.GeneralSettings.HighlightBackColor = Common.ConvertColorToString(Registry.GetStartupSetting("HighlightBackColor", System.Drawing.SystemColors.Window));
+            AstroGrep.Core.GeneralSettings.HighlightBackColor = Convertors.ConvertColorToString(Registry.GetStartupSetting("HighlightBackColor", System.Drawing.SystemColors.Window));
             Registry.DeleteStartupSetting("HighlightBackColor");
          }
          if (Registry.CheckStartupSetting("ResultsForeColor"))
          {
-            AstroGrep.Core.GeneralSettings.ResultsForeColor = Common.ConvertColorToString(Registry.GetStartupSetting("ResultsForeColor", System.Drawing.SystemColors.WindowText));
+            AstroGrep.Core.GeneralSettings.ResultsForeColor = Convertors.ConvertColorToString(Registry.GetStartupSetting("ResultsForeColor", System.Drawing.SystemColors.WindowText));
             Registry.DeleteStartupSetting("ResultsForeColor");
          }
          if (Registry.CheckStartupSetting("ResultsBackColor"))
          {
-            AstroGrep.Core.GeneralSettings.ResultsBackColor = Common.ConvertColorToString(Registry.GetStartupSetting("ResultsBackColor", System.Drawing.SystemColors.Window));
+            AstroGrep.Core.GeneralSettings.ResultsBackColor = Convertors.ConvertColorToString(Registry.GetStartupSetting("ResultsBackColor", System.Drawing.SystemColors.Window));
             Registry.DeleteStartupSetting("ResultsBackColor");
          }
       }

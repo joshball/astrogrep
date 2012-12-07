@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 using libAstroGrep.Plugin;
@@ -34,7 +35,7 @@ namespace AstroGrep.Core
    /// </history>
    public class PluginManager
    {
-      private static PluginCollection __PluginCollection = new PluginCollection();
+      private static List<PluginWrapper> __PluginCollection = new List<PluginWrapper>();
 
       #region Public Methods
       /// <summary>
@@ -50,7 +51,11 @@ namespace AstroGrep.Core
          PluginWrapper plugin = LoadPlugin(path);
 
          if (plugin != null)
-            return __PluginCollection.Add(plugin);
+         {
+            plugin.Index = __PluginCollection.Count;
+            __PluginCollection.Add(plugin);
+            return __PluginCollection.Count - 1;
+         }
 
          return -1;
       }
@@ -65,7 +70,8 @@ namespace AstroGrep.Core
       /// </history>
       public static int Add(PluginWrapper wrapper)
       {
-         return __PluginCollection.Add(wrapper);
+         __PluginCollection.Add(wrapper);
+         return __PluginCollection.Count - 1;
       }
 
       /// <summary>
@@ -78,8 +84,9 @@ namespace AstroGrep.Core
       /// </history>
       public static int Add(IAstroGrepPlugin plugin)
       {
-         PluginWrapper wrapper = new PluginWrapper(plugin, string.Empty, plugin.Name, true, true);
-         return __PluginCollection.Add(wrapper);
+         PluginWrapper wrapper = new PluginWrapper(plugin, string.Empty, plugin.Name, true, true, __PluginCollection.Count);
+         __PluginCollection.Add(wrapper);
+         return __PluginCollection.Count - 1;
       }
 
       /// <summary>
@@ -111,7 +118,7 @@ namespace AstroGrep.Core
       /// <history>
       /// [Curtis_Beard]		07/28/2006	Created
       /// </history>
-      public static PluginCollection Items
+      public static List<PluginWrapper> Items
       {
          get { return __PluginCollection; }
       }
@@ -122,24 +129,36 @@ namespace AstroGrep.Core
       /// <history>
       /// [Curtis_Beard]      07/28/2006	Created
       /// [Curtis_Beard]      08/07/2007	CHG: remove check against version
+      /// [Curtis_Beard]      10/16/2012	ADD: iFilter plugin, load any external plugins
       /// </history>
       public static void Load()
       {
-         // for right now, just load the internal plugins
-	     // Mono2.4 doesn't like this plugin.
-          if (Type.GetType("System.MonoType") == null)
-          {
-              Plugin.MicrosoftWord.MicrosoftWordPlugin wordPlugin = new Plugin.MicrosoftWord.MicrosoftWordPlugin();
-              PluginWrapper wrapper = new PluginWrapper(wordPlugin, string.Empty, wordPlugin.Name, true, true);
-              Add(wrapper);
-          }
+         // load the internal plugins
+         // Mono2.4 doesn't like the internal plugins.
+         if (Type.GetType("System.MonoType") == null)
+         {
+            Plugin.MicrosoftWord.MicrosoftWordPlugin wordPlugin = new Plugin.MicrosoftWord.MicrosoftWordPlugin();
+            PluginWrapper wrapper = new PluginWrapper(wordPlugin, string.Empty, wordPlugin.Name, true, true, 0);
+            Add(wrapper);
+
+            Plugin.IFilter.IFilterPlugin iFilterPlugin = new Plugin.IFilter.IFilterPlugin();
+            PluginWrapper iFilterWrapper = new PluginWrapper(iFilterPlugin, string.Empty, iFilterPlugin.Name, true, false, 1);
+            Add(iFilterWrapper);
+         }
+
+         // load any external plugins
+         string pluginPath = System.IO.Path.Combine(Constants.ProductLocation, "Plugins");
+         if (System.IO.Directory.Exists(pluginPath))
+         {
+            LoadPluginsFromDirectory(pluginPath);
+         }
 
          // enable/disable plugins based on saved state (if found)
          string[] plugins = Common.SplitByString(Core.PluginSettings.Plugins, Constants.PLUGIN_SEPARATOR);
          foreach (string plugin in plugins)
          {
             string[] values = Common.SplitByString(plugin, Constants.PLUGIN_ARGS_SEPARATOR);
-            if (values.Length == 3)
+            if (values.Length == 3 || values.Length == 4)
             {
                string name = values[0];
                string version = values[1];
@@ -150,11 +169,15 @@ namespace AstroGrep.Core
                   if (__PluginCollection[i].Plugin.Name.Equals(name))
                   {
                      __PluginCollection[i].Enabled = bool.Parse(enabled);
+                     __PluginCollection[i].Index = values.Length == 4 ? int.Parse(values[3]) : i;
                      break;
                   }
                }
             }
          }
+
+         // adjust order
+         __PluginCollection.Sort(new PluginWrapperComparer());
       }
 
       /// <summary>
@@ -172,7 +195,7 @@ namespace AstroGrep.Core
             if (plugins.Length > 0)
                plugins.Append(Constants.PLUGIN_SEPARATOR);
 
-            plugins.AppendFormat("{1}{0}{2}{0}{3}", Constants.PLUGIN_ARGS_SEPARATOR, __PluginCollection[i].Plugin.Name, __PluginCollection[i].Plugin.Version, __PluginCollection[i].Enabled.ToString());
+            plugins.AppendFormat("{1}{0}{2}{0}{3}{0}{4}", Constants.PLUGIN_ARGS_SEPARATOR, __PluginCollection[i].Plugin.Name, __PluginCollection[i].Plugin.Version, __PluginCollection[i].Enabled.ToString(), i);
          }
 
          Core.PluginSettings.Plugins = plugins.ToString();
@@ -223,7 +246,7 @@ namespace AstroGrep.Core
                   if (!((objType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract))
                   {
                      // See if this type implements our interface
-                     objInterface = objType.GetInterface("AstroGrepBase.IAstroGrepPlugin", true);
+                     objInterface = objType.GetInterface("libAstroGrep.Plugin.IAstroGrepPlugin", true);
                      if (objInterface != null)
                      {
                         // Load dll
@@ -231,7 +254,7 @@ namespace AstroGrep.Core
                         object objPlugin = dll.CreateInstance(objType.FullName);
 
                         IAstroGrepPlugin plugin = (IAstroGrepPlugin)objPlugin;
-                        PluginWrapper wrapper = new PluginWrapper(plugin, path, dll.FullName, false, true);
+                        PluginWrapper wrapper = new PluginWrapper(plugin, path, dll.FullName, false, true, 0);
 
                         return wrapper;
                      }
@@ -239,10 +262,18 @@ namespace AstroGrep.Core
                }
             }
          }
-         catch {}
+         catch { }
 
          return null;
       }
       #endregion
+
+      internal class PluginWrapperComparer : IComparer<PluginWrapper>
+      {
+         public int Compare(PluginWrapper x, PluginWrapper y)
+         {
+            return x.Index.CompareTo(y.Index);
+         }
+      }
    }
 }

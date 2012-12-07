@@ -3,9 +3,10 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
+using AstroGrep.Core;
 using libAstroGrep;
 
-namespace AstroGrep
+namespace AstroGrep.Output
 {
 	/// <summary>
 	/// Helper class when outputing results to HTML.
@@ -33,6 +34,7 @@ namespace AstroGrep
 	/// </remarks>
 	/// <history>
 	/// [Curtis_Beard]      09/05/2006	Created
+    /// [Curtis_Beard]		10/30/2012	CHG: use AstroGrep.Output for namespace
 	/// </history>
 	public class HTMLHelper
 	{
@@ -106,10 +108,10 @@ namespace AstroGrep
       /// </history>
       public static string ReplaceCssHolders(string css)
       {
-         css = css.Replace("%%resultback%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor)));
-         css = css.Replace("%%resultfore%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor)));
-         css = css.Replace("%%highlightfore%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightForeColor)));
-         css = css.Replace("%%highlightback%%", System.Drawing.ColorTranslator.ToHtml(Windows.Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor)));
+         css = css.Replace("%%resultback%%", System.Drawing.ColorTranslator.ToHtml(Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor)));
+         css = css.Replace("%%resultfore%%", System.Drawing.ColorTranslator.ToHtml(Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor)));
+         css = css.Replace("%%highlightfore%%", System.Drawing.ColorTranslator.ToHtml(Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightForeColor)));
+         css = css.Replace("%%highlightback%%", System.Drawing.ColorTranslator.ToHtml(Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor)));
 
          return css;
       }
@@ -123,17 +125,20 @@ namespace AstroGrep
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
       /// [Curtis_Beard]		01/31/2012	ADD: display for additional options (skip hidden/system options, search paths, modified dates, file sizes)
+      /// [Curtis_Beard]		10/30/2012	CHG: use year replacement for copyright
+      /// [Curtis_Beard]		10/30/2012	ADD: file hit count, CHG: recurse to Subfolders
       /// </history>
       public static string ReplaceSearchOptions(string text, Grep grep)
       {
          var spec = grep.SearchSpec;
 
+         text = text.Replace("%%year%%", DateTime.Now.Year.ToString());
          text = text.Replace("%%searchpaths%%", "Search Path(s): " + string.Join(", ", spec.StartDirectories));
          text = text.Replace("%%filetypes%%", "File Types: " + grep.FileFilterSpec.FileFilter);
          text = text.Replace("%%regex%%", "Regular Expressions: " + spec.UseRegularExpressions);
          text = text.Replace("%%casesen%%", "Case Sensitive: " + spec.UseCaseSensitivity);
          text = text.Replace("%%wholeword%%", "Whole Word: " + spec.UseWholeWordMatching);
-         text = text.Replace("%%recurse%%", "Recurse: " + spec.SearchInSubfolders);
+         text = text.Replace("%%recurse%%", "Subfolders: " + spec.SearchInSubfolders);
          text = text.Replace("%%filenameonly%%", "Show File Names Only: " + spec.ReturnOnlyFileNames);
          text = text.Replace("%%negation%%", "Negation: " + spec.UseNegation);
          text = text.Replace("%%linenumbers%%", "Line Numbers: " + spec.IncludeLineNumbers);
@@ -168,6 +173,13 @@ namespace AstroGrep
             maxSize = "Max File Size: " + grep.FileFilterSpec.FileSizeMax + "<br/>";
          }         
          text = text.Replace("%%filesizemax%%", maxSize);
+
+         string fileHitCount = string.Empty;
+         if (grep.FileFilterSpec.FileHitCount > 0)
+         {
+             fileHitCount = "File Hit Count: " + grep.FileFilterSpec.FileHitCount + "<br/>";
+         }
+         text = text.Replace("%%filehitcount%%", fileHitCount);
 
          text = text.Replace("%%totalfiles%%", grep.Greps.Count.ToString());
          text = text.Replace("%%searchterm%%", spec.SearchText);

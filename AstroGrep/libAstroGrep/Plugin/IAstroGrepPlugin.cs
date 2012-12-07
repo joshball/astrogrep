@@ -29,10 +29,10 @@ namespace libAstroGrep.Plugin
    /// <history>
    /// [Curtis_Beard]		07/27/2006	Created
    /// [Curtis_Beard]		05/25/2007	ADD: Grep now supports returning an Exception object.
+   /// [Curtis_Beard]		10/17/2012	CHG: add IsFileExtensionSupported method, cleanup
    /// </history>
    public interface IAstroGrepPlugin
    {
-      // Plugin Load/Unload
       /// <summary>
       /// Loads the plugin.
       /// </summary>
@@ -52,7 +52,6 @@ namespace libAstroGrep.Plugin
       /// </summary>
       void Unload();
 
-      // Plugin Grep Methods
       /// <summary>
       /// Method that performs grep.
       /// </summary>
@@ -70,45 +69,41 @@ namespace libAstroGrep.Plugin
       /// <returns>HitObject containing valid hit</returns>
       HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex);
 
-     
-
+      /// <summary>
+      /// Determines if given file is supported by current plugin.
+      /// </summary>
+      /// <param name="file">Current FileInfo object</param>
+      /// <returns>True if supported, False if not supported</returns>
+      bool IsFileSupported(System.IO.FileInfo file);
 
       /// <summary>
       /// Gets whether plugin is available to use.
       /// </summary>
-      bool IsAvailable
-      { get; }
+      bool IsAvailable { get; }
 
       /// <summary>
-      /// Supported extensions of plugin.
+      /// Display of supported extensions of plugin.
       /// </summary>
-      string Extensions
-      { get; }
+      string Extensions { get; }
 
-      // Plugin Details
       /// <summary>
       /// Display name of plugin.
       /// </summary>
-      string Name
-      { get; }
+      string Name { get; }
 
       /// <summary>
       /// Version of plugin.
       /// </summary>
-      string Version
-      { get; }
+      string Version { get; }
+
       /// <summary>
       /// Author of plugin.
       /// </summary>
-      string Author
-      { get; }
+      string Author { get; }
 
       /// <summary>
       /// Description of plugin.
       /// </summary>
-      string Description
-      { get; }
-
-     
+      string Description { get; }
    }
 }

@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
+using AstroGrep.Core;
+
 namespace AstroGrep.Windows.Forms
 {
    /// <summary>
@@ -81,7 +83,7 @@ namespace AstroGrep.Windows.Forms
             _graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
             // Gradient the panel
-            using (LinearGradientBrush _gradientBrush = new LinearGradientBrush(new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height), Common.ASTROGREP_ORANGE, Color.White, LinearGradientMode.ForwardDiagonal))
+            using (LinearGradientBrush _gradientBrush = new LinearGradientBrush(new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height), Core.Common.ASTROGREP_ORANGE, Color.White, LinearGradientMode.ForwardDiagonal))
             {
                _graphics.FillRectangle(_gradientBrush, new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height));
             }

@@ -33,7 +33,7 @@ namespace libAstroGrep.Plugin
 
       #region Declarations
 
-       #endregion
+      #endregion
 
       /// <summary>
       /// Initializes a new instance of the PluginWrapper class.
@@ -43,11 +43,14 @@ namespace libAstroGrep.Plugin
       /// </history>
       public PluginWrapper()
       {
-          AssemblyName = string.Empty;
-          AssemblyPath = string.Empty;
+         AssemblyName = string.Empty;
+         AssemblyPath = string.Empty;
+         Internal = false;
+         Enabled = false;
+         Index = -1;
       }
 
-       /// <summary>
+      /// <summary>
       /// Initializes a new instance of the PluginWrapper class.
       /// </summary>
       /// <param name="plugin">IAstroGrepPlugin</param>
@@ -58,54 +61,63 @@ namespace libAstroGrep.Plugin
       /// <history>
       /// [Curtis_Beard]		07/31/2006	Created
       /// </history>
-      public PluginWrapper(IAstroGrepPlugin plugin, string assemblyPath, 
-                           string assemblyName, bool internalPlugin, bool enabled)
+      public PluginWrapper(IAstroGrepPlugin plugin, string assemblyPath,
+                           string assemblyName, bool internalPlugin, bool enabled, int index)
       {
          Plugin = plugin;
          AssemblyPath = assemblyPath;
          AssemblyName = assemblyName;
          Internal = internalPlugin;
          Enabled = enabled;
+         Index = index;
       }
 
-       /// <summary>
-       /// Contains the IAstroGrepPlugin.
-       /// </summary>
-       /// <history>
-       /// [Curtis_Beard]		07/31/2006	Created
-       /// </history>
-       public IAstroGrepPlugin Plugin { get; set; }
+      /// <summary>
+      /// Contains the IAstroGrepPlugin.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/31/2006	Created
+      /// </history>
+      public IAstroGrepPlugin Plugin { get; set; }
 
-       /// <summary>
-       /// Determines whether the plugin is enabled or disabled.
-       /// </summary>
-       /// <history>
-       /// [Curtis_Beard]		07/31/2006	Created
-       /// </history>
-       public bool Enabled { get; set; }
+      /// <summary>
+      /// Determines whether the plugin is enabled or disabled.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/31/2006	Created
+      /// </history>
+      public bool Enabled { get; set; }
 
-       /// <summary>
-       /// Determines whether the plugin is an Internal or External plugin.
-       /// </summary>
-       /// <history>
-       /// [Curtis_Beard]		07/31/2006	Created
-       /// </history>
-       public bool Internal { get; set; }
+      /// <summary>
+      /// Determines whether the plugin is an Internal or External plugin.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/31/2006	Created
+      /// </history>
+      public bool Internal { get; set; }
 
-       /// <summary>
-       /// Contains the fully qualified path to the plugin.
-       /// </summary>
-       /// <history>
-       /// [Curtis_Beard]		07/31/2006	Created
-       /// </history>
-       public string AssemblyPath { get; set; }
+      /// <summary>
+      /// Contains the fully qualified path to the plugin.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/31/2006	Created
+      /// </history>
+      public string AssemblyPath { get; set; }
 
-       /// <summary>
-       /// Contains the full assembly name of the plugin.
-       /// </summary>
-       /// <history>
-       /// [Curtis_Beard]		07/31/2006	Created
-       /// </history>
-       public string AssemblyName { get; set; }
+      /// <summary>
+      /// Contains the full assembly name of the plugin.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/31/2006	Created
+      /// </history>
+      public string AssemblyName { get; set; }
+
+      /// <summary>
+      /// Index of plugin in collection.
+      /// </summary>
+      ///  <history>
+      /// [Curtis_Beard]		10/19/2012	Created
+      /// </history>
+      public int Index { get; set; }
    }
 }

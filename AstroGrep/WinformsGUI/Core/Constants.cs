@@ -49,8 +49,6 @@ namespace AstroGrep
       public static string FONT_SEPARATOR = "||";
       /// <summary>Separator for text editor</summary>
       public static string TEXT_EDITOR_SEPARATOR = "|;;|";
-      /// <summary>Separator for text editor arguments</summary>
-      public static string TEXT_EDITOR_ARGS_SEPARATOR = "|@@|";
       /// <summary>Separator for text editor file types</summary>
       public static string TEXT_EDITOR_TYPE_SEPARATOR = "|";
       /// <summary>Separator for plugins</summary>

@@ -5,6 +5,9 @@ namespace libAstroGrep
         /// <summary>Array of start directories</summary>
         string[] StartDirectories { get; }
 
+        /// <summary>Full file paths to files that will be searched (if defined, StartDirectories ignored, can be used for Search within Results)</summary>
+        string[] StartFilePaths { get; set; }
+
         /// <summary>Use of directory recursion for grep</summary>
         bool SearchInSubfolders { get; }
 

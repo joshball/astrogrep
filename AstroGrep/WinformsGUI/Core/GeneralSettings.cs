@@ -39,6 +39,8 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions, empty out exclude list to use search options value instead
    /// [Curtis_Beard]	   10/05/2012	ADD: 1741935, option to show/hide exclusion/error dialog message to user
    /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
+   /// [Curtis_Beard]	   10/28/2012	ADD: 3575509, results word wrap
+   /// [Curtis_Beard]	   10/28/2012	ADD: 3479503, ability to change file list font
    /// </history>
    public sealed class GeneralSettings
    {
@@ -82,12 +84,17 @@ namespace AstroGrep.Core
       private string searchFilters = string.Format("*.*{0}*.txt{0}*.java{0}*.htm, *.html{0}*.jsp, *.asp{0}*.js, *.inc{0}*.htm, *.html, *.jsp, *.asp{0}*.sql{0}*.bas, *.cls, *.vb{0}*.cs{0}*.cpp, *.c, *.h{0}*.asm", Constants.SEARCH_ENTRIES_SEPARATOR);
       private string searchTexts = string.Empty;
 
-      private string textEditors = string.Format("notepad{0}%1{0}*", Constants.TEXT_EDITOR_ARGS_SEPARATOR);
+      private string textEditors = string.Format("notepad{0}%1{0}*{0}0", TextEditor.DELIMETER);
 
       private bool showSearchOptions = false;
 
       private bool showExclusionErrorMessage = true;
+        
       private bool saveSearchOptionsOnExit = true;
+
+      private bool resultsWordWrap = false;
+
+      private string filePanelFont = string.Format("Microsoft Sans Serif{0}8.25{0}Regular", Constants.FONT_SEPARATOR);
       #endregion
       
       /// <summary>
@@ -382,6 +389,24 @@ namespace AstroGrep.Core
       {
          get { return MySettings.saveSearchOptionsOnExit; }
          set { MySettings.saveSearchOptionsOnExit = value; }
+      }
+
+      /// <summary>
+      /// Gets/sets whether to enable word wrap for the results area.
+      /// </summary>
+      static public bool ResultsWordWrap
+      {
+         get { return MySettings.resultsWordWrap; }
+         set { MySettings.resultsWordWrap = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the file panel font.
+      /// </summary>
+      static public string FilePanelFont
+      {
+         get { return MySettings.filePanelFont; }
+         set { MySettings.filePanelFont = value; }
       }
    }
 }

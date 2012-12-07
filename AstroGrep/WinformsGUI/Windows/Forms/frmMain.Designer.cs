@@ -6,90 +6,92 @@ using System.Collections;
 
 namespace AstroGrep.Windows.Forms
 {
-	public partial class frmMain
-	{
-		#region Windows Form Designer generated code
-		private System.Windows.Forms.ListView lstFileNames;
-private System.Windows.Forms.RichTextBox txtHits;
-private System.Windows.Forms.Panel pnlSearch;
-private System.Windows.Forms.ComboBox cboSearchForText;
-private System.Windows.Forms.ComboBox cboFileName;
-private System.Windows.Forms.ComboBox cboFilePath;
-private System.Windows.Forms.Button btnCancel;
-private System.Windows.Forms.Button btnSearch;
-private System.Windows.Forms.Panel pnlSearchOptions;
-private System.Windows.Forms.Panel pnlMainSearch;
-private System.Windows.Forms.Label lblSearchText;
-private System.Windows.Forms.Label lblFileTypes;
-private System.Windows.Forms.Label lblSearchPath;
-private System.Windows.Forms.Label lblSearchHeading;
-private System.Windows.Forms.Splitter splitUpDown;
-private System.Windows.Forms.Splitter splitLeftRight;
-private System.Windows.Forms.Panel pnlRightSide;
-private System.Windows.Forms.StatusStrip stbStatus;
-private System.Windows.Forms.ToolStripStatusLabel sbStatusPanel;
-private System.Windows.Forms.ToolStripStatusLabel sbTotalCountPanel;
-private System.Windows.Forms.ToolStripStatusLabel sbFileCountPanel;
-private System.Windows.Forms.ToolStripStatusLabel sbFilterCountPanel;
-private System.Windows.Forms.ToolStripStatusLabel sbErrorCountPanel;
-private System.Windows.Forms.LinkLabel lnkSearchOptions;
-private System.Windows.Forms.LinkLabel lnkExclusions;
-private System.Windows.Forms.ToolTip toolTip1;
-private System.Windows.Forms.Panel PanelOptionsContainer;
-private System.Windows.Forms.CheckBox chkNegation;
-private System.Windows.Forms.CheckBox chkCaseSensitive;
-private System.Windows.Forms.CheckBox chkRecurse;
-private System.Windows.Forms.CheckBox chkFileNamesOnly;
-private System.Windows.Forms.CheckBox chkLineNumbers;
-private System.Windows.Forms.CheckBox chkRegularExpressions;
-private System.Windows.Forms.CheckBox chkWholeWordOnly;
-private System.Windows.Forms.NumericUpDown txtContextLines;
-private System.Windows.Forms.Label lblContextLines;
-private System.Windows.Forms.MenuItem mnuFile;
-private System.Windows.Forms.MenuItem mnuSaveResults;
-private System.Windows.Forms.MenuItem mnuPrintResults;
-private System.Windows.Forms.MenuItem mnuExit;
-private System.Windows.Forms.MenuItem mnuEdit;
-private System.Windows.Forms.MenuItem mnuTools;
-private System.Windows.Forms.MenuItem mnuOptions;
-private System.Windows.Forms.MenuItem mnuHelp;
-private System.Windows.Forms.MenuItem mnuAbout;
-private System.Windows.Forms.MenuItem mnuSelectAll;
-private System.Windows.Forms.MenuItem mnuOpenSelected;
-private System.Windows.Forms.MenuItem mnuClearMRU;
-private System.Windows.Forms.MainMenu mnuAll;
-private System.Windows.Forms.MenuItem mnuFileSep;
-private System.Windows.Forms.MenuItem mnuToolsSep;
-private System.Windows.Forms.MenuItem mnuSaveSearchSettings;
-private System.Windows.Forms.ImageList ListViewImageList;
-private AstroGrep.Windows.Controls.PictureButton picBrowse;
-private System.Windows.Forms.MenuItem mnuBrowse;
-private System.Windows.Forms.MenuItem mnuFileSep2;
-private System.Windows.Forms.ContextMenu fileLstMnu;
-private System.Windows.Forms.MenuItem menuItem4;
-private System.Windows.Forms.MenuItem CopyMenuItem;
-private System.Windows.Forms.MenuItem OpenMenuItem;
-private System.Windows.Forms.MenuItem DeleteMenuItem;
-private System.Windows.Forms.MenuItem OpenFolderMenuItem;
-private System.Windows.Forms.MenuItem menuItem2;
-private System.Windows.Forms.MenuItem CopyNameMenuItem;
-private System.Windows.Forms.MenuItem CopyLocatedInMenuItem;
-private System.Windows.Forms.MenuItem CopyLocatedInAndNameMenuItem;
-private Label label2;
-private DateTimePicker dateModEnd;
-private Label label1;
-private DateTimePicker dateModBegin;
-private Label label4;
-private TextBox txtMinSize;
-private Label label3;
-private TextBox txtMaxSize;
-private System.Windows.Forms.ComboBox cboMinSizeType;
-private System.Windows.Forms.ComboBox cboMaxSizeType;
-private System.Windows.Forms.CheckBox chkSkipSystem;
-private System.Windows.Forms.CheckBox chkSkipHidden;
+   public partial class frmMain
+   {
+      #region Windows Form Designer generated code
+      private System.Windows.Forms.ListView lstFileNames;
+      private System.Windows.Forms.RichTextBox txtHits;
+      private System.Windows.Forms.Panel pnlSearch;
+      private System.Windows.Forms.ComboBox cboSearchForText;
+      private System.Windows.Forms.ComboBox cboFileName;
+      private System.Windows.Forms.ComboBox cboFilePath;
+      private System.Windows.Forms.Button btnCancel;
+      private Windows.Controls.SplitButton btnSearch;
+      private System.Windows.Forms.Panel pnlSearchOptions;
+      private System.Windows.Forms.Panel pnlMainSearch;
+      private System.Windows.Forms.Label lblSearchText;
+      private System.Windows.Forms.Label lblFileTypes;
+      private System.Windows.Forms.Label lblSearchPath;
+      private System.Windows.Forms.Label lblSearchHeading;
+      private System.Windows.Forms.Splitter splitUpDown;
+      private System.Windows.Forms.Splitter splitLeftRight;
+      private System.Windows.Forms.Panel pnlRightSide;
+      private System.Windows.Forms.StatusStrip stbStatus;
+      private System.Windows.Forms.ToolStripStatusLabel sbStatusPanel;
+      private System.Windows.Forms.ToolStripStatusLabel sbTotalCountPanel;
+      private System.Windows.Forms.ToolStripStatusLabel sbFileCountPanel;
+      private System.Windows.Forms.ToolStripStatusLabel sbFilterCountPanel;
+      private System.Windows.Forms.ToolStripStatusLabel sbErrorCountPanel;
+      private System.Windows.Forms.LinkLabel lnkSearchOptions;
+      private System.Windows.Forms.LinkLabel lnkExclusions;
+      private System.Windows.Forms.ToolTip toolTip1;
+      private System.Windows.Forms.Panel PanelOptionsContainer;
+      private System.Windows.Forms.CheckBox chkNegation;
+      private System.Windows.Forms.CheckBox chkCaseSensitive;
+      private System.Windows.Forms.CheckBox chkRecurse;
+      private System.Windows.Forms.CheckBox chkFileNamesOnly;
+      private System.Windows.Forms.CheckBox chkLineNumbers;
+      private System.Windows.Forms.CheckBox chkRegularExpressions;
+      private System.Windows.Forms.CheckBox chkWholeWordOnly;
+      private System.Windows.Forms.NumericUpDown txtContextLines;
+      private System.Windows.Forms.Label lblContextLines;
+      private System.Windows.Forms.MenuItem mnuFile;
+      private System.Windows.Forms.MenuItem mnuSaveResults;
+      private System.Windows.Forms.MenuItem mnuPrintResults;
+      private System.Windows.Forms.MenuItem mnuExit;
+      private System.Windows.Forms.MenuItem mnuEdit;
+      private System.Windows.Forms.MenuItem mnuTools;
+      private System.Windows.Forms.MenuItem mnuOptions;
+      private System.Windows.Forms.MenuItem mnuHelp;
+      private System.Windows.Forms.MenuItem mnuAbout;
+      private System.Windows.Forms.MenuItem mnuSelectAll;
+      private System.Windows.Forms.MenuItem mnuOpenSelected;
+      private System.Windows.Forms.MenuItem mnuClearMRU;
+      private System.Windows.Forms.MainMenu mnuAll;
+      private System.Windows.Forms.MenuItem mnuFileSep;
+      private System.Windows.Forms.MenuItem mnuToolsSep;
+      private System.Windows.Forms.MenuItem mnuSaveSearchSettings;
+      private System.Windows.Forms.ImageList ListViewImageList;
+      private AstroGrep.Windows.Controls.PictureButton picBrowse;
+      private System.Windows.Forms.MenuItem mnuBrowse;
+      private System.Windows.Forms.MenuItem mnuFileSep2;
+      private System.Windows.Forms.ContextMenu fileLstMnu;
+      private System.Windows.Forms.MenuItem menuItem4;
+      private System.Windows.Forms.MenuItem CopyMenuItem;
+      private System.Windows.Forms.MenuItem OpenMenuItem;
+      private System.Windows.Forms.MenuItem DeleteMenuItem;
+      private System.Windows.Forms.MenuItem OpenFolderMenuItem;
+      private System.Windows.Forms.MenuItem menuItem2;
+      private System.Windows.Forms.MenuItem CopyNameMenuItem;
+      private System.Windows.Forms.MenuItem CopyLocatedInMenuItem;
+      private System.Windows.Forms.MenuItem CopyLocatedInAndNameMenuItem;
+      private Label label2;
+      private DateTimePicker dateModEnd;
+      private Label label1;
+      private DateTimePicker dateModBegin;
+      private Label label4;
+      private TextBox txtMinSize;
+      private Label label3;
+      private TextBox txtMaxSize;
+      private System.Windows.Forms.ComboBox cboMinSizeType;
+      private System.Windows.Forms.ComboBox cboMaxSizeType;
+      private System.Windows.Forms.CheckBox chkSkipSystem;
+      private System.Windows.Forms.CheckBox chkSkipHidden;
+      private System.Windows.Forms.NumericUpDown txtMinFileCount;
+      private System.Windows.Forms.Label lblMinFileCount;
 
-	    private void InitializeComponent()
-		{
+      private void InitializeComponent()
+      {
          this.components = new System.ComponentModel.Container();
          System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
          this.pnlSearch = new System.Windows.Forms.Panel();
@@ -113,10 +115,10 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.chkRecurse = new System.Windows.Forms.CheckBox();
          this.chkCaseSensitive = new System.Windows.Forms.CheckBox();
          this.lnkSearchOptions = new System.Windows.Forms.LinkLabel();
-		 this.lnkExclusions = new System.Windows.Forms.LinkLabel();
+         this.lnkExclusions = new System.Windows.Forms.LinkLabel();
          this.pnlMainSearch = new System.Windows.Forms.Panel();
          this.picBrowse = new AstroGrep.Windows.Controls.PictureButton();
-         this.btnSearch = new System.Windows.Forms.Button();
+         this.btnSearch = new Windows.Controls.SplitButton();
          this.btnCancel = new System.Windows.Forms.Button();
          this.cboFilePath = new System.Windows.Forms.ComboBox();
          this.cboFileName = new System.Windows.Forms.ComboBox();
@@ -134,9 +136,9 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.menuItem4 = new System.Windows.Forms.MenuItem();
          this.OpenMenuItem = new System.Windows.Forms.MenuItem();
          this.OpenFolderMenuItem = new System.Windows.Forms.MenuItem();
-		 this.CopyNameMenuItem = new System.Windows.Forms.MenuItem();
-		 this.CopyLocatedInMenuItem = new System.Windows.Forms.MenuItem();
-		 this.CopyLocatedInAndNameMenuItem = new System.Windows.Forms.MenuItem();
+         this.CopyNameMenuItem = new System.Windows.Forms.MenuItem();
+         this.CopyLocatedInMenuItem = new System.Windows.Forms.MenuItem();
+         this.CopyLocatedInAndNameMenuItem = new System.Windows.Forms.MenuItem();
          this.menuItem2 = new System.Windows.Forms.MenuItem();
          this.DeleteMenuItem = new System.Windows.Forms.MenuItem();
          this.splitLeftRight = new System.Windows.Forms.Splitter();
@@ -168,8 +170,10 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
          this.chkSkipHidden = new System.Windows.Forms.CheckBox();
          this.chkSkipSystem = new System.Windows.Forms.CheckBox();
-		 this.cboMinSizeType = new System.Windows.Forms.ComboBox();
-		 this.cboMaxSizeType = new System.Windows.Forms.ComboBox();
+         this.cboMinSizeType = new System.Windows.Forms.ComboBox();
+         this.cboMaxSizeType = new System.Windows.Forms.ComboBox();
+         this.txtMinFileCount = new System.Windows.Forms.NumericUpDown();
+         this.lblMinFileCount = new System.Windows.Forms.Label();
          this.pnlSearch.SuspendLayout();
          this.pnlSearchOptions.SuspendLayout();
 
@@ -201,20 +205,22 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.pnlSearchOptions.Controls.Add(this.lnkSearchOptions);
          this.pnlSearchOptions.Location = new System.Drawing.Point(16, 209);
          this.pnlSearchOptions.Name = "pnlSearchOptions";
-         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 473);
+         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 500);
          this.pnlSearchOptions.TabIndex = 1;
          // 
          // PanelOptionsContainer
          // 
          this.PanelOptionsContainer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                      | System.Windows.Forms.AnchorStyles.Right)));
-		 this.PanelOptionsContainer.Controls.Add(this.lnkExclusions);
+         this.PanelOptionsContainer.Controls.Add(this.lblMinFileCount);
+         this.PanelOptionsContainer.Controls.Add(this.txtMinFileCount);
+         this.PanelOptionsContainer.Controls.Add(this.lnkExclusions);
          this.PanelOptionsContainer.Controls.Add(this.chkSkipSystem);
          this.PanelOptionsContainer.Controls.Add(this.chkSkipHidden);
-		 this.PanelOptionsContainer.Controls.Add(this.cboMaxSizeType);
+         this.PanelOptionsContainer.Controls.Add(this.cboMaxSizeType);
          this.PanelOptionsContainer.Controls.Add(this.txtMaxSize);
          this.PanelOptionsContainer.Controls.Add(this.label4);
-		 this.PanelOptionsContainer.Controls.Add(this.cboMinSizeType);
+         this.PanelOptionsContainer.Controls.Add(this.cboMinSizeType);
          this.PanelOptionsContainer.Controls.Add(this.txtMinSize);
          this.PanelOptionsContainer.Controls.Add(this.label3);
          this.PanelOptionsContainer.Controls.Add(this.label2);
@@ -232,20 +238,20 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.PanelOptionsContainer.Controls.Add(this.chkCaseSensitive);
          this.PanelOptionsContainer.Location = new System.Drawing.Point(0, 16);
          this.PanelOptionsContainer.Name = "PanelOptionsContainer";
-         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 453);
+         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 483);
          this.PanelOptionsContainer.TabIndex = 1;
-		 // 
+         // 
          // cboMaxSizeType
          // 
-		 this.cboMaxSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-		 this.cboMaxSizeType.Items.AddRange(new object[] {
+         this.cboMaxSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cboMaxSizeType.Items.AddRange(new object[] {
             "byte",
             "KB",
             "MB",
             "GB"});
          this.cboMaxSizeType.Location = new System.Drawing.Point(140, 355);
          this.cboMaxSizeType.Name = "cboMaxSizeType";
-		 this.cboMaxSizeType.SelectedIndex = 0;
+         this.cboMaxSizeType.SelectedIndex = 0;
          this.cboMaxSizeType.Size = new System.Drawing.Size(75, 18);
          this.cboMaxSizeType.TabIndex = 23;
          // 
@@ -259,24 +265,24 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // label4
          // 
          this.label4.AutoSize = true;
-		 this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label4.Location = new System.Drawing.Point(7, 339);
          this.label4.Name = "label4";
          this.label4.Size = new System.Drawing.Size(53, 13);
          this.label4.TabIndex = 21;
          this.label4.Text = "Max Size:";
-		 // 
+         // 
          // cboMinSizeType
          // 
-		 this.cboMinSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cboMinSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cboMinSizeType.Location = new System.Drawing.Point(140, 316);
-		 this.cboMinSizeType.Items.AddRange(new object[] {
+         this.cboMinSizeType.Items.AddRange(new object[] {
             "byte",
             "KB",
             "MB",
             "GB"});
          this.cboMinSizeType.Name = "cboMinSizeType";
-		 this.cboMinSizeType.SelectedIndex = 0;
+         this.cboMinSizeType.SelectedIndex = 0;
          this.cboMinSizeType.Size = new System.Drawing.Size(75, 18);
          this.cboMinSizeType.TabIndex = 20;
          // 
@@ -290,7 +296,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // label3
          // 
          this.label3.AutoSize = true;
-		 this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label3.Location = new System.Drawing.Point(7, 300);
          this.label3.Name = "label3";
          this.label3.Size = new System.Drawing.Size(50, 13);
@@ -300,7 +306,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // label2
          // 
          this.label2.AutoSize = true;
-		 this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label2.Location = new System.Drawing.Point(7, 251);
          this.label2.Name = "label2";
          this.label2.Size = new System.Drawing.Size(84, 13);
@@ -317,7 +323,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // label1
          // 
          this.label1.AutoSize = true;
-		 this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.label1.Location = new System.Drawing.Point(7, 207);
          this.label1.Name = "label1";
          this.label1.Size = new System.Drawing.Size(75, 13);
@@ -335,7 +341,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // 
          this.lblContextLines.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                      | System.Windows.Forms.AnchorStyles.Right)));
-		 this.lblContextLines.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.lblContextLines.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.lblContextLines.Location = new System.Drawing.Point(56, 175);
          this.lblContextLines.Name = "lblContextLines";
          this.lblContextLines.Size = new System.Drawing.Size(127, 20);
@@ -351,6 +357,29 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.txtContextLines.Size = new System.Drawing.Size(41, 20);
          this.txtContextLines.TabIndex = 13;
          this.toolTip1.SetToolTip(this.txtContextLines, "Show lines above and below the word matched");
+         // 
+         // lblMinFileCount
+         // 
+         this.lblMinFileCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                     | System.Windows.Forms.AnchorStyles.Right)));
+         this.lblMinFileCount.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.lblMinFileCount.Location = new System.Drawing.Point(65, 426);
+         this.lblMinFileCount.Name = "lblMinFileCount";
+         this.lblMinFileCount.Size = new System.Drawing.Size(127, 20);
+         this.lblMinFileCount.TabIndex = 8;
+         this.lblMinFileCount.Text = "Minimum File Count";
+         this.lblMinFileCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+         this.toolTip1.SetToolTip(this.lblMinFileCount, "Only show files with count greater or equal to this number");
+         // 
+         // txtMinFileCount
+         // 
+         this.txtMinFileCount.Location = new System.Drawing.Point(7, 426);
+         this.txtMinFileCount.Name = "txtMinFileCount";
+         this.txtMinFileCount.Size = new System.Drawing.Size(50, 20);
+         this.txtMinFileCount.TabIndex = 13;
+         this.txtMinFileCount.Minimum = 0;
+         this.txtMinFileCount.Maximum = int.MaxValue;
+         this.toolTip1.SetToolTip(this.txtMinFileCount, "Only show files with count greater or equal to this number");
          // 
          // chkWholeWordOnly
          // 
@@ -451,13 +480,15 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.lnkSearchOptions.Text = "Search Options >>";
          this.lnkSearchOptions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
          this.lnkSearchOptions.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkSearchOptions_LinkClicked);
-		 // 
+         // 
          // lnkExclusions
          // 
          this.lnkExclusions.ActiveLinkColor = System.Drawing.SystemColors.HotTrack;
          this.lnkExclusions.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.lnkExclusions.LinkColor = System.Drawing.SystemColors.HotTrack;
-         this.lnkExclusions.Location = new System.Drawing.Point(5, 426);
+         this.lnkExclusions.Location = new System.Drawing.Point(5, 455);
+         this.lnkExclusions.LinkBehavior = LinkBehavior.AlwaysUnderline;
+
          this.lnkExclusions.LinkBehavior = LinkBehavior.AlwaysUnderline;
          this.lnkExclusions.Name = "lnkExclusions";
          this.lnkExclusions.Size = new System.Drawing.Size(150, 16);
@@ -501,15 +532,21 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          // 
          // btnSearch
          // 
+         this.btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
          this.btnSearch.BackColor = System.Drawing.SystemColors.Control;
-         this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
+         this.btnSearch.ShowSplit = true;
          this.btnSearch.Location = new System.Drawing.Point(8, 160);
          this.btnSearch.Name = "btnSearch";
-         this.btnSearch.Size = new System.Drawing.Size(75, 23);
+         this.btnSearch.Size = new System.Drawing.Size(80, 23);
          this.btnSearch.TabIndex = 0;
          this.btnSearch.Text = "&Search";
          this.btnSearch.UseVisualStyleBackColor = false;
-         this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
+         this.btnSearch.Click += new EventHandler(btnSearch_Click);
+         ContextMenu ctxMenu = new ContextMenu();
+         ctxMenu.MenuItems.Add(new MenuItem("Search in results", mnuSearchInResults_Click));
+         this.btnSearch.ContextMenu = ctxMenu;
+         this.btnSearch.ContextMenu.MenuItems[0].Enabled = false;
          // 
          // btnCancel
          // 
@@ -518,9 +555,9 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
          this.btnCancel.Enabled = false;
          this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.btnCancel.Location = new System.Drawing.Point(116, 160);
+         this.btnCancel.Location = new System.Drawing.Point(111, 160);
          this.btnCancel.Name = "btnCancel";
-         this.btnCancel.Size = new System.Drawing.Size(75, 23);
+         this.btnCancel.Size = new System.Drawing.Size(80, 23);
          this.btnCancel.TabIndex = 4;
          this.btnCancel.Text = "&Cancel";
          this.btnCancel.UseVisualStyleBackColor = false;
@@ -646,7 +683,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.lstFileNames.View = System.Windows.Forms.View.Details;
          this.lstFileNames.SelectedIndexChanged += new System.EventHandler(this.lstFileNames_SelectedIndexChanged);
          this.lstFileNames.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstFileNames_KeyDown);
-		 this.lstFileNames.SmallImageList = ListViewImageList;
+         this.lstFileNames.SmallImageList = ListViewImageList;
          // 
          // fileLstMnu
          // 
@@ -666,23 +703,23 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.CopyMenuItem.Index = 0;
          this.CopyMenuItem.Text = "Copy";
          this.CopyMenuItem.Click += new System.EventHandler(this.CopyMenuItem_Click);
-		 // 
+         // 
          // CopyNameMenuItem
          //
-		 this.CopyNameMenuItem.Index = 1;
-		 this.CopyNameMenuItem.Text = "Copy Name";
+         this.CopyNameMenuItem.Index = 1;
+         this.CopyNameMenuItem.Text = "Copy Name";
          this.CopyNameMenuItem.Click += new System.EventHandler(this.CopyNameMenuItem_Click);
-		 // 
+         // 
          // CopyLocatedInMenuItem
          //
-		 this.CopyLocatedInMenuItem.Index = 2;
-		 this.CopyLocatedInMenuItem.Text = "Copy Located In";
+         this.CopyLocatedInMenuItem.Index = 2;
+         this.CopyLocatedInMenuItem.Text = "Copy Located In";
          this.CopyLocatedInMenuItem.Click += new System.EventHandler(this.CopyLocatedInMenuItem_Click);
-		 // 
+         // 
          // CopyLocatedInAndNameMenuItem
          //
-		 this.CopyLocatedInAndNameMenuItem.Index = 3;
-		 this.CopyLocatedInAndNameMenuItem.Text = "Copy Located In + Name";
+         this.CopyLocatedInAndNameMenuItem.Index = 3;
+         this.CopyLocatedInAndNameMenuItem.Text = "Copy Located In + Name";
          this.CopyLocatedInAndNameMenuItem.Click += new System.EventHandler(this.CopyLocatedInAndNameMenuItem_Click);
          // 
          // menuItem4
@@ -868,6 +905,7 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.sbStatusPanel.Name = "sbStatusPanel";
          this.sbStatusPanel.Size = new System.Drawing.Size(648, 17);
          this.sbStatusPanel.Spring = true;
+         this.sbStatusPanel.DoubleClickEnabled = true;
          this.sbStatusPanel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
          // 
          // sbTotalCountPanel
@@ -962,23 +1000,23 @@ private System.Windows.Forms.CheckBox chkSkipHidden;
          this.pnlRightSide.ResumeLayout(false);
          this.ResumeLayout(false);
 
-		}
-		#endregion
+      }
+      #endregion
 
       /// <summary>
       /// Dispose form.
       /// </summary>
       /// <param name="disposing">system parameter</param>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if (components != null) 
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
-	}
+      protected override void Dispose(bool disposing)
+      {
+         if (disposing)
+         {
+            if (components != null)
+            {
+               components.Dispose();
+            }
+         }
+         base.Dispose(disposing);
+      }
+   }
 }

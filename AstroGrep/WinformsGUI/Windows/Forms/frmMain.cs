@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.IO;
+
+using AstroGrep.Core;
 using AstroGrep.Output;
 using libAstroGrep;
 
@@ -34,18 +36,13 @@ namespace AstroGrep.Windows.Forms
    ///   ted@astrocomma.com or curtismbeard@gmail.com
    /// </remarks>
    /// <history>
-   /// [Theodore_Ward]     ??/??/????  Initial
-   /// [Curtis_Beard]      01/11/2005  .Net Conversion/Comments/Option Strict
-   /// [Curtis_Beard]      10/15/2005	CHG: Replace search procedures
-   /// [Andrew_Radford]    17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
-   /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+   /// [Theodore_Ward]      ??/??/????  Initial
+   /// [Curtis_Beard]       01/11/2005  .Net Conversion/Comments/Option Strict
+   /// [Curtis_Beard]       10/15/2005	CHG: Replace search procedures
+   /// [Andrew_Radford]     17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
+   /// [Curtis_Beard]	    03/07/2012	ADD: 3131609, exclusions
    /// [Curtis_Beard]		09/26/2012	CHG: 3572487, move command line logic to program.cs and use property for value
    /// </history>
-   /// TODO:
-   /// * Change main hit list control to a databound grid
-   /// * Extract export code
-   /// * Change export code to produce output using xslt
-   /// * Create XML from a grep report object which is XML serializable
    public partial class frmMain : Form
    {
       #region Declarations
@@ -55,8 +52,7 @@ namespace AstroGrep.Windows.Forms
       private Grep __Grep = null;
       private string __SearchOptionsText = "Search Options {0}";
       private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
-      private readonly System.Collections.Specialized.StringCollection __ErrorCollection = new System.Collections.Specialized.StringCollection();
-      private readonly System.Collections.Specialized.StringCollection __FilterCollection = new System.Collections.Specialized.StringCollection();
+      private readonly List<LogItem> LogItems = new List<LogItem>();
       private List<ExclusionItem> __ExclusionItems = new List<ExclusionItem>();
       private CommandLineProcessing.CommandLineArguments __CommandLineArgs = new CommandLineProcessing.CommandLineArguments();
 
@@ -73,7 +69,7 @@ namespace AstroGrep.Windows.Forms
       private delegate void CalculateTotalCountCallBack();
       private delegate void ClearItemsCallBack();
       private delegate void AddToListCallBack(FileInfo file, int index);
-      private delegate void DisplaySearchMessagesCallBack(System.Collections.Specialized.StringCollection collection, string titleMessage);
+      private delegate void DisplaySearchMessagesCallBack(LogItem.LogItemTypes displayType);
       private delegate void DisplayExclusionErrorMessagesCallBack();
 
       #endregion
@@ -106,6 +102,8 @@ namespace AstroGrep.Windows.Forms
          //
          InitializeComponent();
 
+         API.ListViewExtensions.SetTheme(lstFileNames);
+
          dateModBegin.Value = DateTimePicker.MinDateTime;
          dateModEnd.Value = DateTimePicker.MaxDateTime;
 
@@ -127,8 +125,8 @@ namespace AstroGrep.Windows.Forms
          txtHits.MouseDown += txtHits_MouseDown;
          lstFileNames.MouseDown += lstFileNames_MouseDown;
          lstFileNames.ColumnClick += lstFileNames_ColumnClick;
-         lstFileNames.HandleCreated += lstFileNames_HandleCreated;
          lstFileNames.ItemDrag += lstFileNames_ItemDrag;
+         //sbStatusPanel.DoubleClick += new EventHandler(sbStatusPanel_DoubleClick);
          sbErrorCountPanel.DoubleClick += new EventHandler(sbErrorCountPanel_DoubleClick);
          sbFilterCountPanel.DoubleClick += new EventHandler(sbFilterCountPanel_DoubleClick);
       }
@@ -177,6 +175,7 @@ namespace AstroGrep.Windows.Forms
 
          // Load the search settings
          Legacy.ConvertSearchSettings();
+         int line = Core.SearchSettings.ContextLines;
          LoadSearchSettings();
 
          // Make sure in Mono to set the command-line path
@@ -476,12 +475,16 @@ namespace AstroGrep.Windows.Forms
             chkLineNumbers.Enabled = false;
             txtContextLines.Enabled = false;
             lblContextLines.Enabled = false;
+            lblMinFileCount.Enabled = false;
+            txtMinFileCount.Enabled = false;
          }
          else
          {
             chkLineNumbers.Enabled = true;
             txtContextLines.Enabled = true;
             lblContextLines.Enabled = true;
+            lblMinFileCount.Enabled = true;
+            txtMinFileCount.Enabled = true;
          }
       }
 
@@ -506,15 +509,32 @@ namespace AstroGrep.Windows.Forms
       /// <param name="sender">System parm</param>
       /// <param name="e">System parm</param>
       /// <history>
-      /// [Theodore_Ward]     ??/??/????  Initial
-      /// [Curtis_Beard]	   01/11/2005	.Net Conversion
+      /// [Theodore_Ward]       ??/??/????  Initial
+      /// [Curtis_Beard]	    01/11/2005	.Net Conversion
+      /// [Curtis_Beard]	    10/30/2012	ADD: 28, search within results
       /// </history>
       private void btnSearch_Click(object sender, System.EventArgs e)
       {
          if (!VerifyInterface())
             return;
 
-         StartSearch();
+         StartSearch(false);
+      }
+
+      /// <summary>
+      /// Search in Results Event
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	    10/30/2012	ADD: 28, search within results
+      /// </history>
+      private void mnuSearchInResults_Click(object sender, EventArgs e)
+      {
+          if (!VerifyInterface())
+              return;
+
+          StartSearch(true);
       }
 
       /// <summary>
@@ -536,6 +556,7 @@ namespace AstroGrep.Windows.Forms
             int lineNumber;
             int hitLineNumber;
             int hitColumn;
+            string hitLine = string.Empty;
 
             // Make sure there is something to click on.
             if (lstFileNames.SelectedItems.Count == 0)
@@ -546,17 +567,59 @@ namespace AstroGrep.Windows.Forms
 
             // Find out the line number the cursor is on.
             lineNumber = txtHits.GetLineFromCharIndex(txtHits.SelectionStart);
+            int orgLineNumber = lineNumber;
+
+            // might need to adjust line number when using word wrap
+            /*if (txtHits.WordWrap)
+            {
+               int wrappedCount = 0;
+
+               System.Diagnostics.Debug.WriteLine(string.Format("Starting line number: {0}", lineNumber));
+
+               for (int i = lineNumber; i >= 0; i--)
+               {
+                  int charIndex = txtHits.GetFirstCharIndexFromLine(i);
+                  Point pos = txtHits.GetPositionFromCharIndex(charIndex);
+                  char firstChar = txtHits.GetCharFromPosition(pos);
+                  char secondChar = txtHits.GetCharFromPosition(txtHits.GetPositionFromCharIndex(charIndex + 1));
+                  
+                  string line = hit.RetrieveLine(i);
+                  char lineFirstChar = (!string.IsNullOrEmpty(line) && line.Length > 0) ? line[0] : Char.Parse(" ");
+                  char lineSecondChar = (!string.IsNullOrEmpty(line) && line.Length > 0 && line.Length > 1) ? line[1] : Char.Parse(" ");
+
+                  System.Diagnostics.Debug.WriteLine(string.Format("Character 1:{0}, character 2:{1} at line {2}.  Hit Character 1:{3}, hit character 2:{4}", 
+                     firstChar, secondChar, i, lineFirstChar, lineSecondChar));
+
+                  //if (firstChar != '\n' && firstChar != lineFirstChar)
+                  if (firstChar != '\n' && (firstChar != lineFirstChar || (firstChar == lineFirstChar && secondChar != lineSecondChar)))
+                  {
+                     wrappedCount++;
+                  }
+               }
+
+               lineNumber = lineNumber - wrappedCount;
+               System.Diagnostics.Debug.WriteLine(string.Format("Current line number: {0}, wrapped count: {1}", lineNumber, wrappedCount));
+            }
+
+            // safety check
+            if (lineNumber < 0)
+            {
+               lineNumber = orgLineNumber;
+            }*/
 
             // Use the cursor's linenumber to get the hit's line number.
             hitLineNumber = hit.RetrieveLineNumber(lineNumber);
 
             hitColumn = hit.RetrieveColumn(lineNumber);
 
+            // might need 
+            hitLine = hit.RetrieveLine(lineNumber);
+            
             // Retrieve the filename
             string path = hit.FilePath;
 
             // Open the default editor.
-            Common.EditFile(path, hitLineNumber, hitColumn);
+            TextEditors.EditFile(path, hitLineNumber, hitColumn, hitLine);
          }
       }
 
@@ -588,8 +651,9 @@ namespace AstroGrep.Windows.Forms
             // Retrieve the filename
             string path = hit.FilePath;
 
-            // open the default editor
-            Common.EditFile(path, hit.RetrieveLineNumber(0), hit.RetrieveColumn(0));
+            // open the default editor at first hit
+            int index = hit.RetrieveFirstHitIndex();
+            TextEditors.EditFile(path, hit.RetrieveLineNumber(index), hit.RetrieveColumn(index), hit.RetrieveLine(index));
          }
       }
 
@@ -683,24 +747,13 @@ namespace AstroGrep.Windows.Forms
          lstFileNames.Sort();
 
          // Display sort image and highlight sort column
-         Windows.API.SetHeaderImage(lstFileNames, clearColIndex, lstFileNames.Sorting, false, false);
-         Windows.API.SetHeaderImage(lstFileNames, e.Column, lstFileNames.Sorting, true, true);
+         Windows.API.ListViewExtensions.SetSortIcon(lstFileNames, e.Column, lstFileNames.Sorting);
+
+         // Apply theming since sorting removes it.
+         Windows.API.ListViewExtensions.SetTheme(lstFileNames);
 
          // restore to default cursor
          lstFileNames.Cursor = Cursors.Default;
-      }
-
-      /// <summary>
-      /// Handles setting the ImageList for the ListView control.
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]		09/08/2006	Created
-      /// </history>
-      private void lstFileNames_HandleCreated(object sender, EventArgs e)
-      {
-         Windows.API.SetHeaderImageList(lstFileNames, ListViewImageList);
       }
 
       /// <summary>
@@ -756,7 +809,7 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void sbFilterCountPanel_DoubleClick(object sender, EventArgs e)
       {
-         DisplaySearchMessages(__FilterCollection, Language.GetGenericText("ResultsStatusFilterCount").Replace(": {0}", ""));
+          DisplaySearchMessages(LogItem.LogItemTypes.Exclusion);
       }
 
       /// <summary>
@@ -769,7 +822,20 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void sbErrorCountPanel_DoubleClick(object sender, EventArgs e)
       {
-         DisplaySearchMessages(__ErrorCollection, Language.GetGenericText("ResultsStatusErrorCount").Replace(": {0}", ""));
+         DisplaySearchMessages(LogItem.LogItemTypes.Error);
+      }
+
+      /// <summary>
+      /// Displays the status messages.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   09/27/2012	ADD: 1741735, better error handling display
+      /// </history>
+      private void sbStatusPanel_DoubleClick(object sender, EventArgs e)
+      {
+          DisplaySearchMessages(LogItem.LogItemTypes.Status);
       }
       #endregion
 
@@ -781,6 +847,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   10/11/2006	Created
       /// [Curtis_Beard]	   11/22/2006	CHG: Remove use of browse in combobox
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
       /// </history>
       private void LoadSettings()
       {
@@ -815,24 +882,19 @@ namespace AstroGrep.Windows.Forms
          }
 
          // Results Window
-         txtHits.ForeColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-         txtHits.BackColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
-         txtHits.Font = Common.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
+         txtHits.ForeColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+         txtHits.BackColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
+         txtHits.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
+         txtHits.WordWrap = Core.GeneralSettings.ResultsWordWrap;
 
          // File list columns
+         lstFileNames.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.FilePanelFont);
          SetColumnsText();
-
-         // Status Bar
-         /*SetStatusBarMessage(string.Empty);
-         SetStatusBarTotalCount(0);
-         SetStatusBarFileCount(0);
-         SetStatusBarFilterCount(0);
-         SetStatusBarErrorCount(0);*/
 
          LoadWindowSettings();
 
          // Load the text editors
-         Common.LoadTextEditors();
+         TextEditors.Load();
       }
 
       /// <summary>
@@ -892,9 +954,9 @@ namespace AstroGrep.Windows.Forms
          Core.GeneralSettings.WindowFilePanelHeight = lstFileNames.Height;
 
          //save search comboboxes
-         Core.GeneralSettings.SearchStarts = Common.GetComboBoxEntriesAsString(cboFilePath);
-         Core.GeneralSettings.SearchFilters = Common.GetComboBoxEntriesAsString(cboFileName);
-         Core.GeneralSettings.SearchTexts = Common.GetComboBoxEntriesAsString(cboSearchForText);
+         Core.GeneralSettings.SearchStarts = Convertors.GetComboBoxEntriesAsString(cboFilePath);
+         Core.GeneralSettings.SearchFilters = Convertors.GetComboBoxEntriesAsString(cboFileName);
+         Core.GeneralSettings.SearchTexts = Convertors.GetComboBoxEntriesAsString(cboSearchForText);
 
          Core.GeneralSettings.Save();
       }
@@ -935,7 +997,7 @@ namespace AstroGrep.Windows.Forms
       {
          if (!values.Equals(string.Empty))
          {
-            string[] items = Common.GetComboBoxEntriesFromString(values);
+            string[] items = Convertors.GetComboBoxEntriesFromString(values);
 
             if (items.Length > 0)
             {
@@ -982,6 +1044,7 @@ namespace AstroGrep.Windows.Forms
          txtMaxSize.Text = Core.SearchSettings.MaximumFileSize;
          cboMinSizeType.SelectedItem = Core.SearchSettings.MinimumFileSizeType;
          cboMaxSizeType.SelectedItem = Core.SearchSettings.MaximumFileSizeType;
+         txtMinFileCount.Text = Core.SearchSettings.MinimumFileCount.ToString();
 
          if (!string.IsNullOrEmpty(Core.SearchSettings.ModifiedDateStart))
          {
@@ -1021,6 +1084,7 @@ namespace AstroGrep.Windows.Forms
          Core.SearchSettings.MaximumFileSize = txtMaxSize.Text;
          Core.SearchSettings.MinimumFileSizeType = cboMinSizeType.SelectedItem.ToString();
          Core.SearchSettings.MaximumFileSizeType = cboMaxSizeType.SelectedItem.ToString();
+         Core.SearchSettings.MinimumFileCount = int.Parse(txtMinFileCount.Text);
 
          if (dateModBegin.Value != DateTimePicker.MinimumDateTime)
          {
@@ -1106,6 +1170,8 @@ namespace AstroGrep.Windows.Forms
             lstFileNames.Columns[Constants.COLUMN_INDEX_DATE].Text = Language.GetGenericText("ResultsColumnDate");
             lstFileNames.Columns[Constants.COLUMN_INDEX_COUNT].Text = Language.GetGenericText("ResultsColumnCount");
          }
+
+         AddContextMenuForResults();
       }
 
       /// <summary>
@@ -1261,8 +1327,8 @@ namespace AstroGrep.Windows.Forms
 
          // Clear the contents
          txtHits.Text = string.Empty;
-         txtHits.ForeColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-         txtHits.BackColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
+         txtHits.ForeColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+         txtHits.BackColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
 
          if (__Grep.SearchSpec.UseRegularExpressions)
          {
@@ -1304,8 +1370,8 @@ namespace AstroGrep.Windows.Forms
                      _end = _tempLine.Substring(_pos + _searchText.Length);
 
                      // set default color for starting text
-                     txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-                     txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                     txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+                     txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                      txtHits.SelectedText = _begin;
 
                      // do a check to see if begin and end are valid for wholeword searches
@@ -1322,8 +1388,8 @@ namespace AstroGrep.Windows.Forms
                      // set highlight color for searched text
                      if (_highlight)
                      {
-                        txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-                        txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
+                        txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
+                        txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                      }
                      txtHits.SelectedText = _text;
 
@@ -1341,8 +1407,8 @@ namespace AstroGrep.Windows.Forms
                      _tempLine = _end;
                      if (_pos < 0)
                      {
-                        txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-                        txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                        txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+                        txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                         txtHits.SelectedText = _end;
                      }
 
@@ -1351,18 +1417,21 @@ namespace AstroGrep.Windows.Forms
                else
                {
                   // set default color, no search text found
-                  txtHits.SelectionColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-                  txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                  txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+                  txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                   txtHits.SelectedText = _textToSearch;
                }
             }
          }
 
-         // check for really long lines
-         var width = TextRenderer.MeasureText(txtHits.Text, txtHits.Font).Width;
-         if (width > 20000)
+         if (!txtHits.WordWrap)
          {
-            txtHits.RightMargin = width;
+            // check for really long lines
+            var width = TextRenderer.MeasureText(txtHits.Text, txtHits.Font).Width;
+            if (width > 20000)
+            {
+               txtHits.RightMargin = width;
+            }
          }
       }
 
@@ -1427,8 +1496,8 @@ namespace AstroGrep.Windows.Forms
                _item = _col[_counter];
 
                // set the start text
-               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-               txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
 
                // check for empty string to prevent assigning nothing to selection text preventing
                //  a system beep
@@ -1439,13 +1508,13 @@ namespace AstroGrep.Windows.Forms
                }
 
                // set the hit text
-               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-               txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
+               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
+               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
                txtHits.SelectedText = _textToSearch.Substring(_item.Index, _item.Length);
 
                // set the end text
-               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-               txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                if (_counter + 1 >= _col.Count)
                {
                   //  no more hits so just set the rest
@@ -1463,8 +1532,8 @@ namespace AstroGrep.Windows.Forms
             if (_col.Count == 0)
             {
                //  no match, just a context line
-               txtHits.SelectionColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-               txtHits.SelectionBackColor = Common.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
                txtHits.SelectedText = _textToSearch;
             }
          }
@@ -1479,6 +1548,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   07/10/2006	CHG: Disable combo boxes during search
       /// [Curtis_Beard]	   07/12/2006	CHG: make thread safe
       /// [Curtis_Beard]	   07/25/2006	ADD: enable/disable context lines label
+      /// [Curtis_Beard]	    10/30/2012	ADD: 28, search within results
       /// </history>
       private void SetSearchState(bool enable)
       {
@@ -1494,6 +1564,7 @@ namespace AstroGrep.Windows.Forms
          mnuTools.Enabled = enable;
          mnuHelp.Enabled = enable;
 
+         btnSearch.ContextMenu.MenuItems[0].Enabled = (enable && lstFileNames.Items.Count > 0);
          btnSearch.Enabled = enable;
          btnCancel.Enabled = !enable;
          picBrowse.Enabled = enable;
@@ -1746,7 +1817,7 @@ namespace AstroGrep.Windows.Forms
                          CheckPathExists = true,
                          AddExtension = true,
                          Title = Language.GetGenericText("SaveDialogTitle"),
-                         Filter = "Text (*.txt)|*.txt|HTML (*.html)|*.html|XML (*.xml)|*.xml"
+                         Filter = "Text (*.txt)|*.txt|HTML (*.html)|*.html|XML (*.xml)|*.xml|JSON (*.json)|*.json"
                       };
 
 
@@ -1765,6 +1836,10 @@ namespace AstroGrep.Windows.Forms
                case 3:
                   // Save to xml
                   OutputResults(dlg.FileName, HitListExport.SaveResultsAsXML);
+                  break;
+               case 4:
+                  // Save to json
+                  OutputResults(dlg.FileName, HitListExport.SaveResultsAsJSON);
                   break;
             }
          }
@@ -1896,8 +1971,9 @@ namespace AstroGrep.Windows.Forms
             // retrieve the filename
             path = hit.FilePath;
 
-            // open the default editor
-            Common.EditFile(path, hit.RetrieveLineNumber(0), hit.RetrieveColumn(0));
+            // open the default editor at first hit
+            int index = hit.RetrieveFirstHitIndex();
+            TextEditors.EditFile(path, hit.RetrieveLineNumber(index), hit.RetrieveColumn(index), hit.RetrieveLine(index));
          }
       }
 
@@ -1952,6 +2028,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		05/22/2007	FIX: 1723814, rehighlight the selected result
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
       /// [Curtis_Beard]	   09/26/2012	CHG: Update status bar text
+      /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
       /// </history>
       private void mnuOptions_Click(object sender, System.EventArgs e)
       {
@@ -1970,7 +2047,6 @@ namespace AstroGrep.Windows.Forms
             // load new language if necessary
             if (_form.IsLanguageChange)
             {
-               Language.Load(Core.GeneralSettings.Language);
                Language.ProcessForm(this, this.toolTip1);
 
                SetColumnsText();
@@ -1988,9 +2064,12 @@ namespace AstroGrep.Windows.Forms
             }
 
             // change results display and rehighlight
-            txtHits.ForeColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-            txtHits.BackColor = Common.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
-            txtHits.Font = Common.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
+            txtHits.ForeColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+            txtHits.BackColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
+            txtHits.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
+            txtHits.WordWrap = Core.GeneralSettings.ResultsWordWrap;
+
+            lstFileNames.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.FilePanelFont);
             lstFileNames_SelectedIndexChanged(null, null);
          }
          _form = null;
@@ -2244,6 +2323,22 @@ namespace AstroGrep.Windows.Forms
       {
          string message = string.Format(Language.GetGenericText("SearchSearching"), TruncateFileName(file, stbStatus));
 
+         LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, string.Format(Language.GetGenericText("SearchSearching"), file.FullName)));
+         SetStatusBarMessage(message);
+      }
+
+      /// <summary>
+      /// Handles the Grep object's SearchingFileByPlugin event
+      /// </summary>
+      /// <param name="pluginName">Name of plugin currently searching file</param>
+      /// <history>
+      /// [Curtis_Beard]		10/16/2012	Created
+      /// </history>
+      private void ReceiveSearchingFileByPlugin(string pluginName)
+      {
+         string message = string.Format(Language.GetGenericText("SearchSearchingByPlugin"), pluginName);
+
+         LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, message));
          SetStatusBarMessage(message);
       }
 
@@ -2294,8 +2389,8 @@ namespace AstroGrep.Windows.Forms
          else
             message = string.Format(Language.GetGenericText("SearchFileError"), file.FullName, ex.ToString());
 
-         __ErrorCollection.Add(message);
-         SetStatusBarErrorCount(__ErrorCollection.Count);
+         LogItems.Add(new LogItem(LogItem.LogItemTypes.Error, message, string.Empty));
+         SetStatusBarErrorCount(GetLogItemsCountByType(LogItem.LogItemTypes.Error));
       }
 
       /// <summary>
@@ -2309,7 +2404,8 @@ namespace AstroGrep.Windows.Forms
       {
          string message = Language.GetGenericText("SearchCancelled");
 
-         SetStatusBarMessage(message);
+         LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, message));
+         SetStatusBarMessage(message);         
          SetSearchState(true);
          CalculateTotalCount();
 
@@ -2330,6 +2426,7 @@ namespace AstroGrep.Windows.Forms
       {
          string message = Language.GetGenericText("SearchFinished");
 
+         LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, message));
          SetStatusBarMessage(string.Format("{0}", message));
          CalculateTotalCount();
          SetSearchState(true);
@@ -2347,8 +2444,8 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void ReceiveFileFiltered(System.IO.FileInfo file, string type)
       {
-         __FilterCollection.Add(string.Format("{0} ({1})", file.FullName, type));
-         SetStatusBarFilterCount(__FilterCollection.Count);
+          LogItems.Add(new LogItem(LogItem.LogItemTypes.Exclusion, file.FullName, type));
+          SetStatusBarFilterCount(GetLogItemsCountByType(LogItem.LogItemTypes.Exclusion));
       }
 
       /// <summary>
@@ -2361,36 +2458,68 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void ReceiveDirectoryFiltered(System.IO.DirectoryInfo dir, string type)
       {
-         __FilterCollection.Add(string.Format("{0} ({1})", dir.FullName, type));
-         SetStatusBarFilterCount(__FilterCollection.Count);
+          LogItems.Add(new LogItem(LogItem.LogItemTypes.Exclusion, dir.FullName, type));
+          SetStatusBarFilterCount(GetLogItemsCountByType(LogItem.LogItemTypes.Exclusion));
       }
 
       /// <summary>
-      /// 
+      /// Used to display search messages (like exclusions, errors) to the user.
       /// </summary>
-      /// <param name="collection"></param>
-      /// <param name="titleMessage"></param>
+      /// <param name="displayType">The type of message to display</param>
       /// <history>
       /// [Curtis_Beard]	   09/27/2012	ADD: 1741735, better error handling display
+      /// [Curtis_Beard]	   12/06/2012	CHG: 1741735, rework to use common LogItems
       /// </history>
-      private void DisplaySearchMessages(System.Collections.Specialized.StringCollection collection, string titleMessage)
+      private void DisplaySearchMessages(LogItem.LogItemTypes displayType)
       {
          if (this.InvokeRequired)
          {
             DisplaySearchMessagesCallBack del = new DisplaySearchMessagesCallBack(DisplaySearchMessages);
-            this.Invoke(del, new object[2] { collection, titleMessage });
+            this.Invoke(del, new object[1] { displayType });
             return;
          }
 
-         if (collection.Count > 0)
+         if (GetLogItemsCountByType(displayType) > 0)
          {
-            using (var frm = new frmDisplayMessages())
-            {
-               frm.Messages = collection;
-               frm.TitleMessage = titleMessage;
-               frm.Size = new Size(this.Width - 100, this.Height - 200);
-               frm.ShowDialog(this);
-            }
+             // stick with this form for now until update entire gui with better design for log viewer
+             using (var frm = new frmDisplayMessages())
+             {
+                 System.Collections.Specialized.StringCollection messages = new System.Collections.Specialized.StringCollection();
+                 foreach (LogItem item in LogItems)
+                 {
+                     if (item.ItemType == displayType)
+                     {
+                         string message = item.Value;
+                         if (!string.IsNullOrEmpty(item.Details))
+                         {
+                             message += string.Format(" ({0})", item.Details);
+                         }
+                         messages.Add(message);
+                     }
+                 }
+                 frm.Messages = messages;
+                 frm.TitleMessage = Language.GetGenericText(string.Format("ResultsStatus{0}Count", displayType == LogItem.LogItemTypes.Exclusion ? "Filter" : "Error")).Replace(": {0}", "");
+                 frm.Size = new Size(this.Width - 100, this.Height - 200);
+                 frm.ShowDialog(this);
+             }
+
+            // Newer version of log viewer (not sure yet if we want to use it).
+            //using (var frm = new frmLogDisplay())
+            //{
+            //    frm.LogItems = LogItems;
+
+            //    if (displayType == LogItem.LogItemTypes.Exclusion)
+            //        frm.DefaultFilterType = frmLogDisplay.DefaultFilterTypes.Exclusions;
+            //    else if (displayType == LogItem.LogItemTypes.Error)
+            //        frm.DefaultFilterType = frmLogDisplay.DefaultFilterTypes.Error;
+            //    else if (displayType == LogItem.LogItemTypes.Status)
+            //        frm.DefaultFilterType = frmLogDisplay.DefaultFilterTypes.Status;
+
+            //    frm.StartPosition = FormStartPosition.Manual;
+            //    frm.Location = new Point(this.Left + 20, this.Bottom - frm.Height - stbStatus.Height - 20);
+            //    frm.Size = new Size(this.Width - 40, frm.Height);
+            //    frm.ShowDialog(this);
+            //}
          }
       }
 
@@ -2485,6 +2614,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="count">Total number of filtered items</param>
       /// <history>
       /// [Curtis_Beard]		09/26/2012	Created
+      /// [Curtis_Beard]		10/22/2012	CHG: use yellow background color to alert user
       /// </history>
       private void SetStatusBarFilterCount(int count)
       {
@@ -2496,6 +2626,7 @@ namespace AstroGrep.Windows.Forms
          }
 
          sbFilterCountPanel.Text = string.Format(Language.GetGenericText("ResultsStatusFilterCount"), count);
+         sbFilterCountPanel.BackColor = count > 0 ? Color.Yellow : SystemColors.Control;
       }
 
       /// <summary>
@@ -2504,6 +2635,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="count">Total number of errors</param>
       /// <history>
       /// [Curtis_Beard]		07/02/2007	Created
+      /// [Curtis_Beard]		10/22/2012	CHG: use red background color to alert user
       /// </history>
       private void SetStatusBarErrorCount(int count)
       {
@@ -2515,6 +2647,7 @@ namespace AstroGrep.Windows.Forms
          }
 
          sbErrorCountPanel.Text = string.Format(Language.GetGenericText("ResultsStatusErrorCount"), count);
+         sbErrorCountPanel.BackColor = count > 0 ? Color.Red : SystemColors.Control;
       }
 
       /// <summary>
@@ -2545,14 +2678,15 @@ namespace AstroGrep.Windows.Forms
 
          SetStatusBarTotalCount(total);
          SetStatusBarFileCount(lstFileNames.Items.Count);
-         SetStatusBarFilterCount(__FilterCollection.Count);
-         SetStatusBarErrorCount(__ErrorCollection.Count);
+         SetStatusBarFilterCount(GetLogItemsCountByType(LogItem.LogItemTypes.Exclusion));
+         SetStatusBarErrorCount(GetLogItemsCountByType(LogItem.LogItemTypes.Error));
       }
 
 
       /// <summary>
       /// Start the searching
       /// </summary>
+      /// <param name="searchWithInResults">true for searching within current results, false starts a new search</param>
       /// <history>
       /// [Curtis_Beard]		10/17/2005	Created
       /// [Curtis_Beard]		07/03/2006	FIX: 1516775, Remove trim on the search expression
@@ -2560,15 +2694,27 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		11/22/2006	CHG: Remove use of browse in combobox
       /// [Curtis_Beard]		08/07/2007  ADD: 1741735, better search error handling
       /// [Curtis_Beard]		08/21/2007  FIX: 1778467, make sure file pattern is correct if a '\' is present
-      /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
+      /// [Curtis_Beard]	    01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
       /// [Curtis_Beard]		02/07/2012  CHG: 1741735, report full error message
-      /// [Curtis_Beard]	   02/24/2012	CHG: 3488322, use hand cursor for results view to signal click
+      /// [Curtis_Beard]	    02/24/2012	CHG: 3488322, use hand cursor for results view to signal click
+      /// [Curtis_Beard]	    10/30/2012	ADD: 28, search within results
       /// </history>
-      private void StartSearch()
+      private void StartSearch(bool searchWithInResults)
       {
          try
          {
             string path = cboFilePath.Text.Trim();
+
+            string[] filePaths = null;
+            if (searchWithInResults)
+            {
+                // get currently listed file paths from ListView
+                filePaths = new string[lstFileNames.Items.Count];
+                for (int i = 0; i < lstFileNames.Items.Count; i++)
+                {
+                    filePaths[i] = Path.Combine(lstFileNames.Items[i].SubItems[Constants.COLUMN_INDEX_DIRECTORY].Text, lstFileNames.Items[i].SubItems[Constants.COLUMN_INDEX_FILE].Text);
+                }
+            }
 
             // update combo selections
             AddComboSelection(cboSearchForText, cboSearchForText.Text);
@@ -2582,30 +2728,22 @@ namespace AstroGrep.Windows.Forms
             SetSearchState(false);
 
             // reset display
-            __ErrorCollection.Clear();
-            __FilterCollection.Clear();
+            LogItems.Clear();
             SetStatusBarMessage(string.Empty);
             SetStatusBarTotalCount(0);
-            SetStatusBarFileCount(0);            
+            SetStatusBarFileCount(0);
             SetStatusBarFilterCount(0);
             SetStatusBarErrorCount(0);
-            
+
             ClearItems();
             txtHits.Clear();
 
             // setup structs to pass to grep
             var fileFilterSpec = GetFilterSpecFromUI();
-            var searchSpec = GetSearchSpecFromUI(path, fileFilterSpec.FileFilter);
+            var searchSpec = GetSearchSpecFromUI(path, fileFilterSpec.FileFilter, filePaths);
 
             // create new grep instance
             __Grep = new Grep(searchSpec, fileFilterSpec);
-
-            //// setup extension exclusions
-            //var extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
-            //foreach (var ext in extensions)
-            //{
-            //   __Grep.AddExclusionExtension(ext.ToLower());
-            //}
 
             // add plugins
             __Grep.Plugins = Core.PluginManager.Items;
@@ -2619,7 +2757,9 @@ namespace AstroGrep.Windows.Forms
             __Grep.SearchingFile += ReceiveSearchingFile;
             __Grep.FileFiltered += ReceiveFileFiltered;
             __Grep.DirectoryFiltered += ReceiveDirectoryFiltered;
+            __Grep.SearchingFileByPlugin += ReceiveSearchingFileByPlugin;
 
+            LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, Language.GetGenericText("SearchStarted")));
             __Grep.BeginExecute();
          }
          catch (Exception ex)
@@ -2656,6 +2796,7 @@ namespace AstroGrep.Windows.Forms
       struct SearchSpec : ISearchSpec
       {
          public string[] StartDirectories { get; set; }
+         public string[] StartFilePaths { get; set; }
          public bool SearchInSubfolders { get; set; }
          public bool UseRegularExpressions { get; set; }
          public bool UseCaseSensitivity { get; set; }
@@ -2679,6 +2820,7 @@ namespace AstroGrep.Windows.Forms
          public long FileSizeMin { get; set; }
          public long FileSizeMax { get; set; }
          public List<ExclusionItem> ExclusionItems { get; set; }
+         public int FileHitCount { get; set; }
       }
 
       /// <summary>
@@ -2687,8 +2829,8 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Andrew_Radford]		13/08/2009  CHG: Now retruns IFileFilterSpec rather than altering global state
       /// [Curtis_Beard]		01/31/2012  ADD: 1561584, ability to ignore hidden/system files/directories
-      /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
-      /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]        02/09/2012  ADD: 3424156, size drop down selection
+      /// [Curtis_Beard]	    03/07/2012	ADD: 3131609, exclusions
       /// </history>
       private IFileFilterSpec GetFilterSpecFromUI()
       {
@@ -2700,17 +2842,17 @@ namespace AstroGrep.Windows.Forms
             _fileName = _fileName.Substring(slashPos + 1);
 
          var spec = new FileFilterSpec
-                   {
-                      FileFilter = _fileName,
-                      SkipHiddenFiles = chkSkipHidden.Checked,
-                      SkipSystemFiles = chkSkipSystem.Checked,
-                      DateModifiedStart = dateModBegin.Value,
-                      DateModifiedEnd = dateModEnd.Value
-                   };
-
-         spec.FileSizeMin = GetFileSize(txtMinSize.Text, cboMinSizeType.SelectedItem.ToString(), long.MinValue);
-         spec.FileSizeMax = GetFileSize(txtMaxSize.Text, cboMaxSizeType.SelectedItem.ToString(), long.MaxValue);
-         spec.ExclusionItems = __ExclusionItems;
+         {
+            FileFilter = _fileName,
+            SkipHiddenFiles = chkSkipHidden.Checked,
+            SkipSystemFiles = chkSkipSystem.Checked,
+            DateModifiedStart = dateModBegin.Value,
+            DateModifiedEnd = dateModEnd.Value,
+            FileSizeMin = GetFileSize(txtMinSize.Text, cboMinSizeType.SelectedItem.ToString(), long.MinValue),
+            FileSizeMax = GetFileSize(txtMaxSize.Text, cboMaxSizeType.SelectedItem.ToString(), long.MaxValue),
+            ExclusionItems = __ExclusionItems,
+            FileHitCount = int.Parse(txtMinFileCount.Text)
+         };
 
          return spec;
       }
@@ -2718,41 +2860,54 @@ namespace AstroGrep.Windows.Forms
       /// <summary>
       /// Sets the grep options
       /// </summary>
+      /// <param name="path"></param>
+      /// <param name="fileFilter"></param>
+      /// <param name="filePaths"></param>
       /// <history>
       /// [Curtis_Beard]		10/17/2005	Created
       /// [Curtis_Beard]		07/28/2006  ADD: extension exclusion list
-      /// [Andrew_Radford]    13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
-      /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
-      /// [Curtis_Beard]	   08/01/2012	FIX: 3553252, use | character for path delimitation character
+      /// [Andrew_Radford]      13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
+      /// [Curtis_Beard]	    01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
+      /// [Curtis_Beard]	    08/01/2012	FIX: 3553252, use | character for path delimitation character
+      /// [Curtis_Beard]	    10/30/2012	ADD: 28, search within results
       /// </history>
-      private ISearchSpec GetSearchSpecFromUI(string path, string fileFilter)
+      private ISearchSpec GetSearchSpecFromUI(string path, string fileFilter, string[] filePaths)
       {
-         string[] paths = path.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-
          var spec = new SearchSpec
-              {
-                 UseCaseSensitivity = chkCaseSensitive.Checked,
-                 ContextLines = Convert.ToInt32(txtContextLines.Value),
-                 IncludeLineNumbers = chkLineNumbers.Checked,
-                 UseNegation = chkNegation.Checked,
-                 ReturnOnlyFileNames = chkFileNamesOnly.Checked,
-                 SearchInSubfolders = chkRecurse.Checked,
-                 UseRegularExpressions = chkRegularExpressions.Checked,
-                 UseWholeWordMatching = chkWholeWordOnly.Checked,
-                 SearchText = cboSearchForText.Text
-              };
-
-         // fileName has a slash, so append the directory and get the file filter
-         int slashPos = fileFilter.LastIndexOf(Path.DirectorySeparatorChar.ToString());
-         if (slashPos > -1)
          {
-            // append to each starting directory
-            for (int i = 0; i < paths.Length; i++)
-            {
-               paths[i] += fileFilter.Substring(0, slashPos);
-            }
+            UseCaseSensitivity = chkCaseSensitive.Checked,
+            ContextLines = Convert.ToInt32(txtContextLines.Value),
+            IncludeLineNumbers = chkLineNumbers.Checked,
+            UseNegation = chkNegation.Checked,
+            ReturnOnlyFileNames = chkFileNamesOnly.Checked,
+            SearchInSubfolders = chkRecurse.Checked,
+            UseRegularExpressions = chkRegularExpressions.Checked,
+            UseWholeWordMatching = chkWholeWordOnly.Checked,
+            SearchText = cboSearchForText.Text
+         };
+
+         if (filePaths != null && filePaths.Length > 0)
+         {
+             spec.StartFilePaths = filePaths;
+             spec.StartDirectories = null;
          }
-         spec.StartDirectories = paths;
+         else
+         {
+             string[] paths = path.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+
+             // fileName has a slash, so append the directory and get the file filter
+             int slashPos = fileFilter.LastIndexOf(Path.DirectorySeparatorChar.ToString());
+             if (slashPos > -1)
+             {
+                 // append to each starting directory
+                 for (int i = 0; i < paths.Length; i++)
+                 {
+                     paths[i] += fileFilter.Substring(0, slashPos);
+                 }
+             }
+             spec.StartDirectories = paths;
+             spec.StartFilePaths = null;
+         }
 
          return spec;
       }
@@ -2786,7 +2941,7 @@ namespace AstroGrep.Windows.Forms
          _listItem.SubItems.Add(file.LastWriteTime.ToString());
 
          // add explorer style of file size for display but store file size in bytes for comparision
-         ListViewItem.ListViewSubItem subItem = new ListViewItem.ListViewSubItem(_listItem, StrFormatByteSize(file.Length));
+         ListViewItem.ListViewSubItem subItem = new ListViewItem.ListViewSubItem(_listItem, API.StrFormatByteSize(file.Length));
          subItem.Tag = file.Length;
          _listItem.SubItems.Add(subItem);
 
@@ -2799,32 +2954,6 @@ namespace AstroGrep.Windows.Forms
 
          // clear it out
          _listItem = null;
-      }
-
-      /// <summary>
-      /// API declaration to display explorer style of file size.
-      /// </summary>
-      /// <param name="fileSize">File size in bytes</param>
-      /// <param name="buffer">buffer to hold value</param>
-      /// <param name="bufferSize">buffer size</param>
-      /// <returns>explorer style display of file size</returns>
-      [System.Runtime.InteropServices.DllImport("Shlwapi.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
-      private static extern long StrFormatByteSize(
-              long fileSize
-              , [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)] System.Text.StringBuilder buffer
-              , int bufferSize);
-
-
-      /// <summary>
-      /// Converts a numeric value into a string that represents the number expressed as a size value in bytes, kilobytes, megabytes, or gigabytes, depending on the size.
-      /// </summary>
-      /// <param name="filesize">The numeric value to be converted.</param>
-      /// <returns>the converted string</returns>
-      private string StrFormatByteSize(long filesize)
-      {
-         System.Text.StringBuilder sb = new System.Text.StringBuilder(11);
-         StrFormatByteSize(filesize, sb, sb.Capacity);
-         return sb.ToString();
       }
 
       /// <summary>
@@ -2897,12 +3026,84 @@ namespace AstroGrep.Windows.Forms
 
          // only show if not disabled by user and either filter count or error count is greater than 0
          if (Core.GeneralSettings.ShowExclusionErrorMessage &&
-            ((__FilterCollection != null && __FilterCollection.Count > 0) ||
-            (__ErrorCollection != null && __ErrorCollection.Count > 0)))
+            (GetLogItemsCountByType(LogItem.LogItemTypes.Exclusion) > 0 ||
+            GetLogItemsCountByType(LogItem.LogItemTypes.Error) > 0))
          {
             MessageBox.Show(this, Language.GetGenericText("ExclusionErrorMessageText"), 
                Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
          }
+      }
+
+      /// <summary>
+      /// Setup the context menu for the results area.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]        10/10/2012  Initial: 3575509, show copy/select all context menu
+      /// </history>
+      private void AddContextMenuForResults()
+      {
+         ContextMenu ctx = new ContextMenu();
+         
+         MenuItem item = new MenuItem(Language.GetGenericText("ResultsContextMenu.Copy"));
+         item.Click += new EventHandler(txtHitsContextCopy_Click);
+         ctx.MenuItems.Add(item);
+
+         item = new MenuItem("-");
+         ctx.MenuItems.Add(item);
+
+         item = new MenuItem(Language.GetGenericText("ResultsContextMenu.SelectAll"));
+         item.Click += new EventHandler(txtHitsContextSelectAll_Click);
+         ctx.MenuItems.Add(item);
+
+         txtHits.ContextMenu = ctx;
+      }
+
+      /// <summary>
+      /// Copy selected text in results.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]        10/10/2012  Initial: 3575509, show copy/select all context menu
+      /// </history>
+      private void txtHitsContextCopy_Click(object sender, EventArgs e)
+      {
+         txtHits.Copy();
+      }
+
+      /// <summary>
+      /// Select all results text.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]        10/10/2012  Initial: 3575509, show copy/select all context menu
+      /// </history>
+      private void txtHitsContextSelectAll_Click(object sender, EventArgs e)
+      {
+         txtHits.Focus();
+         txtHits.SelectAll();
+      }
+
+      /// <summary>
+      /// Gets the number of items in the LogItems list for a given type.
+      /// </summary>
+      /// <param name="type">LogItemType to determine count</param>
+      /// <returns>0 if LogItems is null, count for type otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]	   12/06/2012	CHG: 1741735, rework to use common LogItems
+      /// </history>
+      private int GetLogItemsCountByType(LogItem.LogItemTypes type)
+      {
+          if (LogItems == null || LogItems.Count == 0)
+              return 0;
+
+          return LogItems.FindAll(
+              delegate(LogItem item)
+              {
+                  return item.ItemType == type;
+              }
+              ).Count;
       }
       #endregion
    }

@@ -5,7 +5,6 @@
       <control name="lblSearchText" value="Text suchen" />
       <control name="lblFileTypes" value="Dateitypen" />
       <control name="btnCancel" value="&amp;Abbrechen" />
-      <control name="btnSearch" value="&amp;Suchen" />
       <control name="lblSearchPath" value="Suchpfad" />
       <control name="lblContextLines" value="Kontextzeilen" tooltip="Zeigt Zeilen über und unter dem Fund an." />
       <control name="chkLineNumbers" value="&amp;Zeilennummerierung" tooltip="Fügt die zugegörige Zeilennummer zu jedem Fund hinzu." />
@@ -34,6 +33,9 @@
          <menuitem index="6" value="Verzeichnis geöffnet" />
          <menuitem index="7" value="-" />
          <menuitem index="8" value="Element löschen" />
+      </control>
+      <control name="btnSearch" value="&amp;Suchen">
+         <menuitem index="0" value="Suche in den Ergebnissen" />
       </control>
       
       <menu index="0" value="&amp;Datei">
@@ -82,6 +84,7 @@
       <control name="btnCancel" value="&amp;Abbrechen" />
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Separate Typen mit | Charakter."/>
+      <control name="lblTabSize" value="Tabgröße" />
    </screen>
 
    <screen name="frmOptions" value="Einstellungen">
@@ -111,9 +114,11 @@
       <control name="lblPluginDetailName" value="Name:"/>
       <control name="lblPluginDetailVersion" value="Version:"/>
       <control name="lblPluginDetailAuthor" value="Author:"/>
-      <control name="btnFindFont" value="&amp;Schriftart suchen"/>
+      <control name="btnFindFont" value="&amp;Schriftart suchen..."/>
       <control name="chkShowExclusionErrorMessage" value="&amp;Zeigen Sie eine Eingabeaufforderung, wenn eine Suche liefert Produkte ausgeschlossen oder ein Fehler auftritt."/>
       <control name="chkSaveSearchOptions" value="Suche speichern Optionen auf Exit."/>
+      <control name="grpFileList" value="Dateiliste" />
+      <control name="btnFileFindFont" value="Schriftart suchen..."/>
    </screen>
 
    <screen name="frmPrint" value="Drucken">
@@ -185,6 +190,7 @@
       <text name="SearchFinished" value="Suche beendet"/>
       <text name="SearchStarted" value="Suche begonnen"/>
       <text name="SearchSearching" value="Durchsuche {0}"/>
+      <text name="SearchSearchingByPlugin" value="Plugin {0} wurde verwendet, um die Datei zu suchen." />
       <text name="SearchExplorerItem" value="Suche nach {0}..."/>
 
       <text name="ResultsPreviewText" value="(21)  Beispielergebnisse, Zeile und Fund werden angezeigt"/>
@@ -201,6 +207,7 @@
       <text name="TextEditorsColumnFileType" value="Dateityp"/>
       <text name="TextEditorsColumnLocation" value="Texteditor"/>
       <text name="TextEditorsColumnCmdLine" value="Kommandozeile"/>
+      <text name="TextEditorsColumnTabSize" value="Tabgröße"/>
       <text name="TextEditorsErrorNoEditor" value="Bitte definieren Sie einen texteditor."/>
       <text name="TextEditorsErrorFileTypeExists" value="Der Dateityp ist bereits vorhanden. Bitte versuchen Sie es erneut."/>
 
@@ -214,6 +221,9 @@
       <text name="ResultsStatusFileCount" value="Datei: {0}"/>
       <text name="ResultsStatusFilterCount" value="Ausschlüsse: {0}"/>
       <text name="ResultsStatusErrorCount" value="Störung: {0}"/>
+
+      <text name="ResultsContextMenu.Copy" value="Kopieren"/>
+      <text name="ResultsContextMenu.SelectAll" value="Alles auswählen"/>
 
       <text name="PluginsColumnEnabled" value="Aktiv"/>
       <text name="PluginsColumnName" value="Name"/>
