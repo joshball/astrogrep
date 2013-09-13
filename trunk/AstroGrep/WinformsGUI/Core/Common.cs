@@ -3,7 +3,7 @@ using System;
 namespace AstroGrep.Core
 {
     /// <summary>
-    /// Common Routines and Variables
+    /// Common Routines and Variables - test commit
     /// </summary>
     /// <remarks>
     ///   AstroGrep File Searching Utility. Written by Theodore L. Ward
