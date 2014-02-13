@@ -125,17 +125,27 @@ namespace AstroGrep
       /// <returns>List of ExclusionItem objects</returns>
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   09/18/2013	ADD: 56, add suggested default directory names to exclude for common apps
       /// </history>
       private static System.Collections.Generic.List<libAstroGrep.ExclusionItem> GetDefaultExclusionsList()
       {
          var list = new System.Collections.Generic.List<libAstroGrep.ExclusionItem>();
 
+         // default extensions
          var exts = DEFAULT_EXTENSION_EXCLUDE_LIST.Split(';');
          foreach (var ext in exts)
          {
-            var item = new libAstroGrep.ExclusionItem(libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension, ext, libAstroGrep.ExclusionItem.OptionsTypes.None, false);
+            var item = new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension, ext, libAstroGrep.ExclusionItem.OptionsTypes.None, false);
             list.Add(item);
          }
+
+         // default directory names to ignore (Git, Mercurial, SVN, CVS, Eclipse Metadata, Eclipse Settings)
+         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".git", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
+         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".hg", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
+         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".svn", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
+         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".cvs", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
+         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".metadata", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
+         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".settings", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
 
          return list;
       }

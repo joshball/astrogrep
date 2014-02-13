@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroGrep", "WinformsGUI\AstroGrep.csproj", "{583FF22B-9586-4543-B4B4-747E06C963ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libAstroGrep", "libAstroGrep\libAstroGrep.csproj", "{03EDAD50-4218-41D4-AEA8-5D072253EA17}"

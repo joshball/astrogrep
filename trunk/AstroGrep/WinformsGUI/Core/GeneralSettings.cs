@@ -95,6 +95,8 @@ namespace AstroGrep.Core
       private bool resultsWordWrap = false;
 
       private string filePanelFont = string.Format("Microsoft Sans Serif{0}8.25{0}Regular", Constants.FONT_SEPARATOR);
+
+      private bool detectFileEncoding = true;
       #endregion
       
       /// <summary>
@@ -407,6 +409,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.filePanelFont; }
          set { MySettings.filePanelFont = value; }
+      }
+
+      /// <summary>
+      /// Gets/sets whether to detect file encodings.
+      /// </summary>
+      static public bool DetectFileEncoding
+      {
+         get { return MySettings.detectFileEncoding; }
+         set { MySettings.detectFileEncoding = value; }
       }
    }
 }

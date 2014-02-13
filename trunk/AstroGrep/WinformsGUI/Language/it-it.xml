@@ -7,6 +7,7 @@
       <control name="btnCancel" value="&amp;Annulla" />
       <control name="lblSearchPath" value="Percorso di ricerca" />
       <control name="lblContextLines" value="Righe di contesto" tooltip="Numero di righe da visualizzare sopra e sotto la parola trovata" />
+      <control name="txtContextLines" tooltip="Numero di righe da visualizzare sopra e sotto la parola trovata" />
       <control name="chkLineNumbers" value="&amp;Numero riga" tooltip="Visualizza il numero di riga prima di ogni corripondenza" />
       <control name="chkNegation" value="&amp;Esclusione" tooltip="Trova i file che non contengono il testo cercato" />
       <control name="chkFileNamesOnly" value="&amp;Visualizza solo nomi dei file" tooltip="Visualizza solo i nomi dei file contenenti corrispondenze (operazione consigliata con file di grandi dimensioni)" />
@@ -22,17 +23,25 @@
       <control name="label2" value="Prima della modifica:" />
       <control name="label3" value="Dimensione minima:" />
       <control name="label4" value="Dimensione massima:" />
+      <control name="lblMinFileCount" value="Minimo Conteggio file" tooltip="Mostra solo i file con numero maggiore o uguale a questo numero" />
+      <control name="txtMinFileCount" tooltip="Mostra solo i file con numero maggiore o uguale a questo numero" />
       <control name="lnkExclusions" value="Esclusioni..." />
       <control name="lstFileNames">
-         <menuitem index="0" value="copia" />
-         <menuitem index="1" value="copia nome" />
-         <menuitem index="2" value="situata in copia" />
-         <menuitem index="3" value="copia Situato In Nome +" />
+         <menuitem index="0" value="Copia tutto" />
+         <menuitem index="1" value="Copia nome" />
+         <menuitem index="2" value="Copia percorso" />
+         <menuitem index="3" value="Copia percorso e nome" />
          <menuitem index="4" value="-" />
-         <menuitem index="5" value="file aperto" />
-         <menuitem index="6" value="elenco aperto" />
-         <menuitem index="7" value="-" />
-         <menuitem index="8" value="cancellare voce" />
+         <menuitem index="5" value="Operazioni sui file">
+            <menuitem index="0" value="Copia" />
+            <menuitem index="1" value="Elimina" />
+         </menuitem>
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="Apri file" />
+         <menuitem index="8" value="Apri cartella" />
+         <menuitem index="9" value="Apri con applicazione associata" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Cancella dalla lista" />
       </control>
       <control name="btnSearch" value="&amp;Cerca">
          <menuitem index="0" value="Cerca nei risultati" />
@@ -62,7 +71,7 @@
 
       <!-- status bar items default state-->
       <control name="sbTotalCountPanel" value="Totale: 0"/>
-      <control name="sbFileCountPanel" value="Lima: 0"/>
+      <control name="sbFileCountPanel" value="File: 0"/>
       <control name="sbFilterCountPanel" value="Esclusioni: 0" tooltip="Fare doppio clic per visualizzare le esclusioni."/>
       <control name="sbErrorCountPanel" value="Errore: 0" tooltip="Fare doppio clic per visualizzare gli errori."/>
    </screen>
@@ -122,6 +131,7 @@
       <control name="chkSaveSearchOptions" value="Salva le opzioni di ricerca in uscita."/>
       <control name="grpFileList" value="Elenco dei file" />
       <control name="btnFileFindFont" value="Trova font..."/>
+      <control name="chkDetectFileEncoding" value="Rileva la codifica del file."/>
    </screen>
    
    <screen name="frmPrint" value="Stampa">
@@ -186,6 +196,7 @@
       <text name="VerifyErrorNoSearchText" value="Specificare il testo da ricercare."/>
       <text name="VerifyErrorInvalidRegEx" value="L'espressione regolare è fornito non è valido ({0}). Si prega di verificare la vostra espressione."/>
       <text name="VerifyErrorGeneric" value="Impossibile convalidare i parametri specificati.  Verificare che siano validi."/>
+      <text name="VerifyErrorFileHitCount" value="Il conteggio minimo file deve essere maggiore o uguale a {0}."/>
       
       <text name="SearchGenericError" value="Errore durante la ricerca: {0}"/>
       <text name="SearchFileError" value="Errore durante la ricerca del file: {0}. ({1})"/>
@@ -224,7 +235,7 @@ Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="ResultsColumnSize" value="Dimensione"/>
 
       <text name="ResultsStatusTotalCount" value="Totale: {0}"/>
-      <text name="ResultsStatusFileCount" value="Lima: {0}"/>
+      <text name="ResultsStatusFileCount" value="File: {0}"/>
       <text name="ResultsStatusFilterCount" value="Esclusioni: {0}"/>
       <text name="ResultsStatusErrorCount" value="Errore: {0}"/>
 
@@ -239,6 +250,7 @@ Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="Update.Latest" value="Scarica {0} aggiornamento {1}"/>
       <text name="Update.Error" value="Aggiornamento non riuscito"/>
 
+      <text name="Exclusions.Enabled" value="attivato"/>
       <text name="Exclusions.Type" value="tipo"/>
       <text name="Exclusions.Value" value="valore"/>
       <text name="Exclusions.Option" value="opzioni"/>

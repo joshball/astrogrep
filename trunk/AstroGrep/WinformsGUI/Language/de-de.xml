@@ -7,6 +7,7 @@
       <control name="btnCancel" value="&amp;Abbrechen" />
       <control name="lblSearchPath" value="Suchpfad" />
       <control name="lblContextLines" value="Kontextzeilen" tooltip="Zeigt Zeilen über und unter dem Fund an." />
+      <control name="txtContextLines" tooltip="Zeigt Zeilen über und unter dem Fund an." />
       <control name="chkLineNumbers" value="&amp;Zeilennummerierung" tooltip="Fügt die zugegörige Zeilennummer zu jedem Fund hinzu." />
       <control name="chkNegation" value="&amp;Negierung" tooltip="Suche nach Dateien, die den Suchtext nicht enthalten." />
       <control name="chkFileNamesOnly" value="&amp;Zeige nur Dateinamen" tooltip="Zeigt nur die Dateinamen an, in welchen der Suchtext vorkommt (kann für große Dateien schneller sein)" />
@@ -22,17 +23,25 @@
       <control name="label2" value="Modifiziert werden, bevor:" />
       <control name="label3" value="Min. Größe:" />
       <control name="label4" value="Max. Größe:" />
+      <control name="lblMinFileCount" value="Minimum Datei Count" tooltip="Nur Dateien mit Zählerstand größer oder gleich dieser Zahl" />
+      <control name="txtMinFileCount" tooltip="Nur Dateien mit Zählerstand größer oder gleich dieser Zahl" />
       <control name="lnkExclusions" value="Ausschlüsse..." />
       <control name="lstFileNames">
-         <menuitem index="0" value="kopieren Sie" />
+         <menuitem index="0" value="kopieren Sie alle" />
          <menuitem index="1" value="kopieren Namen" />
          <menuitem index="2" value="Kopieren Liegeplatz" />
          <menuitem index="3" value="Kopieren Liegeplatz + Namen" />
          <menuitem index="4" value="-" />
-         <menuitem index="5" value="öffnen Sie die Datei" />
-         <menuitem index="6" value="Verzeichnis geöffnet" />
-         <menuitem index="7" value="-" />
-         <menuitem index="8" value="Element löschen" />
+         <menuitem index="5" value="Dateioperationen">
+            <menuitem index="0" value="kopieren" />
+            <menuitem index="1" value="löschen" />
+         </menuitem>
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="öffnen Sie die Datei" />
+         <menuitem index="8" value="Verzeichnis geöffnet" />
+         <menuitem index="9" value="Öffnen mit zugehörigen Anwendung" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Aus Liste entfernen" />
       </control>
       <control name="btnSearch" value="&amp;Suchen">
          <menuitem index="0" value="Suche in den Ergebnissen" />
@@ -119,6 +128,7 @@
       <control name="chkSaveSearchOptions" value="Suche speichern Optionen auf Exit."/>
       <control name="grpFileList" value="Dateiliste" />
       <control name="btnFileFindFont" value="Schriftart suchen..."/>
+      <control name="chkDetectFileEncoding" value="Detect-Datei-Codierung."/>
    </screen>
 
    <screen name="frmPrint" value="Drucken">
@@ -183,6 +193,7 @@
       <text name="VerifyErrorNoSearchText" value="Sie müssen einen Suchtext angeben, nach dem gesucht werden soll."/>
       <text name="VerifyErrorInvalidRegEx" value="Der reguläre Ausdruck Sie ist ungültig ({0}). Bitte überprüfen Sie Ihren Ausdruck."/>
       <text name="VerifyErrorGeneric" value="Die angegebenen Parameter können nicht bestätigt werden. Bitte überprüfen Sie deren Korrektheit."/>
+      <text name="VerifyErrorFileHitCount" value="Die minimale Dateianzahl muss größer als oder gleich {0} sein."/>
 
       <text name="SearchGenericError" value="Ein Fehler trat während des Suchens auf: {0}"/>
       <text name="SearchFileError" value="Ein Fehler trat während des Suchens in der Date {0} auf. ({1})"/>
@@ -233,6 +244,7 @@
       <text name="Update.Latest" value="Laden Sie {0} aktualisieren {1}"/>
       <text name="Update.Error" value="Aktualisieren Sie überprüfen gescheitert"/>
 
+      <text name="Exclusions.Enabled" value="Aktiv"/>
       <text name="Exclusions.Type" value="Typ"/>
       <text name="Exclusions.Value" value="Wert"/>
       <text name="Exclusions.Option" value="Optionen"/>

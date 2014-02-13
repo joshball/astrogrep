@@ -173,6 +173,7 @@ namespace libAstroGrep
       /// [Curtis_Beard]	   09/08/2005	Created
       /// [Curtis_Beard]	   10/13/2005	ADD: Support for comma-separated fileFilter
       /// [Curtis_Beard]	   07/12/2006	CHG: remove parameters and use properties
+      /// [Curtis_Beard]	   09/17/2013	CHG: 61, ability to split file filters by comma and semi colon (, ;)
       /// </history>
       public void Execute()
       {
@@ -194,11 +195,12 @@ namespace libAstroGrep
               }
               else
               {
-                  foreach (var _filter in FileFilterSpec.FileFilter.Split(char.Parse(",")))
+                  string[] filters = FileFilterSpec.FileFilter.Split(new char[]{ ',', ';'}, StringSplitOptions.RemoveEmptyEntries);
+                  foreach (var filter in filters)
                   {
                       foreach (var dir in SearchSpec.StartDirectories)
                       {
-                          Execute(new DirectoryInfo(dir), null, _filter);
+                          Execute(new DirectoryInfo(dir), null, filter);
                       }
                   }
               }
@@ -292,12 +294,11 @@ namespace libAstroGrep
       /// [Andrew_Radford]    13/08/2009  CHG: Remove searchtext param
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// [Curtis_Beard]	   10/10/2012	CHG: 3131609, signal when directories are filtered out due to system/hidden flag
+      /// [Curtis_Beard]      09/17/2013    FIX: 45, check against a specific extension when only 3 characters is defined (*.txt can return things like *.txtabc due to .net GetFiles)
+      /// [Curtis_Beard]      09/20/2013    CHG: use EnumerateFiles and EnumerateDirectories instead of GetFiles,GetDirectories to not lock up on waiting for those methods.
       /// </history>
       private void Execute(DirectoryInfo sourceDirectory, string sourceDirectoryFilter, string sourceFileFilter)
       {
-         DirectoryInfo[] SourceSubDirectories;
-         FileInfo[] SourceFiles;
-
          // skip directory if matches an exclusion item
          if (FileFilterSpec != null && FileFilterSpec.ExclusionItems != null)
          {
@@ -312,27 +313,36 @@ namespace libAstroGrep
          }
 
          // Check for File Filter
+         string filePattern = "*";
          if (sourceFileFilter != null)
-            SourceFiles = sourceDirectory.GetFiles(sourceFileFilter.Trim());
-         else
-            SourceFiles = sourceDirectory.GetFiles();
+            filePattern = sourceFileFilter.Trim();
 
          // Check for Folder Filter
+         string dirPattern = "*";
          if (sourceDirectoryFilter != null)
-            SourceSubDirectories = sourceDirectory.GetDirectories(sourceDirectoryFilter.Trim());
-         else
-            SourceSubDirectories = sourceDirectory.GetDirectories();
+            dirPattern = sourceDirectoryFilter.Trim();
 
          //Search Every File for search text
-         foreach (FileInfo SourceFile in SourceFiles)
+         foreach (FileInfo SourceFile in sourceDirectory.EnumerateFiles(filePattern))
          {
-             SearchFile(SourceFile);
+             bool processFile = true;
+             if (sourceFileFilter != null && !StriktMatch(SourceFile.Extension, sourceFileFilter.Trim()))
+             {
+                 processFile = false;
+
+                 OnFileFiltered(SourceFile, "FileExtension");
+             }
+
+             if (processFile)
+             {
+                 SearchFile(SourceFile);
+             }
          }
 
          if (SearchSpec.SearchInSubfolders)
          {
             //Recursively go through every subdirectory and it's files (according to folder filter)
-            foreach (var sourceSubDirectory in SourceSubDirectories)
+            foreach (var sourceSubDirectory in sourceDirectory.EnumerateDirectories(dirPattern))
             {
                try
                {
@@ -582,8 +592,45 @@ namespace libAstroGrep
             }
             #endregion
 
+            #region Encoding Detection
+
+            byte[] sampleBytes;
+
+            //Check if can read first
+            try
+            {
+               sampleBytes = EncodingTools.ReadFileContentSample(file.FullName);
+            }
+            catch (Exception ex)
+            {
+               // can't read file
+               OnSearchError(file, ex);
+               return;
+            }
+
+            //if (!SkipBinaryFileDetection)
+            //{
+            //      // check for /0/0/0/0
+            //      if (EncodingTools.IsBinaryFile(sampleBytes))
+            //      {
+            //         // binary file?
+            //         OnSearchError(file, new Exception("The file was detected as binary."));
+            //         return;
+            //      }
+            //}
+
+            System.Text.Encoding encoding = DetectEncoding(sampleBytes);
+            if (encoding == null)
+            {
+               // Could not detect file encoding
+               OnSearchError(file, new Exception("Could not detect file encoding."));
+               return;
+            }
+
+            #endregion
+
             _stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            _reader = new StreamReader(_stream, System.Text.Encoding.Default);
+            _reader = new StreamReader(_stream, encoding);
 
             // Default spacer (left margin) values. If Line Numbers are on,
             // these will be reset within the loop to include line numbers.
@@ -1043,6 +1090,64 @@ namespace libAstroGrep
          }
 
          return false;
+      }
+
+      /// <summary>
+      /// Determines if file extension is valid against the search pattern
+      /// </summary>
+      /// <param name="fileExtension">Current file extension</param>
+      /// <param name="searchPattern">Current file search pattern</param>
+      /// <returns>true if valid, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]      09/17/2013    FIX: 45, check against a specific extension when only 3 characters is defined (*.txt can return things like *.txtabc due to .net GetFiles)
+      /// </history>
+      private bool StriktMatch(string fileExtension, string searchPattern)
+      {
+          bool isStriktMatch = false;
+
+          string extension = searchPattern.Substring(searchPattern.LastIndexOf('.'));
+
+          if (String.IsNullOrEmpty(extension))
+          {
+              isStriktMatch = true;
+          }
+          else if (extension.IndexOfAny(new char[] { '*', '?' }) != -1)
+          {
+              isStriktMatch = true;
+          }
+          else if (String.Compare(fileExtension, extension, true) == 0)
+          {
+              isStriktMatch = true;
+          }
+          else
+          {
+              isStriktMatch = false;
+          }
+
+          return isStriktMatch;
+      }
+
+      /// <summary>
+      /// Detect file encoding using passed in sample bytes of file.
+      /// If DetectFileEncoding is false, fall back to using Encoding.Default like before.
+      /// </summary>
+      /// <param name="sampleBytes">sample byts of current file</param>
+      /// <returns>Encoding detected, otherwise if disabled use Encoding.Default</returns>
+      /// <history>
+      /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
+      /// </history>
+      private System.Text.Encoding DetectEncoding(byte[] sampleBytes)
+      {
+         if (SearchSpec.DetectFileEncoding)
+         {
+            //if (AlwaysUseEncoding != null)
+            //   return AlwaysUseEncoding;
+
+            return EncodingDetector.Detect(sampleBytes, defaultEncoding: System.Text.Encoding.Default);
+         }
+
+         // this is the encoding previous versions used (so it is an option to return to that)
+         return System.Text.Encoding.Default;
       }
       #endregion
 

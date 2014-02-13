@@ -75,6 +75,7 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.MenuItem CopyNameMenuItem;
       private System.Windows.Forms.MenuItem CopyLocatedInMenuItem;
       private System.Windows.Forms.MenuItem CopyLocatedInAndNameMenuItem;
+      private System.Windows.Forms.MenuItem OpenWithAssociatedApp;
       private Label label2;
       private DateTimePicker dateModEnd;
       private Label label1;
@@ -89,6 +90,10 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.CheckBox chkSkipHidden;
       private System.Windows.Forms.NumericUpDown txtMinFileCount;
       private System.Windows.Forms.Label lblMinFileCount;
+	   private MenuItem FileOperationsMenuItem;
+      private MenuItem FileCopyMenuItem;
+      private MenuItem FileDeleteMenuItem;
+      private MenuItem menuItem6;
 
       private void InitializeComponent()
       {
@@ -136,6 +141,7 @@ namespace AstroGrep.Windows.Forms
          this.menuItem4 = new System.Windows.Forms.MenuItem();
          this.OpenMenuItem = new System.Windows.Forms.MenuItem();
          this.OpenFolderMenuItem = new System.Windows.Forms.MenuItem();
+         this.OpenWithAssociatedApp = new System.Windows.Forms.MenuItem();
          this.CopyNameMenuItem = new System.Windows.Forms.MenuItem();
          this.CopyLocatedInMenuItem = new System.Windows.Forms.MenuItem();
          this.CopyLocatedInAndNameMenuItem = new System.Windows.Forms.MenuItem();
@@ -174,7 +180,11 @@ namespace AstroGrep.Windows.Forms
          this.cboMaxSizeType = new System.Windows.Forms.ComboBox();
          this.txtMinFileCount = new System.Windows.Forms.NumericUpDown();
          this.lblMinFileCount = new System.Windows.Forms.Label();
-         this.pnlSearch.SuspendLayout();
+         this.FileOperationsMenuItem = new System.Windows.Forms.MenuItem();
+         this.FileCopyMenuItem = new System.Windows.Forms.MenuItem();
+         this.FileDeleteMenuItem = new System.Windows.Forms.MenuItem();
+         this.menuItem6 = new System.Windows.Forms.MenuItem();
+		 this.pnlSearch.SuspendLayout();
          this.pnlSearchOptions.SuspendLayout();
 
          this.PanelOptionsContainer.SuspendLayout();
@@ -693,15 +703,18 @@ namespace AstroGrep.Windows.Forms
 		    this.CopyLocatedInMenuItem,
 		    this.CopyLocatedInAndNameMenuItem,
             this.menuItem4,
+            this.FileOperationsMenuItem,
+            this.menuItem6,
             this.OpenMenuItem,
             this.OpenFolderMenuItem,
+            this.OpenWithAssociatedApp,
             this.menuItem2,
             this.DeleteMenuItem});
          // 
          // CopyMenuItem
          // 
          this.CopyMenuItem.Index = 0;
-         this.CopyMenuItem.Text = "Copy";
+         this.CopyMenuItem.Text = "Copy All";
          this.CopyMenuItem.Click += new System.EventHandler(this.CopyMenuItem_Click);
          // 
          // CopyNameMenuItem
@@ -729,25 +742,31 @@ namespace AstroGrep.Windows.Forms
          // 
          // OpenMenuItem
          // 
-         this.OpenMenuItem.Index = 5;
+         this.OpenMenuItem.Index = 7;
          this.OpenMenuItem.Text = "Open File";
          this.OpenMenuItem.Click += new System.EventHandler(this.OpenMenuItem_Click);
          // 
          // OpenFolderMenuItem
          // 
-         this.OpenFolderMenuItem.Index = 6;
+         this.OpenFolderMenuItem.Index = 8;
          this.OpenFolderMenuItem.Text = "Open Directory";
          this.OpenFolderMenuItem.Click += new System.EventHandler(this.OpenFolderMenuItem_Click);
+         //
+         // OpenWithAssociatedApp
+         //
+         this.OpenWithAssociatedApp.Index = 9;
+         this.OpenWithAssociatedApp.Text = "Open With Associated App";
+         this.OpenWithAssociatedApp.Click += new System.EventHandler(this.OpenWithAssociatedApp_Click);
          // 
          // menuItem2
          // 
-         this.menuItem2.Index = 7;
+         this.menuItem2.Index = 10;
          this.menuItem2.Text = "-";
          // 
          // DeleteMenuItem
          // 
-         this.DeleteMenuItem.Index = 8;
-         this.DeleteMenuItem.Text = "Delete Item";
+         this.DeleteMenuItem.Index = 11;
+         this.DeleteMenuItem.Text = "Remove from list";
          this.DeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
          // 
          // splitLeftRight
@@ -943,6 +962,31 @@ namespace AstroGrep.Windows.Forms
          this.sbErrorCountPanel.DoubleClickEnabled = true;
          this.sbErrorCountPanel.ToolTipText = "Double click to display errors.";
          // 
+         // FileOperationsMenuItem
+         // 
+         this.FileOperationsMenuItem.Index = 5;
+         this.FileOperationsMenuItem.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.FileCopyMenuItem,
+            this.FileDeleteMenuItem});
+         this.FileOperationsMenuItem.Text = "File Operations";
+         // 
+         // FileCopyMenuItem
+         // 
+         this.FileCopyMenuItem.Index = 0;
+         this.FileCopyMenuItem.Text = "Copy";
+         this.FileCopyMenuItem.Click += new System.EventHandler(this.FileCopyMenuItem_Click);
+         // 
+         // FileDeleteMenuItem
+         // 
+         this.FileDeleteMenuItem.Index = 1;
+         this.FileDeleteMenuItem.Text = "Delete";
+         this.FileDeleteMenuItem.Click += new System.EventHandler(this.FileDeleteMenuItem_Click);
+         // 
+         // menuItem6
+         // 
+         this.menuItem6.Index = 6;
+         this.menuItem6.Text = "-";
+		 // 
          // ListViewImageList
          // 
          this.ListViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ListViewImageList.ImageStream")));

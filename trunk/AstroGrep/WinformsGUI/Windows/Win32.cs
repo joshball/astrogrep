@@ -1492,5 +1492,75 @@ namespace AstroGrep.Windows
             }
         }
         #endregion
+
+        #region File Deletion
+        /// <summary>
+        /// Helper class to delete a file via the recycle bin.
+        /// </summary>
+        public class FileDeletion
+        {
+           [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+           private struct SHFILEOPSTRUCT
+           {
+              public IntPtr hwnd;
+              [MarshalAs(UnmanagedType.U4)]
+              public int wFunc;
+              public string pFrom;
+              public string pTo;
+              public short fFlags;
+              [MarshalAs(UnmanagedType.Bool)]
+              public bool fAnyOperationsAborted;
+              public IntPtr hNameMappings;
+              public string lpszProgressTitle;
+           }
+
+           [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+           private static extern int SHFileOperation(ref SHFILEOPSTRUCT FileOp);
+
+           private const int FO_DELETE = 3;
+           private const int FOF_ALLOWUNDO = 0x40;
+           private const int FOF_NOCONFIRMATION = 0x10;    //Don't prompt the user.;
+
+           /// <summary>
+           /// Do not show a dialog during the process
+           /// </summary>
+           private const int FOF_SILENT = 0x0004;
+           ///// <summary>
+           ///// Do not ask the user to confirm selection
+           ///// </summary>
+           //private const int FOF_NOCONFIRMATION = 0x0010;
+           ///// <summary>
+           ///// Delete the file to the recycle bin.  (Required flag to send a file to the bin
+           ///// </summary>
+           //private const int FOF_ALLOWUNDO = 0x0040;
+           /// <summary>
+           /// Do not show the names of the files or folders that are being recycled.
+           /// </summary>
+           private const int FOF_SIMPLEPROGRESS = 0x0100;
+           /// <summary>
+           /// Surpress errors, if any occur during the process.
+           /// </summary>
+           private const int FOF_NOERRORUI = 0x0400;
+           /// <summary>
+           /// Warn if files are too big to fit in the recycle bin and will need
+           /// to be deleted completely.
+           /// </summary>
+           private const int FOF_WANTNUKEWARNING = 0x4000;
+
+           /// <summary>
+           /// Deletes the file using the recycle bin.
+           /// </summary>
+           /// <param name="path"></param>
+           public static void Delete(string path)
+           {
+              SHFILEOPSTRUCT shf = new SHFILEOPSTRUCT();
+              shf.wFunc = FO_DELETE;
+              shf.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+              shf.pFrom = path + "\0" + "\0";
+
+              SHFileOperation(ref shf);
+           }
+        }
+      #endregion
     }
 }

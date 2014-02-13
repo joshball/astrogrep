@@ -51,17 +51,20 @@ namespace AstroGrep.Output
         /// <param name="grep">libAstroGrep object</param>
         /// <param name="lstFileNames">ListView containing hits</param>
         /// <history>
-        /// [Curtis_Beard]		  09/06/2006	Created
-        /// [Andrew_Radford]      20/09/2009	Extracted from main form code-behind
-        /// [Curtis_Beard]		  01/31/2012	CHG: output some basic search information, make divider same length as filename
+        /// [Curtis_Beard]		   09/06/2006	Created
+        /// [Andrew_Radford]     20/09/2009	Extracted from main form code-behind
+        /// [Curtis_Beard]		   01/31/2012	CHG: output some basic search information, make divider same length as filename
+        /// [Curtis_Beard]		   02/12/2014	CHG: handle file search only better, add search options to output
         /// </history>
         public static void SaveResultsAsText(string path, Grep grep, ListView lstFileNames)
         {
             // Open the file
-            using (var writer = new StreamWriter(path, false, System.Text.Encoding.Default))
+            using (var writer = new StreamWriter(path, false, System.Text.Encoding.UTF8))
             {
                 StringBuilder builder = new StringBuilder();
                 int totalHits = 0;
+
+                bool isFileSearch = string.IsNullOrEmpty(grep.SearchSpec.SearchText);
 
                 // loop through File Names list
                 for (int _index = 0; _index < lstFileNames.Items.Count; _index++)
@@ -71,26 +74,83 @@ namespace AstroGrep.Output
                     var _hit = grep.RetrieveHitObject(hitNum);
                     totalHits += _hit.HitCount;
 
-
                     // write info to a file
-                    builder.AppendLine(new string('-', _hit.FilePath.Length));
-                    builder.AppendLine(_hit.FilePath);
-                    builder.AppendLine(new string('-', _hit.FilePath.Length));
-                    builder.AppendLine(_hit.Lines);
-                    builder.AppendLine();
+                    if (isFileSearch || grep.SearchSpec.ReturnOnlyFileNames)
+                    {
+                       builder.AppendLine(_hit.FilePath);
+                    }
+                    else
+                    {
+                       builder.AppendLine(new string('-', _hit.FilePath.Length));
+                       builder.AppendLine(_hit.FilePath);
+                       builder.AppendLine(new string('-', _hit.FilePath.Length));
+                       builder.AppendLine(_hit.Lines);
+                       builder.AppendLine();
+                    }
                 }
 
                 // output basic search information as a header
                 writer.WriteLine("AstroGrep Results");
-                writer.WriteLine("-----------------");
-                writer.WriteLine(string.Format("{0} was found {1} time{2} in {3} file{4}",
-                   grep.SearchSpec.SearchText,
-                   totalHits,
-                   totalHits > 1 ? "s" : "",
-                   grep.Greps.Count,
-                   grep.Greps.Count > 1 ? "s" : ""));
+                writer.WriteLine("-------------------------------------------------------");
+                if (!isFileSearch)
+                {
+                   writer.WriteLine(string.Format("{0} was found {1} time{2} in {3} file{4}",
+                      grep.SearchSpec.SearchText,
+                      totalHits,
+                      totalHits > 1 ? "s" : "",
+                      grep.Greps.Count,
+                      grep.Greps.Count > 1 ? "s" : ""));
+
+                   writer.WriteLine("");
+                   
+                }
+
+                writer.WriteLine("");
+               
+                // output options
+                writer.WriteLine("\tSearch Options");
+                writer.WriteLine("\t---------------------------------------------------");
+                //writer.WriteLine("searchPaths", string.Join(", ", grep.SearchSpec.StartDirectories));
+                writer.WriteLine("\tFile Types: {0}", grep.FileFilterSpec.FileFilter);
+                writer.WriteLine("\tRegular Expressions: {0}", grep.SearchSpec.UseRegularExpressions.ToString());
+                writer.WriteLine("\tCase Sensitive: {0}", grep.SearchSpec.UseCaseSensitivity.ToString());
+                writer.WriteLine("\tWhole Word: {0}", grep.SearchSpec.UseWholeWordMatching.ToString());
+                writer.WriteLine("\tSubfolders: {0}", grep.SearchSpec.SearchInSubfolders.ToString());
+                writer.WriteLine("\tShow File Names Only: {0}", grep.SearchSpec.ReturnOnlyFileNames.ToString());
+                writer.WriteLine("\tNegation: {0}", grep.SearchSpec.UseNegation.ToString());
+                writer.WriteLine("\tLine Numbers: {0}", grep.SearchSpec.IncludeLineNumbers.ToString());
+                writer.WriteLine("\tContext Lines: {0}", grep.SearchSpec.ContextLines.ToString());
+                writer.WriteLine("\tSkip Hidden Files/Directories: {0}", grep.FileFilterSpec.SkipHiddenFiles.ToString());
+                writer.WriteLine("\tSkip System Files/Directories: {0}", grep.FileFilterSpec.SkipSystemFiles.ToString());
+                if (grep.FileFilterSpec.DateModifiedStart != DateTimePicker.MinimumDateTime)
+                {
+                   writer.WriteLine("\tModified Date Start: {0}", grep.FileFilterSpec.DateModifiedStart.ToString());
+                }
+                if (grep.FileFilterSpec.DateModifiedEnd != DateTimePicker.MaximumDateTime)
+                {
+                   writer.WriteLine("\tModified Date End: {0}", grep.FileFilterSpec.DateModifiedEnd.ToString());
+                }
+                if (grep.FileFilterSpec.FileSizeMin != long.MinValue)
+                {
+                   writer.WriteLine("\tMin File Size: {0}", grep.FileFilterSpec.FileSizeMin.ToString());
+                }
+                if (grep.FileFilterSpec.FileSizeMax != long.MaxValue)
+                {
+                   writer.WriteLine("\tMax File Size: {0}", grep.FileFilterSpec.FileSizeMax.ToString());
+                }
+                if (grep.FileFilterSpec.FileHitCount > 0)
+                {
+                   writer.WriteLine("\tMinimum File Count: {0}", grep.FileFilterSpec.FileHitCount.ToString());
+                }
+
                 writer.WriteLine("");
                 writer.WriteLine("");
+
+                writer.WriteLine("Results");
+                if (isFileSearch || grep.SearchSpec.ReturnOnlyFileNames)
+                {
+                   writer.WriteLine("-------------------------------------------------------");
+                }
 
                 // output actual results
                 writer.Write(builder.ToString());
@@ -104,14 +164,15 @@ namespace AstroGrep.Output
         /// <param name="grep">libAstroGrep object</param>
         /// <param name="lstFileNames">ListView containing hits</param>
         /// <history>
-        /// [Curtis_Beard]		09/06/2006	Created
-        /// [Andrew_Radford]    20/09/2009	Extracted from main form code-behind
-        /// [Curtis_Beard]		01/31/2012	CHG: make divider same length as filename
-        /// [Curtis_Beard]		10/30/2012	CHG: add total in hits in file
+        /// [Curtis_Beard]		   09/06/2006	Created
+        /// [Andrew_Radford]     20/09/2009	Extracted from main form code-behind
+        /// [Curtis_Beard]		   01/31/2012	CHG: make divider same length as filename
+        /// [Curtis_Beard]		   10/30/2012	CHG: add total in hits in file
+        /// [Curtis_Beard]		   02/12/2014	CHG: handle file search only better
         /// </history>
         public static void SaveResultsAsHTML(string path, Grep grep, ListView lstFileNames)
         {
-            using (var writer = new StreamWriter(path, false, System.Text.Encoding.Default))
+            using (var writer = new StreamWriter(path, false, System.Text.Encoding.UTF8))
             {
                 var allSections = new System.Text.StringBuilder();
                 string repeater;
@@ -119,8 +180,9 @@ namespace AstroGrep.Output
                 string template = HTMLHelper.GetContents("Output.html");
                 string css = HTMLHelper.GetContents("Output.css");
                 int totalHits = 0;
+                bool isFileSearch = string.IsNullOrEmpty(grep.SearchSpec.SearchText);
 
-                if (grep.SearchSpec.ReturnOnlyFileNames)
+                if (grep.SearchSpec.ReturnOnlyFileNames || isFileSearch)
                     template = HTMLHelper.GetContents("Output-fileNameOnly.html");
 
                 css = HTMLHelper.ReplaceCssHolders(css);
@@ -157,8 +219,7 @@ namespace AstroGrep.Output
                 }
 
                 template = template.Replace(repeat, allSections.ToString());
-                template = template.Replace("%%totalhits%%", totalHits.ToString());
-                template = HTMLHelper.ReplaceSearchOptions(template, grep);
+                template = HTMLHelper.ReplaceSearchOptions(template, grep, totalHits);
 
                 // write out template to the file
                 writer.WriteLine(template);
@@ -172,15 +233,18 @@ namespace AstroGrep.Output
         /// <param name="grep">libAstroGrep object</param>
         /// <param name="lstFileNames">ListView containing hits</param>
         /// <history>
-        /// [Curtis_Beard]		09/06/2006	Created
-        /// [Andrew_Radford]    20/09/2009	Extracted from main form code-behind
-        /// [Curtis_Beard]		01/31/2012	ADD: display for additional options (skip hidden/system options, search paths, modified dates, file sizes)
-        /// [Curtis_Beard]		10/30/2012	ADD: file hit count, CHG: recurse to subFolders
+        /// [Curtis_Beard]		   09/06/2006	Created
+        /// [Andrew_Radford]     20/09/2009	Extracted from main form code-behind
+        /// [Curtis_Beard]		   01/31/2012	ADD: display for additional options (skip hidden/system options, search paths, modified dates, file sizes)
+        /// [Curtis_Beard]		   10/30/2012	ADD: file hit count, CHG: recurse to subFolders
+        /// [Curtis_Beard]		   02/12/2014	CHG: handle file search only better
         /// </history>
         public static void SaveResultsAsXML(string path, Grep grep, ListView lstFileNames)
         {
             using (var writer = new XmlTextWriter(path, Encoding.UTF8))
             {
+               bool isFileSearch = string.IsNullOrEmpty(grep.SearchSpec.SearchText);
+
                 writer.Formatting = Formatting.Indented;
 
                 writer.WriteStartDocument(true);
@@ -220,7 +284,7 @@ namespace AstroGrep.Output
                 }
                 if (grep.FileFilterSpec.FileHitCount > 0)
                 {
-                    writer.WriteElementString("fileHitCount", grep.FileFilterSpec.FileHitCount.ToString());
+                    writer.WriteElementString("minimumFileCount", grep.FileFilterSpec.FileHitCount.ToString());
                 }
                 writer.WriteEndElement();
 
@@ -248,8 +312,11 @@ namespace AstroGrep.Output
                     writer.WriteAttributeString("total", _hit.HitCount.ToString());
 
                     // write out lines
-                    for (int _jIndex = 0; _jIndex < _hit.LineCount; _jIndex++)
-                        writer.WriteElementString("line", _hit.RetrieveLine(_jIndex));
+                    if (!isFileSearch && !grep.SearchSpec.ReturnOnlyFileNames)
+                    {
+                       for (int _jIndex = 0; _jIndex < _hit.LineCount; _jIndex++)
+                          writer.WriteElementString("line", _hit.RetrieveLine(_jIndex));
+                    }
                     writer.WriteEndElement();
                 }
 
@@ -265,54 +332,86 @@ namespace AstroGrep.Output
         /// <param name="grep">libAstroGrep object</param>
         /// <param name="lstFileNames">ListView containing hits</param>
         /// <history>
-        /// [Curtis_Beard]		10/30/2012	Created
+        /// [Curtis_Beard]		   10/30/2012	Created
+        /// [Curtis_Beard]		   02/12/2014	CHG: handle file search only better
         /// </history>
         public static void SaveResultsAsJSON(string path, Grep grep, ListView lstFileNames)
         {
             // Open the file
-            using (var writer = new StreamWriter(path, false, System.Text.Encoding.Default))
+            using (var writer = new StreamWriter(path, false, System.Text.Encoding.UTF8))
             {
-                writer.Write("{");
+               bool isFileSearch = string.IsNullOrEmpty(grep.SearchSpec.SearchText);
+                writer.WriteLine("{");
 
                 // write out search options
-                writer.Write("\"options\":{");
-                writer.Write(string.Format("\"searchPaths\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.StartDirectories)));
-                writer.Write(string.Format(",\"fileTypes\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.FileFilter)));
-                writer.Write(string.Format(",\"searchText\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.SearchText)));
-                writer.Write(string.Format(",\"regularExpressions\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.UseRegularExpressions)));
-                writer.Write(string.Format(",\"caseSensitive\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.UseCaseSensitivity)));
-                writer.Write(string.Format(",\"wholeWord\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.UseWholeWordMatching)));
-                writer.Write(string.Format(",\"subFolders\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.SearchInSubfolders)));
-                writer.Write(string.Format(",\"showFileNamesOnly\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.ReturnOnlyFileNames)));
-                writer.Write(string.Format(",\"negation\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.UseNegation)));
-                writer.Write(string.Format(",\"lineNumbers\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.IncludeLineNumbers)));
-                writer.Write(string.Format(",\"contextLines\":{0}", JSONHelper.ToJSONString(grep.SearchSpec.ContextLines)));
-                writer.Write(string.Format(",\"skipHidden\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.SkipHiddenFiles)));
-                writer.Write(string.Format(",\"skipSystem\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.SkipSystemFiles)));
+                writer.WriteLine("\t\"options\":");
+                writer.WriteLine("\t{");
+                writer.WriteLine(string.Format("\t\t\"searchPaths\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.StartDirectories)));
+                writer.WriteLine(string.Format("\t\t\"fileTypes\":{0},", JSONHelper.ToJSONString(grep.FileFilterSpec.FileFilter)));
+                writer.WriteLine(string.Format("\t\t\"searchText\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.SearchText)));
+                writer.WriteLine(string.Format("\t\t\"regularExpressions\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.UseRegularExpressions)));
+                writer.WriteLine(string.Format("\t\t\"caseSensitive\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.UseCaseSensitivity)));
+                writer.WriteLine(string.Format("\t\t\"wholeWord\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.UseWholeWordMatching)));
+                writer.WriteLine(string.Format("\t\t\"subFolders\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.SearchInSubfolders)));
+                writer.WriteLine(string.Format("\t\t\"showFileNamesOnly\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.ReturnOnlyFileNames)));
+                writer.WriteLine(string.Format("\t\t\"negation\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.UseNegation)));
+                writer.WriteLine(string.Format("\t\t\"lineNumbers\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.IncludeLineNumbers)));
+                writer.WriteLine(string.Format("\t\t\"contextLines\":{0},", JSONHelper.ToJSONString(grep.SearchSpec.ContextLines)));
+                writer.WriteLine(string.Format("\t\t\"skipHidden\":{0},", JSONHelper.ToJSONString(grep.FileFilterSpec.SkipHiddenFiles)));
+                writer.WriteLine(string.Format("\t\t\"skipSystem\":{0},", JSONHelper.ToJSONString(grep.FileFilterSpec.SkipSystemFiles)));
+                bool writeBefore = false;
                 if (grep.FileFilterSpec.DateModifiedStart != DateTimePicker.MinimumDateTime)
                 {
-                    writer.Write(string.Format(",\"dateModifiedStart\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.DateModifiedStart)));
+                   if (writeBefore)
+                   {
+                      writer.WriteLine(",");
+                   }
+                   writer.Write(string.Format("\t\t\"dateModifiedStart\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.DateModifiedStart)));
+                   writeBefore = true;
                 }
                 if (grep.FileFilterSpec.DateModifiedEnd != DateTimePicker.MaximumDateTime)
                 {
-                    writer.Write(string.Format(",\"dateModifiedEnd\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.DateModifiedEnd)));
+                   if (writeBefore)
+                   {
+                      writer.WriteLine(",");
+                   }
+                   writer.Write(string.Format("\t\t\"dateModifiedEnd\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.DateModifiedEnd)));
+                   writeBefore = true;
                 }
                 if (grep.FileFilterSpec.FileSizeMin != long.MinValue)
                 {
-                    writer.Write(string.Format(",\"fileSizeMin\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.FileSizeMin)));
+                   if (writeBefore)
+                   {
+                      writer.WriteLine(",");
+                   }
+                   writer.Write(string.Format("\t\t\"fileSizeMin\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.FileSizeMin)));
+                   writeBefore = true;
                 }
                 if (grep.FileFilterSpec.FileSizeMax != long.MaxValue)
                 {
-                    writer.Write(string.Format(",\"fileSizeMax\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.FileSizeMax)));
+                   if (writeBefore)
+                   {
+                      writer.WriteLine(",");
+                   }
+                   writer.Write(string.Format("\t\t\"fileSizeMax\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.FileSizeMax)));
+                   writeBefore = true;
                 }
                 if (grep.FileFilterSpec.FileHitCount > 0)
                 {
-                    writer.Write(string.Format(",\"fileHitCount\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.FileHitCount)));
+                   if (writeBefore)
+                   {
+                      writer.WriteLine(",");
+                   }
+                   writer.Write(string.Format("\t\t\"minimumFileCount\":{0}", JSONHelper.ToJSONString(grep.FileFilterSpec.FileHitCount)));
+                   writeBefore = true;
                 }
-                writer.Write("}"); // end options
+                writer.WriteLine();
+                writer.WriteLine("\t},"); // end options
+                writer.WriteLine();
 
-                writer.Write(",\"search\":{");
-                writer.Write(string.Format("\"totalfiles\":{0}", JSONHelper.ToJSONString(grep.Greps.Count)));
+                writer.WriteLine("\t\"search\":");
+                writer.WriteLine("\t{");
+                writer.WriteLine(string.Format("\t\t\"totalfiles\":{0},", JSONHelper.ToJSONString(grep.Greps.Count)));
 
                 // get total hits
                 int totalHits = 0;
@@ -324,38 +423,44 @@ namespace AstroGrep.Output
                     // add to total
                     totalHits += _hit.HitCount;
                 }
-                writer.Write(string.Format(",\"totalfound\":{0}", JSONHelper.ToJSONString(totalHits)));
+                writer.WriteLine(string.Format("\t\t\"totalfound\":{0},", JSONHelper.ToJSONString(totalHits)));
 
-                writer.Write(",\"items\":[");
+                writer.WriteLine("\t\t\"items\":");
+                writer.WriteLine("\t\t\t[");
                 for (int _index = 0; _index < lstFileNames.Items.Count; _index++)
                 {
                     var hitNum = int.Parse(lstFileNames.Items[_index].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text);
                     var _hit = grep.RetrieveHitObject(hitNum);
                     
                     if (_index == 0)
-                        writer.Write("{");
+                       writer.WriteLine("\t\t\t\t{");
                     else
-                        writer.Write(",{");
+                       writer.WriteLine("\t\t\t\t{");
 
-                    writer.Write(string.Format("\"file\":{0}", JSONHelper.ToJSONString(_hit.FilePath)));
-                    writer.Write(string.Format(",\"total\":{0}", JSONHelper.ToJSONString(_hit.HitCount)));
+                    writer.WriteLine(string.Format("\t\t\t\t\t\"file\":{0},", JSONHelper.ToJSONString(_hit.FilePath)));
+                    writer.WriteLine(string.Format("\t\t\t\t\t\"total\":{0},", JSONHelper.ToJSONString(_hit.HitCount)));
                     
 
                     // write out lines
-                    writer.Write(",\"lines\":[");
-                    for (int _jIndex = 0; _jIndex < _hit.LineCount; _jIndex++)
+                    if (!isFileSearch && !grep.SearchSpec.ReturnOnlyFileNames)
                     {
-                        if (_jIndex > 0)
-                            writer.Write(",");
+                       writer.Write("\t\t\t\t\t\"lines\":[");
+                       for (int _jIndex = 0; _jIndex < _hit.LineCount; _jIndex++)
+                       {
+                          if (_jIndex > 0)
+                             writer.Write(",");
 
-                        writer.Write(JSONHelper.ToJSONString(_hit.RetrieveLine(_jIndex)));
+                          writer.Write(JSONHelper.ToJSONString(_hit.RetrieveLine(_jIndex)));
+                       }
+                       writer.WriteLine("]");  // end lines
                     }
-                    writer.Write("]");  // end lines
 
-                    writer.Write("}");  // end item
+                    string itemEnd = _index + 1 < lstFileNames.Items.Count ? "\t\t\t\t}," : "\t\t\t\t}";
+                    writer.WriteLine(itemEnd);  // end item
                 }
-                writer.Write("]");  // end items
-                writer.Write("}");  // end search
+                writer.WriteLine("\t\t\t]");  // end items
+
+                writer.WriteLine("\t}");  // end search
 
                 writer.Write("}"); // end all
             }

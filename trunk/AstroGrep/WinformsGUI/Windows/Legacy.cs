@@ -158,7 +158,7 @@ namespace AstroGrep.Windows
 
             foreach (var ext in extensions)
             {
-               libAstroGrep.ExclusionItem item = new libAstroGrep.ExclusionItem(libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension, ext, libAstroGrep.ExclusionItem.OptionsTypes.None, false);
+               libAstroGrep.ExclusionItem item = new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension, ext, libAstroGrep.ExclusionItem.OptionsTypes.None, false);
                exclusions.Add(item);
             }
 

@@ -7,6 +7,7 @@
       <control name="btnCancel" value="&amp;Cancel" />
       <control name="lblSearchPath" value="Search Path" />
       <control name="lblContextLines" value="Context Lines" tooltip="Show lines above and below the word matched" />
+      <control name="txtContextLines" tooltip="Show lines above and below the word matched" />
       <control name="chkLineNumbers" value="&amp;Line Numbers" tooltip="Include line numbers before each match" />
       <control name="chkNegation" value="&amp;Negation" tooltip="Find the files without the Search Text in them" />
       <control name="chkFileNamesOnly" value="Show File Names &amp;Only" tooltip="Show names but not contents of files that have matches (may be faster on large files)" />
@@ -22,17 +23,25 @@
       <control name="label2" value="Modified Before:" />
       <control name="label3" value="Min Size:" />
       <control name="label4" value="Max Size:" />
+      <control name="lblMinFileCount" value="Minimum File Count" tooltip="Only show files with count greater or equal to this number" />
+      <control name="txtMinFileCount" tooltip="Only show files with count greater or equal to this number" />
       <control name="lnkExclusions" value="Exclusions..." />
       <control name="lstFileNames">
-         <menuitem index="0" value="Copy" />
+         <menuitem index="0" value="Copy All" />
          <menuitem index="1" value="Copy Name" />
          <menuitem index="2" value="Copy Located In" />
          <menuitem index="3" value="Copy Located In + Name" />
          <menuitem index="4" value="-" />
-         <menuitem index="5" value="Open File" />
-         <menuitem index="6" value="Open Directory" />
-         <menuitem index="7" value="-" />
-         <menuitem index="8" value="Delete Item" />
+         <menuitem index="5" value="File Operations">
+            <menuitem index="0" value="Copy" />
+            <menuitem index="1" value="Delete" />
+         </menuitem>
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="Open File" />
+         <menuitem index="8" value="Open Directory" />
+         <menuitem index="9" value="Open With Associated App" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Remove from list" />
       </control>
       <control name="btnSearch" value="&amp;Search">
          <menuitem index="0" value="Search in results"/>
@@ -116,9 +125,10 @@
       <control name="lblPluginDetailAuthor" value="Author:"/>
       <control name="btnFindFont" value="&amp;Find Font..."/>
       <control name="chkShowExclusionErrorMessage" value="Show a &amp;prompt when a search yields items being excluded or an error occurs."/>
-      <control name="chkSaveSearchOptions" value="Save search options on exit."/>
+      <control name="chkSaveSearchOptions" value="Save search options on &amp;exit."/>
       <control name="grpFileList" value="File List" />
       <control name="btnFileFindFont" value="Find Font..."/>
+      <control name="chkDetectFileEncoding" value="Detect &amp;file encoding."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -183,6 +193,7 @@
       <text name="VerifyErrorNoSearchText" value="You must supply text for which to search."/>
       <text name="VerifyErrorInvalidRegEx" value="The regular expression you supplied is invalid ({0}).  Please verify your expression."/>
       <text name="VerifyErrorGeneric" value="Unable to validate specified parameters.  Please verify they are valid."/>
+      <text name="VerifyErrorFileHitCount" value="The minimum file count must be greater than or equal to {0}."/>
       
       <text name="SearchGenericError" value="An error occurred searching: {0}"/>
       <text name="SearchFileError" value="An error occurred searching file: {0}. ({1})"/>
@@ -233,6 +244,7 @@
       <text name="Update.Latest" value="Download {0} update {1}"/>
       <text name="Update.Error" value="Update check failed"/>
 
+      <text name="Exclusions.Enabled" value="Enabled"/>
       <text name="Exclusions.Type" value="Type"/>
       <text name="Exclusions.Value" value="Value"/>
       <text name="Exclusions.Option" value="Options"/>

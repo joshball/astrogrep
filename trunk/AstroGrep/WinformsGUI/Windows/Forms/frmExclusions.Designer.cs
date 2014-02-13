@@ -31,13 +31,14 @@
          this.btnOK = new System.Windows.Forms.Button();
          this.btnCancel = new System.Windows.Forms.Button();
          this.lstExclusions = new System.Windows.Forms.ListView();
-         this.chdType = new System.Windows.Forms.ColumnHeader();
-         this.chdValue = new System.Windows.Forms.ColumnHeader();
-         this.chdOption = new System.Windows.Forms.ColumnHeader();
+         this.chdType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.chdValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.chdOption = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.btnAdd = new System.Windows.Forms.Button();
          this.btnEdit = new System.Windows.Forms.Button();
          this.btnDelete = new System.Windows.Forms.Button();
          this.btnRestoreDefaults = new System.Windows.Forms.Button();
+         this.chdEnabled = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.SuspendLayout();
          // 
          // btnOK
@@ -65,7 +66,9 @@
          // 
          // lstExclusions
          // 
+         this.lstExclusions.CheckBoxes = true;
          this.lstExclusions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.chdEnabled,
             this.chdType,
             this.chdValue,
             this.chdOption});
@@ -90,12 +93,12 @@
          // chdValue
          // 
          this.chdValue.Text = "Value";
-         this.chdValue.Width = 325;
+         this.chdValue.Width = 296;
          // 
          // chdOption
          // 
          this.chdOption.Text = "Option";
-         this.chdOption.Width = 131;
+         this.chdOption.Width = 100;
          // 
          // btnAdd
          // 
@@ -142,6 +145,10 @@
          this.btnRestoreDefaults.UseVisualStyleBackColor = true;
          this.btnRestoreDefaults.Click += new System.EventHandler(this.btnRestoreDefaults_Click);
          // 
+         // chdEnabled
+         // 
+         this.chdEnabled.Text = "Enabled";
+         // 
          // frmExclusions
          // 
          this.AcceptButton = this.btnOK;
@@ -181,5 +188,6 @@
       private System.Windows.Forms.ColumnHeader chdValue;
       private System.Windows.Forms.ColumnHeader chdOption;
       private System.Windows.Forms.Button btnRestoreDefaults;
+      private System.Windows.Forms.ColumnHeader chdEnabled;
    }
 }
