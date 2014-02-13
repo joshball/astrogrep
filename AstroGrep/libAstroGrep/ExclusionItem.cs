@@ -79,6 +79,11 @@ namespace libAstroGrep
       #endregion
 
       #region Properties
+
+      /// <summary>
+      /// Determines whether the exclusion is enabled.
+      /// </summary>
+      public bool Enabled { get; set; }
       
       /// <summary>
       /// Exclusion type.
@@ -110,6 +115,7 @@ namespace libAstroGrep
       /// </history>
       public ExclusionItem()
       {
+         Enabled = true;
          Type = ExclusionTypes.FilePath;
          Value = string.Empty;
          Option = OptionsTypes.None;
@@ -119,6 +125,7 @@ namespace libAstroGrep
       /// <summary>
       /// Creates an instance of this object.
       /// </summary>
+      /// <param name="enabled">Enabled</param>
       /// <param name="type">Exclusion type</param>
       /// <param name="value">Exclusion value</param>
       /// <param name="option">Exclusion option</param>
@@ -126,8 +133,9 @@ namespace libAstroGrep
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// </history>
-      public ExclusionItem(ExclusionTypes type, string value, OptionsTypes option, bool ignoreCase)
+      public ExclusionItem(bool enabled, ExclusionTypes type, string value, OptionsTypes option, bool ignoreCase)
       {
+         Enabled = enabled;
          Type = type;
          Value = value;
          Option = option;
@@ -143,7 +151,7 @@ namespace libAstroGrep
       /// </history>
       public override string ToString()
       {
-         return string.Format("{1}{0}{2}{0}{3}{0}{4}", DELIMETER, Type.ToString(), Value, Option.ToString(), IgnoreCase.ToString());
+         return string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}", DELIMETER, Type.ToString(), Value, Option.ToString(), IgnoreCase.ToString(), Enabled);
       }
 
       /// <summary>
@@ -156,25 +164,30 @@ namespace libAstroGrep
       /// </history>
       public bool ShouldExcludeFile(System.IO.FileInfo file)
       {
-         switch (Type)
+         if (Enabled)
          {
-            case ExclusionTypes.FileExtension:
-               string temp = Value.ToLower();
-               if (file.Extension.StartsWith(".") && !temp.StartsWith("."))
-               {
-                  temp = string.Format(".{0}", temp);
-               }
-               return file.Extension.ToLower().Equals(temp);
+            switch (Type)
+            {
+               case ExclusionTypes.FileExtension:
+                  string temp = Value.ToLower();
+                  if (file.Extension.StartsWith(".") && !temp.StartsWith("."))
+                  {
+                     temp = string.Format(".{0}", temp);
+                  }
+                  return file.Extension.ToLower().Equals(temp);
 
-            case ExclusionTypes.FileName:
-               return CheckStringAgainstOption(file.Name);
+               case ExclusionTypes.FileName:
+                  return CheckStringAgainstOption(file.Name);
 
-            case ExclusionItem.ExclusionTypes.FilePath:
-               return CheckStringAgainstOption(file.FullName);
+               case ExclusionItem.ExclusionTypes.FilePath:
+                  return CheckStringAgainstOption(file.FullName);
 
-            default:
-               return false;
+               default:
+                  return false;
+            }
          }
+
+         return false;
       }
 
       /// <summary>
@@ -187,17 +200,22 @@ namespace libAstroGrep
       /// </history>
       public bool ShouldExcludeDirectory(System.IO.DirectoryInfo dir)
       {
-         switch (Type)
+         if (Enabled)
          {
-            case ExclusionTypes.DirectoryName:
-               return CheckStringAgainstOption(dir.Name);
+            switch (Type)
+            {
+               case ExclusionTypes.DirectoryName:
+                  return CheckStringAgainstOption(dir.Name);
 
-            case ExclusionItem.ExclusionTypes.DirectoryPath:
-               return CheckStringAgainstOption(dir.FullName);
+               case ExclusionItem.ExclusionTypes.DirectoryPath:
+                  return CheckStringAgainstOption(dir.FullName);
 
-            default:
-               return false;
+               default:
+                  return false;
+            }
          }
+
+         return false;
       }
 
       /// <summary>
@@ -210,24 +228,29 @@ namespace libAstroGrep
       /// </history>
       private bool CheckStringAgainstOption(string checkValue)
       {
-         switch (Option)
+         if (Enabled)
          {
-            case OptionsTypes.Equals:
-               return checkValue.Equals(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+            switch (Option)
+            {
+               case OptionsTypes.Equals:
+                  return checkValue.Equals(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
 
-            case OptionsTypes.Contains:
-               return checkValue.IndexOf(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture) > -1;
+               case OptionsTypes.Contains:
+                  return checkValue.IndexOf(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture) > -1;
 
-            case OptionsTypes.StartsWith:
-               return checkValue.StartsWith(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+               case OptionsTypes.StartsWith:
+                  return checkValue.StartsWith(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
 
-            case OptionsTypes.EndsWith:
-               return checkValue.EndsWith(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+               case OptionsTypes.EndsWith:
+                  return checkValue.EndsWith(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
 
-            case OptionsTypes.None:
-            default:
-               return false;
+               case OptionsTypes.None:
+               default:
+                  return false;
+            }
          }
+
+         return false;
       }
 
       #region Public Static Methods
@@ -249,6 +272,8 @@ namespace libAstroGrep
          item.Value = values[1];
          item.Option = (OptionsTypes)Enum.Parse(typeof(OptionsTypes), values[2]);
          item.IgnoreCase = Convert.ToBoolean(values[3]);
+         if (values.Length > 4)
+            item.Enabled = Convert.ToBoolean(values[4]);
 
          return item;
       }

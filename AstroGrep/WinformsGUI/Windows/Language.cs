@@ -337,16 +337,46 @@ namespace AstroGrep.Windows
       /// </history>
       public static void SetContextMenuItemText(Control holder, MenuItem item)
       {
+         SetContextMenuItemText(holder, item, null);
+      }
+
+      /// <summary>
+      /// Sets the given context menuitem's text property or sub menuitem if specified.
+      /// </summary>
+      /// <param name="holder">Control containing ContextMenu</param>
+      /// <param name="item">MenuItem</param>
+      /// <param name="subItem">MenuItem's child MenuItem to set</param>
+      /// <history>
+      /// [Curtis_Beard]		09/18/2013	ADD: 65, support for contextmenu sub items
+      /// </history>
+      public static void SetContextMenuItemText(Control holder, MenuItem item, MenuItem subItem)
+      {
          if (__RootNode != null)
          {
             string formName = GetParentControl(holder).Name;
-            XmlNode node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']/control[@name='" + holder.Name + "']/menuitem[@index='" + item.Index + "']");
+            XmlNode node = null;
+
+            if (subItem == null)
+            {
+               node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']/control[@name='" + holder.Name + "']/menuitem[@index='" + item.Index + "']");
+            }
+            else
+            {
+               node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']/control[@name='" + holder.Name + "']/menuitem[@index='" + item.Index + "']/menuitem[@index='" + subItem.Index + "']");
+            }
 
             if (node != null)
             {
                if (node.Attributes["value"] != null)
                {
-                  item.Text = node.Attributes["value"].Value;
+                  if (subItem == null)
+                  {
+                     item.Text = node.Attributes["value"].Value;
+                  }
+                  else
+                  {
+                     subItem.Text = node.Attributes["value"].Value;
+                  }
                }
             }
          }
@@ -527,6 +557,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]		07/31/2006	Created
       /// [Curtis_Beard]		02/01/2012	ADD: support for control's contextmenu
+      /// [Curtis_Beard]		09/18/2013	ADD: 65, support for contextmenu sub items
       /// </history>
       private static void ProcessControl(Control control, ToolTip tip)
       {
@@ -540,6 +571,15 @@ namespace AstroGrep.Windows
                foreach (MenuItem item in control.ContextMenu.MenuItems)
                {
                   SetContextMenuItemText(control, item);
+
+                  // process any sub menu items
+                  if (item.MenuItems != null && item.MenuItems.Count > 0)
+                  {
+                     foreach (MenuItem subItem in item.MenuItems)
+                     {
+                        SetContextMenuItemText(control, item, subItem);
+                     }
+                  }
                }
             }
          }

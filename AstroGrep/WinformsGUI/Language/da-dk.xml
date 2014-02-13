@@ -7,6 +7,7 @@
       <control name="btnCancel" value="&amp;Afbryd" />
       <control name="lblSearchPath" value="Søge Sti" />
       <control name="lblContextLines" value="Kontekst Linier" tooltip="Vis linerne over og under fundne match" />
+      <control name="txtContextLines" tooltip="Vis linerne over og under fundne match" />
       <control name="chkLineNumbers" value="&amp;Linienumre" tooltip="Vis linienumre ved hvert match" />
       <control name="chkNegation" value="&amp;Negering" tooltip="Find alle filer der IKKE indeholder søge teksten" />
       <control name="chkFileNamesOnly" value="Vis kun filnavne" tooltip="Vis kun filnavnet og ikke indholdet af søgeresultatet (hurtigere for store filer)" />
@@ -22,17 +23,25 @@
       <control name="label2" value="Ændret Før:" />
       <control name="label3" value="Min størrelse:" />
       <control name="label4" value="Max størrelse:" />
+      <control name="lblMinFileCount" value="minimum antal filer" tooltip="Vis kun filer med count større end eller lig til dette nummer" />
+      <control name="txtMinFileCount" tooltip="Vis kun filer med count større end eller lig til dette nummer" />
       <control name="lnkExclusions" value="udelukkelser..." />
       <control name="lstFileNames">
-         <menuitem index="0" value="kopi" />
+         <menuitem index="0" value="kopier alle" />
          <menuitem index="1" value="kopiere navn" />
          <menuitem index="2" value="kopi beliggende i" />
          <menuitem index="3" value="kopi beliggende i + navn" />
          <menuitem index="4" value="-" />
-         <menuitem index="5" value="åbne fil" />
-         <menuitem index="6" value="åben vejviser" />
-         <menuitem index="7" value="-" />
-         <menuitem index="8" value="slet element" />
+         <menuitem index="5" value="filhandlinger">
+            <menuitem index="0" value="kopier" />
+            <menuitem index="1" value="slet" />
+         </menuitem>
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="åbne fil" />
+         <menuitem index="8" value="åben vejviser" />
+         <menuitem index="9" value="Åbn med tilhørende ansøgning" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Fjern fra liste" />
       </control>
       <control name="btnSearch" value="&amp;Søg">
          <menuitem index="0" value="Søg i resultater"/>
@@ -119,6 +128,7 @@
       <control name="chkSaveSearchOptions" value="Gem søgeindstillinger på exit."/>
       <control name="grpFileList" value="Filliste" />
       <control name="btnFileFindFont" value="Find skrift..."/>
+      <control name="chkDetectFileEncoding" value="Detect filkodningen."/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -183,6 +193,7 @@
       <text name="VerifyErrorNoSearchText" value="Angiv den tekst der skal søges efter." />
       <text name="VerifyErrorInvalidRegEx" value="Det regulære udtryk, du har angivet, er ugyldig ({0}). Bekræft venligst din udtryk."/>
       <text name="VerifyErrorGeneric" value="Ude af stand til at anvende angivne parametre.  Verificer venligst at de er gyldige." />
+      <text name="VerifyErrorFileHitCount" value="Den mindste fil count skal være større end eller lig med {0}."/>
       
       <text name="SearchGenericError" value="Der opstod en fejl under søgningen: {0}" />
       <text name="SearchFileError" value="Der opstod en fejl under søgningen i fil: {0}. ({1})" />
@@ -233,6 +244,7 @@
       <text name="Update.Latest" value="Hent {0} opdatering {1}"/>
       <text name="Update.Error" value="Opdater mislykkedes"/>
 
+      <text name="Exclusions.Enabled" value="I kraft"/>
       <text name="Exclusions.Type" value="typen"/>
       <text name="Exclusions.Value" value="værdi"/>
       <text name="Exclusions.Option" value="optioner"/>

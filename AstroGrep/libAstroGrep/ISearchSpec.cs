@@ -34,5 +34,8 @@ namespace libAstroGrep
 
         /// <summary>Sets including line numbers as part of a line</summary>
         bool IncludeLineNumbers { get; }
+
+        /// <summary>Sets whether to detect file encoding or use default encoding (previous versions)</summary>
+        bool DetectFileEncoding { get; }
     }
 }

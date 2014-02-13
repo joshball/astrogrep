@@ -74,9 +74,10 @@ namespace AstroGrep.Windows.Forms
          Language.ProcessForm(this);
 
          // set column text
-         lstExclusions.Columns[0].Text = Language.GetGenericText("Exclusions.Type", "Type");
-         lstExclusions.Columns[1].Text = Language.GetGenericText("Exclusions.Value", "Value");
-         lstExclusions.Columns[2].Text = Language.GetGenericText("Exclusions.Option", "Option");
+         lstExclusions.Columns[0].Text = Language.GetGenericText("Exclusions.Enabled", "Enabled");
+         lstExclusions.Columns[1].Text = Language.GetGenericText("Exclusions.Type", "Type");
+         lstExclusions.Columns[2].Text = Language.GetGenericText("Exclusions.Value", "Value");
+         lstExclusions.Columns[3].Text = Language.GetGenericText("Exclusions.Option", "Option");
 
          LoadExclusions();
 
@@ -115,7 +116,9 @@ namespace AstroGrep.Windows.Forms
          exclusionItems.Clear();
          foreach (ListViewItem listItem in lstExclusions.Items)
          {
-            exclusionItems.Add(listItem.Tag as ExclusionItem);
+            var item = listItem.Tag as ExclusionItem;
+            item.Enabled = listItem.Checked;
+            exclusionItems.Add(item);
          }
 
          this.DialogResult = DialogResult.OK;
@@ -159,17 +162,19 @@ namespace AstroGrep.Windows.Forms
          {
             // get currently selected exclusion
             var item = lstExclusions.SelectedItems[0].Tag as ExclusionItem;
+            item.Enabled = lstExclusions.SelectedItems[0].Checked;
 
             var dlg = new frmAddEditExclusions(item);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                item = dlg.CurrentItem;
                var listItem = GetListViewItem(item);
+               lstExclusions.SelectedItems[0].Checked = item.Enabled;
                lstExclusions.SelectedItems[0].Tag = item;
 
-               lstExclusions.SelectedItems[0].Text = listItem.Text;
                lstExclusions.SelectedItems[0].SubItems[1].Text = listItem.SubItems[1].Text;
                lstExclusions.SelectedItems[0].SubItems[2].Text = listItem.SubItems[2].Text;
+               lstExclusions.SelectedItems[0].SubItems[3].Text = listItem.SubItems[3].Text;
 
                SetButtonState();
             }
@@ -308,7 +313,8 @@ namespace AstroGrep.Windows.Forms
       {
          ListViewItem listItem = new ListViewItem();
          listItem.Tag = item;
-         listItem.Text = Language.GetGenericText("Exclusions." + item.Type.ToString());
+         listItem.Checked = item.Enabled;
+         listItem.SubItems.Add(Language.GetGenericText("Exclusions." + item.Type.ToString()));
          listItem.SubItems.Add(item.Value);
          listItem.SubItems.Add(string.Format("{0}{1}", Language.GetGenericText("Exclusions." + item.Option.ToString()), item.IgnoreCase ? Language.GetGenericText("Exclusions.IgnoreCase") : ""));
 

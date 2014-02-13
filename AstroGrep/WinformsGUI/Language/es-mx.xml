@@ -7,6 +7,7 @@
       <control name="btnCancel" value="&amp;Cancelación" />
       <control name="lblSearchPath" value="Camino de búsqueda en un fichero" />
       <control name="lblContextLines" value="Líneas del contexto" tooltip="Demostrar las líneas sobre y debajo de la palabra emparejada" />
+      <control name="txtContextLines" tooltip="Demostrar las líneas sobre y debajo de la palabra emparejada" />
       <control name="chkLineNumbers" value="&amp;Línea números" tooltip="Incluir la línea números antes de cada fósforo" />
       <control name="chkNegation" value="&amp;Negación" tooltip="Encontrar los archivos sin el texto de la búsqueda en ellos" />
       <control name="chkFileNamesOnly" value="Nombres del archivo solamente" tooltip="Demostrar los nombres pero no el contenido de los archivos que tienen fósforos (puede ser más rápido en archivos grandes)" />
@@ -22,17 +23,25 @@
       <control name="label2" value="Antes de modificar:" />
       <control name="label3" value="Tamaño mínimo:" />
       <control name="label4" value="Tamaño máximo:" />
+      <control name="lblMinFileCount" value="Conde Archivo mínima" tooltip="Mostrar sólo archivos con recuento mayor o igual a este número" />
+      <control name="txtMinFileCount" tooltip="Mostrar sólo archivos con recuento mayor o igual a este número" />
       <control name="lnkExclusions" value="Exclusiones..." />
       <control name="lstFileNames">
-         <menuitem index="0" value="copia" />
+         <menuitem index="0" value="copiar todo" />
          <menuitem index="1" value="copiar el nombre" />
          <menuitem index="2" value="copia ubicada en" />
          <menuitem index="3" value="copia ubicada en el nombre de +" />
          <menuitem index="4" value="-" />
-         <menuitem index="5" value="archivo abierto" />
-         <menuitem index="6" value="directorio abierto" />
-         <menuitem index="7" value="-" />
-         <menuitem index="8" value="suprimir el punto" />
+         <menuitem index="5" value="Operaciones con archivos">
+            <menuitem index="0" value="copie" />
+            <menuitem index="1" value="borrar" />
+         </menuitem>
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="archivo abierto" />
+         <menuitem index="8" value="directorio abierto" />
+         <menuitem index="9" value="Abrir con la aplicación asociada" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Eliminar de la lista" />
       </control>
       <control name="btnSearch" value="&amp;Búsqueda">
          <menuitem index="0" value="Buscar en los resultados" />
@@ -119,6 +128,7 @@
       <control name="chkSaveSearchOptions" value="Guardar las opciones de búsqueda a la salida."/>
       <control name="grpFileList" value="Lista de archivos" />
       <control name="btnFileFindFont" value="Buscar fuente..."/>
+      <control name="chkDetectFileEncoding" value="Detectar la codificación del archivo."/>
    </screen>
    
    <screen name="frmPrint" value="Impresión">
@@ -183,6 +193,7 @@
       <text name="VerifyErrorNoSearchText" value="You must supply text for which to search."/>
       <text name="VerifyErrorInvalidRegEx" value="La expresión regular que ha proporcionado no es válido ({0}). Verifique por favor su expresión."/>
       <text name="VerifyErrorGeneric" value="Unable to validate specified parameters.  Please verify they are valid."/>
+      <text name="VerifyErrorFileHitCount" value="El número mínimo de archivo debe ser mayor que o igual a {0}."/>
       
       <text name="SearchGenericError" value="Un error ocurrió buscando: {0}"/>
       <text name="SearchFileError" value="Un error ocurrió buscando el archivo: {0}. ({1})"/>
@@ -233,6 +244,7 @@
       <text name="Update.Latest" value="Descargar {0} actualización {1}"/>
       <text name="Update.Error" value="Actualizar Error en la comprobación"/>
 
+      <text name="Exclusions.Enabled" value="Permitido"/>
       <text name="Exclusions.Type" value="tipo"/>
       <text name="Exclusions.Value" value="valor"/>
       <text name="Exclusions.Option" value="Opciones"/>

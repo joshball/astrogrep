@@ -94,6 +94,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      11/02/2006	CHG: Conversion to C#, setup event handlers
       /// [Curtis_Beard]      02/09/2012	FIX: 3486074, set modification date end to max value
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]	   09/18/2013	ADD: 58, add drag/drop support for path
       /// </history>
       public frmMain()
       {
@@ -118,6 +119,9 @@ namespace AstroGrep.Windows.Forms
          mnuFile.Select += mnuFile_Select;
          mnuEdit.Select += mnuEdit_Select;
          cboFilePath.DropDown += cboFilePath_DropDown;
+         cboFilePath.DragDrop += cboFilePath_DragDrop;
+         cboFilePath.DragEnter += cboFilePath_DragEnter;
+         cboFilePath.AllowDrop = true;
          cboFileName.DropDown += cboFileName_DropDown;
          cboSearchForText.DropDown += cboSearchForText_DropDown;
          chkNegation.CheckedChanged += chkNegation_CheckedChanged;
@@ -837,6 +841,57 @@ namespace AstroGrep.Windows.Forms
       {
           DisplaySearchMessages(LogItem.LogItemTypes.Status);
       }
+
+      /// <summary>
+      /// Handles the DragEnter event for the path combo box.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <remarks>
+      /// Handles file drops only by putting the directory into the combo box.
+      /// </remarks>
+      /// <history>
+      /// [Curtis_Beard]	   09/18/2013	ADD: 58, add drag/drop support for path
+      /// </history>
+      private void cboFilePath_DragEnter(object sender, DragEventArgs e)
+      {
+          if ((e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy)
+          {
+              if (e.Data.GetDataPresent(DataFormats.FileDrop))
+              {
+                  e.Effect = DragDropEffects.Copy;
+              }
+          }
+      }
+
+      /// <summary>
+      /// Handles the DragDrop event for the path combo box.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <remarks>
+      /// Handles file drops only by putting the directory into the combo box.
+      /// </remarks>
+      /// <history>
+      /// [Curtis_Beard]	   09/18/2013	ADD: 58, add drag/drop support for path
+      /// </history>
+      private void cboFilePath_DragDrop(object sender, DragEventArgs e)
+      {
+          string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+          if (files != null && files.Length > 0)
+          {
+              string path1 = files[0];
+              if (Directory.Exists(path1))
+              {
+                  AddComboSelection(cboFilePath, path1);
+              }
+              else if (File.Exists(path1))
+              {
+                  FileInfo file = new FileInfo(path1);
+                  AddComboSelection(cboFilePath, file.DirectoryName);
+              }
+          }
+      }
       #endregion
 
       #region Private Methods
@@ -865,6 +920,8 @@ namespace AstroGrep.Windows.Forms
          if (cboFilePath.Items.Count > 0 && cboFilePath.Items.Count != 1)
          {
             cboFilePath.SelectedIndex = 0;
+
+            SetWindowText();
          }
 
          // Filter
@@ -1027,6 +1084,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   02/07/2012	FIX: 3485448, save modified start/end date, min/max file sizes
       /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   02/04/2014	FIX: use NumericUpDown's Value property instead of text
       /// </history>
       private void LoadSearchSettings()
       {
@@ -1036,7 +1094,7 @@ namespace AstroGrep.Windows.Forms
          chkLineNumbers.Checked = Core.SearchSettings.IncludeLineNumbers;
          chkRecurse.Checked = Core.SearchSettings.UseRecursion;
          chkFileNamesOnly.Checked = Core.SearchSettings.ReturnOnlyFileNames;
-         txtContextLines.Text = Core.SearchSettings.ContextLines.ToString();
+         txtContextLines.Value = Core.SearchSettings.ContextLines;
          chkNegation.Checked = Core.SearchSettings.UseNegation;
          chkSkipHidden.Checked = Core.SearchSettings.SkipHidden;
          chkSkipSystem.Checked = Core.SearchSettings.SkipSystem;
@@ -1044,7 +1102,7 @@ namespace AstroGrep.Windows.Forms
          txtMaxSize.Text = Core.SearchSettings.MaximumFileSize;
          cboMinSizeType.SelectedItem = Core.SearchSettings.MinimumFileSizeType;
          cboMaxSizeType.SelectedItem = Core.SearchSettings.MaximumFileSizeType;
-         txtMinFileCount.Text = Core.SearchSettings.MinimumFileCount.ToString();
+         txtMinFileCount.Value = Core.SearchSettings.MinimumFileCount;
 
          if (!string.IsNullOrEmpty(Core.SearchSettings.ModifiedDateStart))
          {
@@ -1067,6 +1125,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   02/07/2012	FIX: 3485448, save modified start/end date, min/max file sizes
       /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   02/04/2014	FIX: use NumericUpDown's Value property instead of text
       /// </history>
       private void SaveSearchSettings()
       {
@@ -1076,7 +1135,7 @@ namespace AstroGrep.Windows.Forms
          Core.SearchSettings.IncludeLineNumbers = chkLineNumbers.Checked;
          Core.SearchSettings.UseRecursion = chkRecurse.Checked;
          Core.SearchSettings.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
-         Core.SearchSettings.ContextLines = int.Parse(txtContextLines.Text);
+         Core.SearchSettings.ContextLines = Convert.ToInt32(txtContextLines.Value);
          Core.SearchSettings.UseNegation = chkNegation.Checked;
          Core.SearchSettings.SkipHidden = chkSkipHidden.Checked;
          Core.SearchSettings.SkipSystem = chkSkipSystem.Checked;
@@ -1084,7 +1143,7 @@ namespace AstroGrep.Windows.Forms
          Core.SearchSettings.MaximumFileSize = txtMaxSize.Text;
          Core.SearchSettings.MinimumFileSizeType = cboMinSizeType.SelectedItem.ToString();
          Core.SearchSettings.MaximumFileSizeType = cboMaxSizeType.SelectedItem.ToString();
-         Core.SearchSettings.MinimumFileCount = int.Parse(txtMinFileCount.Text);
+         Core.SearchSettings.MinimumFileCount = Convert.ToInt32(txtMinFileCount.Value);
 
          if (dateModBegin.Value != DateTimePicker.MinimumDateTime)
          {
@@ -1186,27 +1245,19 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
       /// [Curtis_Beard]	   08/01/2012	FIX: 3553252, use | character for path delimitation character
       /// [Curtis_Beard]	   09/27/2012	FIX: 1881938, validate regular expression
+      /// [Curtis_Beard]	   02/12/2014	ADD: check for empty minimum file count, use tryparse instead of try/catch for context lines
       /// </history>
       private bool VerifyInterface()
       {
          try
          {
-            try
-            {
-               int _lines = int.Parse(txtContextLines.Text);
-               if (_lines < 0 || _lines > Constants.MAX_CONTEXT_LINES)
-               {
-                  MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorContextLines"), 0, Constants.MAX_CONTEXT_LINES.ToString()),
-                     Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                  return false;
-               }
-            }
-            catch
+            int _lines = -1;
+            if (!int.TryParse(txtContextLines.Text, out _lines) || _lines < 0 || _lines > Constants.MAX_CONTEXT_LINES)
             {
                MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorContextLines"), 0, Constants.MAX_CONTEXT_LINES.ToString()),
                   Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                return false;
-            }
+            }            
 
             if (cboFileName.Text.Trim().Equals(string.Empty))
             {
@@ -1253,6 +1304,14 @@ namespace AstroGrep.Windows.Forms
                      Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                   return false;
                }
+            }
+
+            int hitCount = -1;
+            if (!int.TryParse(txtMinFileCount.Text, out hitCount) || hitCount < 0)
+            {
+               MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorFileHitCount"), 0),
+                     Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+               return false;
             }
          }
          catch
@@ -2223,7 +2282,9 @@ namespace AstroGrep.Windows.Forms
       /// <summary>
       /// Need certain keyboard events on the lstFileNames.
       /// </summary>
-      /// /// <history>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
       /// [Ed_Jakbuowski]     05/20/2009  Created
       /// [Curtis_Beard]	   09/28/2012	CHG: use common select method
       /// </history>
@@ -2252,6 +2313,8 @@ namespace AstroGrep.Windows.Forms
       /// <summary>
       /// Context Menu item for opening selected files
       /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
       /// /// <history>
       /// [Ed_Jakbuowski]     05/20/2009  Created
       /// </history>
@@ -2263,6 +2326,8 @@ namespace AstroGrep.Windows.Forms
       /// <summary>
       /// Context Menu item for opening selected file's Directory
       /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
       /// /// <history>
       /// [Ed_Jakbuowski]     05/20/2009  Created
       /// </history>
@@ -2286,10 +2351,45 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
+      /// Context Menu item for opening selected file with associated application.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      02/12/2014  ADD: 67, open selected file(s) with associated application
+      /// </history>
+      private void OpenWithAssociatedApp_Click(object sender, System.EventArgs e)
+      {
+         try
+         {
+            string path;
+            HitObject hit;
+
+            for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
+            {
+               // retrieve hit object
+               hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+
+               // retrieve the filename
+               path = hit.FilePath;
+
+               TextEditors.OpenFileWithDefaultApp(path);
+            }
+         }
+         catch (Exception ex)
+         {
+            MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+         }
+      }
+
+      /// <summary>
       /// Context Menu Item for deleting items from the list.
       /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
       /// /// <history>
       /// [Ed_Jakbuowski]     05/20/2009  Created
+      /// [Curtis_Beard]      09/17/2013  FIX: 40, update counts after a removal from the list
       /// </history>
       private void DeleteMenuItem_Click(object sender, System.EventArgs e)
       {
@@ -2300,10 +2400,82 @@ namespace AstroGrep.Windows.Forms
          {
             while (lstFileNames.SelectedItems.Count > 0)
                lstFileNames.SelectedItems[0].Remove();
+
+             // update counts
+             CalculateTotalCount();
          }
          catch (Exception ex)
          {
             MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+         }
+      }
+
+      /// <summary>
+      /// Handles deleting the selected files by using the recycle bin.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      09/18/2013  ADD: 65, file operations context menu
+      /// </history>
+      private void FileDeleteMenuItem_Click(object sender, EventArgs e)
+      {
+         Dictionary<string, string> files = new Dictionary<string, string>();
+
+         for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
+         {
+            // retrieve hit object
+            var hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+            var index = lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text;
+
+            files.Add(index, hit.FilePath);
+         }
+
+         foreach (var file in files)
+         {
+            // recycle bin delete
+            API.FileDeletion.Delete(file.Value);
+
+            // remove from list
+            ListViewItem[] items = lstFileNames.Items.Find(file.Key, false);
+            if (items != null && items.Length == 1)
+            {
+               items[0].Remove();
+            }
+         }
+
+         // clear results area since all selected files are removed
+         if (files.Count > 0)
+         {
+            txtHits.Clear();
+            CalculateTotalCount();
+         }
+      }
+
+      /// <summary>
+      /// Handles copying the selected files to the clipboard.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      09/18/2013  ADD: 65, file operations context menu
+      /// </history>
+      private void FileCopyMenuItem_Click(object sender, EventArgs e)
+      {
+         System.Collections.Specialized.StringCollection files = new System.Collections.Specialized.StringCollection();
+
+         for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
+         {
+            // retrieve hit object
+            var hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+
+            // retrieve the filename
+            files.Add(hit.FilePath);
+         }
+
+         if (files.Count > 0)
+         {
+            Clipboard.SetFileDropList(files);
          }
       }
 
@@ -2721,6 +2893,8 @@ namespace AstroGrep.Windows.Forms
             AddComboSelection(cboFileName, cboFileName.Text);
             AddComboSelection(cboFilePath, path);
 
+            SetWindowText();
+
             // reset cursor
             txtHits.Cursor = Cursors.IBeam;
 
@@ -2806,6 +2980,7 @@ namespace AstroGrep.Windows.Forms
          public string SearchText { get; set; }
          public bool ReturnOnlyFileNames { get; set; }
          public bool IncludeLineNumbers { get; set; }
+         public bool DetectFileEncoding { get; set; }
       }
 
 
@@ -2829,8 +3004,9 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Andrew_Radford]		13/08/2009  CHG: Now retruns IFileFilterSpec rather than altering global state
       /// [Curtis_Beard]		01/31/2012  ADD: 1561584, ability to ignore hidden/system files/directories
-      /// [Curtis_Beard]        02/09/2012  ADD: 3424156, size drop down selection
-      /// [Curtis_Beard]	    03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
+      /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   02/04/2014	FIX: use NumericUpDown's Value property instead of text
       /// </history>
       private IFileFilterSpec GetFilterSpecFromUI()
       {
@@ -2850,8 +3026,8 @@ namespace AstroGrep.Windows.Forms
             DateModifiedEnd = dateModEnd.Value,
             FileSizeMin = GetFileSize(txtMinSize.Text, cboMinSizeType.SelectedItem.ToString(), long.MinValue),
             FileSizeMax = GetFileSize(txtMaxSize.Text, cboMaxSizeType.SelectedItem.ToString(), long.MaxValue),
-            ExclusionItems = __ExclusionItems,
-            FileHitCount = int.Parse(txtMinFileCount.Text)
+            ExclusionItems = __ExclusionItems.FindAll(delegate(ExclusionItem i) { return i.Enabled; }),
+            FileHitCount = Convert.ToInt32(txtMinFileCount.Value)
          };
 
          return spec;
@@ -2866,10 +3042,11 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]		10/17/2005	Created
       /// [Curtis_Beard]		07/28/2006  ADD: extension exclusion list
-      /// [Andrew_Radford]      13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
-      /// [Curtis_Beard]	    01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
-      /// [Curtis_Beard]	    08/01/2012	FIX: 3553252, use | character for path delimitation character
-      /// [Curtis_Beard]	    10/30/2012	ADD: 28, search within results
+      /// [Andrew_Radford]    13/08/2009  CHG: Now retruns ISearchSpec rather than altering global state
+      /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
+      /// [Curtis_Beard]	   08/01/2012	FIX: 3553252, use | character for path delimitation character
+      /// [Curtis_Beard]	   10/30/2012	ADD: 28, search within results
+      /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
       /// </history>
       private ISearchSpec GetSearchSpecFromUI(string path, string fileFilter, string[] filePaths)
       {
@@ -2883,7 +3060,8 @@ namespace AstroGrep.Windows.Forms
             SearchInSubfolders = chkRecurse.Checked,
             UseRegularExpressions = chkRegularExpressions.Checked,
             UseWholeWordMatching = chkWholeWordOnly.Checked,
-            SearchText = cboSearchForText.Text
+            SearchText = cboSearchForText.Text,
+            DetectFileEncoding = GeneralSettings.DetectFileEncoding
          };
 
          if (filePaths != null && filePaths.Length > 0)
@@ -2936,6 +3114,7 @@ namespace AstroGrep.Windows.Forms
 
          // Create the list item
          var _listItem = new ListViewItem(file.Name);
+         _listItem.Name = index.ToString();
          _listItem.ImageIndex = ListViewImageManager.GetImageIndex(file, ListViewImageList);
          _listItem.SubItems.Add(file.DirectoryName);
          _listItem.SubItems.Add(file.LastWriteTime.ToString());
@@ -3104,6 +3283,20 @@ namespace AstroGrep.Windows.Forms
                   return item.ItemType == type;
               }
               ).Count;
+      }
+
+      /// <summary>
+      /// Sets the form's text to include the first entry of the search path's
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	   09/18/2013	CHG: 64/53, add search path to window title
+      /// </history>
+      private void SetWindowText()
+      {
+         if (cboFilePath.Items.Count > 0)
+         {
+            this.Text = string.Format("{0} - AstroGrep", cboFilePath.Items[0].ToString());
+         }
       }
       #endregion
    }

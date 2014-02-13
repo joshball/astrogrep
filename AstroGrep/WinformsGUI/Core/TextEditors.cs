@@ -227,6 +227,20 @@ namespace AstroGrep.Core
         }
 
         /// <summary>
+        /// Opens the given file using the default associated application.
+        /// </summary>
+        /// <param name="path">Full path to file</param>
+        /// <history>
+        /// [Curtis_Beard]      02/12/2014  ADD: 67, open selected file(s) with associated application
+        /// </history>
+        public static void OpenFileWithDefaultApp(string path)
+        {
+           System.Diagnostics.Process.Start(path);
+        }
+
+        #region Private Methods
+
+        /// <summary>
         /// Open the defined editor for a file that the user has double clicked on.
         /// </summary>
         /// <param name="textEditor">Text editor object reference</param>
@@ -282,5 +296,7 @@ namespace AstroGrep.Core
                    Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+
+        #endregion
     }
 }

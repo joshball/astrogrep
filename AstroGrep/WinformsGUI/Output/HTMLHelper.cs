@@ -84,15 +84,19 @@ namespace AstroGrep.Output
       /// <returns>Line with search text highlighted</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
+      /// [Curtis_Beard]		02/12/2014	CHG: handle file search only better
       /// </history>
       public static string GetHighlightLine(string line, Grep grep)
       {
-         string newLine;
+         string newLine = string.Empty;
 
-         if (grep.SearchSpec.UseRegularExpressions)
-            newLine = HighlightRegEx(line, grep);
-         else
-            newLine = HighlightNormal(line, grep);
+         if (!string.IsNullOrEmpty(grep.SearchSpec.SearchText))
+         {
+            if (grep.SearchSpec.UseRegularExpressions)
+               newLine = HighlightRegEx(line, grep);
+            else
+               newLine = HighlightNormal(line, grep);
+         }
 
          return newLine + "<br />";
       }
@@ -121,17 +125,20 @@ namespace AstroGrep.Output
       /// </summary>
       /// <param name="text">Text containing holders</param>
       /// <param name="grep">Grep object containing settings</param>
+      /// <param name="totalHits">Number of total hits</param>
       /// <returns>Text with holders replaced</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
       /// [Curtis_Beard]		01/31/2012	ADD: display for additional options (skip hidden/system options, search paths, modified dates, file sizes)
       /// [Curtis_Beard]		10/30/2012	CHG: use year replacement for copyright
       /// [Curtis_Beard]		10/30/2012	ADD: file hit count, CHG: recurse to Subfolders
+      /// [Curtis_Beard]		02/12/2014	CHG: handle file search only better, add totalHits as parameter
       /// </history>
-      public static string ReplaceSearchOptions(string text, Grep grep)
+      public static string ReplaceSearchOptions(string text, Grep grep, int totalHits)
       {
          var spec = grep.SearchSpec;
 
+         text = text.Replace("%%totalhits%%", totalHits.ToString());
          text = text.Replace("%%year%%", DateTime.Now.Year.ToString());
          text = text.Replace("%%searchpaths%%", "Search Path(s): " + string.Join(", ", spec.StartDirectories));
          text = text.Replace("%%filetypes%%", "File Types: " + grep.FileFilterSpec.FileFilter);
@@ -177,17 +184,24 @@ namespace AstroGrep.Output
          string fileHitCount = string.Empty;
          if (grep.FileFilterSpec.FileHitCount > 0)
          {
-             fileHitCount = "File Hit Count: " + grep.FileFilterSpec.FileHitCount + "<br/>";
+             fileHitCount = "Minimum File Count: " + grep.FileFilterSpec.FileHitCount + "<br/>";
          }
          text = text.Replace("%%filehitcount%%", fileHitCount);
 
-         text = text.Replace("%%totalfiles%%", grep.Greps.Count.ToString());
-         text = text.Replace("%%searchterm%%", spec.SearchText);
-
-         if (spec.UseNegation)
-            text = text.Replace("%%usenegation%%", "not ");
-         else
-            text = text.Replace("%%usenegation%%", string.Empty);
+         // %%searchmessage%%
+         string searchMessage = string.Empty;
+         if (!string.IsNullOrEmpty(grep.SearchSpec.SearchText))
+         {
+            if (grep.SearchSpec.ReturnOnlyFileNames)
+            {
+               searchMessage = string.Format("{0} was {1}found in {2} file{3}", spec.SearchText, spec.UseNegation ? "not " : "", grep.Greps.Count, grep.Greps.Count > 1 ? "s" : "");
+            }
+            else
+            {
+               searchMessage = string.Format("{0} was found {1} time{2} in {3} file{4}", spec.SearchText, totalHits, totalHits > 1 ? "s" : "", grep.Greps.Count, grep.Greps.Count > 1 ? "s" : "");
+            }
+         }
+         text = text.Replace("%%searchmessage%%", searchMessage);
 
          return text;
       }
