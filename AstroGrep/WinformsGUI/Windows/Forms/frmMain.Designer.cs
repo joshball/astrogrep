@@ -16,7 +16,7 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.ComboBox cboFileName;
       private System.Windows.Forms.ComboBox cboFilePath;
       private System.Windows.Forms.Button btnCancel;
-      private Windows.Controls.SplitButton btnSearch;
+      private AstroGrep.Windows.Controls.SplitButton btnSearch;
       private System.Windows.Forms.Panel pnlSearchOptions;
       private System.Windows.Forms.Panel pnlMainSearch;
       private System.Windows.Forms.Label lblSearchText;
@@ -94,6 +94,8 @@ namespace AstroGrep.Windows.Forms
       private MenuItem FileCopyMenuItem;
       private MenuItem FileDeleteMenuItem;
       private MenuItem menuItem6;
+      private System.Windows.Forms.ContextMenu ctxMenuBtnSearch;
+      private MenuItem MenuBtnSearch;
 
       private void InitializeComponent()
       {
@@ -184,7 +186,9 @@ namespace AstroGrep.Windows.Forms
          this.FileCopyMenuItem = new System.Windows.Forms.MenuItem();
          this.FileDeleteMenuItem = new System.Windows.Forms.MenuItem();
          this.menuItem6 = new System.Windows.Forms.MenuItem();
-		 this.pnlSearch.SuspendLayout();
+         this.ctxMenuBtnSearch = new System.Windows.Forms.ContextMenu();
+         this.MenuBtnSearch = new MenuItem();
+		   this.pnlSearch.SuspendLayout();
          this.pnlSearchOptions.SuspendLayout();
 
          this.PanelOptionsContainer.SuspendLayout();
@@ -193,6 +197,10 @@ namespace AstroGrep.Windows.Forms
          ((System.ComponentModel.ISupportInitialize)(this.picBrowse)).BeginInit();
          this.pnlRightSide.SuspendLayout();
          this.SuspendLayout();
+
+         this.MenuBtnSearch.Text = "Search in results";
+         this.MenuBtnSearch.Click += mnuSearchInResults_Click;
+         this.ctxMenuBtnSearch.MenuItems.Add(this.MenuBtnSearch);
          // 
          // pnlSearch
          // 
@@ -553,9 +561,7 @@ namespace AstroGrep.Windows.Forms
          this.btnSearch.Text = "&Search";
          this.btnSearch.UseVisualStyleBackColor = false;
          this.btnSearch.Click += new EventHandler(btnSearch_Click);
-         ContextMenu ctxMenu = new ContextMenu();
-         ctxMenu.MenuItems.Add(new MenuItem("Search in results", mnuSearchInResults_Click));
-         this.btnSearch.ContextMenu = ctxMenu;
+         this.btnSearch.ContextMenu = ctxMenuBtnSearch;
          this.btnSearch.ContextMenu.MenuItems[0].Enabled = false;
          // 
          // btnCancel
