@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using System.Windows.Forms;
 
 using libAstroGrep;
@@ -37,11 +38,12 @@ namespace AstroGrep.Windows
    /// 	[Curtis_Beard]	   01/11/2005	.Net Conversion/Comments/Option Strict
    /// 	[Curtis_Beard]	   09/10/2005	CHG: to class, pass in information
    /// 	[Curtis_Beard]	   07/19/2006	CHG: Apply correct namespace and reformat comments
+   /// 	[Curtis_Beard]	   11/14/2014	CHG: Use StringBuilder instead of string for storing document contents
    /// </history>
    public class GrepPrint
    {
       #region Declarations
-      private string __document = string.Empty;
+      private StringBuilder documentBuilder = new StringBuilder();
       private ListView __listView;
       private IList<HitObject> __grepTable;
       #endregion
@@ -81,7 +83,7 @@ namespace AstroGrep.Windows
             AddLine("----------------------------------------------------------------------");
          }
 
-         return __document;
+         return GetDocument();
       }
 
       /// <summary>
@@ -92,6 +94,7 @@ namespace AstroGrep.Windows
       /// [Theodore_Ward]   ??/??/????  Initial
       /// [Curtis_Beard]	   01/11/2005	.Net Conversion
       /// [Curtis_Beard]	   11/01/2005	CHG: Get correct hit object index
+      /// [Curtis_Beard]      11/14/2014	CHG: use correct index variable when printing hit lines 
       /// </history>
       public string PrintSelectedItems()
       {
@@ -109,12 +112,12 @@ namespace AstroGrep.Windows
             AddLine("----------------------------------------------------------------------");
 
             for (int _internalIndex = 0; _internalIndex < _hit.LineCount; _internalIndex++)
-               PrintHit(_hit.RetrieveLine(_internalIndex));
+               PrintHit(string.Format("{0}{1}", _hit.RetrieveSpacerText(_internalIndex), _hit.RetrieveLine(_internalIndex)));
 
             AddLine("");
          }
 
-         return __document;
+         return GetDocument();
       }
 
       /// <summary>
@@ -136,40 +139,12 @@ namespace AstroGrep.Windows
             AddLine("----------------------------------------------------------------------");
 
             for (int _index = 0; _index < _hit.LineCount; _index++)
-               PrintHit(_hit.RetrieveLine(_index));
+               PrintHit(string.Format("{0}{1}", _hit.RetrieveSpacerText(_index), _hit.RetrieveLine(_index)));
 
             AddLine("");
          }
 
-         return __document;
-      }
-
-      /// <summary>
-      ///   Print a single hit item
-      /// </summary>
-      /// <returns>Document to print</returns>
-      /// <history>
-      ///   [Theodore_Ward]   ??/??/????  Initial
-      /// 	[Curtis_Beard]	   01/11/2005	.Net Conversion
-      ///   [Curtis_Beard]	   11/01/2005	CHG: Get correct hit object index
-      /// </history>
-      public string PrintSingleItem()
-      {
-         if (__listView.SelectedItems.Count > 0)
-         {
-            var _hit = __grepTable[int.Parse(__listView.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text)];
-
-            SetupDocument(string.Empty);
-
-            AddLine("----------------------------------------------------------------------");
-            AddLine(_hit.FilePath);
-            AddLine("----------------------------------------------------------------------");
-
-            for (int _index = 0; _index < _hit.LineCount; _index++)
-               PrintHit(_hit.RetrieveLine(_index));
-         }
-
-         return __document;
+         return GetDocument();
       }
       #endregion
 
@@ -200,7 +175,12 @@ namespace AstroGrep.Windows
       /// </history>
       private void SetupDocument(string header)
       {
-         __document = string.Empty;
+         documentBuilder.Clear();
+
+         if (!string.IsNullOrEmpty(header))
+         {
+            documentBuilder.AppendLine(header);
+         }
       }
 
       /// <summary>
@@ -212,7 +192,19 @@ namespace AstroGrep.Windows
       /// </history>
       private void AddLine(string line)
       {
-         __document += line + "\r\n";
+         documentBuilder.AppendLine(line);
+      }
+
+      /// <summary>
+      /// Retrieves all the contents of the document.
+      /// </summary>
+      /// <returns>string of all contents</returns>
+      /// <history>
+      /// [Curtis_Beard]	   11/14/2014	Initial
+      /// </history>
+      private string GetDocument()
+      {
+         return documentBuilder.ToString();
       }
       #endregion
    }

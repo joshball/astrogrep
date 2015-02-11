@@ -1,175 +1,188 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
 using AstroGrep.Core;
+using libAstroGrep;
 using libAstroGrep.Plugin;
 
 namespace AstroGrep.Windows.Forms
 {
-    /// <summary>
-    /// Used to display the options dialog.
-    /// </summary>
-    /// <remarks>
-    /// AstroGrep File Searching Utility. Written by Theodore L. Ward
-    /// Copyright (C) 2002 AstroComma Incorporated.
-    /// 
-    /// This program is free software; you can redistribute it and/or
-    /// modify it under the terms of the GNU General public License
-    /// as published by the Free Software Foundation; either version 2
-    /// of the License, or (at your option) any later version.
-    /// 
-    /// This program is distributed in the hope that it will be useful,
-    /// but WITHOUT ANY WARRANTY; without even the implied warranty of
-    /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    /// GNU General public License for more details.
-    /// 
-    /// You should have received a copy of the GNU General public License
-    /// along with this program; if not, write to the Free Software
-    /// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-    /// 
-    /// The author may be contacted at:
-    /// ted@astrocomma.com or curtismbeard@gmail.com
-    /// </remarks>
-    /// <history>
-    /// [Curtis_Beard]		05/23/2007	Created
-    /// [Curtis_Beard]		07/13/2007	ADD: system tray options
-    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions, remove file extension exclusion list
-    /// </history>
-    public class frmOptions : System.Windows.Forms.Form
-    {
-        private System.Windows.Forms.TabControl tbcOptions;
-        private System.Windows.Forms.Button btnOK;
-        private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.TabPage tabGeneral;
-        private System.Windows.Forms.TabPage tabTextEditors;
-        private System.Windows.Forms.TabPage tabResults;
-        private System.Windows.Forms.TabPage tabPlugins;
-        private System.Windows.Forms.Label lblResultPreview;
-        private System.Windows.Forms.RichTextBox rtxtResultsPreview;
-        private System.Windows.Forms.GroupBox grpResultWindow;
-        private AstroGrep.Windows.Controls.ColorButton btnResultsWindowBackColor;
-        private AstroGrep.Windows.Controls.ColorButton btnResultsWindowForeColor;
-        private System.Windows.Forms.Label lblResultsWindowBack;
-        private System.Windows.Forms.Label lblResultsWindowFore;
-        private System.Windows.Forms.GroupBox grpResultMatch;
-        private AstroGrep.Windows.Controls.ColorButton BackColorButton;
-        private AstroGrep.Windows.Controls.ColorButton ForeColorButton;
-        private System.Windows.Forms.Label BackColorLabel;
-        private System.Windows.Forms.Label ForeColorLabel;
-        private System.Windows.Forms.GroupBox LanguageGroup;
-        private System.Windows.Forms.ComboBox cboLanguage;
-        private System.Windows.Forms.ComboBox cboPathMRUCount;
-        private System.Windows.Forms.Label lblStoredPaths;
-        private System.Windows.Forms.GroupBox PluginDetailsGroup;
-        private System.Windows.Forms.Label lblPluginDetailAuthor;
-        private System.Windows.Forms.Label lblPluginVersion;
-        private System.Windows.Forms.Label lblPluginName;
-        private System.Windows.Forms.Label lblPluginDescription;
-        private System.Windows.Forms.Label lblPluginAuthor;
-        private System.Windows.Forms.Label lblPluginDetailVersion;
-        private System.Windows.Forms.Label lblPluginDetailName;
-        private System.Windows.Forms.ListView PluginsList;
-        private System.Windows.Forms.ColumnHeader PluginsColumnEnabled;
-        private System.Windows.Forms.ColumnHeader PluginsColumnName;
-        private System.Windows.Forms.ColumnHeader PluginsColumnExt;
-        private System.Windows.Forms.Button btnEdit;
-        private System.Windows.Forms.Button btnRemove;
-        private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.ListView TextEditorsList;
-        private System.Windows.Forms.ColumnHeader ColumnType;
-        private System.Windows.Forms.ColumnHeader ColumnEditor;
-        private System.Windows.Forms.ColumnHeader ColumnArguments;
-        private System.Windows.Forms.GroupBox ShortcutGroup;
-        private System.Windows.Forms.CheckBox chkStartMenuShortcut;
-        private System.Windows.Forms.CheckBox chkDesktopShortcut;
-        private System.Windows.Forms.CheckBox chkRightClickOption;
+   /// <summary>
+   /// Used to display the options dialog.
+   /// </summary>
+   /// <remarks>
+   /// AstroGrep File Searching Utility. Written by Theodore L. Ward
+   /// Copyright (C) 2002 AstroComma Incorporated.
+   /// 
+   /// This program is free software; you can redistribute it and/or
+   /// modify it under the terms of the GNU General public License
+   /// as published by the Free Software Foundation; either version 2
+   /// of the License, or (at your option) any later version.
+   /// 
+   /// This program is distributed in the hope that it will be useful,
+   /// but WITHOUT ANY WARRANTY; without even the implied warranty of
+   /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   /// GNU General public License for more details.
+   /// 
+   /// You should have received a copy of the GNU General public License
+   /// along with this program; if not, write to the Free Software
+   /// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+   /// 
+   /// The author may be contacted at:
+   /// ted@astrocomma.com or curtismbeard@gmail.com
+   /// </remarks>
+   /// <history>
+   /// [Curtis_Beard]		05/23/2007	Created
+   /// [Curtis_Beard]		07/13/2007	ADD: system tray options
+   /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions, remove file extension exclusion list
+   /// </history>
+   public class frmOptions : System.Windows.Forms.Form
+   {
+      private System.Windows.Forms.TabControl tbcOptions;
+      private System.Windows.Forms.Button btnOK;
+      private System.Windows.Forms.Button btnCancel;
+      private System.Windows.Forms.TabPage tabGeneral;
+      private System.Windows.Forms.TabPage tabTextEditors;
+      private System.Windows.Forms.TabPage tabResults;
+      private System.Windows.Forms.TabPage tabPlugins;
+      private System.Windows.Forms.Label lblResultPreview;
+      private System.Windows.Forms.RichTextBox rtxtResultsPreview;
+      private System.Windows.Forms.GroupBox grpResultWindow;
+      private AstroGrep.Windows.Controls.ColorButton btnResultsWindowBackColor;
+      private AstroGrep.Windows.Controls.ColorButton btnResultsWindowForeColor;
+      private System.Windows.Forms.Label lblResultsWindowBack;
+      private System.Windows.Forms.Label lblResultsWindowFore;
+      private System.Windows.Forms.GroupBox grpResultMatch;
+      private AstroGrep.Windows.Controls.ColorButton BackColorButton;
+      private AstroGrep.Windows.Controls.ColorButton ForeColorButton;
+      private System.Windows.Forms.Label BackColorLabel;
+      private System.Windows.Forms.Label ForeColorLabel;
+      private System.Windows.Forms.GroupBox LanguageGroup;
+      private System.Windows.Forms.ComboBox cboLanguage;
+      private System.Windows.Forms.ComboBox cboPathMRUCount;
+      private System.Windows.Forms.Label lblStoredPaths;
+      private System.Windows.Forms.GroupBox PluginDetailsGroup;
+      private System.Windows.Forms.Label lblPluginDetailAuthor;
+      private System.Windows.Forms.Label lblPluginVersion;
+      private System.Windows.Forms.Label lblPluginName;
+      private System.Windows.Forms.Label lblPluginDescription;
+      private System.Windows.Forms.Label lblPluginAuthor;
+      private System.Windows.Forms.Label lblPluginDetailVersion;
+      private System.Windows.Forms.Label lblPluginDetailName;
+      private System.Windows.Forms.ListView PluginsList;
+      private System.Windows.Forms.ColumnHeader PluginsColumnEnabled;
+      private System.Windows.Forms.ColumnHeader PluginsColumnName;
+      private System.Windows.Forms.ColumnHeader PluginsColumnExt;
+      private System.Windows.Forms.Button btnEdit;
+      private System.Windows.Forms.Button btnRemove;
+      private System.Windows.Forms.Button btnAdd;
+      private System.Windows.Forms.ListView TextEditorsList;
+      private System.Windows.Forms.ColumnHeader ColumnType;
+      private System.Windows.Forms.ColumnHeader ColumnEditor;
+      private System.Windows.Forms.ColumnHeader ColumnArguments;
+      private System.Windows.Forms.GroupBox ShortcutGroup;
+      private System.Windows.Forms.CheckBox chkStartMenuShortcut;
+      private System.Windows.Forms.CheckBox chkDesktopShortcut;
+      private System.Windows.Forms.CheckBox chkRightClickOption;
 
-        private bool __LanguageChange = false;
-        private Label lblCurrentFont;
-        private Button btnFindFont;
-        private CheckBox chkShowExclusionErrorMessage;
-        private CheckBox chkWordWrap;
+      private bool __LanguageChange = false;
+      private Label lblCurrentFont;
+      private Button btnFindFont;
+      private CheckBox chkShowExclusionErrorMessage;
+      private CheckBox chkWordWrap;
 
-        private CheckBox chkSaveSearchOptions;
-        private bool __RightClickEnabled = false;
-        private bool __RightClickUpdate = false;
-        private bool __IsAdmin = API.UACHelper.HasAdminPrivileges();
-        private GroupBox grpFileList;
-        private Label lblFileCurrentFont;
-        private Button btnFileFindFont;
-        private Font __FileFont = Convertors.ConvertStringToFont(Core.GeneralSettings.FilePanelFont);
-        private ColumnHeader ColumnTabSize;
-        private Button btnDown;
-        private Button btnUp;
-        private CheckBox chkDetectFileEncoding;
+      private CheckBox chkSaveSearchOptions;
+      private bool __RightClickEnabled = false;
+      private bool __RightClickUpdate = false;
+      private bool __IsAdmin = API.UACHelper.HasAdminPrivileges();
+      private GroupBox grpFileList;
+      private Label lblFileCurrentFont;
+      private Button btnFileFindFont;
+      private Font __FileFont = Convertors.ConvertStringToFont(Core.GeneralSettings.FilePanelFont);
+      private ColumnHeader ColumnTabSize;
+      private Button btnDown;
+      private Button btnUp;
+      private CheckBox chkRemoveLeadingWhiteSpace;
+      private TabPage tabFileEncoding;
+      private Button btnFileEncodingDelete;
+      private Button btnFileEncodingEdit;
+      private Button btnFileEncodingAdd;
+      private ListView lstFiles;
+      private ColumnHeader clhEnabled;
+      private ColumnHeader clhFile;
+      private ColumnHeader clhEncoding;
+      private bool inhibitFileEncodingAutoCheck;
+      private CheckBox chkDetectFileEncoding;
 
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.Container components = null;
+      /// <summary>
+      /// Required designer variable.
+      /// </summary>
+      private System.ComponentModel.Container components = null;
 
-        /// <summary>
-        /// Creates a new instance of the frmOptions class.
-        /// </summary>
-        /// <history>
-        /// [Curtis_Beard]		05/23/2007	Created
-        /// [Curtis_Beard]      10/09/2012	CHG: 3575507, handle UAC request for right click option
-        /// </history>
-        public frmOptions()
-        {
-            //
-            // Required for Windows Form Designer support
-            //
-            InitializeComponent();
+      /// <summary>
+      /// Creates a new instance of the frmOptions class.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		05/23/2007	Created
+      /// [Curtis_Beard]      10/09/2012	CHG: 3575507, handle UAC request for right click option
+      /// </history>
+      public frmOptions()
+      {
+         //
+         // Required for Windows Form Designer support
+         //
+         InitializeComponent();
 
-            __RightClickEnabled = Shortcuts.IsSearchOption();
+         __RightClickEnabled = Shortcuts.IsSearchOption();
 
-            ForeColorButton.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
-            BackColorButton.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
-            btnResultsWindowForeColor.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
-            btnResultsWindowBackColor.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
-            chkRightClickOption.CheckedChanged += new EventHandler(chkRightClickOption_CheckedChanged);
+         ForeColorButton.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
+         BackColorButton.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
+         btnResultsWindowForeColor.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
+         btnResultsWindowBackColor.ColorChange += new AstroGrep.Windows.Controls.ColorButton.ColorChangeHandler(NewColor);
+         chkRightClickOption.CheckedChanged += new EventHandler(chkRightClickOption_CheckedChanged);
 
-            // get mainform's image list to use here for up/down buttons
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
-            System.Windows.Forms.ImageList ListViewImageList = new ImageList();
-            ListViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ListViewImageList.ImageStream")));
-            ListViewImageList.TransparentColor = System.Drawing.Color.Transparent;
-            ListViewImageList.Images.SetKeyName(0, "");
-            ListViewImageList.Images.SetKeyName(1, "");
+         // get mainform's image list to use here for up/down buttons
+         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+         System.Windows.Forms.ImageList ListViewImageList = new ImageList();
+         ListViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ListViewImageList.ImageStream")));
+         ListViewImageList.TransparentColor = System.Drawing.Color.Transparent;
+         ListViewImageList.Images.SetKeyName(0, "");
+         ListViewImageList.Images.SetKeyName(1, "");
 
-            btnUp.ImageList = ListViewImageList;
-            btnUp.ImageIndex = 0;
-            btnDown.ImageList = ListViewImageList;
-            btnDown.ImageIndex = 1;
+         btnUp.ImageList = ListViewImageList;
+         btnUp.ImageIndex = 0;
+         btnDown.ImageList = ListViewImageList;
+         btnDown.ImageIndex = 1;
 
-            API.ListViewExtensions.SetTheme(TextEditorsList);
-            API.ListViewExtensions.SetTheme(PluginsList);
-        }
+         API.ListViewExtensions.SetTheme(lstFiles);
+         API.ListViewExtensions.SetTheme(TextEditorsList);
+         API.ListViewExtensions.SetTheme(PluginsList);
+      }
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
+      /// <summary>
+      /// Clean up any resources being used.
+      /// </summary>
+      protected override void Dispose(bool disposing)
+      {
+         if (disposing)
+         {
+            if (components != null)
             {
-                if (components != null)
-                {
-                    components.Dispose();
-                }
+               components.Dispose();
             }
-            base.Dispose(disposing);
-        }
+         }
+         base.Dispose(disposing);
+      }
 
-        #region Windows Form Designer generated code
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
+      #region Windows Form Designer generated code
+      /// <summary>
+      /// Required method for Designer support - do not modify
+      /// the contents of this method with the code editor.
+      /// </summary>
+      private void InitializeComponent()
+      {
          this.tbcOptions = new System.Windows.Forms.TabControl();
          this.tabGeneral = new System.Windows.Forms.TabPage();
          this.chkSaveSearchOptions = new System.Windows.Forms.CheckBox();
@@ -198,16 +211,13 @@ namespace AstroGrep.Windows.Forms
          this.lblResultPreview = new System.Windows.Forms.Label();
          this.rtxtResultsPreview = new System.Windows.Forms.RichTextBox();
          this.grpResultWindow = new System.Windows.Forms.GroupBox();
+         this.chkRemoveLeadingWhiteSpace = new System.Windows.Forms.CheckBox();
          this.chkWordWrap = new System.Windows.Forms.CheckBox();
          this.lblCurrentFont = new System.Windows.Forms.Label();
          this.btnFindFont = new System.Windows.Forms.Button();
-         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
-         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
          this.lblResultsWindowBack = new System.Windows.Forms.Label();
          this.lblResultsWindowFore = new System.Windows.Forms.Label();
          this.grpResultMatch = new System.Windows.Forms.GroupBox();
-         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
-         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
          this.BackColorLabel = new System.Windows.Forms.Label();
          this.ForeColorLabel = new System.Windows.Forms.Label();
          this.tabPlugins = new System.Windows.Forms.TabPage();
@@ -227,6 +237,18 @@ namespace AstroGrep.Windows.Forms
          this.PluginsColumnExt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.btnOK = new System.Windows.Forms.Button();
          this.btnCancel = new System.Windows.Forms.Button();
+         this.tabFileEncoding = new System.Windows.Forms.TabPage();
+         this.lstFiles = new System.Windows.Forms.ListView();
+         this.clhEnabled = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.clhFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.clhEncoding = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.btnFileEncodingAdd = new System.Windows.Forms.Button();
+         this.btnFileEncodingEdit = new System.Windows.Forms.Button();
+         this.btnFileEncodingDelete = new System.Windows.Forms.Button();
+         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
+         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
+         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
+         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
          this.chkDetectFileEncoding = new System.Windows.Forms.CheckBox();
          this.tbcOptions.SuspendLayout();
          this.tabGeneral.SuspendLayout();
@@ -239,6 +261,7 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.SuspendLayout();
          this.tabPlugins.SuspendLayout();
          this.PluginDetailsGroup.SuspendLayout();
+         this.tabFileEncoding.SuspendLayout();
          this.SuspendLayout();
          // 
          // tbcOptions
@@ -247,6 +270,7 @@ namespace AstroGrep.Windows.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
          this.tbcOptions.Controls.Add(this.tabGeneral);
+         this.tbcOptions.Controls.Add(this.tabFileEncoding);
          this.tbcOptions.Controls.Add(this.tabTextEditors);
          this.tbcOptions.Controls.Add(this.tabResults);
          this.tbcOptions.Controls.Add(this.tabPlugins);
@@ -259,7 +283,6 @@ namespace AstroGrep.Windows.Forms
          // 
          // tabGeneral
          // 
-         this.tabGeneral.Controls.Add(this.chkDetectFileEncoding);
          this.tabGeneral.Controls.Add(this.chkSaveSearchOptions);
          this.tabGeneral.Controls.Add(this.chkShowExclusionErrorMessage);
          this.tabGeneral.Controls.Add(this.ShortcutGroup);
@@ -286,7 +309,7 @@ namespace AstroGrep.Windows.Forms
          // chkShowExclusionErrorMessage
          // 
          this.chkShowExclusionErrorMessage.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-         this.chkShowExclusionErrorMessage.Location = new System.Drawing.Point(8, 236);
+         this.chkShowExclusionErrorMessage.Location = new System.Drawing.Point(8, 213);
          this.chkShowExclusionErrorMessage.Name = "chkShowExclusionErrorMessage";
          this.chkShowExclusionErrorMessage.Size = new System.Drawing.Size(472, 35);
          this.chkShowExclusionErrorMessage.TabIndex = 36;
@@ -568,6 +591,7 @@ namespace AstroGrep.Windows.Forms
          // 
          this.grpResultWindow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+         this.grpResultWindow.Controls.Add(this.chkRemoveLeadingWhiteSpace);
          this.grpResultWindow.Controls.Add(this.chkWordWrap);
          this.grpResultWindow.Controls.Add(this.lblCurrentFont);
          this.grpResultWindow.Controls.Add(this.btnFindFont);
@@ -582,10 +606,21 @@ namespace AstroGrep.Windows.Forms
          this.grpResultWindow.TabStop = false;
          this.grpResultWindow.Text = "Results Window";
          // 
+         // chkRemoveLeadingWhiteSpace
+         // 
+         this.chkRemoveLeadingWhiteSpace.AutoSize = true;
+         this.chkRemoveLeadingWhiteSpace.Location = new System.Drawing.Point(11, 114);
+         this.chkRemoveLeadingWhiteSpace.Name = "chkRemoveLeadingWhiteSpace";
+         this.chkRemoveLeadingWhiteSpace.Size = new System.Drawing.Size(172, 17);
+         this.chkRemoveLeadingWhiteSpace.TabIndex = 26;
+         this.chkRemoveLeadingWhiteSpace.Text = "Remove Leading White Space";
+         this.chkRemoveLeadingWhiteSpace.UseVisualStyleBackColor = true;
+         this.chkRemoveLeadingWhiteSpace.CheckedChanged += new System.EventHandler(this.chkRemoveLeadingWhiteSpace_CheckedChanged);
+         // 
          // chkWordWrap
          // 
          this.chkWordWrap.AutoSize = true;
-         this.chkWordWrap.Location = new System.Drawing.Point(11, 114);
+         this.chkWordWrap.Location = new System.Drawing.Point(438, 114);
          this.chkWordWrap.Name = "chkWordWrap";
          this.chkWordWrap.Size = new System.Drawing.Size(78, 17);
          this.chkWordWrap.TabIndex = 25;
@@ -613,22 +648,6 @@ namespace AstroGrep.Windows.Forms
          this.btnFindFont.Text = "&Find Font";
          this.btnFindFont.UseVisualStyleBackColor = true;
          this.btnFindFont.Click += new System.EventHandler(this.btnFindFont_Click);
-         // 
-         // btnResultsWindowBackColor
-         // 
-         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(441, 24);
-         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
-         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-         this.btnResultsWindowBackColor.Size = new System.Drawing.Size(75, 23);
-         this.btnResultsWindowBackColor.TabIndex = 22;
-         // 
-         // btnResultsWindowForeColor
-         // 
-         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
-         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
-         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-         this.btnResultsWindowForeColor.Size = new System.Drawing.Size(75, 23);
-         this.btnResultsWindowForeColor.TabIndex = 21;
          // 
          // lblResultsWindowBack
          // 
@@ -662,22 +681,6 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.TabIndex = 23;
          this.grpResultMatch.TabStop = false;
          this.grpResultMatch.Text = "Results Match";
-         // 
-         // BackColorButton
-         // 
-         this.BackColorButton.Location = new System.Drawing.Point(441, 24);
-         this.BackColorButton.Name = "BackColorButton";
-         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-         this.BackColorButton.Size = new System.Drawing.Size(75, 23);
-         this.BackColorButton.TabIndex = 18;
-         // 
-         // ForeColorButton
-         // 
-         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
-         this.ForeColorButton.Name = "ForeColorButton";
-         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-         this.ForeColorButton.Size = new System.Drawing.Size(75, 23);
-         this.ForeColorButton.TabIndex = 17;
          // 
          // BackColorLabel
          // 
@@ -859,13 +862,131 @@ namespace AstroGrep.Windows.Forms
          this.btnCancel.Text = "&Cancel";
          this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
          // 
+         // tabFileEncoding
+         // 
+         this.tabFileEncoding.Controls.Add(this.chkDetectFileEncoding);
+         this.tabFileEncoding.Controls.Add(this.btnFileEncodingDelete);
+         this.tabFileEncoding.Controls.Add(this.btnFileEncodingEdit);
+         this.tabFileEncoding.Controls.Add(this.btnFileEncodingAdd);
+         this.tabFileEncoding.Controls.Add(this.lstFiles);
+         this.tabFileEncoding.Location = new System.Drawing.Point(4, 22);
+         this.tabFileEncoding.Name = "tabFileEncoding";
+         this.tabFileEncoding.Size = new System.Drawing.Size(553, 348);
+         this.tabFileEncoding.TabIndex = 4;
+         this.tabFileEncoding.Text = "File Encoding";
+         this.tabFileEncoding.UseVisualStyleBackColor = true;
+         // 
+         // lstFiles
+         // 
+         this.lstFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+         this.lstFiles.CheckBoxes = true;
+         this.lstFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.clhEnabled,
+            this.clhFile,
+            this.clhEncoding});
+         this.lstFiles.FullRowSelect = true;
+         this.lstFiles.HideSelection = false;
+         this.lstFiles.Location = new System.Drawing.Point(8, 32);
+         this.lstFiles.Name = "lstFiles";
+         this.lstFiles.Size = new System.Drawing.Size(537, 258);
+         this.lstFiles.TabIndex = 1;
+         this.lstFiles.UseCompatibleStateImageBehavior = false;
+         this.lstFiles.View = System.Windows.Forms.View.Details;
+         this.lstFiles.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lstFiles_ColumnClick);
+         this.lstFiles.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.lstFiles_ItemCheck);
+         this.lstFiles.SelectedIndexChanged += new System.EventHandler(this.lstFiles_SelectedIndexChanged);
+         this.lstFiles.DoubleClick += new System.EventHandler(this.lstFiles_DoubleClick);
+         this.lstFiles.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstFiles_KeyDown);
+         this.lstFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lstFiles_MouseDown);
+         this.lstFiles.MouseUp += new System.Windows.Forms.MouseEventHandler(this.lstFiles_MouseUp);
+         // 
+         // clhEnabled
+         // 
+         this.clhEnabled.Text = "Enabled";
+         // 
+         // clhFile
+         // 
+         this.clhFile.Text = "File";
+         this.clhFile.Width = 326;
+         // 
+         // clhEncoding
+         // 
+         this.clhEncoding.Text = "Encoding";
+         this.clhEncoding.Width = 143;
+         // 
+         // btnFileEncodingAdd
+         // 
+         this.btnFileEncodingAdd.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnFileEncodingAdd.Location = new System.Drawing.Point(8, 310);
+         this.btnFileEncodingAdd.Name = "btnFileEncodingAdd";
+         this.btnFileEncodingAdd.Size = new System.Drawing.Size(75, 23);
+         this.btnFileEncodingAdd.TabIndex = 2;
+         this.btnFileEncodingAdd.Text = "&Add...";
+         this.btnFileEncodingAdd.UseVisualStyleBackColor = true;
+         this.btnFileEncodingAdd.Click += new System.EventHandler(this.btnFileEncodingAdd_Click);
+         // 
+         // btnFileEncodingEdit
+         // 
+         this.btnFileEncodingEdit.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnFileEncodingEdit.Location = new System.Drawing.Point(96, 310);
+         this.btnFileEncodingEdit.Name = "btnFileEncodingEdit";
+         this.btnFileEncodingEdit.Size = new System.Drawing.Size(75, 23);
+         this.btnFileEncodingEdit.TabIndex = 3;
+         this.btnFileEncodingEdit.Text = "&Edit...";
+         this.btnFileEncodingEdit.UseVisualStyleBackColor = true;
+         this.btnFileEncodingEdit.Click += new System.EventHandler(this.btnFileEncodingEdit_Click);
+         // 
+         // btnFileEncodingDelete
+         // 
+         this.btnFileEncodingDelete.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnFileEncodingDelete.Location = new System.Drawing.Point(184, 310);
+         this.btnFileEncodingDelete.Name = "btnFileEncodingDelete";
+         this.btnFileEncodingDelete.Size = new System.Drawing.Size(75, 23);
+         this.btnFileEncodingDelete.TabIndex = 4;
+         this.btnFileEncodingDelete.Text = "&Delete";
+         this.btnFileEncodingDelete.UseVisualStyleBackColor = true;
+         this.btnFileEncodingDelete.Click += new System.EventHandler(this.btnFileEncodingDelete_Click);
+         // 
+         // btnResultsWindowBackColor
+         // 
+         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(441, 24);
+         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
+         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.btnResultsWindowBackColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowBackColor.TabIndex = 22;
+         // 
+         // btnResultsWindowForeColor
+         // 
+         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
+         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
+         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.btnResultsWindowForeColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowForeColor.TabIndex = 21;
+         // 
+         // BackColorButton
+         // 
+         this.BackColorButton.Location = new System.Drawing.Point(441, 24);
+         this.BackColorButton.Name = "BackColorButton";
+         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.BackColorButton.Size = new System.Drawing.Size(75, 23);
+         this.BackColorButton.TabIndex = 18;
+         // 
+         // ForeColorButton
+         // 
+         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
+         this.ForeColorButton.Name = "ForeColorButton";
+         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.ForeColorButton.Size = new System.Drawing.Size(75, 23);
+         this.ForeColorButton.TabIndex = 17;
+         // 
          // chkDetectFileEncoding
          // 
          this.chkDetectFileEncoding.AutoSize = true;
-         this.chkDetectFileEncoding.Location = new System.Drawing.Point(8, 213);
+         this.chkDetectFileEncoding.Location = new System.Drawing.Point(8, 9);
          this.chkDetectFileEncoding.Name = "chkDetectFileEncoding";
          this.chkDetectFileEncoding.Size = new System.Drawing.Size(124, 17);
-         this.chkDetectFileEncoding.TabIndex = 38;
+         this.chkDetectFileEncoding.TabIndex = 39;
          this.chkDetectFileEncoding.Text = "Detect file encoding.";
          this.chkDetectFileEncoding.UseVisualStyleBackColor = true;
          // 
@@ -900,757 +1021,1080 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.ResumeLayout(false);
          this.tabPlugins.ResumeLayout(false);
          this.PluginDetailsGroup.ResumeLayout(false);
+         this.tabFileEncoding.ResumeLayout(false);
+         this.tabFileEncoding.PerformLayout();
          this.ResumeLayout(false);
 
-        }
-        #endregion
+      }
+      #endregion
 
-        /// <summary>
-        /// Checks to see if the language w changed.
-        /// </summary>
-        /// <history>
-        /// [Curtis_Beard]		07/25/2006	Created
-        /// </history>
-        public bool IsLanguageChange
-        {
-            get { return __LanguageChange; }
-        }
+      /// <summary>
+      /// Checks to see if the language w changed.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/25/2006	Created
+      /// </history>
+      public bool IsLanguageChange
+      {
+         get { return __LanguageChange; }
+      }
 
-        /// <summary>
-        /// Handles setting the user specified options into the correct controls for display.
-        /// </summary>
-        /// <param name="sender">System parameter</param>
-        /// <param name="e">System parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/19/2006	Created
-        /// [Curtis_Beard]		07/21/2006	ADD: Custom colors for fore/back of results
-        /// [Curtis_Beard]		07/28/2006	ADD: extension exclusion list
-        /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
-        /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
-        /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
-        /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
-        /// [Curtis_Beard]	   10/28/2012	ADD: 3575509, results word wrap
-        /// [Curtis_Beard]	   10/28/2012	ADD: 3479503, ability to change file list font
-        /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
-        /// </history>
-        private void frmOptions_Load(object sender, System.EventArgs e)
-        {
-            cboPathMRUCount.SelectedIndex = Core.GeneralSettings.MaximumMRUPaths - 1;
-            chkRightClickOption.Checked = Shortcuts.IsSearchOption();
+      /// <summary>
+      /// Handles setting the user specified options into the correct controls for display.
+      /// </summary>
+      /// <param name="sender">System parameter</param>
+      /// <param name="e">System parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/19/2006	Created
+      /// [Curtis_Beard]		07/21/2006	ADD: Custom colors for fore/back of results
+      /// [Curtis_Beard]		07/28/2006	ADD: extension exclusion list
+      /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
+      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
+      /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
+      /// [Curtis_Beard]	   10/28/2012	ADD: 3575509, results word wrap
+      /// [Curtis_Beard]	   10/28/2012	ADD: 3479503, ability to change file list font
+      /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
+      /// [Curtis_Beard]	   09/16/2014	ADD: installer check to hide desktop/start menu options
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
+      /// </history>
+      private void frmOptions_Load(object sender, System.EventArgs e)
+      {
+         cboPathMRUCount.SelectedIndex = Core.GeneralSettings.MaximumMRUPaths - 1;
+         chkRightClickOption.Checked = Shortcuts.IsSearchOption();
+         if (Registry.IsInstaller())
+         {
+            chkDesktopShortcut.Visible = false;
+            chkStartMenuShortcut.Visible = false;
+         }
+         else
+         {
             chkDesktopShortcut.Checked = Shortcuts.IsDesktopShortcut();
             chkStartMenuShortcut.Checked = Shortcuts.IsStartMenuShortcut();
-            chkShowExclusionErrorMessage.Checked = Core.GeneralSettings.ShowExclusionErrorMessage;
-            chkSaveSearchOptions.Checked = Core.GeneralSettings.SaveSearchOptionsOnExit;
-            chkWordWrap.Checked = Core.GeneralSettings.ResultsWordWrap;
-            chkWordWrap.Visible = false;//hide until we can figure out the best way to detect mouse clicks for word wrapped lines in frmMain.
-            chkDetectFileEncoding.Checked = Core.GeneralSettings.DetectFileEncoding;
+         }
+         chkShowExclusionErrorMessage.Checked = Core.GeneralSettings.ShowExclusionErrorMessage;
+         chkSaveSearchOptions.Checked = Core.GeneralSettings.SaveSearchOptionsOnExit;
+         chkWordWrap.Checked = Core.GeneralSettings.ResultsWordWrap;
+         chkWordWrap.Visible = false;//hide until we can figure out the best way to detect mouse clicks for word wrapped lines in frmMain.
+         chkDetectFileEncoding.Checked = Core.GeneralSettings.DetectFileEncoding;
+         chkRemoveLeadingWhiteSpace.Checked = Core.GeneralSettings.RemoveLeadingWhiteSpace;
 
 
-            // ColorButton init
-            ForeColorButton.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-            BackColorButton.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightBackColor);
-            btnResultsWindowForeColor.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-            btnResultsWindowBackColor.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
+         // ColorButton init
+         ForeColorButton.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
+         BackColorButton.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightBackColor);
+         btnResultsWindowForeColor.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+         btnResultsWindowBackColor.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
 
-            // results font
-            rtxtResultsPreview.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
-            DisplayFont(rtxtResultsPreview.Font, lblCurrentFont);
+         // results font
+         rtxtResultsPreview.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
+         DisplayFont(rtxtResultsPreview.Font, lblCurrentFont);
 
-            // file list font
-            DisplayFont(__FileFont, lblFileCurrentFont);
+         // file list font
+         DisplayFont(__FileFont, lblFileCurrentFont);
 
-            tbcOptions.SelectedTab = tabGeneral;
+         tbcOptions.SelectedTab = tabGeneral;
 
-            LoadEditors(TextEditors.GetAll());
-            LoadPlugins();
+         LoadEditors(TextEditors.GetAll());
+         LoadPlugins();
+         LoadFileEncodings();
 
-            //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
-            Language.ProcessForm(this);
-            Language.LegacyLoadComboBox(cboLanguage);
+         //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
+         Language.ProcessForm(this);
+         Language.LegacyLoadComboBox(cboLanguage);
 
-            // set the user selected language
-            if (cboLanguage.Items.Count > 0)
+         // set the user selected language
+         if (cboLanguage.Items.Count > 0)
+         {
+            foreach (object oItem in cboLanguage.Items)
             {
-                foreach (object oItem in cboLanguage.Items)
-                {
-                    LanguageItem item = (LanguageItem)oItem;
-                    if (item.Culture.Equals(Core.GeneralSettings.Language))
-                    {
-                        cboLanguage.SelectedItem = item;
-                        break;
-                    }
-                }
+               LanguageItem item = (LanguageItem)oItem;
+               if (item.Culture.Equals(Core.GeneralSettings.Language))
+               {
+                  cboLanguage.SelectedItem = item;
+                  break;
+               }
+            }
+         }
+
+         // set column text
+         TextEditorsList.Columns[0].Text = Language.GetGenericText("TextEditorsColumnFileType");
+         TextEditorsList.Columns[1].Text = Language.GetGenericText("TextEditorsColumnLocation");
+         TextEditorsList.Columns[2].Text = Language.GetGenericText("TextEditorsColumnCmdLine");
+         TextEditorsList.Columns[3].Text = Language.GetGenericText("TextEditorsColumnTabSize");
+         PluginsList.Columns[0].Text = Language.GetGenericText("PluginsColumnEnabled");
+         PluginsList.Columns[1].Text = Language.GetGenericText("PluginsColumnName");
+         PluginsList.Columns[2].Text = Language.GetGenericText("PluginsColumnExtensions");
+         lstFiles.Columns[0].Text = Language.GetGenericText("FileEncoding.Enabled", "Enabled");
+         lstFiles.Columns[1].Text = Language.GetGenericText("FileEncoding.FilePath", "File Path");
+         lstFiles.Columns[2].Text = Language.GetGenericText("FileEncoding.Encoding", "Encoding");
+      }
+
+      #region Private Methods
+      /// <summary>
+      /// Update the results preview.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
+      /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]	   09/11/2014	FIX, don't play windows chime if matching text is at end of line
+      /// </history>
+      private void UpdateResultsPreview()
+      {
+         string PREVIEW_TEXT = Language.GetGenericText("ResultsPreviewText");
+         string PREVIEW_SPACER_TEXT = Language.GetGenericText("ResultsPreviewSpacerText");
+         string PREVIEW_MATCH_TEXT = Language.GetGenericText("ResultsPreviewTextMatch");
+
+         string _textToSearch = string.Empty;
+         string _searchText = PREVIEW_MATCH_TEXT;
+         string _tempLine = string.Empty;
+
+         string _begin = string.Empty;
+         string _text = string.Empty;
+         string _end = string.Empty;
+         int _pos = 0;
+         bool _highlight = false;
+
+         if (tbcOptions.SelectedTab == tabResults)
+         {
+            // Clear the contents
+            rtxtResultsPreview.Text = string.Empty;
+            rtxtResultsPreview.ForeColor = btnResultsWindowForeColor.SelectedColor;
+            rtxtResultsPreview.BackColor = btnResultsWindowBackColor.SelectedColor;
+
+            // Retrieve hit text
+            _textToSearch = PREVIEW_TEXT;
+
+            if (chkRemoveLeadingWhiteSpace.Checked)
+            {
+               _textToSearch = PREVIEW_TEXT.TrimStart();
             }
 
-            // set column text
-            TextEditorsList.Columns[0].Text = Language.GetGenericText("TextEditorsColumnFileType");
-            TextEditorsList.Columns[1].Text = Language.GetGenericText("TextEditorsColumnLocation");
-            TextEditorsList.Columns[2].Text = Language.GetGenericText("TextEditorsColumnCmdLine");
-            TextEditorsList.Columns[3].Text = Language.GetGenericText("TextEditorsColumnTabSize");
-            PluginsList.Columns[0].Text = Language.GetGenericText("PluginsColumnEnabled");
-            PluginsList.Columns[1].Text = Language.GetGenericText("PluginsColumnName");
-            PluginsList.Columns[2].Text = Language.GetGenericText("PluginsColumnExtensions");
-        }
+            _textToSearch = string.Format("{0}{1}", PREVIEW_SPACER_TEXT, _textToSearch);
 
-        #region Private Methods
-        /// <summary>
-        /// Update the results preview.
-        /// </summary>
-        /// <history>
-        /// [Curtis_Beard]		07/21/2006	Created
-        /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
-        /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
-        /// </history>
-        private void UpdateResultsPreview()
-        {
-            string PREVIEW_TEXT = Language.GetGenericText("ResultsPreviewText");
-            string PREVIEW_MATCH_TEXT = Language.GetGenericText("ResultsPreviewTextMatch");
+            // Set default font
+            rtxtResultsPreview.SelectionFont = rtxtResultsPreview.Font;
 
-            string _textToSearch = string.Empty;
-            string _searchText = PREVIEW_MATCH_TEXT;
-            string _tempLine = string.Empty;
+            _tempLine = _textToSearch;
 
-            string _begin = string.Empty;
-            string _text = string.Empty;
-            string _end = string.Empty;
-            int _pos = 0;
-            bool _highlight = false;
+            // attempt to locate the text in the line
+            _pos = _tempLine.IndexOf(_searchText);
 
-            if (tbcOptions.SelectedTab == tabResults)
+            if (_pos > -1)
             {
-                // Clear the contents
-                rtxtResultsPreview.Text = string.Empty;
-                rtxtResultsPreview.ForeColor = btnResultsWindowForeColor.SelectedColor;
-                rtxtResultsPreview.BackColor = btnResultsWindowBackColor.SelectedColor;
+               do
+               {
+                  _highlight = false;
 
-                // Retrieve hit text
-                _textToSearch = PREVIEW_TEXT;
+                  //
+                  // retrieve parts of text
+                  _begin = _tempLine.Substring(0, _pos);
+                  _text = _tempLine.Substring(_pos, _searchText.Length);
+                  _end = _tempLine.Substring(_pos + _searchText.Length);
 
-                // Set default font
-                rtxtResultsPreview.SelectionFont = rtxtResultsPreview.Font;
+                  // set default color for starting text
+                  rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
+                  rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
+                  rtxtResultsPreview.SelectedText = _begin;
 
-                _tempLine = _textToSearch;
+                  // do a check to see if begin and end are valid for wholeword searches
+                  _highlight = true;
 
-                // attempt to locate the text in the line
-                _pos = _tempLine.IndexOf(_searchText);
+                  // set highlight color for searched text
+                  if (_highlight)
+                  {
+                     rtxtResultsPreview.SelectionColor = ForeColorButton.SelectedColor;
+                     rtxtResultsPreview.SelectionBackColor = BackColorButton.SelectedColor;
+                  }
+                  rtxtResultsPreview.SelectedText = _text;
 
-                if (_pos > -1)
-                {
-                    do
-                    {
-                        _highlight = false;
+                  // Check remaining string for other hits in same line
+                  _pos = _end.IndexOf(_searchText);
 
-                        //
-                        // retrieve parts of text
-                        _begin = _tempLine.Substring(0, _pos);
-                        _text = _tempLine.Substring(_pos, _searchText.Length);
-                        _end = _tempLine.Substring(_pos + _searchText.Length);
+                  // set default color for end, if no more hits in line
+                  _tempLine = _end;
+                  if (_pos < 0)
+                  {
+                     rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
+                     rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
+                     if (_end.Length > 0)
+                     {
+                        rtxtResultsPreview.SelectedText = _end;
+                     }
+                  }
 
-                        // set default color for starting text
-                        rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
-                        rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
-                        rtxtResultsPreview.SelectedText = _begin;
-
-                        // do a check to see if begin and end are valid for wholeword searches
-                        _highlight = true;
-
-                        // set highlight color for searched text
-                        if (_highlight)
-                        {
-                            rtxtResultsPreview.SelectionColor = ForeColorButton.SelectedColor;
-                            rtxtResultsPreview.SelectionBackColor = BackColorButton.SelectedColor;
-                        }
-                        rtxtResultsPreview.SelectedText = _text;
-
-                        // Check remaining string for other hits in same line
-                        _pos = _end.IndexOf(_searchText);
-
-                        // set default color for end, if no more hits in line
-                        _tempLine = _end;
-                        if (_pos < 0)
-                        {
-                            rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
-                            rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
-                            rtxtResultsPreview.SelectedText = _end;
-                        }
-
-                    } while (_pos > -1);
-                }
-                else
-                {
-                    // set default color, no search text found
-                    rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
-                    rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
-                    rtxtResultsPreview.SelectedText = _textToSearch;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Handle when a new color has been selected.
-        /// </summary>
-        /// <param name="newColor">new Color</param>
-        /// <history>
-        /// [Curtis_Beard]		07/21/2006	Created
-        /// </history>
-        private void NewColor(Color newColor)
-        {
-            UpdateResultsPreview();
-        }
-
-        /// <summary>
-        /// Loads the given text editors.
-        /// </summary>
-        /// <param name="editors">TextEditor array, can be nothing</param>
-        /// <history>
-        /// [Curtis_Beard]	   07/10/2006	Created
-        /// </history>
-        private void LoadEditors(TextEditor[] editors)
-        {
-            if (editors != null)
-            {
-                TextEditorsList.BeginUpdate();
-                foreach (TextEditor editor in editors)
-                {
-                    ListViewItem item = new ListViewItem();
-                    item.Text = editor.FileType;
-                    item.SubItems.Add(editor.Editor);
-                    item.SubItems.Add(editor.Arguments);
-                    item.SubItems.Add(editor.TabSize.ToString());
-                    item.Selected = true;
-                    TextEditorsList.Items.Add(item);
-                }
-                TextEditorsList.EndUpdate();
-            }
-        }
-
-        /// <summary>
-        /// Saves the defined text editors.
-        /// </summary>
-        /// <history>
-        /// [Curtis_Beard]	   07/10/2006	Created
-        /// </history>
-        private void SaveEditors()
-        {
-            if (TextEditorsList.Items.Count == 0)
-            {
-                TextEditors.Save(null);
-                return;
-            }
-
-            TextEditor[] editors = new TextEditor[TextEditorsList.Items.Count];
-            int index = 0;
-            foreach (ListViewItem item in TextEditorsList.Items)
-            {
-                TextEditor editor = new TextEditor();
-                editor.FileType = item.Text;
-                editor.Editor = item.SubItems[1].Text;
-                editor.Arguments = item.SubItems[2].Text;
-                editor.TabSize = Convert.ToInt32(item.SubItems[3].Text);
-                editors[index] = editor;
-                index += 1;
-            }
-
-            TextEditors.Save(editors);
-        }
-
-        /// <summary>
-        /// Sets the TextEditor's button states depending on if one is selected.
-        /// </summary>
-        /// <history>
-        /// [Curtis_Beard]		07/20/2006	Created
-        /// </history>
-        private void SetTextEditorsButtonState()
-        {
-            if (TextEditorsList.SelectedItems.Count > 0)
-            {
-                btnRemove.Enabled = true;
-                btnEdit.Enabled = true;
+               } while (_pos > -1);
             }
             else
             {
-                btnRemove.Enabled = false;
-                btnEdit.Enabled = false;
+               // set default color, no search text found
+               rtxtResultsPreview.SelectionColor = btnResultsWindowForeColor.SelectedColor;
+               rtxtResultsPreview.SelectionBackColor = btnResultsWindowBackColor.SelectedColor;
+               rtxtResultsPreview.SelectedText = _textToSearch;
             }
-        }
+         }
+      }
 
-        /// <summary>
-        /// Determines if a text editor is defined for all file types.
-        /// </summary>
-        /// <returns>Returns true if an all file types text editor is defined, false otherwise</returns>
-        /// <history>
-        /// [Curtis_Beard]		07/20/2006	Created
-        /// </history>
-        private bool IsAllTypesDefined()
-        {
-            foreach (ListViewItem item in TextEditorsList.Items)
+      /// <summary>
+      /// Handle when a new color has been selected.
+      /// </summary>
+      /// <param name="newColor">new Color</param>
+      /// <history>
+      /// [Curtis_Beard]		07/21/2006	Created
+      /// </history>
+      private void NewColor(Color newColor)
+      {
+         UpdateResultsPreview();
+      }
+
+      /// <summary>
+      /// Loads the given text editors.
+      /// </summary>
+      /// <param name="editors">TextEditor array, can be nothing</param>
+      /// <history>
+      /// [Curtis_Beard]	   07/10/2006	Created
+      /// </history>
+      private void LoadEditors(TextEditor[] editors)
+      {
+         if (editors != null)
+         {
+            TextEditorsList.BeginUpdate();
+            foreach (TextEditor editor in editors)
             {
-                if (item.Text.Equals("*"))
-                    return true;
+               ListViewItem item = new ListViewItem();
+               item.Text = editor.FileType;
+               item.SubItems.Add(editor.Editor);
+               item.SubItems.Add(editor.Arguments);
+               item.SubItems.Add(editor.TabSize.ToString());
+               item.Selected = true;
+               TextEditorsList.Items.Add(item);
             }
+            TextEditorsList.EndUpdate();
+         }
+      }
 
-            return false;
-        }
+      /// <summary>
+      /// Saves the defined text editors.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	   07/10/2006	Created
+      /// </history>
+      private void SaveEditors()
+      {
+         if (TextEditorsList.Items.Count == 0)
+         {
+            TextEditors.Save(null);
+            return;
+         }
 
-        /// <summary>
-        /// Retrieves an array of file types currently defined.
-        /// </summary>
-        /// <returns>String array of file types</returns>
-        private string[] GetExistingFileTypes()
-        {
-            string[] types = new string[TextEditorsList.Items.Count];
+         TextEditor[] editors = new TextEditor[TextEditorsList.Items.Count];
+         int index = 0;
+         foreach (ListViewItem item in TextEditorsList.Items)
+         {
+            TextEditor editor = new TextEditor();
+            editor.FileType = item.Text;
+            editor.Editor = item.SubItems[1].Text;
+            editor.Arguments = item.SubItems[2].Text;
+            editor.TabSize = Convert.ToInt32(item.SubItems[3].Text);
+            editors[index] = editor;
+            index += 1;
+         }
 
-            for (int i = 0; i < TextEditorsList.Items.Count; i++)
+         TextEditors.Save(editors);
+      }
+
+      /// <summary>
+      /// Sets the TextEditor's button states depending on if one is selected.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/20/2006	Created
+      /// </history>
+      private void SetTextEditorsButtonState()
+      {
+         if (TextEditorsList.SelectedItems.Count > 0)
+         {
+            btnRemove.Enabled = true;
+            btnEdit.Enabled = true;
+         }
+         else
+         {
+            btnRemove.Enabled = false;
+            btnEdit.Enabled = false;
+         }
+      }
+
+      /// <summary>
+      /// Determines if a text editor is defined for all file types.
+      /// </summary>
+      /// <returns>Returns true if an all file types text editor is defined, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]		07/20/2006	Created
+      /// </history>
+      private bool IsAllTypesDefined()
+      {
+         foreach (ListViewItem item in TextEditorsList.Items)
+         {
+            if (item.Text.Equals("*"))
+               return true;
+         }
+
+         return false;
+      }
+
+      /// <summary>
+      /// Retrieves an array of file types currently defined.
+      /// </summary>
+      /// <returns>String array of file types</returns>
+      /// <history>
+      /// [Curtis_Beard]		08/13/2014	FIX: better detection of file types
+      /// </history>
+      private List<string> GetExistingFileTypes()
+      {
+         List<string> types = new List<string>();
+
+         for (int i = 0; i < TextEditorsList.Items.Count; i++)
+         {
+            string value = TextEditorsList.Items[i].Text;
+            if (value.Contains(Constants.TEXT_EDITOR_TYPE_SEPARATOR))
             {
-                types[i] = TextEditorsList.Items[i].Text;
+               foreach (string val in value.Split(Constants.TEXT_EDITOR_TYPE_SEPARATOR.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+               {
+                  types.Add(val.ToLower());
+               }
             }
-
-            return types;
-        }
-
-        /// <summary>
-        /// Displays the given font as a string on the given label.
-        /// </summary>
-        /// <param name="fnt">Font to display</param>
-        /// <param name="lbl">Label to show font</param>
-        /// <history>
-        /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
-        /// [Curtis_Beard]	   10/26/2012	CHG: use / to separate values instead of comma which could be used in SizeInPoints
-        /// </history>
-        private void DisplayFont(Font fnt, Label lbl)
-        {
-            lbl.Text = string.Format("{0} / {1} / {2}", fnt.Name, fnt.SizeInPoints, fnt.Style.ToString());
-        }
-        #endregion
-
-        #region Control Events
-        /// <summary>
-        /// Handles saving the user specified options.
-        /// </summary>
-        /// <param name="sender">System parameter</param>
-        /// <param name="e">System parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/19/2006	Created
-        /// [Curtis_Beard]		07/21/2006	ADD: Custom colors for fore/back of results
-        /// [Curtis_Beard]		07/25/2006	FIX: Add back Browse... if it was removed
-        /// [Curtis_Beard]      07/28/2006  ADD: extension exclusion list
-        /// [Curtis_Beard]      11/10/2006  FIX: Don't load new language, just set that it changed
-        /// [Curtis_Beard]      11/13/2006  CHG: Only try and save the search option if enabled
-        /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
-        /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
-        /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
-        /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
-        /// [Curtis_Beard]	   10/28/2012	ADD: 3575509, results word wrap
-        /// [Curtis_Beard]	   10/28/2012	CHG: 3575507, handle UAC request for right click option
-        /// [Curtis_Beard]	   10/28/2012	ADD: 3479503, ability to change file list font
-        /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
-        /// </history>
-        private void btnOK_Click(object sender, System.EventArgs e)
-        {
-            // Store the values in the globals
-            Core.GeneralSettings.MaximumMRUPaths = cboPathMRUCount.SelectedIndex + 1;
-            Core.GeneralSettings.HighlightForeColor = Convertors.ConvertColorToString(ForeColorButton.SelectedColor);
-            Core.GeneralSettings.HighlightBackColor = Convertors.ConvertColorToString(BackColorButton.SelectedColor);
-            Core.GeneralSettings.ResultsForeColor = Convertors.ConvertColorToString(btnResultsWindowForeColor.SelectedColor);
-            Core.GeneralSettings.ResultsBackColor = Convertors.ConvertColorToString(btnResultsWindowBackColor.SelectedColor);
-            Core.GeneralSettings.ResultsFont = Convertors.ConvertFontToString(rtxtResultsPreview.Font);
-            Core.GeneralSettings.ShowExclusionErrorMessage = chkShowExclusionErrorMessage.Checked;
-            Core.GeneralSettings.SaveSearchOptionsOnExit = chkSaveSearchOptions.Checked;
-            Core.GeneralSettings.ResultsWordWrap = chkWordWrap.Checked;
-            Core.GeneralSettings.FilePanelFont = Convertors.ConvertFontToString(__FileFont);
-            Core.GeneralSettings.DetectFileEncoding = chkDetectFileEncoding.Checked;
-
-            // Only load new language on a change
-            LanguageItem item = (LanguageItem)cboLanguage.SelectedItem;
-            if (!Core.GeneralSettings.Language.Equals(item.Culture))
+            else
             {
-                Core.GeneralSettings.Language = item.Culture;
-                Language.Load(Core.GeneralSettings.Language);
-                __LanguageChange = true;
+               types.Add(value.ToLower());
             }
+         }
 
-            // set shortcuts
+         return types;
+      }
+
+      /// <summary>
+      /// Displays the given font as a string on the given label.
+      /// </summary>
+      /// <param name="fnt">Font to display</param>
+      /// <param name="lbl">Label to show font</param>
+      /// <history>
+      /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
+      /// [Curtis_Beard]	   10/26/2012	CHG: use / to separate values instead of comma which could be used in SizeInPoints
+      /// </history>
+      private void DisplayFont(Font fnt, Label lbl)
+      {
+         lbl.Text = string.Format("{0} / {1} / {2}", fnt.Name, fnt.SizeInPoints, fnt.Style.ToString());
+      }
+      #endregion
+
+      #region Control Events
+      /// <summary>
+      /// Handles saving the user specified options.
+      /// </summary>
+      /// <param name="sender">System parameter</param>
+      /// <param name="e">System parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/19/2006	Created
+      /// [Curtis_Beard]		07/21/2006	ADD: Custom colors for fore/back of results
+      /// [Curtis_Beard]		07/25/2006	FIX: Add back Browse... if it was removed
+      /// [Curtis_Beard]      07/28/2006  ADD: extension exclusion list
+      /// [Curtis_Beard]      11/10/2006  FIX: Don't load new language, just set that it changed
+      /// [Curtis_Beard]      11/13/2006  CHG: Only try and save the search option if enabled
+      /// [Curtis_Beard]		10/11/2007	CHG: use language culture ids
+      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
+      /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
+      /// [Curtis_Beard]	   10/28/2012	ADD: 3575509, results word wrap
+      /// [Curtis_Beard]	   10/28/2012	CHG: 3575507, handle UAC request for right click option
+      /// [Curtis_Beard]	   10/28/2012	ADD: 3479503, ability to change file list font
+      /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
+      /// [Curtis_Beard]	   09/16/2014	ADD: installer check for desktop/start menu options processing
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
+      /// </history>
+      private void btnOK_Click(object sender, System.EventArgs e)
+      {
+         // Store the values in the globals
+         Core.GeneralSettings.MaximumMRUPaths = cboPathMRUCount.SelectedIndex + 1;
+         Core.GeneralSettings.HighlightForeColor = Convertors.ConvertColorToString(ForeColorButton.SelectedColor);
+         Core.GeneralSettings.HighlightBackColor = Convertors.ConvertColorToString(BackColorButton.SelectedColor);
+         Core.GeneralSettings.ResultsForeColor = Convertors.ConvertColorToString(btnResultsWindowForeColor.SelectedColor);
+         Core.GeneralSettings.ResultsBackColor = Convertors.ConvertColorToString(btnResultsWindowBackColor.SelectedColor);
+         Core.GeneralSettings.ResultsFont = Convertors.ConvertFontToString(rtxtResultsPreview.Font);
+         Core.GeneralSettings.ShowExclusionErrorMessage = chkShowExclusionErrorMessage.Checked;
+         Core.GeneralSettings.SaveSearchOptionsOnExit = chkSaveSearchOptions.Checked;
+         Core.GeneralSettings.ResultsWordWrap = chkWordWrap.Checked;
+         Core.GeneralSettings.FilePanelFont = Convertors.ConvertFontToString(__FileFont);
+         Core.GeneralSettings.DetectFileEncoding = chkDetectFileEncoding.Checked;
+         Core.GeneralSettings.RemoveLeadingWhiteSpace = chkRemoveLeadingWhiteSpace.Checked;
+
+         // Only load new language on a change
+         LanguageItem item = (LanguageItem)cboLanguage.SelectedItem;
+         if (!Core.GeneralSettings.Language.Equals(item.Culture))
+         {
+            Core.GeneralSettings.Language = item.Culture;
+            Language.Load(Core.GeneralSettings.Language);
+            __LanguageChange = true;
+         }
+
+         // set shortcuts
+         if (!Registry.IsInstaller())
+         {
             Shortcuts.SetDesktopShortcut(chkDesktopShortcut.Checked);
             Shortcuts.SetStartMenuShortcut(chkStartMenuShortcut.Checked);
+         }
 
-            SaveEditors();
+         SaveEditors();
 
-            Core.PluginManager.Save();
+         SaveFileEncodings();
 
-            // handle right click search change
-            if (__RightClickUpdate)
+         Core.PluginManager.Save();
+
+         // handle right click search change
+         if (__RightClickUpdate)
+         {
+            try
             {
-                try
-                {
-                    string path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.ExecutablePath), "AstroGrep.AdminProcess.exe");
-                    string agPath = string.Format("\"{0}\"", Application.ExecutablePath);
-                    string explorerText = string.Format("\"{0}\"", Language.GetGenericText("SearchExplorerItem"));
-                    string args = string.Format("\"{0}\" {1} {2}", chkRightClickOption.Checked.ToString(), agPath, explorerText);
+               string path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.ExecutablePath), "AstroGrep.AdminProcess.exe");
+               string agPath = string.Format("\"{0}\"", Application.ExecutablePath);
+               string explorerText = string.Format("\"{0}\"", Language.GetGenericText("SearchExplorerItem"));
+               string args = string.Format("\"{0}\" {1} {2}", chkRightClickOption.Checked.ToString(), agPath, explorerText);
 
-                    API.UACHelper.AttemptPrivilegeEscalation(path, args, false);
-                }
-                catch (Exception ex)
-                {
-                    // TODO
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                }
+               API.UACHelper.AttemptPrivilegeEscalation(path, args, false);
             }
-
-            this.Close();
-        }
-
-        /// <summary>
-        /// Closes the form
-        /// </summary>
-        /// <param name="sender">System parameter</param>
-        /// <param name="e">System parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/19/2006	Created
-        /// </history>
-        private void btnCancel_Click(object sender, System.EventArgs e)
-        {
-            this.Close();
-        }
-
-        /// <summary>
-        /// Add a new text editor.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/20/2006	Created
-        /// </history>
-        private void btnAdd_Click(object sender, System.EventArgs e)
-        {
-            if (tbcOptions.SelectedTab == tabTextEditors)
+            catch (Exception ex)
             {
-                frmAddEditTextEditor dlg = new frmAddEditTextEditor();
-                dlg.IsAdd = true;
-                dlg.IsAllTypesDefined = IsAllTypesDefined();
-                dlg.ExistingFileTypes = GetExistingFileTypes();
-
-                if (dlg.ShowDialog(this) == DialogResult.OK)
-                {
-                    // create new entry
-                    ListViewItem item = new ListViewItem();
-                    item.Text = dlg.Editor.FileType;
-                    item.SubItems.Add(dlg.Editor.Editor);
-                    item.SubItems.Add(dlg.Editor.Arguments);
-                    item.SubItems.Add(dlg.Editor.TabSize.ToString());
-                    TextEditorsList.Items.Add(item);
-
-                    SetTextEditorsButtonState();
-                }
+               // TODO
+               System.Diagnostics.Debug.WriteLine(ex.Message);
             }
+         }
 
-            this.DialogResult = DialogResult.None;
-        }
+         this.Close();
+      }
 
-        /// <summary>
-        /// Edit the selected text editor.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/20/2006	Created
-        /// </history>
-        private void btnEdit_Click(object sender, System.EventArgs e)
-        {
-            if (tbcOptions.SelectedTab == tabTextEditors)
+      /// <summary>
+      /// Closes the form
+      /// </summary>
+      /// <param name="sender">System parameter</param>
+      /// <param name="e">System parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/19/2006	Created
+      /// </history>
+      private void btnCancel_Click(object sender, System.EventArgs e)
+      {
+         this.Close();
+      }
+
+      /// <summary>
+      /// Add a new text editor.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/20/2006	Created
+      /// </history>
+      private void btnAdd_Click(object sender, System.EventArgs e)
+      {
+         if (tbcOptions.SelectedTab == tabTextEditors)
+         {
+            frmAddEditTextEditor dlg = new frmAddEditTextEditor();
+            dlg.IsAdd = true;
+            dlg.IsAllTypesDefined = IsAllTypesDefined();
+            dlg.ExistingFileTypes = GetExistingFileTypes();
+
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                if (TextEditorsList.SelectedItems.Count > 0)
-                {
-                    ListViewItem item = TextEditorsList.SelectedItems[0];
-                    frmAddEditTextEditor dlg = new frmAddEditTextEditor();
+               // create new entry
+               ListViewItem item = new ListViewItem();
+               item.Text = dlg.Editor.FileType;
+               item.SubItems.Add(dlg.Editor.Editor);
+               item.SubItems.Add(dlg.Editor.Arguments);
+               item.SubItems.Add(dlg.Editor.TabSize.ToString());
+               TextEditorsList.Items.Add(item);
 
-                    // set values
-                    dlg.IsAdd = false;
-                    dlg.IsAllTypesDefined = IsAllTypesDefined();
-                    dlg.Editor = new TextEditor(item.Text, item.SubItems[1].Text, item.SubItems[2].Text, Convert.ToInt32(item.SubItems[3].Text));
-
-                    if (dlg.ShowDialog(this) == DialogResult.OK)
-                    {
-                        // get values
-                        TextEditorsList.SelectedItems[0].Text = dlg.Editor.FileType;
-                        TextEditorsList.SelectedItems[0].SubItems[1].Text = dlg.Editor.Editor;
-                        TextEditorsList.SelectedItems[0].SubItems[2].Text = dlg.Editor.Arguments;
-                        TextEditorsList.SelectedItems[0].SubItems[3].Text = dlg.Editor.TabSize.ToString();
-                    }
-
-                    SetTextEditorsButtonState();
-                }
+               SetTextEditorsButtonState();
             }
+         }
 
-            this.DialogResult = DialogResult.None;
-        }
+         this.DialogResult = DialogResult.None;
+      }
 
-        /// <summary>
-        /// Delete the selected text editor.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/20/2006	Created
-        /// </history>
-        private void btnRemove_Click(object sender, System.EventArgs e)
-        {
-            if (tbcOptions.SelectedTab == tabTextEditors)
+      /// <summary>
+      /// Edit the selected text editor.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/20/2006	Created
+      /// [Curtis_Beard]		08/13/2014	FIX: better detection of file types
+      /// </history>
+      private void btnEdit_Click(object sender, System.EventArgs e)
+      {
+         if (tbcOptions.SelectedTab == tabTextEditors)
+         {
+            if (TextEditorsList.SelectedItems.Count > 0)
             {
-                // remove
-                if (TextEditorsList.SelectedItems.Count > 0)
-                {
-                    TextEditorsList.Items.Remove(TextEditorsList.SelectedItems[0]);
-                    SetTextEditorsButtonState();
-                }
+               ListViewItem item = TextEditorsList.SelectedItems[0];
+               frmAddEditTextEditor dlg = new frmAddEditTextEditor();
+
+               // set values
+               dlg.IsAdd = false;
+               dlg.IsAllTypesDefined = IsAllTypesDefined();
+               dlg.Editor = new TextEditor(item.Text, item.SubItems[1].Text, item.SubItems[2].Text, Convert.ToInt32(item.SubItems[3].Text));
+               dlg.ExistingFileTypes = GetExistingFileTypes();
+
+               if (dlg.ShowDialog(this) == DialogResult.OK)
+               {
+                  // get values
+                  TextEditorsList.SelectedItems[0].Text = dlg.Editor.FileType;
+                  TextEditorsList.SelectedItems[0].SubItems[1].Text = dlg.Editor.Editor;
+                  TextEditorsList.SelectedItems[0].SubItems[2].Text = dlg.Editor.Arguments;
+                  TextEditorsList.SelectedItems[0].SubItems[3].Text = dlg.Editor.TabSize.ToString();
+               }
+
+               SetTextEditorsButtonState();
             }
+         }
 
-            this.DialogResult = DialogResult.None;
-        }
+         this.DialogResult = DialogResult.None;
+      }
 
-        /// <summary>
-        /// Update the text editor button states.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/20/2006	Created
-        /// </history>
-        private void TextEditorsList_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-            SetTextEditorsButtonState();
-        }
-
-        /// <summary>
-        /// Edit the selected text editor entry.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		07/20/2006	Created
-        /// </history>
-        private void TextEditorsList_DoubleClick(object sender, EventArgs e)
-        {
-            Point clientPoint = TextEditorsList.PointToClient(Control.MousePosition);
-            ListViewItem item = TextEditorsList.GetItemAt(clientPoint.X, clientPoint.Y);
-
-            if (item != null)
+      /// <summary>
+      /// Delete the selected text editor.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/20/2006	Created
+      /// </history>
+      private void btnRemove_Click(object sender, System.EventArgs e)
+      {
+         if (tbcOptions.SelectedTab == tabTextEditors)
+         {
+            // remove
+            if (TextEditorsList.SelectedItems.Count > 0)
             {
-                item.Selected = true;
-                btnEdit_Click(null, null);
+               TextEditorsList.Items.Remove(TextEditorsList.SelectedItems[0]);
+               SetTextEditorsButtonState();
             }
-        }
+         }
 
-        /// <summary>
-        /// Setup tab pages when selected.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		05/22/2007	Created
-        /// </history>
-        private void tbcOptions_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-            if (tbcOptions.SelectedTab == tabResults)
+         this.DialogResult = DialogResult.None;
+      }
+
+      /// <summary>
+      /// Update the text editor button states.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/20/2006	Created
+      /// </history>
+      private void TextEditorsList_SelectedIndexChanged(object sender, System.EventArgs e)
+      {
+         SetTextEditorsButtonState();
+      }
+
+      /// <summary>
+      /// Edit the selected text editor entry.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		07/20/2006	Created
+      /// </history>
+      private void TextEditorsList_DoubleClick(object sender, EventArgs e)
+      {
+         Point clientPoint = TextEditorsList.PointToClient(Control.MousePosition);
+         ListViewItem item = TextEditorsList.GetItemAt(clientPoint.X, clientPoint.Y);
+
+         if (item != null)
+         {
+            item.Selected = true;
+            btnEdit_Click(null, null);
+         }
+      }
+
+      /// <summary>
+      /// Setup tab pages when selected.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		05/22/2007	Created
+      /// </history>
+      private void tbcOptions_SelectedIndexChanged(object sender, System.EventArgs e)
+      {
+         if (tbcOptions.SelectedTab == tabResults)
+         {
+            UpdateResultsPreview();
+         }
+         else if (tbcOptions.SelectedTab == tabPlugins)
+         {
+            if (PluginsList.Items.Count > 0)
             {
-                UpdateResultsPreview();
+               PluginsList.Items[0].Selected = true;
             }
-            else if (tbcOptions.SelectedTab == tabPlugins)
+         }
+      }
+
+
+      /// <summary>
+      /// Show font selection dialog.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
+      /// </history>
+      private void btnFindFont_Click(object sender, EventArgs e)
+      {
+         var dlg = new FontDialog()
+         {
+            ShowColor = false,
+            ShowEffects = false,
+            ShowHelp = false,
+            Font = rtxtResultsPreview.Font
+         };
+
+         var result = dlg.ShowDialog(this);
+         if (result == DialogResult.OK)
+         {
+            DisplayFont(dlg.Font, lblCurrentFont);
+            rtxtResultsPreview.Font = dlg.Font;
+         }
+      }
+
+      /// <summary>
+      /// Show font selection dialog.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
+      /// </history>
+      private void btnFileFindFont_Click(object sender, EventArgs e)
+      {
+         var dlg = new FontDialog()
+         {
+            ShowColor = false,
+            ShowEffects = false,
+            ShowHelp = false,
+            Font = __FileFont
+         };
+
+         var result = dlg.ShowDialog(this);
+         if (result == DialogResult.OK)
+         {
+            DisplayFont(dlg.Font, lblFileCurrentFont);
+            __FileFont = dlg.Font;
+         }
+      }
+
+      /// <summary>
+      /// Handle change to the right click checkbox.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      10/09/2012	Initial: 3575507, handle UAC request for right click option
+      /// </history>
+      private void chkRightClickOption_CheckedChanged(object sender, EventArgs e)
+      {
+         if (chkRightClickOption.Checked != __RightClickEnabled)
+         {
+            if (!__IsAdmin)
             {
-                if (PluginsList.Items.Count > 0)
-                {
-                    PluginsList.Items[0].Selected = true;
-                }
+               API.UACHelper.AddShieldToButton(btnOK);
             }
-        }
-
-
-        /// <summary>
-        /// Show font selection dialog.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
-        /// </history>
-        private void btnFindFont_Click(object sender, EventArgs e)
-        {
-            var dlg = new FontDialog()
+            __RightClickUpdate = true;
+         }
+         else
+         {
+            if (!__IsAdmin)
             {
-                ShowColor = false,
-                ShowEffects = false,
-                ShowHelp = false,
-                Font = rtxtResultsPreview.Font
-            };
-
-            var result = dlg.ShowDialog(this);
-            if (result == DialogResult.OK)
-            {
-                DisplayFont(dlg.Font, lblCurrentFont);
-                rtxtResultsPreview.Font = dlg.Font;
+               API.UACHelper.RemoveShieldFromButton(btnOK);
             }
-        }
+            __RightClickUpdate = false;
+         }
+      }
 
-        /// <summary>
-        /// Show font selection dialog.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
-        /// </history>
-        private void btnFileFindFont_Click(object sender, EventArgs e)
-        {
-            var dlg = new FontDialog()
-            {
-                ShowColor = false,
-                ShowEffects = false,
-                ShowHelp = false,
-                Font = __FileFont
-            };
+      /// <summary>
+      /// Update results preview display when remove leading white space checkbox changes.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
+      /// </history>
+      private void chkRemoveLeadingWhiteSpace_CheckedChanged(object sender, EventArgs e)
+      {
+         UpdateResultsPreview();
+      }
+      #endregion
 
-            var result = dlg.ShowDialog(this);
-            if (result == DialogResult.OK)
-            {
-                DisplayFont(dlg.Font, lblFileCurrentFont);
-                __FileFont = dlg.Font;
-            }
-        }
+      #region Plugin Methods
+      /// <summary>
+      /// Load the plugins from the manager to the listview.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		07/28/2006	Created
+      /// </history>
+      private void LoadPlugins()
+      {
+         PluginsList.Items.Clear();
+         ListViewItem item;
 
-        /// <summary>
-        /// Handle change to the right click checkbox.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]      10/09/2012	Initial: 3575507, handle UAC request for right click option
-        /// </history>
-        private void chkRightClickOption_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chkRightClickOption.Checked != __RightClickEnabled)
-            {
-                if (!__IsAdmin)
-                {
-                    API.UACHelper.AddShieldToButton(btnOK);
-                }
-                __RightClickUpdate = true;
-            }
+         for (int i = 0; i < Core.PluginManager.Items.Count; i++)
+         {
+            item = new ListViewItem();
+            item.Checked = Core.PluginManager.Items[i].Enabled;
+            item.SubItems.Add(Core.PluginManager.Items[i].Plugin.Name);
+            item.SubItems.Add(Core.PluginManager.Items[i].Plugin.Extensions);
+            PluginsList.Items.Add(item);
+         }
+      }
+
+      /// <summary>
+      /// Display the selected plugin details.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		09/05/2006	Created
+      /// </history>
+      private void PluginsList_SelectedIndexChanged(object sender, System.EventArgs e)
+      {
+         if (PluginsList.SelectedItems.Count > 0)
+            LoadPluginDetails(Core.PluginManager.Items[PluginsList.SelectedItems[0].Index].Plugin);
+         else
+            ClearPluginDetails();
+      }
+
+      /// <summary>
+      /// Enable or disable the selected plugin.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		09/05/2006	Created
+      /// </history>
+      private void PluginsList_ItemCheck(object sender, System.Windows.Forms.ItemCheckEventArgs e)
+      {
+         if (e.Index > -1 && e.Index < PluginsList.Items.Count)
+         {
+            PluginsList.Items[e.Index].Selected = true;
+            if (e.NewValue == CheckState.Checked)
+               Core.PluginManager.Items[e.Index].Enabled = true;
             else
+               Core.PluginManager.Items[e.Index].Enabled = false;
+         }
+      }
+
+      /// <summary>
+      /// Clear the plugin details.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		09/05/2006	Created
+      /// </history>
+      private void ClearPluginDetails()
+      {
+         lblPluginName.Text = string.Empty;
+         lblPluginVersion.Text = string.Empty;
+         lblPluginAuthor.Text = string.Empty;
+         lblPluginDescription.Text = string.Empty;
+      }
+
+      /// <summary>
+      /// Display the plugin details.
+      /// </summary>
+      /// <param name="plugin">IAstroGrepPlugin to load</param>
+      /// <history>
+      /// [Curtis_Beard]		09/05/2006	Created
+      /// </history>
+      private void LoadPluginDetails(IAstroGrepPlugin plugin)
+      {
+         lblPluginName.Text = plugin.Name;
+         lblPluginVersion.Text = plugin.Version;
+         lblPluginAuthor.Text = plugin.Author;
+         lblPluginDescription.Text = plugin.Description;
+      }
+
+      private void btnUp_Click(object sender, EventArgs e)
+      {
+         // move selected plugin up in list
+         if (PluginsList.SelectedItems.Count > 0 && PluginsList.SelectedItems[0].Index != 0)
+         {
+            Core.PluginManager.Items.Reverse(PluginsList.SelectedItems[0].Index - 1, 2);
+            LoadPlugins();
+         }
+      }
+
+      private void btnDown_Click(object sender, EventArgs e)
+      {
+         // move selected plugin down in list
+         if (PluginsList.SelectedItems.Count > 0 && PluginsList.SelectedItems[0].Index != (PluginsList.Items.Count - 1))
+         {
+            Core.PluginManager.Items.Reverse(PluginsList.SelectedItems[0].Index, 2);
+            LoadPlugins();
+         }
+      }
+      #endregion
+
+      #region File Encoding Methods
+
+      private void LoadFileEncodings()
+      {
+         var fileEncodings = FileEncoding.ConvertStringToFileEncodings(GeneralSettings.FileEncodings);
+         if (fileEncodings != null && fileEncodings.Count > 0)
+         {
+            lstFiles.BeginUpdate();
+
+            foreach (var file in fileEncodings)
             {
-                if (!__IsAdmin)
-                {
-                    API.UACHelper.RemoveShieldFromButton(btnOK);
-                }
-                __RightClickUpdate = false;
+               var item = GetFileEncodingListViewItem(file);
+               lstFiles.Items.Add(item);
             }
-        }
-        #endregion
 
-        #region Plugin Methods
-        /// <summary>
-        /// Load the plugins from the manager to the listview.
-        /// </summary>
-        /// <history>
-        /// [Curtis_Beard]		07/28/2006	Created
-        /// </history>
-        private void LoadPlugins()
-        {
-            PluginsList.Items.Clear();
-            ListViewItem item;
+            lstFiles.EndUpdate();
+         }
 
-            for (int i = 0; i < Core.PluginManager.Items.Count; i++)
+         SetFileEncodingButtonState();
+      }
+
+      private void SaveFileEncodings()
+      {
+         string encodings = string.Empty;
+
+         if (lstFiles.Items.Count > 0)
+         {
+            var fileEncodings = new List<FileEncoding>();
+            foreach (ListViewItem item in lstFiles.Items)
             {
-                item = new ListViewItem();
-                item.Checked = Core.PluginManager.Items[i].Enabled;
-                item.SubItems.Add(Core.PluginManager.Items[i].Plugin.Name);
-                item.SubItems.Add(Core.PluginManager.Items[i].Plugin.Extensions);
-                PluginsList.Items.Add(item);
+               var encoding = item.Tag as FileEncoding;
+               encoding.Enabled = item.Checked;
+               fileEncodings.Add(encoding);
             }
-        }
 
-        /// <summary>
-        /// Display the selected plugin details.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		09/05/2006	Created
-        /// </history>
-        private void PluginsList_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-            if (PluginsList.SelectedItems.Count > 0)
-                LoadPluginDetails(Core.PluginManager.Items[PluginsList.SelectedItems[0].Index].Plugin);
-            else
-                ClearPluginDetails();
-        }
+            encodings = FileEncoding.ConvertFileEncodingsToString(fileEncodings);
+         }
 
-        /// <summary>
-        /// Enable or disable the selected plugin.
-        /// </summary>
-        /// <param name="sender">system parameter</param>
-        /// <param name="e">system parameter</param>
-        /// <history>
-        /// [Curtis_Beard]		09/05/2006	Created
-        /// </history>
-        private void PluginsList_ItemCheck(object sender, System.Windows.Forms.ItemCheckEventArgs e)
-        {
-            if (e.Index > -1 && e.Index < PluginsList.Items.Count)
+         GeneralSettings.FileEncodings = encodings;
+      }
+
+      private void btnFileEncodingAdd_Click(object sender, EventArgs e)
+      {
+         var dialog = new frmAddEditFileEncoding();
+         if (dialog.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+         {
+            lstFiles.Items.Add(GetFileEncodingListViewItem(dialog.SelectedFileEncoding));
+
+            SetFileEncodingButtonState();
+         }
+
+         this.DialogResult = System.Windows.Forms.DialogResult.None;
+      }
+
+      private void btnFileEncodingEdit_Click(object sender, EventArgs e)
+      {
+         if (lstFiles.SelectedItems.Count > 0)
+         {
+            // get currently selected exclusion
+            var item = lstFiles.SelectedItems[0].Tag as FileEncoding;
+            item.Enabled = lstFiles.SelectedItems[0].Checked;
+
+            var dialog = new frmAddEditFileEncoding();
+            dialog.SelectedFileEncoding = item;
+            if (dialog.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
             {
-                PluginsList.Items[e.Index].Selected = true;
-                if (e.NewValue == CheckState.Checked)
-                    Core.PluginManager.Items[e.Index].Enabled = true;
-                else
-                    Core.PluginManager.Items[e.Index].Enabled = false;
+               item = dialog.SelectedFileEncoding;
+               var listItem = GetFileEncodingListViewItem(item);
+               lstFiles.SelectedItems[0].Checked = item.Enabled;
+               lstFiles.SelectedItems[0].Tag = item;
+
+               lstFiles.SelectedItems[0].SubItems[1].Text = listItem.SubItems[1].Text;
+               lstFiles.SelectedItems[0].SubItems[2].Text = listItem.SubItems[2].Text;
+
+               SetFileEncodingButtonState();
             }
-        }
+         }
 
-        /// <summary>
-        /// Clear the plugin details.
-        /// </summary>
-        /// <history>
-        /// [Curtis_Beard]		09/05/2006	Created
-        /// </history>
-        private void ClearPluginDetails()
-        {
-            lblPluginName.Text = string.Empty;
-            lblPluginVersion.Text = string.Empty;
-            lblPluginAuthor.Text = string.Empty;
-            lblPluginDescription.Text = string.Empty;
-        }
+         this.DialogResult = System.Windows.Forms.DialogResult.None;
+      }
 
-        /// <summary>
-        /// Display the plugin details.
-        /// </summary>
-        /// <param name="plugin">IAstroGrepPlugin to load</param>
-        /// <history>
-        /// [Curtis_Beard]		09/05/2006	Created
-        /// </history>
-        private void LoadPluginDetails(IAstroGrepPlugin plugin)
-        {
-            lblPluginName.Text = plugin.Name;
-            lblPluginVersion.Text = plugin.Version;
-            lblPluginAuthor.Text = plugin.Author;
-            lblPluginDescription.Text = plugin.Description;
-        }
-
-        private void btnUp_Click(object sender, EventArgs e)
-        {
-            // move selected plugin up in list
-            if (PluginsList.SelectedItems.Count > 0 && PluginsList.SelectedItems[0].Index != 0)
+      private void btnFileEncodingDelete_Click(object sender, EventArgs e)
+      {
+         // remove
+         if (lstFiles.SelectedItems.Count > 0)
+         {
+            foreach (ListViewItem item in lstFiles.SelectedItems)
             {
-                Core.PluginManager.Items.Reverse(PluginsList.SelectedItems[0].Index - 1, 2);
-                LoadPlugins();
+               lstFiles.Items.Remove(item);
             }
-        }
+            SetFileEncodingButtonState();
+         }
 
-        private void btnDown_Click(object sender, EventArgs e)
-        {
-            // move selected plugin down in list
-            if (PluginsList.SelectedItems.Count > 0 && PluginsList.SelectedItems[0].Index != (PluginsList.Items.Count - 1))
+         this.DialogResult = DialogResult.None;
+      }
+
+      /// <summary>
+      /// Sets the TextEditor's button states depending on if one is selected.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// </history>
+      private void SetFileEncodingButtonState()
+      {
+         if (lstFiles.SelectedItems.Count > 0)
+         {
+            btnFileEncodingDelete.Enabled = true;
+            btnFileEncodingEdit.Enabled = true;
+         }
+         else
+         {
+            btnFileEncodingDelete.Enabled = false;
+            btnFileEncodingEdit.Enabled = false;
+         }
+      }
+
+      /// <summary>
+      /// Get the list view item from the given FileEncoding object.
+      /// </summary>
+      /// <param name="item">FileEncoding object</param>
+      /// <returns>ListViewItem object</returns>
+      /// <history>
+      /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// </history>
+      private ListViewItem GetFileEncodingListViewItem(FileEncoding item)
+      {
+         ListViewItem listItem = new ListViewItem();
+         listItem.Tag = item;
+         listItem.Checked = item.Enabled;
+         listItem.SubItems.Add(item.FilePath);
+         listItem.SubItems.Add(item.Encoding.EncodingName);
+
+         return listItem;
+      }
+
+      /// <summary>
+      /// Update the button states.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// </history>
+      private void lstFiles_SelectedIndexChanged(object sender, System.EventArgs e)
+      {
+         SetFileEncodingButtonState();
+      }
+
+      /// <summary>
+      /// Edit the selected file entry.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// </history>
+      private void lstFiles_DoubleClick(object sender, EventArgs e)
+      {
+         Point clientPoint = lstFiles.PointToClient(Control.MousePosition);
+         ListViewItem item = lstFiles.GetItemAt(clientPoint.X, clientPoint.Y);
+
+         if (item != null)
+         {
+            item.Selected = true;
+            btnFileEncodingEdit_Click(null, null);
+         }
+      }
+
+      /// <summary>
+      /// Handles the key down event (supports ctrl-a, del).
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// </history>
+      private void lstFiles_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+      {
+         if (e.KeyCode == Keys.A && e.Control) //ctrl+a  Select All
+         {
+            foreach (ListViewItem item in lstFiles.Items)
             {
-                Core.PluginManager.Items.Reverse(PluginsList.SelectedItems[0].Index, 2);
-                LoadPlugins();
+               item.Selected = true;
             }
-        }
-        #endregion
-    }
+         }
+
+         if (e.KeyCode == Keys.Delete) //delete
+         {
+            btnFileEncodingDelete_Click(sender, EventArgs.Empty);
+         }
+      }
+
+      /// <summary>
+      /// Handle not changing checked state of item when double clicking to edit it.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   03/04/2014	FIX: 52, don't change check state when double clicking to edit
+      /// </history>
+      private void lstFiles_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+      {
+         inhibitFileEncodingAutoCheck = true;
+      }
+
+      /// <summary>
+      /// Handle not changing checked state of item when double clicking to edit it.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   03/04/2014	FIX: 52, don't change check state when double clicking to edit
+      /// </history>
+      private void lstFiles_ItemCheck(object sender, System.Windows.Forms.ItemCheckEventArgs e)
+      {
+         if (inhibitFileEncodingAutoCheck)
+         {
+            e.NewValue = e.CurrentValue;
+         }
+      }
+
+      /// <summary>
+      /// Handle not changing checked state of item when double clicking to edit it.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   03/04/2014	FIX: 52, don't change check state when double clicking to edit
+      /// </history>
+      private void lstFiles_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+      {
+         inhibitFileEncodingAutoCheck = false;
+      }
+
+      /// <summary>
+      /// Handles ListView Column Click event to allow Enabled column to toggle all checkboxes.
+      /// </summary>
+      /// <param name="sender">lstFiles listview</param>
+      /// <param name="e">column click arguments</param>
+      /// <history>
+      /// [Curtis_Beard]	   08/13/2014	ADD: 79, allow Enabled column to toggle all checkboxes
+      /// </history>
+      private void lstFiles_ColumnClick(object sender, ColumnClickEventArgs e)
+      {
+         // enabled column
+         if (e.Column == 0)
+         {
+            bool allChecked = (lstFiles.CheckedItems.Count == lstFiles.Items.Count);
+            foreach (ListViewItem item in lstFiles.Items)
+            {
+               item.Checked = !allChecked;
+            }
+         }
+      }
+
+      #endregion
+   }
 }

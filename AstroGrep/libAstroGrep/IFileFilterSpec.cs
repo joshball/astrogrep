@@ -1,49 +1,26 @@
 using System;
+using System.Collections.Generic;
 
 namespace libAstroGrep
 {
    /// <summary>
    /// Interface to grep that allow filter of files.
    /// </summary>
+   /// <history>
+   /// [Curtis_Beard]	   11/11/2014	CHG: move all file/dir filters to FilterItems list.
+   /// </history>
    public interface IFileFilterSpec
    {
       /// <summary>The FileFilter</summary>
       string FileFilter { get; }
 
-      /// <summary>Whether to skip hidden files and directories.</summary>
-      bool SkipHiddenFiles { get; }
-
-      /// <summary>Whether to skip system files and directories.</summary>
-      bool SkipSystemFiles { get; }
-
       /// <summary>
-      /// Modified start date
+      /// List of FilterItems that will filter out files/directories based on user inputted options.
       /// </summary>
-      DateTime DateModifiedStart { get; }
-
-      /// <summary>
-      /// Modified end date
-      /// </summary>
-      DateTime DateModifiedEnd { get; }
-
-      /// <summary>
-      /// Minimum file size
-      /// </summary>
-      long FileSizeMin { get; }
-
-      /// <summary>
-      /// Maximum file size
-      /// </summary>
-      long FileSizeMax { get; }
-
-      /// <summary>
-      /// List of ExclusionItem objects to exclude certain files/folders.
-      /// </summary>
-      System.Collections.Generic.List<ExclusionItem> ExclusionItems { get; }
-
-      /// <summary>
-      /// Sets the number of hits that must occur in a file before being displayed to user.
-      /// </summary>
-      int FileHitCount { get; }
+      /// <remarks>
+      /// Examples are Files that are readonly, binary, or the name contains certain text.
+      /// Directories that are created after a certain date, or marked as system.
+      /// </remarks>
+      List<FilterItem> FilterItems { get; }
    }
 }

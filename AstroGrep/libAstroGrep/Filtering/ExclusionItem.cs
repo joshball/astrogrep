@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace libAstroGrep
 {
    /// <summary>
-   /// Container for an exclusion item.
+   /// Container for an exclusion item. [DEPRECATED, use FilterItem]
+   /// Should only be used to convert exclusionitem to filteritem
    /// </summary>
    /// <remarks>
    ///   AstroGrep File Searching Utility. Written by Theodore L. Ward
@@ -30,6 +32,7 @@ namespace libAstroGrep
    /// </remarks>
    /// <history>
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+   /// [Curtis_Beard]	   11/06/2014	CHG: Deprecate class, use FilterItem
    /// </history>
    public class ExclusionItem
    {
@@ -41,10 +44,12 @@ namespace libAstroGrep
       #endregion
 
       #region Enumerations
-      
+
       /// <summary>
       /// Exclusion type enumeration.
       /// </summary>
+      /// <history>
+      /// </history>
       public enum ExclusionTypes
       {
          /// <summary>File Extension</summary>
@@ -154,105 +159,6 @@ namespace libAstroGrep
          return string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}", DELIMETER, Type.ToString(), Value, Option.ToString(), IgnoreCase.ToString(), Enabled);
       }
 
-      /// <summary>
-      /// Deteremines whether the given FileInfo object should be excluded based on the exclusion settings.
-      /// </summary>
-      /// <param name="file">FileInfo object</param>
-      /// <returns>true if matches a setting, false if not</returns>
-      /// <history>
-      /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
-      /// </history>
-      public bool ShouldExcludeFile(System.IO.FileInfo file)
-      {
-         if (Enabled)
-         {
-            switch (Type)
-            {
-               case ExclusionTypes.FileExtension:
-                  string temp = Value.ToLower();
-                  if (file.Extension.StartsWith(".") && !temp.StartsWith("."))
-                  {
-                     temp = string.Format(".{0}", temp);
-                  }
-                  return file.Extension.ToLower().Equals(temp);
-
-               case ExclusionTypes.FileName:
-                  return CheckStringAgainstOption(file.Name);
-
-               case ExclusionItem.ExclusionTypes.FilePath:
-                  return CheckStringAgainstOption(file.FullName);
-
-               default:
-                  return false;
-            }
-         }
-
-         return false;
-      }
-
-      /// <summary>
-      /// Deteremines whether the given DirectoryInfo object should be excluded based on the exclusion settings.
-      /// </summary>
-      /// <param name="dir">DirectoryInfo object</param>
-      /// <returns>true if matches a setting, false if not</returns>
-      /// <history>
-      /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
-      /// </history>
-      public bool ShouldExcludeDirectory(System.IO.DirectoryInfo dir)
-      {
-         if (Enabled)
-         {
-            switch (Type)
-            {
-               case ExclusionTypes.DirectoryName:
-                  return CheckStringAgainstOption(dir.Name);
-
-               case ExclusionItem.ExclusionTypes.DirectoryPath:
-                  return CheckStringAgainstOption(dir.FullName);
-
-               default:
-                  return false;
-            }
-         }
-
-         return false;
-      }
-
-      /// <summary>
-      /// Checks whether the given string matches against the value based on exclusion settings.
-      /// </summary>
-      /// <param name="checkValue">Value to check</param>
-      /// <returns>true if matches, false otherwise</returns>
-      /// <history>
-      /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
-      /// </history>
-      private bool CheckStringAgainstOption(string checkValue)
-      {
-         if (Enabled)
-         {
-            switch (Option)
-            {
-               case OptionsTypes.Equals:
-                  return checkValue.Equals(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
-
-               case OptionsTypes.Contains:
-                  return checkValue.IndexOf(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture) > -1;
-
-               case OptionsTypes.StartsWith:
-                  return checkValue.StartsWith(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
-
-               case OptionsTypes.EndsWith:
-                  return checkValue.EndsWith(Value, IgnoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
-
-               case OptionsTypes.None:
-               default:
-                  return false;
-            }
-         }
-
-         return false;
-      }
-
       #region Public Static Methods
 
       /// <summary>
@@ -276,34 +182,6 @@ namespace libAstroGrep
             item.Enabled = Convert.ToBoolean(values[4]);
 
          return item;
-      }
-
-      /// <summary>
-      /// Converts a List of ExclusionItems to a string.
-      /// </summary>
-      /// <param name="list">List of ExclusionItems</param>
-      /// <returns>string of exclusion items</returns>
-      /// <history>
-      /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
-      /// </history>
-      public static string ConvertExclusionsToString(List<ExclusionItem> list)
-      {
-         var builder = new System.Text.StringBuilder();
-
-         if (list != null)
-         {
-            foreach (var item in list)
-            {
-               if (builder.Length > 0)
-               {
-                  builder.Append(LIST_DELIMETER);
-               }
-
-               builder.Append(item.ToString());
-            }
-         }
-
-         return builder.ToString();
       }
 
       /// <summary>

@@ -31,6 +31,8 @@
          this.btnOK = new System.Windows.Forms.Button();
          this.btnCancel = new System.Windows.Forms.Button();
          this.lstExclusions = new System.Windows.Forms.ListView();
+         this.chdEnabled = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.chdCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.chdType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.chdValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.chdOption = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -38,13 +40,13 @@
          this.btnEdit = new System.Windows.Forms.Button();
          this.btnDelete = new System.Windows.Forms.Button();
          this.btnRestoreDefaults = new System.Windows.Forms.Button();
-         this.chdEnabled = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.SuspendLayout();
          // 
          // btnOK
          // 
+         this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
          this.btnOK.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.btnOK.Location = new System.Drawing.Point(466, 413);
+         this.btnOK.Location = new System.Drawing.Point(526, 413);
          this.btnOK.Name = "btnOK";
          this.btnOK.Size = new System.Drawing.Size(75, 23);
          this.btnOK.TabIndex = 0;
@@ -54,9 +56,10 @@
          // 
          // btnCancel
          // 
+         this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
          this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
          this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.btnCancel.Location = new System.Drawing.Point(547, 413);
+         this.btnCancel.Location = new System.Drawing.Point(607, 413);
          this.btnCancel.Name = "btnCancel";
          this.btnCancel.Size = new System.Drawing.Size(75, 23);
          this.btnCancel.TabIndex = 1;
@@ -66,39 +69,54 @@
          // 
          // lstExclusions
          // 
+         this.lstExclusions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
          this.lstExclusions.CheckBoxes = true;
          this.lstExclusions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.chdEnabled,
+            this.chdCategory,
             this.chdType,
             this.chdValue,
             this.chdOption});
          this.lstExclusions.FullRowSelect = true;
-         this.lstExclusions.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
          this.lstExclusions.HideSelection = false;
          this.lstExclusions.Location = new System.Drawing.Point(12, 12);
          this.lstExclusions.Name = "lstExclusions";
-         this.lstExclusions.Size = new System.Drawing.Size(610, 395);
+         this.lstExclusions.Size = new System.Drawing.Size(670, 395);
          this.lstExclusions.TabIndex = 2;
          this.lstExclusions.UseCompatibleStateImageBehavior = false;
          this.lstExclusions.View = System.Windows.Forms.View.Details;
+         this.lstExclusions.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lstExclusions_ColumnClick);
+         this.lstExclusions.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.lstExclusions_ItemCheck);
          this.lstExclusions.SelectedIndexChanged += new System.EventHandler(this.lstExclusions_SelectedIndexChanged);
          this.lstExclusions.DoubleClick += new System.EventHandler(this.lstExclusions_DoubleClick);
          this.lstExclusions.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstExclusions_KeyDown);
+         this.lstExclusions.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lstExclusions_MouseDown);
+         this.lstExclusions.MouseUp += new System.Windows.Forms.MouseEventHandler(this.lstExclusions_MouseUp);
+         // 
+         // chdEnabled
+         // 
+         this.chdEnabled.Text = "Enabled";
+         // 
+         // chdCategory
+         // 
+         this.chdCategory.Text = "Category";
+         this.chdCategory.Width = 111;
          // 
          // chdType
          // 
          this.chdType.Text = "Type";
-         this.chdType.Width = 125;
+         this.chdType.Width = 131;
          // 
          // chdValue
          // 
          this.chdValue.Text = "Value";
-         this.chdValue.Width = 296;
+         this.chdValue.Width = 228;
          // 
          // chdOption
          // 
          this.chdOption.Text = "Option";
-         this.chdOption.Width = 100;
+         this.chdOption.Width = 111;
          // 
          // btnAdd
          // 
@@ -145,17 +163,13 @@
          this.btnRestoreDefaults.UseVisualStyleBackColor = true;
          this.btnRestoreDefaults.Click += new System.EventHandler(this.btnRestoreDefaults_Click);
          // 
-         // chdEnabled
-         // 
-         this.chdEnabled.Text = "Enabled";
-         // 
          // frmExclusions
          // 
          this.AcceptButton = this.btnOK;
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.CancelButton = this.btnCancel;
-         this.ClientSize = new System.Drawing.Size(634, 448);
+         this.ClientSize = new System.Drawing.Size(694, 448);
          this.Controls.Add(this.btnRestoreDefaults);
          this.Controls.Add(this.btnDelete);
          this.Controls.Add(this.btnEdit);
@@ -189,5 +203,6 @@
       private System.Windows.Forms.ColumnHeader chdOption;
       private System.Windows.Forms.Button btnRestoreDefaults;
       private System.Windows.Forms.ColumnHeader chdEnabled;
+      private System.Windows.Forms.ColumnHeader chdCategory;
    }
 }

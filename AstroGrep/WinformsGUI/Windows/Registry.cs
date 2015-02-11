@@ -282,6 +282,40 @@ namespace AstroGrep.Windows
          catch {}
       }
 
+      /// <summary>
+      /// Retrieve installer selected language.
+      /// </summary>
+      /// <returns>installer language (language number), string.empty if not found or read before</returns>
+      /// <history>
+      /// [Curtis_Beard]		05/08/2014	ADD: 70, Installer
+      /// </history>
+      public static string GetInstallerLanguage()
+      {
+         string language = GetSetting(@"Software", "AstroGrep", "Installer Language", string.Empty);
+         string read = GetSetting(@"Software", "AstroGrep", "Installer Language Checked", bool.FalseString);
+         
+         // installer language set but not read yet, then return that language (and mark as read), otherwise return empty string
+         if (!string.IsNullOrEmpty(language) && read.Equals(bool.FalseString, StringComparison.InvariantCultureIgnoreCase))
+         {
+            SaveSetting(@"Software", "AstroGrep", "Installer Language Checked", bool.TrueString);
+            return language;
+         }
+
+         return string.Empty;
+      }
+
+      /// <summary>
+      /// Determines if product was installed via Installer.
+      /// </summary>
+      /// <returns>true if installed via Installer, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]	   09/16/2014	ADD: installer registry check method
+      /// </history>
+      public static bool IsInstaller()
+      {
+         return !string.IsNullOrEmpty(GetSetting(@"Software", "AstroGrep", "Installer Language", string.Empty));
+      }
+
       #region Private Methods
       private static string GetSetting(string path, string section, string key, string defaultValue)
       {

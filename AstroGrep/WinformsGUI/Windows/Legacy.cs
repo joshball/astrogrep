@@ -96,6 +96,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]		10/10/2006	Created
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/06/2014	CHG: convert exclusionitem to filteritem
       /// </history>
       public static void ConvertSearchSettings()
       {
@@ -150,23 +151,152 @@ namespace AstroGrep.Windows
             Registry.DeleteStartupSetting("NUM_CONTEXT_LINES");
          }
 
+         var filterItems = new System.Collections.Generic.List<libAstroGrep.FilterItem>();
+
          // old list to new search option
          if (!string.IsNullOrEmpty(Core.GeneralSettings.ExtensionExcludeList))
          {
             var extensions = Core.GeneralSettings.ExtensionExcludeList.Split(';');
-            var exclusions = new System.Collections.Generic.List<libAstroGrep.ExclusionItem>();
 
             foreach (var ext in extensions)
             {
-               libAstroGrep.ExclusionItem item = new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension, ext, libAstroGrep.ExclusionItem.OptionsTypes.None, false);
-               exclusions.Add(item);
+               libAstroGrep.FilterItem item = new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Extension), ext, libAstroGrep.FilterType.ValueOptions.None, false, true);
+               filterItems.Add(item);
             }
 
             // set extension exclude to list to empty
             Core.GeneralSettings.ExtensionExcludeList = string.Empty;
+         }
 
-            // set exclusions list to default
-            Core.SearchSettings.Exclusions = libAstroGrep.ExclusionItem.ConvertExclusionsToString(exclusions);
+         // ExclusionItems to FilterItems
+         if (!string.IsNullOrEmpty(Core.SearchSettings.Exclusions))
+         {
+            var exclusionItems = libAstroGrep.ExclusionItem.ConvertStringToExclusions(Core.SearchSettings.Exclusions);
+            foreach (var oldItem in exclusionItems)
+            {
+               libAstroGrep.FilterItem item = new libAstroGrep.FilterItem();
+               item.Enabled = oldItem.Enabled;
+               item.Value = oldItem.Value;
+               item.ValueIgnoreCase = oldItem.IgnoreCase;
+               switch (oldItem.Option)
+               {
+                  case libAstroGrep.ExclusionItem.OptionsTypes.Contains:
+                     item.ValueOption = libAstroGrep.FilterType.ValueOptions.Contains;
+                     break;
+
+                  case libAstroGrep.ExclusionItem.OptionsTypes.EndsWith:
+                     item.ValueOption = libAstroGrep.FilterType.ValueOptions.EndsWith;
+                     break;
+
+                  case libAstroGrep.ExclusionItem.OptionsTypes.Equals:
+                     item.ValueOption = libAstroGrep.FilterType.ValueOptions.Equals;
+                     break;
+
+                  case libAstroGrep.ExclusionItem.OptionsTypes.None:
+                     item.ValueOption = libAstroGrep.FilterType.ValueOptions.None;
+                     break;
+
+                  case libAstroGrep.ExclusionItem.OptionsTypes.StartsWith:
+                     item.ValueOption = libAstroGrep.FilterType.ValueOptions.StartsWith;
+                     break;
+               }
+               switch (oldItem.Type)
+               {
+                  case libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName:
+                     item.FilterType = new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name);
+                     break;
+
+                  case libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryPath:
+                     item.FilterType = new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Path);
+                     break;
+
+                  case libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension:
+                     item.FilterType = new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Extension);
+                     break;
+
+                  case libAstroGrep.ExclusionItem.ExclusionTypes.FileName:
+                     item.FilterType = new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Name);
+                     break;
+
+                  case libAstroGrep.ExclusionItem.ExclusionTypes.FilePath:
+                     item.FilterType = new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Path);
+                     break;
+               }
+               filterItems.Add(item);
+            }
+
+            // set exclusions list to empty
+            Core.SearchSettings.Exclusions = string.Empty;
+         }
+
+         if (Core.SearchSettings.MinimumFileCount > 0)
+         {
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.MinimumHitCount),
+               Core.SearchSettings.MinimumFileCount.ToString(), libAstroGrep.FilterType.ValueOptions.None, false, true));
+
+            Core.SearchSettings.MinimumFileCount = 0;
+         }
+
+         if (Core.SearchSettings.SkipHidden)
+         {
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Hidden),
+               string.Empty, libAstroGrep.FilterType.ValueOptions.None, false, true));
+
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Hidden),
+               string.Empty, libAstroGrep.FilterType.ValueOptions.None, false, true));
+
+            Core.SearchSettings.SkipHidden = false;
+         }
+
+         if (Core.SearchSettings.SkipSystem)
+         {
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.System),
+               string.Empty, libAstroGrep.FilterType.ValueOptions.None, false, true));
+
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.System),
+               string.Empty, libAstroGrep.FilterType.ValueOptions.None, false, true));
+
+            Core.SearchSettings.SkipSystem = false;
+         }
+
+         if (!string.IsNullOrEmpty(Core.SearchSettings.MinimumFileSize))
+         {
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Size),
+               Core.SearchSettings.MinimumFileSize, libAstroGrep.FilterType.ValueOptions.LessThan, false, Core.SearchSettings.MinimumFileSizeType, true));
+
+            Core.SearchSettings.MinimumFileSize = string.Empty;
+            Core.SearchSettings.MinimumFileSizeType = string.Empty;
+         }
+
+         if (!string.IsNullOrEmpty(Core.SearchSettings.MaximumFileSize))
+         {
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Size),
+               Core.SearchSettings.MaximumFileSize, libAstroGrep.FilterType.ValueOptions.GreaterThan, false, Core.SearchSettings.MaximumFileSizeType, true));
+
+            Core.SearchSettings.MaximumFileSize = string.Empty;
+            Core.SearchSettings.MaximumFileSizeType = string.Empty;
+         }
+
+         if (!string.IsNullOrEmpty(Core.SearchSettings.ModifiedDateStart))
+         {
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.DateModified),
+               Core.SearchSettings.ModifiedDateStart, libAstroGrep.FilterType.ValueOptions.LessThan, false, true));
+
+            Core.SearchSettings.ModifiedDateStart = string.Empty;
+         }
+
+         if (!string.IsNullOrEmpty(Core.SearchSettings.ModifiedDateEnd))
+         {
+            filterItems.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.DateModified),
+               Core.SearchSettings.ModifiedDateEnd, libAstroGrep.FilterType.ValueOptions.GreaterThan, false, true));
+
+            Core.SearchSettings.ModifiedDateEnd = string.Empty;
+         }
+
+         // set filteritems list to new value
+         if (filterItems.Count > 0)
+         {
+            Core.SearchSettings.FilterItems = libAstroGrep.FilterItem.ConvertFilterItemsToString(filterItems);
          }
 
          AstroGrep.Core.SearchSettings.Save();
@@ -298,9 +428,17 @@ namespace AstroGrep.Windows
 		/// [Curtis_Beard]		05/22/2007  Created
 		/// [Curtis_Beard]		08/30/2007  ADD: support for installer language values
       /// [Curtis_Beard]		01/24/2012  CHG: remove default case
+      /// [Curtis_Beard]		05/08/2014  CHG: 70, installer support
 		/// </history>
 		public static void ConvertLanguageValue()
 		{
+         // set language to installer selected
+         string installerLanguage = Registry.GetInstallerLanguage();
+         if (!string.IsNullOrEmpty(installerLanguage))
+         {
+            Core.GeneralSettings.Language = installerLanguage;
+         }
+
 			switch (Core.GeneralSettings.Language)
 			{
 				case "Español":

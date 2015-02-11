@@ -43,7 +43,7 @@ namespace AstroGrep.Windows
         /// [Curtis_Beard]	    10/14/2005	Created
         /// [Curtis_Beard]	    07/21/2006	CHG: Use a try/catch block for any erroneous errors
         /// [Curtis_Beard]	    10/11/2006	CHG: Remove setting reference to frmMain in Common class
-        /// [Curtis_Beard]      09/26/2012	CHG: 3572487, detect command line arg for displaying help and show dialog with options
+        /// [Curtis_Beard]     09/26/2012	CHG: 3572487, detect command line arg for displaying help and show dialog with options
         /// </history>
         [STAThread]
         static void Main()
@@ -70,6 +70,7 @@ namespace AstroGrep.Windows
                     Windows.Forms.frmMain mainForm = new AstroGrep.Windows.Forms.frmMain();
                     mainForm.CommandLineArgs = args;
 
+                    Application.AddMessageFilter(new ListViewMouseWheelMoveMessageFilter());
                     Application.Run(mainForm);
                 }
             }

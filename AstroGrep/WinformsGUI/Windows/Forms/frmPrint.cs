@@ -82,6 +82,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parm</param>
       /// <history>
       /// [Curtis_Beard]      02/02/2005	Created
+      /// [Curtis_Beard]      11/14/2014	CHG: Remove printing of current hit
       /// </history>
       private void frmPrint_Load(object sender, EventArgs e)
       {
@@ -90,7 +91,6 @@ namespace AstroGrep.Windows.Forms
 
          // load the list of types to print
          lstPrintTypes.Items.Add(Language.GetGenericText("PrintTypeSelected"));
-         lstPrintTypes.Items.Add(Language.GetGenericText("PrintTypeCurrent"));
          lstPrintTypes.Items.Add(Language.GetGenericText("PrintTypeAll"));
          lstPrintTypes.Items.Add(Language.GetGenericText("PrintTypeFile"));
 
@@ -320,6 +320,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   02/02/2005	Created
       /// [Curtis_Beard]	   09/10/2005	CHG: create grepPrint object to generate document
       /// [Curtis_Beard]      11/02/2005	CHG: Use try/catch and set doc to error message in catch
+      /// [Curtis_Beard]      11/14/2014	CHG: Remove printing of current hit
       /// </history>
       private void SetDocument()
       {
@@ -333,12 +334,9 @@ namespace AstroGrep.Windows.Forms
                   __document = _printDoc.PrintSelectedItems();
                   break;
                case 1:
-                  __document = _printDoc.PrintSingleItem();
-                  break;
-               case 2:
                   __document = _printDoc.PrintAllHits();
                   break;
-               case 3:
+               case 2:
                   __document = _printDoc.PrintFileList();
                   break;
                default:

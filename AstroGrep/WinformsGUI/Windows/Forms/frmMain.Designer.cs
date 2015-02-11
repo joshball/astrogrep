@@ -28,6 +28,7 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.Panel pnlRightSide;
       private System.Windows.Forms.StatusStrip stbStatus;
       private System.Windows.Forms.ToolStripStatusLabel sbStatusPanel;
+      private System.Windows.Forms.ToolStripStatusLabel sbEncodingPanel;
       private System.Windows.Forms.ToolStripStatusLabel sbTotalCountPanel;
       private System.Windows.Forms.ToolStripStatusLabel sbFileCountPanel;
       private System.Windows.Forms.ToolStripStatusLabel sbFilterCountPanel;
@@ -46,6 +47,7 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.NumericUpDown txtContextLines;
       private System.Windows.Forms.Label lblContextLines;
       private System.Windows.Forms.MenuItem mnuFile;
+      private System.Windows.Forms.MenuItem mnuNewWindow;
       private System.Windows.Forms.MenuItem mnuSaveResults;
       private System.Windows.Forms.MenuItem mnuPrintResults;
       private System.Windows.Forms.MenuItem mnuExit;
@@ -53,6 +55,11 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.MenuItem mnuTools;
       private System.Windows.Forms.MenuItem mnuOptions;
       private System.Windows.Forms.MenuItem mnuHelp;
+      private System.Windows.Forms.MenuItem mnuHelpContents;
+      private System.Windows.Forms.MenuItem mnuHelpRegEx;
+      private System.Windows.Forms.MenuItem mnuHelpSep1;
+      private System.Windows.Forms.MenuItem mnuCheckForUpdates;
+      private System.Windows.Forms.MenuItem mnuHelpSep2;
       private System.Windows.Forms.MenuItem mnuAbout;
       private System.Windows.Forms.MenuItem mnuSelectAll;
       private System.Windows.Forms.MenuItem mnuOpenSelected;
@@ -65,6 +72,7 @@ namespace AstroGrep.Windows.Forms
       private AstroGrep.Windows.Controls.PictureButton picBrowse;
       private System.Windows.Forms.MenuItem mnuBrowse;
       private System.Windows.Forms.MenuItem mnuFileSep2;
+      private System.Windows.Forms.MenuItem mnuFileSep3;
       private System.Windows.Forms.ContextMenu fileLstMnu;
       private System.Windows.Forms.MenuItem menuItem4;
       private System.Windows.Forms.MenuItem CopyMenuItem;
@@ -76,26 +84,22 @@ namespace AstroGrep.Windows.Forms
       private System.Windows.Forms.MenuItem CopyLocatedInMenuItem;
       private System.Windows.Forms.MenuItem CopyLocatedInAndNameMenuItem;
       private System.Windows.Forms.MenuItem OpenWithAssociatedApp;
-      private Label label2;
-      private DateTimePicker dateModEnd;
-      private Label label1;
-      private DateTimePicker dateModBegin;
-      private Label label4;
-      private TextBox txtMinSize;
-      private Label label3;
-      private TextBox txtMaxSize;
-      private System.Windows.Forms.ComboBox cboMinSizeType;
-      private System.Windows.Forms.ComboBox cboMaxSizeType;
-      private System.Windows.Forms.CheckBox chkSkipSystem;
-      private System.Windows.Forms.CheckBox chkSkipHidden;
-      private System.Windows.Forms.NumericUpDown txtMinFileCount;
-      private System.Windows.Forms.Label lblMinFileCount;
 	   private MenuItem FileOperationsMenuItem;
       private MenuItem FileCopyMenuItem;
       private MenuItem FileDeleteMenuItem;
       private MenuItem menuItem6;
       private System.Windows.Forms.ContextMenu ctxMenuBtnSearch;
       private MenuItem MenuBtnSearch;
+      private MenuItem ToolsMRUSearchPaths;
+      private MenuItem ToolsMRUFilterTypes;
+      private MenuItem ToolsMRUSearchText;
+      private MenuItem ToolsMRUSep;
+      private MenuItem ToolsMRUAll;
+      private MenuItem mnuView;
+      private MenuItem ViewStatus;
+      private MenuItem ViewExclusions;
+      private MenuItem ViewError;
+      private MenuItem ViewAll;
 
       private void InitializeComponent()
       {
@@ -104,14 +108,6 @@ namespace AstroGrep.Windows.Forms
          this.pnlSearch = new System.Windows.Forms.Panel();
          this.pnlSearchOptions = new System.Windows.Forms.Panel();
          this.PanelOptionsContainer = new System.Windows.Forms.Panel();
-         this.txtMaxSize = new System.Windows.Forms.TextBox();
-         this.label4 = new System.Windows.Forms.Label();
-         this.txtMinSize = new System.Windows.Forms.TextBox();
-         this.label3 = new System.Windows.Forms.Label();
-         this.label2 = new System.Windows.Forms.Label();
-         this.dateModEnd = new System.Windows.Forms.DateTimePicker();
-         this.label1 = new System.Windows.Forms.Label();
-         this.dateModBegin = new System.Windows.Forms.DateTimePicker();
          this.lblContextLines = new System.Windows.Forms.Label();
          this.txtContextLines = new System.Windows.Forms.NumericUpDown();
          this.chkWholeWordOnly = new System.Windows.Forms.CheckBox();
@@ -152,6 +148,8 @@ namespace AstroGrep.Windows.Forms
          this.splitLeftRight = new System.Windows.Forms.Splitter();
          this.mnuAll = new System.Windows.Forms.MainMenu(this.components);
          this.mnuFile = new System.Windows.Forms.MenuItem();
+         this.mnuNewWindow = new System.Windows.Forms.MenuItem();
+         this.mnuFileSep3 = new System.Windows.Forms.MenuItem();
          this.mnuBrowse = new System.Windows.Forms.MenuItem();
          this.mnuFileSep2 = new System.Windows.Forms.MenuItem();
          this.mnuSaveResults = new System.Windows.Forms.MenuItem();
@@ -167,27 +165,37 @@ namespace AstroGrep.Windows.Forms
          this.mnuSaveSearchSettings = new System.Windows.Forms.MenuItem();
          this.mnuOptions = new System.Windows.Forms.MenuItem();
          this.mnuHelp = new System.Windows.Forms.MenuItem();
+         this.mnuHelpContents = new System.Windows.Forms.MenuItem();
+         this.mnuHelpRegEx = new System.Windows.Forms.MenuItem();
+         this.mnuHelpSep1 = new System.Windows.Forms.MenuItem();
+         this.mnuCheckForUpdates = new System.Windows.Forms.MenuItem();
+         this.mnuHelpSep2 = new System.Windows.Forms.MenuItem();
          this.mnuAbout = new System.Windows.Forms.MenuItem();
          this.stbStatus = new System.Windows.Forms.StatusStrip();
          this.sbStatusPanel = new System.Windows.Forms.ToolStripStatusLabel();
+         this.sbEncodingPanel = new System.Windows.Forms.ToolStripStatusLabel();
          this.sbTotalCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
          this.sbFileCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
          this.sbFilterCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
          this.sbErrorCountPanel = new System.Windows.Forms.ToolStripStatusLabel();
          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
          this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
-         this.chkSkipHidden = new System.Windows.Forms.CheckBox();
-         this.chkSkipSystem = new System.Windows.Forms.CheckBox();
-         this.cboMinSizeType = new System.Windows.Forms.ComboBox();
-         this.cboMaxSizeType = new System.Windows.Forms.ComboBox();
-         this.txtMinFileCount = new System.Windows.Forms.NumericUpDown();
-         this.lblMinFileCount = new System.Windows.Forms.Label();
          this.FileOperationsMenuItem = new System.Windows.Forms.MenuItem();
          this.FileCopyMenuItem = new System.Windows.Forms.MenuItem();
          this.FileDeleteMenuItem = new System.Windows.Forms.MenuItem();
          this.menuItem6 = new System.Windows.Forms.MenuItem();
          this.ctxMenuBtnSearch = new System.Windows.Forms.ContextMenu();
          this.MenuBtnSearch = new MenuItem();
+         this.ToolsMRUSearchPaths = new MenuItem();
+         this.ToolsMRUFilterTypes = new MenuItem();
+         this.ToolsMRUSearchText = new MenuItem();
+         this.ToolsMRUAll = new MenuItem();
+         this.ToolsMRUSep = new MenuItem();
+         this.mnuView = new MenuItem();
+         this.ViewStatus = new MenuItem();
+         this.ViewExclusions = new MenuItem();
+         this.ViewError = new MenuItem();
+         this.ViewAll = new MenuItem();
 		   this.pnlSearch.SuspendLayout();
          this.pnlSearchOptions.SuspendLayout();
 
@@ -223,28 +231,14 @@ namespace AstroGrep.Windows.Forms
          this.pnlSearchOptions.Controls.Add(this.lnkSearchOptions);
          this.pnlSearchOptions.Location = new System.Drawing.Point(16, 209);
          this.pnlSearchOptions.Name = "pnlSearchOptions";
-         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 500);
+         this.pnlSearchOptions.Size = new System.Drawing.Size(200, 250);
          this.pnlSearchOptions.TabIndex = 1;
          // 
          // PanelOptionsContainer
          // 
          this.PanelOptionsContainer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                      | System.Windows.Forms.AnchorStyles.Right)));
-         this.PanelOptionsContainer.Controls.Add(this.lblMinFileCount);
-         this.PanelOptionsContainer.Controls.Add(this.txtMinFileCount);
          this.PanelOptionsContainer.Controls.Add(this.lnkExclusions);
-         this.PanelOptionsContainer.Controls.Add(this.chkSkipSystem);
-         this.PanelOptionsContainer.Controls.Add(this.chkSkipHidden);
-         this.PanelOptionsContainer.Controls.Add(this.cboMaxSizeType);
-         this.PanelOptionsContainer.Controls.Add(this.txtMaxSize);
-         this.PanelOptionsContainer.Controls.Add(this.label4);
-         this.PanelOptionsContainer.Controls.Add(this.cboMinSizeType);
-         this.PanelOptionsContainer.Controls.Add(this.txtMinSize);
-         this.PanelOptionsContainer.Controls.Add(this.label3);
-         this.PanelOptionsContainer.Controls.Add(this.label2);
-         this.PanelOptionsContainer.Controls.Add(this.dateModEnd);
-         this.PanelOptionsContainer.Controls.Add(this.label1);
-         this.PanelOptionsContainer.Controls.Add(this.dateModBegin);
          this.PanelOptionsContainer.Controls.Add(this.lblContextLines);
          this.PanelOptionsContainer.Controls.Add(this.txtContextLines);
          this.PanelOptionsContainer.Controls.Add(this.chkWholeWordOnly);
@@ -256,104 +250,8 @@ namespace AstroGrep.Windows.Forms
          this.PanelOptionsContainer.Controls.Add(this.chkCaseSensitive);
          this.PanelOptionsContainer.Location = new System.Drawing.Point(0, 16);
          this.PanelOptionsContainer.Name = "PanelOptionsContainer";
-         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 483);
+         this.PanelOptionsContainer.Size = new System.Drawing.Size(200, 233);
          this.PanelOptionsContainer.TabIndex = 1;
-         // 
-         // cboMaxSizeType
-         // 
-         this.cboMaxSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cboMaxSizeType.Items.AddRange(new object[] {
-            "byte",
-            "KB",
-            "MB",
-            "GB"});
-         this.cboMaxSizeType.Location = new System.Drawing.Point(140, 355);
-         this.cboMaxSizeType.Name = "cboMaxSizeType";
-         this.cboMaxSizeType.SelectedIndex = 0;
-         this.cboMaxSizeType.Size = new System.Drawing.Size(75, 18);
-         this.cboMaxSizeType.TabIndex = 23;
-         // 
-         // txtMaxSize
-         // 
-         this.txtMaxSize.Location = new System.Drawing.Point(7, 355);
-         this.txtMaxSize.Name = "txtMaxSize";
-         this.txtMaxSize.Size = new System.Drawing.Size(129, 20);
-         this.txtMaxSize.TabIndex = 22;
-         // 
-         // label4
-         // 
-         this.label4.AutoSize = true;
-         this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label4.Location = new System.Drawing.Point(7, 339);
-         this.label4.Name = "label4";
-         this.label4.Size = new System.Drawing.Size(53, 13);
-         this.label4.TabIndex = 21;
-         this.label4.Text = "Max Size:";
-         // 
-         // cboMinSizeType
-         // 
-         this.cboMinSizeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cboMinSizeType.Location = new System.Drawing.Point(140, 316);
-         this.cboMinSizeType.Items.AddRange(new object[] {
-            "byte",
-            "KB",
-            "MB",
-            "GB"});
-         this.cboMinSizeType.Name = "cboMinSizeType";
-         this.cboMinSizeType.SelectedIndex = 0;
-         this.cboMinSizeType.Size = new System.Drawing.Size(75, 18);
-         this.cboMinSizeType.TabIndex = 20;
-         // 
-         // txtMinSize
-         // 
-         this.txtMinSize.Location = new System.Drawing.Point(7, 316);
-         this.txtMinSize.Name = "txtMinSize";
-         this.txtMinSize.Size = new System.Drawing.Size(129, 20);
-         this.txtMinSize.TabIndex = 19;
-         // 
-         // label3
-         // 
-         this.label3.AutoSize = true;
-         this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label3.Location = new System.Drawing.Point(7, 300);
-         this.label3.Name = "label3";
-         this.label3.Size = new System.Drawing.Size(50, 13);
-         this.label3.TabIndex = 18;
-         this.label3.Text = "Min Size:";
-         // 
-         // label2
-         // 
-         this.label2.AutoSize = true;
-         this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label2.Location = new System.Drawing.Point(7, 251);
-         this.label2.Name = "label2";
-         this.label2.Size = new System.Drawing.Size(84, 13);
-         this.label2.TabIndex = 17;
-         this.label2.Text = "Modified Before:";
-         // 
-         // dateModEnd
-         // 
-         this.dateModEnd.Location = new System.Drawing.Point(7, 267);
-         this.dateModEnd.Name = "dateModEnd";
-         this.dateModEnd.Size = new System.Drawing.Size(208, 20);
-         this.dateModEnd.TabIndex = 16;
-         // 
-         // label1
-         // 
-         this.label1.AutoSize = true;
-         this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.label1.Location = new System.Drawing.Point(7, 207);
-         this.label1.Name = "label1";
-         this.label1.Size = new System.Drawing.Size(75, 13);
-         this.label1.TabIndex = 15;
-         this.label1.Text = "Modified After:";
-         // 
-         // dateModBegin
-         // 
-         this.dateModBegin.Location = new System.Drawing.Point(7, 223);
-         this.dateModBegin.Name = "dateModBegin";
-         this.dateModBegin.Size = new System.Drawing.Size(208, 20);
-         this.dateModBegin.TabIndex = 14;
          // 
          // lblContextLines
          // 
@@ -375,29 +273,6 @@ namespace AstroGrep.Windows.Forms
          this.txtContextLines.Size = new System.Drawing.Size(41, 20);
          this.txtContextLines.TabIndex = 13;
          this.toolTip1.SetToolTip(this.txtContextLines, "Show lines above and below the word matched");
-         // 
-         // lblMinFileCount
-         // 
-         this.lblMinFileCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                     | System.Windows.Forms.AnchorStyles.Right)));
-         this.lblMinFileCount.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.lblMinFileCount.Location = new System.Drawing.Point(65, 426);
-         this.lblMinFileCount.Name = "lblMinFileCount";
-         this.lblMinFileCount.Size = new System.Drawing.Size(127, 20);
-         this.lblMinFileCount.TabIndex = 8;
-         this.lblMinFileCount.Text = "Minimum File Count";
-         this.lblMinFileCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-         this.toolTip1.SetToolTip(this.lblMinFileCount, "Only show files with count greater or equal to this number");
-         // 
-         // txtMinFileCount
-         // 
-         this.txtMinFileCount.Location = new System.Drawing.Point(7, 426);
-         this.txtMinFileCount.Name = "txtMinFileCount";
-         this.txtMinFileCount.Size = new System.Drawing.Size(50, 20);
-         this.txtMinFileCount.TabIndex = 13;
-         this.txtMinFileCount.Minimum = 0;
-         this.txtMinFileCount.Maximum = int.MaxValue;
-         this.toolTip1.SetToolTip(this.txtMinFileCount, "Only show files with count greater or equal to this number");
          // 
          // chkWholeWordOnly
          // 
@@ -504,7 +379,7 @@ namespace AstroGrep.Windows.Forms
          this.lnkExclusions.ActiveLinkColor = System.Drawing.SystemColors.HotTrack;
          this.lnkExclusions.FlatStyle = System.Windows.Forms.FlatStyle.System;
          this.lnkExclusions.LinkColor = System.Drawing.SystemColors.HotTrack;
-         this.lnkExclusions.Location = new System.Drawing.Point(5, 455);
+         this.lnkExclusions.Location = new System.Drawing.Point(5, 207);
          this.lnkExclusions.LinkBehavior = LinkBehavior.AlwaysUnderline;
 
          this.lnkExclusions.LinkBehavior = LinkBehavior.AlwaysUnderline;
@@ -790,6 +665,7 @@ namespace AstroGrep.Windows.Forms
          this.mnuAll.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mnuFile,
             this.mnuEdit,
+            this.mnuView,
             this.mnuTools,
             this.mnuHelp});
          // 
@@ -797,6 +673,8 @@ namespace AstroGrep.Windows.Forms
          // 
          this.mnuFile.Index = 0;
          this.mnuFile.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuNewWindow,
+            this.mnuFileSep3,
             this.mnuBrowse,
             this.mnuFileSep2,
             this.mnuSaveResults,
@@ -807,38 +685,50 @@ namespace AstroGrep.Windows.Forms
          // 
          // mnuBrowse
          // 
-         this.mnuBrowse.Index = 0;
+         this.mnuNewWindow.Index = 0;
+         this.mnuNewWindow.Shortcut = System.Windows.Forms.Shortcut.CtrlN;
+         this.mnuNewWindow.Text = "&New Window";
+         this.mnuNewWindow.Click += new System.EventHandler(this.mnuNewWindow_Click);
+         // 
+         // mnuFileSep3
+         // 
+         this.mnuFileSep3.Index = 1;
+         this.mnuFileSep3.Text = "-";
+         // 
+         // mnuBrowse
+         // 
+         this.mnuBrowse.Index = 2;
          this.mnuBrowse.Shortcut = System.Windows.Forms.Shortcut.CtrlO;
          this.mnuBrowse.Text = "Select Sea&rch Path...";
          this.mnuBrowse.Click += new System.EventHandler(this.mnuBrowse_Click);
          // 
          // mnuFileSep2
          // 
-         this.mnuFileSep2.Index = 1;
+         this.mnuFileSep2.Index = 3;
          this.mnuFileSep2.Text = "-";
          // 
          // mnuSaveResults
          // 
-         this.mnuSaveResults.Index = 2;
+         this.mnuSaveResults.Index = 4;
          this.mnuSaveResults.Shortcut = System.Windows.Forms.Shortcut.CtrlS;
          this.mnuSaveResults.Text = "&Save Results";
          this.mnuSaveResults.Click += new System.EventHandler(this.mnuSaveResults_Click);
          // 
          // mnuPrintResults
          // 
-         this.mnuPrintResults.Index = 3;
+         this.mnuPrintResults.Index = 5;
          this.mnuPrintResults.Shortcut = System.Windows.Forms.Shortcut.CtrlP;
          this.mnuPrintResults.Text = "&Print Results";
          this.mnuPrintResults.Click += new System.EventHandler(this.mnuPrintResults_Click);
          // 
          // mnuFileSep
          // 
-         this.mnuFileSep.Index = 4;
+         this.mnuFileSep.Index = 6;
          this.mnuFileSep.Text = "-";
          // 
          // mnuExit
          // 
-         this.mnuExit.Index = 5;
+         this.mnuExit.Index = 7;
          this.mnuExit.Shortcut = System.Windows.Forms.Shortcut.CtrlQ;
          this.mnuExit.Text = "E&xit";
          this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
@@ -862,10 +752,44 @@ namespace AstroGrep.Windows.Forms
          this.mnuOpenSelected.Index = 1;
          this.mnuOpenSelected.Text = "&Open Selected Files";
          this.mnuOpenSelected.Click += new System.EventHandler(this.mnuOpenSelected_Click);
+         //
+         // mnuView
+         //
+         this.mnuView.Index = 2;
+         this.mnuView.MenuItems.AddRange(new System.Windows.Forms.MenuItem[]{
+            this.ViewStatus,
+            this.ViewExclusions,
+            this.ViewError,
+            this.ViewAll});
+         this.mnuView.Text = "&View";
+         // 
+         // ViewStatus
+         // 
+         this.ViewStatus.Index = 0;
+         this.ViewStatus.Text = "&Status Messages";
+         this.ViewStatus.Click += new System.EventHandler(this.ViewStatus_Click);
+         // 
+         // ViewExclusions
+         // 
+         this.ViewExclusions.Index = 1;
+         this.ViewExclusions.Text = "&Exclusion Messages";
+         this.ViewExclusions.Click += new System.EventHandler(this.ViewExclusions_Click);
+         // 
+         // ViewError
+         // 
+         this.ViewError.Index = 2;
+         this.ViewError.Text = "E&rror Messages";
+         this.ViewError.Click += new System.EventHandler(this.ViewError_Click);
+         // 
+         // ViewAll
+         // 
+         this.ViewAll.Index = 3;
+         this.ViewAll.Text = "&All Messages";
+         this.ViewAll.Click += new System.EventHandler(this.ViewAll_Click);
          // 
          // mnuTools
          // 
-         this.mnuTools.Index = 2;
+         this.mnuTools.Index = 3;
          this.mnuTools.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mnuClearMRU,
             this.mnuToolsSep,
@@ -873,11 +797,46 @@ namespace AstroGrep.Windows.Forms
             this.mnuOptions});
          this.mnuTools.Text = "&Tools";
          // 
+         // ToolsMRUSearchPaths
+         // 
+         this.ToolsMRUSearchPaths.Index = 0;
+         this.ToolsMRUSearchPaths.Text = "&Search Paths";
+         this.ToolsMRUSearchPaths.Click += new System.EventHandler(this.ToolsMRUSearchPaths_Click);
+         // 
+         // ToolsMRUFilterTypes
+         // 
+         this.ToolsMRUFilterTypes.Index = 1;
+         this.ToolsMRUFilterTypes.Text = "&Search Paths";
+         this.ToolsMRUFilterTypes.Click += new System.EventHandler(this.ToolsMRUFilterTypes_Click);
+         // 
+         // ToolsMRUSearchText
+         // 
+         this.ToolsMRUSearchText.Index = 2;
+         this.ToolsMRUSearchText.Text = "&Search Paths";
+         this.ToolsMRUSearchText.Click += new System.EventHandler(this.ToolsMRUSearchText_Click);
+         // 
+         // ToolsMRUSep
+         // 
+         this.ToolsMRUSep.Index = 3;
+         this.ToolsMRUSep.Text = "-";
+         // 
+         // ToolsMRUAll
+         // 
+         this.ToolsMRUAll.Index = 4;
+         this.ToolsMRUAll.Text = "&Search Paths";
+         this.ToolsMRUAll.Click += new System.EventHandler(this.ToolsMRUAll_Click);
+         // 
          // mnuClearMRU
          // 
-         this.mnuClearMRU.Index = 0;
+         this.mnuClearMRU.Index = 0;         
+         this.mnuClearMRU.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.ToolsMRUSearchPaths,
+            this.ToolsMRUFilterTypes,
+            this.ToolsMRUSearchText,
+            this.ToolsMRUSep,
+            this.ToolsMRUAll});
          this.mnuClearMRU.Text = "&Clear Most Recently Used Lists";
-         this.mnuClearMRU.Click += new System.EventHandler(this.mnuClearMRU_Click);
+         //this.mnuClearMRU.Click += new System.EventHandler(this.mnuClearMRU_Click);
          // 
          // mnuToolsSep
          // 
@@ -899,21 +858,55 @@ namespace AstroGrep.Windows.Forms
          // 
          // mnuHelp
          // 
-         this.mnuHelp.Index = 3;
+         this.mnuHelp.Index = 4;
          this.mnuHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuHelpContents,
+            this.mnuHelpRegEx,
+            this.mnuHelpSep1,
+            this.mnuCheckForUpdates,
+            this.mnuHelpSep2,
             this.mnuAbout});
          this.mnuHelp.Text = "&Help";
          // 
+         // mnuHelpContents
+         // 
+         this.mnuHelpContents.Index = 0;
+         this.mnuHelpContents.Text = "&View Help";
+         this.mnuHelpContents.Click += new System.EventHandler(this.mnuHelpContents_Click);
+         // 
+         // mnuHelpRegEx
+         // 
+         this.mnuHelpRegEx.Index = 1;
+         this.mnuHelpRegEx.Text = "&Regular Expressions";
+         this.mnuHelpRegEx.Click += new System.EventHandler(this.mnuHelpRegEx_Click);
+         // 
+         // mnuHelpSep1
+         // 
+         this.mnuHelpSep1.Index = 2;
+         this.mnuHelpSep1.Text = "-";
+         // 
+         // mnuCheckForUpdates
+         // 
+         this.mnuCheckForUpdates.Index = 3;
+         this.mnuCheckForUpdates.Text = "&Check for Updates...";
+         this.mnuCheckForUpdates.Click += new System.EventHandler(this.mnuCheckForUpdates_Click);
+         // 
+         // mnuHelpSep2
+         // 
+         this.mnuHelpSep2.Index = 4;
+         this.mnuHelpSep2.Text = "-";
+         // 
          // mnuAbout
          // 
-         this.mnuAbout.Index = 0;
-         this.mnuAbout.Text = "&About...";
+         this.mnuAbout.Index = 5;
+         this.mnuAbout.Text = "&About AstroGrep";
          this.mnuAbout.Click += new System.EventHandler(this.mnuAbout_Click);
          // 
          // stbStatus
          // 
          this.stbStatus.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sbStatusPanel,
+            this.sbEncodingPanel,
             this.sbTotalCountPanel,
             this.sbFileCountPanel,
             this.sbFilterCountPanel,
@@ -933,9 +926,17 @@ namespace AstroGrep.Windows.Forms
          this.sbStatusPanel.DoubleClickEnabled = true;
          this.sbStatusPanel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
          // 
+         // sbEncodingPanel
+         // 
+         this.sbEncodingPanel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+         this.sbEncodingPanel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+         this.sbEncodingPanel.Name = "sbEncodingPanel";
+         this.sbEncodingPanel.Size = new System.Drawing.Size(48, 17);
+         this.sbEncodingPanel.Text = string.Empty;
+         // 
          // sbTotalCountPanel
          // 
-         this.sbTotalCountPanel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)));
+         this.sbTotalCountPanel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
          this.sbTotalCountPanel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
          this.sbTotalCountPanel.Name = "sbTotalCountPanel";
          this.sbTotalCountPanel.Size = new System.Drawing.Size(48, 17);
@@ -992,37 +993,13 @@ namespace AstroGrep.Windows.Forms
          // 
          this.menuItem6.Index = 6;
          this.menuItem6.Text = "-";
-		 // 
+		   // 
          // ListViewImageList
          // 
          this.ListViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ListViewImageList.ImageStream")));
          this.ListViewImageList.TransparentColor = System.Drawing.Color.Transparent;
          this.ListViewImageList.Images.SetKeyName(0, "");
          this.ListViewImageList.Images.SetKeyName(1, "");
-         // 
-         // chkSkipHidden
-         // 
-         this.chkSkipHidden.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                     | System.Windows.Forms.AnchorStyles.Right)));
-         this.chkSkipHidden.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.chkSkipHidden.Location = new System.Drawing.Point(7, 381);
-         this.chkSkipHidden.Name = "chkSkipHidden";
-         this.chkSkipHidden.Size = new System.Drawing.Size(178, 16);
-         this.chkSkipHidden.TabIndex = 22;
-         this.chkSkipHidden.Text = "Skip Hidden Files/Directories";
-         this.toolTip1.SetToolTip(this.chkSkipHidden, "Ignore hidden files/directories");
-         // 
-         // chkSkipSystem
-         // 
-         this.chkSkipSystem.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                     | System.Windows.Forms.AnchorStyles.Right)));
-         this.chkSkipSystem.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.chkSkipSystem.Location = new System.Drawing.Point(7, 403);
-         this.chkSkipSystem.Name = "chkSkipSystem";
-         this.chkSkipSystem.Size = new System.Drawing.Size(178, 16);
-         this.chkSkipSystem.TabIndex = 23;
-         this.chkSkipSystem.Text = "Skip System Files/Directories";
-         this.toolTip1.SetToolTip(this.chkSkipSystem, "Ignore system files/directories");
          // 
          // frmMain
          // 
@@ -1051,6 +1028,7 @@ namespace AstroGrep.Windows.Forms
          this.ResumeLayout(false);
 
       }
+      
       #endregion
 
       /// <summary>

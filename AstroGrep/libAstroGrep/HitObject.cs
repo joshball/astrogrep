@@ -48,6 +48,7 @@ namespace libAstroGrep
       #region Declarations
 
       private FileInfo __File = null;
+      private System.Text.Encoding detectedEncoding = null;
       private readonly List<HitObjectStorage> __storage = new List<HitObjectStorage>();
 
       #endregion
@@ -138,28 +139,6 @@ namespace libAstroGrep
       }
 
       /// <summary>
-      /// Retrieve all lines containing the search text
-      /// </summary>
-      /// <value>All lines</value>
-      /// <history>
-      /// [Curtis_Beard]      09/09/2005	Created
-      /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
-      /// </history>
-      public string Lines
-      {
-         get
-         {
-            var lines = new StringBuilder(__storage.Count);
-            foreach (var item in __storage)
-            {
-               lines.Append(item.Line);
-            }
-
-            return lines.ToString();
-         }
-      }
-
-      /// <summary>
       /// Retrieve the total number of lines
       /// </summary>
       /// <value>Total number of lines</value>
@@ -195,6 +174,18 @@ namespace libAstroGrep
       /// </history>
       public int HitCount { get; private set; }
 
+      /// <summary>
+      /// Gets/Sets the detected file encoding.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	   12/01/2014	Created
+      /// </history>
+      public System.Text.Encoding DetectedEncoding
+      {
+         get { return detectedEncoding; }
+         set { detectedEncoding = value; }
+      }
+
       #endregion
 
       #region Public Methods
@@ -213,6 +204,19 @@ namespace libAstroGrep
             return string.Empty;
 
          return __storage[index].Line;
+      }
+
+      /// <summary>
+      /// Retrieves the spacer text for the current line.
+      /// </summary>
+      /// <param name="index">line to retrieve</param>
+      /// <returns>string.Empty if index is greater than total, spacer text of current line otherwise</returns>
+      public string RetrieveSpacerText(int index)
+      {
+         if (index >= __storage.Count)
+            return string.Empty;
+
+         return __storage[index].SpacerText;
       }
 
       /// <summary>
@@ -270,8 +274,25 @@ namespace libAstroGrep
       }
 
       /// <summary>
+      /// Determine if given line contains a hit.
+      /// </summary>
+      /// <param name="index">line number to retrieve</param>
+      /// <returns>true if line contains a hit, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]      11/25/2014	Initial
+      /// </history>
+      public bool DoesLineContainHit(int index)
+      {
+         if (index >= __storage.Count)
+            return false;
+
+         return __storage[index].IsHit;
+      }
+
+      /// <summary>
       /// Add a hit to the collection.
       /// </summary>
+      /// <param name="spacerText">Current line spacer text</param>
       /// <param name="line">line of text containing search text</param>
       /// <param name="lineNumber">line number of line in file</param>
       /// <returns>position of added item in collection</returns>
@@ -279,14 +300,16 @@ namespace libAstroGrep
       /// [Curtis_Beard]      09/09/2005	Created
       /// [Curtis_Beard]      07/26/2006	ADD: 1512026, save column position
       /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
       /// </history>
-      public int Add(string line, int lineNumber)
+      public int Add(string spacerText, string line, int lineNumber)
       {
          var item = new HitObjectStorage();
          item.Line = line;
          item.LineNumber = lineNumber;
          item.ColumnNumber = 1;
          item.IsHit = false;
+         item.SpacerText = spacerText;
          __storage.Add(item);
 
          return __storage.Count - 1;
@@ -295,6 +318,7 @@ namespace libAstroGrep
       /// <summary>
       /// Add a hit to the collection.
       /// </summary>
+      /// <param name="spacerText">Current line spacer text</param>
       /// <param name="line">line of text containing search text</param>
       /// <param name="lineNumber">line number of line in file</param>
       /// <param name="column">column position of first hit in line</param>
@@ -302,14 +326,16 @@ namespace libAstroGrep
       /// <history>
       /// [Curtis_Beard]		07/26/2006	ADD: 1512026, save column position
       /// [Curtis_Beard]      10/13/2012	CHG: use class instead of 3 lists
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
       /// </history>
-      public int Add(string line, int lineNumber, int column)
+      public int Add(string spacerText, string line, int lineNumber, int column)
       {
          var item = new HitObjectStorage();
          item.Line = line;
          item.LineNumber = lineNumber;
          item.ColumnNumber = column;
          item.IsHit = true;
+         item.SpacerText = spacerText;
          __storage.Add(item);
 
          return __storage.Count - 1;
@@ -345,6 +371,7 @@ namespace libAstroGrep
       /// </summary>
       /// <history>
       /// [Curtis_Beard]      10/13/2012	ADD: use class instead of 3 lists
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
       /// </history>
       internal class HitObjectStorage
       {
@@ -360,11 +387,15 @@ namespace libAstroGrep
          /// <summary>Determines if this is a hit or context line</summary>
          public bool IsHit { get; set; }
 
+         /// <summary>Spacer text for current line</summary>
+         public string SpacerText { get; set; }
+
          /// <summary>
          /// Initializes this class.
          /// </summary>
          /// <history>
          /// [Curtis_Beard]      10/13/2012	ADD: use class instead of 3 lists
+         /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
          /// </history>
          public HitObjectStorage()
          {
@@ -372,6 +403,7 @@ namespace libAstroGrep
             LineNumber = 1;
             ColumnNumber = 1;
             IsHit = false;
+            SpacerText = string.Empty;
          }
       }
    }

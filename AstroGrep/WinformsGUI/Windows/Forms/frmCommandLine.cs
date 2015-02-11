@@ -46,6 +46,8 @@ namespace AstroGrep.Windows.Forms
       public frmCommandLine()
       {
          InitializeComponent();
+         API.ListViewExtensions.SetTheme(lstArguments);
+         this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
       }
 
       /// <summary>
@@ -55,34 +57,44 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parm</param>
       /// <history>
       /// [Curtis_Beard]	   09/26/2012	ADD: 3572487, display command line flags
+      /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
+      /// [Curtis_Beard]		11/12/2014	CHG: use ListView instead of TextBox, increase size of form
       /// </history>
       private void frmCommandLine_Load(object sender, EventArgs e)
       {
          //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
          Language.ProcessForm(this);
 
-         // setup command line flags text
-         System.Text.StringBuilder builder = new System.Text.StringBuilder();
-         builder.AppendFormat("Command Line Arguments {0}", Environment.NewLine);
-         builder.Append(Environment.NewLine);
-         builder.AppendFormat("/spath=\"value\"     - Start Path{0}", Environment.NewLine);
-         builder.AppendFormat("/stypes=\"value\"    - File Types{0}", Environment.NewLine);
-         builder.AppendFormat("/stext=\"value\"     - Search Text{0}", Environment.NewLine);
-         builder.AppendFormat("/local             - Store config files in local directory{0}", Environment.NewLine);
-         builder.AppendFormat("/e                 - Use regular expressions{0}", Environment.NewLine);
-         builder.AppendFormat("/c                 - Case sensitive{0}", Environment.NewLine);
-         builder.AppendFormat("/w                 - Whole Word{0}", Environment.NewLine);
-         builder.AppendFormat("/r                 - Recursive search (search subfolders){0}", Environment.NewLine);
-         builder.AppendFormat("/n                 - Negation{0}", Environment.NewLine);
-         builder.AppendFormat("/l                 - Line numbers{0}", Environment.NewLine);
-         builder.AppendFormat("/f                 - File names only{0}", Environment.NewLine);
-         builder.AppendFormat("/cl=\"value\"        - Number of context lines{0}", Environment.NewLine);
-         builder.AppendFormat("/sh                - Skip hidden files and folders{0}", Environment.NewLine);
-         builder.AppendFormat("/ss                - Skip system files and directories{0}", Environment.NewLine);
-         builder.AppendFormat("/s                 - Start searching immediately{0}", Environment.NewLine);
-
-         txtDisplay.Text = builder.ToString();
-         txtDisplay.Select(0, 0);
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/spath=\"value\"", "Start Path" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/stypes=\"value\"", "File Types" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/stext=\"value\"", "Search Text" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/local", "Store config files in local directory" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/e", "Use regular expressions" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/c", "Case sensitive" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/w", "Whole Word" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/r", "Recursive search (search subfolders)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/n", "Negation" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/l", "Line numbers" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/f", "File names only" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/cl=\"value\"", "Number of context lines" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/sh", "Skip hidden files and folders" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/ss", "Skip system files and folders" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/shf", "Skip hidden files" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/shd", "Skip hidden folders" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/ssf", "Skip system files" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/ssd", "Skip system folders" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/srf", "Skip ReadOnly files" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/s", "Start searching immediately" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/opath=\"value\"", "Save results to path (/s implied)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/otype=\"value\"", "Save results type (json,html,xml,txt)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/exit", "Exit application after search" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/dmf=\"operator|value\"", "Date modified file (=,!=,>,<,>=,<=|MM/DD/YYYY)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/dmd=\"operator|value\"", "Date modified directory (=,!=,>,<,>=,<=|MM/DD/YYYY)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/dcf=\"operator|value\"", "Date created file (=,!=,>,<,>=,<=|MM/DD/YYYY)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/dcd=\"operator|value\"", "Date created directory (=,!=,>,<,>=,<=|MM/DD/YYYY)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/minfsize=\"operator|value\"", "Minimum file size (=,!=,>,<,>=,<=|bytes)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/maxfsize=\"operator|value\"", "Maximum file size (=,!=,>,<,>=,<=|bytes)" }));
+         lstArguments.Items.Add(new ListViewItem(new string[] { "/minfc=\"value\"", "Minimum file count" }));
       }
 
       /// <summary>

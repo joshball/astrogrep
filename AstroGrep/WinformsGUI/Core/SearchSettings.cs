@@ -52,6 +52,10 @@ namespace AstroGrep.Core
       private bool negation = false;
       private bool lineNumbers = true;
       private int contextLines = 0;
+      
+      private string filterItems = Constants.DefaultFilterItems;
+
+      #region Deprecated Property Declarations
       private bool skipHidden = false;
       private bool skipSystem = false;
       private string minFileSize = string.Empty;
@@ -60,8 +64,10 @@ namespace AstroGrep.Core
       private string maxFileSizeType = "byte";
       private string modifiedStart = string.Empty;
       private string modifiedEnd = string.Empty;
-      private string exclusions = Constants.DefaultExclusions;
+      private string exclusions = string.Empty;
       private int minimumFileCount = 0;
+      #endregion
+
       #endregion
 
       /// <summary>
@@ -182,6 +188,16 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
+      /// Search filter items.
+      /// </summary>
+      static public string FilterItems
+      {
+         get { return MySettings.filterItems; }
+         set { MySettings.filterItems = value; }
+      }
+
+      #region Deprecated Properties
+      /// <summary>
       /// Skip hidden files and directories.
       /// </summary>
       static public bool SkipHidden
@@ -270,5 +286,6 @@ namespace AstroGrep.Core
          get { return MySettings.minimumFileCount; }
          set { MySettings.minimumFileCount = value; }
       }
+      #endregion
    }
 }

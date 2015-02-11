@@ -26,8 +26,6 @@ private System.Windows.Forms.ToolTip toolTip1;
          this.lblDisclaimer = new System.Windows.Forms.Label();
          this.CopyrightLabel = new System.Windows.Forms.Label();
          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-         this.lblVersionCheck = new System.Windows.Forms.Label();
-         this.lnkDownload = new System.Windows.Forms.LinkLabel();
          ((System.ComponentModel.ISupportInitialize)(this.picIcon)).BeginInit();
          this.SuspendLayout();
          // 
@@ -119,37 +117,12 @@ private System.Windows.Forms.ToolTip toolTip1;
          this.CopyrightLabel.TabIndex = 10;
          this.CopyrightLabel.Text = "Copyright (C) 2002-2007 AstroComma Inc.";
          // 
-         // lblVersionCheck
-         // 
-         this.lblVersionCheck.AutoSize = true;
-         this.lblVersionCheck.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.lblVersionCheck.Location = new System.Drawing.Point(8, 260);
-         this.lblVersionCheck.Name = "lblVersionCheck";
-         this.lblVersionCheck.Size = new System.Drawing.Size(119, 14);
-         this.lblVersionCheck.TabIndex = 11;
-         this.lblVersionCheck.Text = "Checking for updates...";
-         // 
-         // lnkDownload
-         // 
-         this.lnkDownload.AutoSize = true;
-         this.lnkDownload.Location = new System.Drawing.Point(328, 260);
-         this.lnkDownload.Name = "lnkDownload";
-         this.lnkDownload.Size = new System.Drawing.Size(89, 14);
-         this.lnkDownload.TabIndex = 12;
-         this.lnkDownload.TabStop = true;
-         this.lnkDownload.Text = "Download Latest";
-         this.toolTip1.SetToolTip(this.lnkDownload, "http://astrogrep.sourceforge.net/download/");
-         this.lnkDownload.Visible = false;
-         this.lnkDownload.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkDownload_LinkClicked);
-         // 
          // frmAbout
          // 
          this.AcceptButton = this.cmdOK;
          this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
          this.CancelButton = this.cmdOK;
          this.ClientSize = new System.Drawing.Size(513, 292);
-         this.Controls.Add(this.lnkDownload);
-         this.Controls.Add(this.lblVersionCheck);
          this.Controls.Add(this.CopyrightLabel);
          this.Controls.Add(this.LicenseLinkLabel);
          this.Controls.Add(this.lnkHomePage);
@@ -189,8 +162,5 @@ private System.Windows.Forms.ToolTip toolTip1;
 			}
 			base.Dispose( disposing );
 		}
-
-      private System.Windows.Forms.Label lblVersionCheck;
-      private System.Windows.Forms.LinkLabel lnkDownload;
 	}
 }

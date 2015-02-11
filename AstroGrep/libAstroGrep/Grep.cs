@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using libAstroGrep.Plugin;
@@ -46,6 +47,7 @@ namespace libAstroGrep
    /// [Curtis_Beard]		06/27/2007	CHG: removed message parameters for Complete/Cancel events
    /// [Andrew_Radford]    05/08/2008  CHG: Convert code to C# 3.5
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+   /// [Curtis_Beard]	   12/01/2014	ADD: support for detected encoding event
    /// </history>
    public class Grep
    {
@@ -89,13 +91,23 @@ namespace libAstroGrep
       /// <summary>The search has been cancelled</summary>
       public event SearchCancelHandler SearchCancel;
 
+      /// <summary>
+      /// File filtering
+      /// </summary>
       /// <param name="file">FileInfo object of file currently being filtered</param>
-      public delegate void FileFilteredOut(FileInfo file, string type);
+      /// <param name="filterItem">FilterItem causing filtering</param>
+      /// <param name="value">Value causing filtering</param>
+      public delegate void FileFilteredOut(FileInfo file, FilterItem filterItem, string value);
       /// <summary>File being filtered</summary>
       public event FileFilteredOut FileFiltered;
 
-      /// <param name="file">DirectoryInfo object of directory currently being filtered</param>
-      public delegate void DirectoryFilteredOut(DirectoryInfo dir, string type);
+      /// <summary>
+      /// Directory filtering
+      /// </summary>
+      /// <param name="dir">DirectoryInfo object of directory currently being filtered</param>
+      /// <param name="filterItem">FilterItem causing filtering</param>
+      /// <param name="value">Value causing filtering</param>
+      public delegate void DirectoryFilteredOut(DirectoryInfo dir, FilterItem filterItem, string value);
       /// <summary>Directory being filtered</summary>
       public event DirectoryFilteredOut DirectoryFiltered;
 
@@ -104,6 +116,14 @@ namespace libAstroGrep
       public delegate void SearchingFileByPluginHandler(string pluginName);
       /// <summary>File being searched by a plugin</summary>
       public event SearchingFileByPluginHandler SearchingFileByPlugin;
+
+      /// <summary>The current file's detected encoding</summary>
+      /// <param name="file">FileInfo object</param>
+      /// <param name="encoding">System.Text.Encoding</param>
+      /// <param name="encoderName">The detected encoder name</param>
+      public delegate void FileEncodingDetectedHandler(FileInfo file, System.Text.Encoding encoding, string encoderName);
+      /// <summary>File's detected encoding</summary>
+      public event FileEncodingDetectedHandler FileEncodingDetected;
       #endregion
 
       #region Public Properties
@@ -122,18 +142,31 @@ namespace libAstroGrep
 
       #endregion
 
+      private int userFilterCount = 0;
+
       /// <summary>
       /// Initializes a new instance of the Grep class.
       /// </summary>
       /// <history>
       /// [Curtis_Beard]		07/12/2006	Created
-      /// [Andrew_Radford]      13/08/2009  Added Const. dependency on ISearchSpec, IFileFilterSpec
+      /// [Andrew_Radford]    13/08/2009  Added Const. dependency on ISearchSpec, IFileFilterSpec
       /// </history>
       public Grep(ISearchSpec searchSpec, IFileFilterSpec filterSpec)
       {
          SearchSpec = searchSpec;
          FileFilterSpec = filterSpec;
          Greps = new List<HitObject>();
+
+         if (FileFilterSpec.FilterItems != null)
+         {
+            // get first file->minimum hit count filter (should only be 1)
+            var fileCountFilter = (from f in FileFilterSpec.FilterItems where f.FilterType.Category == FilterType.Categories.File && f.FilterType.SubCategory == FilterType.SubCategories.MinimumHitCount select f).FirstOrDefault();
+
+            if (fileCountFilter != null)
+            {
+               int.TryParse(fileCountFilter.Value, out userFilterCount);
+            }
+         }
       }
 
       #region Public Methods
@@ -174,37 +207,42 @@ namespace libAstroGrep
       /// [Curtis_Beard]	   10/13/2005	ADD: Support for comma-separated fileFilter
       /// [Curtis_Beard]	   07/12/2006	CHG: remove parameters and use properties
       /// [Curtis_Beard]	   09/17/2013	CHG: 61, ability to split file filters by comma and semi colon (, ;)
+      /// [Curtis_Beard]		11/10/2014	FIX: 59, check for duplicate entries of file filter
       /// </history>
       public void Execute()
       {
-          if (SearchSpec.StartFilePaths != null && SearchSpec.StartFilePaths.Length > 0)
-          {
-              foreach (string path in SearchSpec.StartFilePaths)
-              {
-                  SearchFile(new FileInfo(path));
-              }
-          }
-          else
-          {
-              if (string.IsNullOrEmpty(FileFilterSpec.FileFilter))
-              {
+         if (SearchSpec.StartFilePaths != null && SearchSpec.StartFilePaths.Length > 0)
+         {
+            foreach (string path in SearchSpec.StartFilePaths)
+            {
+               SearchFile(new FileInfo(path));
+            }
+         }
+         else
+         {
+            if (string.IsNullOrEmpty(FileFilterSpec.FileFilter))
+            {
+               foreach (var dir in SearchSpec.StartDirectories)
+               {
+                  Execute(new DirectoryInfo(dir), null, null);
+               }
+            }
+            else
+            {
+               string[] filters = FileFilterSpec.FileFilter.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+               
+               // remove any duplicates
+               List<string> fileFilters = filters.Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+
+               foreach (var filter in fileFilters)
+               {
                   foreach (var dir in SearchSpec.StartDirectories)
                   {
-                      Execute(new DirectoryInfo(dir), null, null);
+                     Execute(new DirectoryInfo(dir), null, filter);
                   }
-              }
-              else
-              {
-                  string[] filters = FileFilterSpec.FileFilter.Split(new char[]{ ',', ';'}, StringSplitOptions.RemoveEmptyEntries);
-                  foreach (var filter in filters)
-                  {
-                      foreach (var dir in SearchSpec.StartDirectories)
-                      {
-                          Execute(new DirectoryInfo(dir), null, filter);
-                      }
-                  }
-              }
-          }
+               }
+            }
+         }
       }
 
       /// <summary>
@@ -300,13 +338,15 @@ namespace libAstroGrep
       private void Execute(DirectoryInfo sourceDirectory, string sourceDirectoryFilter, string sourceFileFilter)
       {
          // skip directory if matches an exclusion item
-         if (FileFilterSpec != null && FileFilterSpec.ExclusionItems != null)
+         if (FileFilterSpec != null && FileFilterSpec.FilterItems != null)
          {
-            foreach (ExclusionItem item in FileFilterSpec.ExclusionItems)
+            var dirFilterItems = from f in FileFilterSpec.FilterItems where f.FilterType.Category == FilterType.Categories.Directory select f;
+            foreach (FilterItem item in dirFilterItems)
             {
-               if (item.ShouldExcludeDirectory(sourceDirectory))
+               string filterValue = string.Empty;
+               if (item.ShouldExcludeDirectory(sourceDirectory, out filterValue))
                {
-                  OnDirectoryFiltered(sourceDirectory, item.Type.ToString());
+                  OnDirectoryFiltered(sourceDirectory, item, filterValue);
                   return;
                }
             }
@@ -325,18 +365,20 @@ namespace libAstroGrep
          //Search Every File for search text
          foreach (FileInfo SourceFile in sourceDirectory.EnumerateFiles(filePattern))
          {
-             bool processFile = true;
-             if (sourceFileFilter != null && !StriktMatch(SourceFile.Extension, sourceFileFilter.Trim()))
-             {
-                 processFile = false;
+            bool processFile = true;
+            if (sourceFileFilter != null && !StriktMatch(SourceFile.Extension, sourceFileFilter.Trim()))
+            {
+               processFile = false;
 
-                 OnFileFiltered(SourceFile, "FileExtension");
-             }
+               string filterValue = SourceFile.Extension;
+               FilterItem filterItem = new FilterItem(new FilterType(FilterType.Categories.File, FilterType.SubCategories.Extension), string.Empty, FilterType.ValueOptions.None, false, true);
+               OnFileFiltered(SourceFile, filterItem, filterValue);
+            }
 
-             if (processFile)
-             {
-                 SearchFile(SourceFile);
-             }
+            if (processFile)
+            {
+               SearchFile(SourceFile);
+            }
          }
 
          if (SearchSpec.SearchInSubfolders)
@@ -346,18 +388,6 @@ namespace libAstroGrep
             {
                try
                {
-                  if (FileFilterSpec.SkipSystemFiles && (sourceSubDirectory.Attributes & FileAttributes.System) == FileAttributes.System)
-                  {
-                     OnDirectoryFiltered(sourceSubDirectory, "System");
-                     continue;
-                  }
-                  
-                  if (FileFilterSpec.SkipHiddenFiles && (sourceSubDirectory.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                  {
-                     OnDirectoryFiltered(sourceSubDirectory, "Hidden");
-                     continue;
-                  }
-
                   Execute(sourceSubDirectory, sourceDirectoryFilter, sourceFileFilter);
                }
                catch
@@ -374,35 +404,36 @@ namespace libAstroGrep
       /// <param name="SourceFile">FileInfo object to be searched</param>
       private void SearchFile(FileInfo SourceFile)
       {
-          try
-          {
-              // skip any files that are filtered out
-              string filterType = string.Empty;
-              if (ShouldFilterOut(SourceFile, FileFilterSpec, out filterType))
-              {
-                  OnFileFiltered(SourceFile, filterType);
-              }
-              else if (string.IsNullOrEmpty(SearchSpec.SearchText))
-              {
-                  // return a 'file hit' if the search text is empty
-                  var _grepHit = new HitObject(SourceFile) { Index = Greps.Count };
-                  _grepHit.Add(Environment.NewLine, 0);
-                  Greps.Add(_grepHit);
-                  OnFileHit(SourceFile, _grepHit.Index);
-              }
-              else
-              {
-                  SearchFileContents(SourceFile);
-              }
-          }
-          catch (ThreadAbortException)
-          {
-              UnloadPlugins();
-          }
-          catch (Exception ex)
-          {
-              OnSearchError(SourceFile, ex);
-          }
+         try
+         {
+            // skip any files that are filtered out
+            FilterItem filterItem = null;
+            string filterValue = string.Empty;
+            if (ShouldFilterOut(SourceFile, FileFilterSpec, out filterItem, out filterValue))
+            {
+               OnFileFiltered(SourceFile, filterItem, filterValue);
+            }
+            else if (string.IsNullOrEmpty(SearchSpec.SearchText))
+            {
+               // return a 'file hit' if the search text is empty
+               var _grepHit = new HitObject(SourceFile) { Index = Greps.Count };
+               _grepHit.Add(string.Empty, string.Empty, 0);
+               Greps.Add(_grepHit);
+               OnFileHit(SourceFile, _grepHit.Index);
+            }
+            else
+            {
+               SearchFileContents(SourceFile);
+            }
+         }
+         catch (ThreadAbortException)
+         {
+            UnloadPlugins();
+         }
+         catch (Exception ex)
+         {
+            OnSearchError(SourceFile, ex);
+         }
       }
 
       /// <summary>
@@ -410,58 +441,27 @@ namespace libAstroGrep
       /// </summary>
       /// <param name="file">FileInfo object of current file</param>
       /// <param name="fileFilterSpec">Current file filter settings</param>
+      /// <param name="filterItem">Item causing filtering, null if none</param>
+      /// <param name="filterValue">Output of actual filter value</param>
       /// <returns>true if file does not pass file filter settings, false otherwise</returns>
       /// <history>
       /// [Andrew_Radford]    13/08/2009  Created
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// </history>
-      private static bool ShouldFilterOut(FileInfo file, IFileFilterSpec fileFilterSpec, out string type)
+      private static bool ShouldFilterOut(FileInfo file, IFileFilterSpec fileFilterSpec, out FilterItem filterItem, out string filterValue)
       {
-         type = string.Empty;
+         filterItem = null;
+         filterValue = string.Empty;
 
-         if (fileFilterSpec.SkipSystemFiles && (file.Attributes & FileAttributes.System) == FileAttributes.System)
+         if (fileFilterSpec.FilterItems != null && fileFilterSpec.FilterItems.Count > 0)
          {
-            type = "System";
-            return true;
-         }
-
-         if (fileFilterSpec.SkipHiddenFiles && (file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-         {
-            type = "Hidden";
-            return true;
-         }
-
-         if (file.LastWriteTime < fileFilterSpec.DateModifiedStart)
-         {
-            type = "DateModifiedStart";
-            return true;
-         }
-
-         if (file.LastWriteTime > fileFilterSpec.DateModifiedEnd)
-         {
-            type = "DateModifiedEnd";
-            return true;
-         }
-
-         if (file.Length < fileFilterSpec.FileSizeMin)
-         {
-            type = "FileSizeMin";
-            return true;
-         }
-
-         if (file.Length > fileFilterSpec.FileSizeMax)
-         {
-            type = "FileSizeMax";
-            return true;
-         }
-
-         if (fileFilterSpec.ExclusionItems != null && fileFilterSpec.ExclusionItems.Count > 0)
-         {
-            foreach (ExclusionItem item in fileFilterSpec.ExclusionItems)
+            var fileFilterItems = from f in fileFilterSpec.FilterItems where f.FilterType.Category == FilterType.Categories.File select f;
+            foreach (FilterItem item in fileFilterItems)
             {
-               if (item.ShouldExcludeFile(file))
+               filterValue = string.Empty;
+               if (item.ShouldExcludeFile(file, out filterValue))
                {
-                  type = item.Type.ToString();
+                  filterItem = item;
                   return true;
                }
             }
@@ -494,6 +494,9 @@ namespace libAstroGrep
       /// [Curtis_Beard]		10/12/2012	FIX: get correct position when using whole word option
       /// [Curtis_Beard]		10/12/2012	CHG: 32, implement a hit count filter
       /// [Curtis_Beard]		10/31/2012	CHG: renamed to SearchFileContents, remove parameter searchText
+      /// [Curtis_Beard]		08/19/2014	FIX: 57, escape search text when whole word is enabled but not regular expressions
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space, remove use of newline so each line is in hit object
+      /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
       /// </history>
       private void SearchFileContents(FileInfo file)
       {
@@ -515,6 +518,7 @@ namespace libAstroGrep
          int _lastHit = 0;
          string _contextSpacer = string.Empty;
          string _spacer;
+         int userFilterCount = 0;
 
          try
          {
@@ -528,7 +532,6 @@ namespace libAstroGrep
                   if (Plugins[i].Enabled && Plugins[i].Plugin.IsAvailable)
                   {
                      // detect if plugin supports extension
-                     //bool isFound = IsInList(file.Extension, Plugins[i].Plugin.Extensions, ',');
                      bool isFound = Plugins[i].Plugin.IsFileSupported(file);
 
                      // if extension not supported try another plugin
@@ -594,38 +597,63 @@ namespace libAstroGrep
 
             #region Encoding Detection
 
-            byte[] sampleBytes;
+            string usedEncoder = string.Empty;
+            System.Text.Encoding encoding = null;
 
-            //Check if can read first
-            try
+            //
+            // find a user specified file encoding
+            //
+            FileEncoding fileEncoding = SearchSpec.FileEncodings != null && SearchSpec.FileEncodings.Count > 0 ? 
+               (from f in SearchSpec.FileEncodings where f.FilePath.Equals(file.FullName, StringComparison.InvariantCultureIgnoreCase) && f.Enabled select f).ToList().FirstOrDefault()
+               :  null;
+            if (fileEncoding != null)
             {
-               sampleBytes = EncodingTools.ReadFileContentSample(file.FullName);
+               usedEncoder = "User";
+               encoding = fileEncoding.Encoding;
             }
-            catch (Exception ex)
+            else
             {
-               // can't read file
-               OnSearchError(file, ex);
-               return;
+               //
+               // no user specified encoding, try to detect one
+               //
+               byte[] sampleBytes;
+
+               //Check if can read first
+               try
+               {
+                  sampleBytes = EncodingTools.ReadFileContentSample(file.FullName);
+               }
+               catch (Exception ex)
+               {
+                  // can't read file
+                  OnSearchError(file, ex);
+                  return;
+               }
+
+               usedEncoder = string.Empty;
+               encoding = DetectEncoding(sampleBytes, out usedEncoder);
             }
 
-            //if (!SkipBinaryFileDetection)
-            //{
-            //      // check for /0/0/0/0
-            //      if (EncodingTools.IsBinaryFile(sampleBytes))
-            //      {
-            //         // binary file?
-            //         OnSearchError(file, new Exception("The file was detected as binary."));
-            //         return;
-            //      }
-            //}
-
-            System.Text.Encoding encoding = DetectEncoding(sampleBytes);
             if (encoding == null)
             {
                // Could not detect file encoding
                OnSearchError(file, new Exception("Could not detect file encoding."));
                return;
             }
+
+            OnFileEncodingDetected(file, encoding, usedEncoder);
+
+            // process all encoding detectors and display results to output window
+            //var values = EncodingDetector.DetectAll(sampleBytes);
+            //if (values.Count > 0)
+            //{
+            //   System.Diagnostics.Debug.WriteLine(string.Format("File: {0}", file.FullName));
+            //   foreach (var value in values)
+            //   {
+            //      System.Diagnostics.Debug.WriteLine(string.Format("Encoding: {0} ({1})", value.Encoding != null ? value.Encoding.EncodingName : "None", value.Option.ToString()));
+            //   }
+            //   System.Diagnostics.Debug.WriteLine(Environment.NewLine);
+            //}
 
             #endregion
 
@@ -699,7 +727,7 @@ namespace libAstroGrep
                         // If we are looking for whole worlds only, perform the check.
                         if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b");
+                           _regularExp = new Regex("\\b" + Regex.Escape(SearchSpec.SearchText) + "\\b");
                            Match mtc = _regularExp.Match(textLine);
                            if (mtc != null && mtc.Success)
                            {
@@ -724,7 +752,7 @@ namespace libAstroGrep
                         // If we are looking for whole worlds only, perform the check.
                         if (SearchSpec.UseWholeWordMatching)
                         {
-                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
+                           _regularExp = new Regex("\\b" + Regex.Escape(SearchSpec.SearchText) + "\\b", RegexOptions.IgnoreCase);
                            Match mtc = _regularExp.Match(textLine);
                            if (mtc != null && mtc.Success)
                            {
@@ -758,7 +786,7 @@ namespace libAstroGrep
                      // create new hit and add to collection
                      if (_grepHit == null)
                      {
-                        _grepHit = new HitObject(file) { Index = Greps.Count };
+                        _grepHit = new HitObject(file) { Index = Greps.Count, DetectedEncoding = encoding };
                         Greps.Add(_grepHit);
                      }
 
@@ -804,7 +832,7 @@ namespace libAstroGrep
                         if (_grepHit.LineCount > 0)
                         {
                            // Insert a blank space before the context lines.
-                           int _pos = _grepHit.Add(Environment.NewLine, -1);
+                           int _pos = _grepHit.Add(string.Empty, string.Empty, -1);
 
                            if (DoesPassHitCountCheck(_grepHit))
                            {
@@ -825,7 +853,7 @@ namespace libAstroGrep
                            if (_lineNumber > tempPosInStr)
                            {
                               // Add the context line.
-                              int _pos = _grepHit.Add(_contextSpacer + _context[_contextIndex] + Environment.NewLine, _lineNumber - tempPosInStr);
+                              int _pos = _grepHit.Add(_contextSpacer, _context[_contextIndex], _lineNumber - tempPosInStr);
 
                               if (DoesPassHitCountCheck(_grepHit))
                               {
@@ -847,7 +875,7 @@ namespace libAstroGrep
                         _posInStr = _regularExpCol[0].Index;
                      }
                      _posInStr += 1;
-                     int _index = _grepHit.Add(_spacer + textLine + Environment.NewLine, _lineNumber, _posInStr);
+                     int _index = _grepHit.Add(_spacer, textLine, _lineNumber, _posInStr);
 
                      if (SearchSpec.UseRegularExpressions)
                      {
@@ -870,7 +898,7 @@ namespace libAstroGrep
                      // We didn't find a hit, but since lastHit is > 0, we
                      // need to display this context line.
                      //***************************************************
-                     int _index = _grepHit.Add(_contextSpacer + textLine + Environment.NewLine, _lineNumber);
+                     int _index = _grepHit.Add(_contextSpacer, textLine, _lineNumber);
 
                      if (DoesPassHitCountCheck(_grepHit))
                      {
@@ -912,7 +940,9 @@ namespace libAstroGrep
                // doesn't pass the hit count filter
                Greps.RemoveAt(Greps.Count - 1);
 
-               OnFileFiltered(file, string.Format("FileCount: {0}, Limit: {1}", _grepHit.HitCount, FileFilterSpec.FileHitCount));
+               string filterValue = _grepHit.HitCount.ToString();
+               FilterItem filterItem = new FilterItem(new FilterType(FilterType.Categories.File, FilterType.SubCategories.MinimumHitCount), userFilterCount.ToString(), FilterType.ValueOptions.None, false, true);
+               OnFileFiltered(file, filterItem, filterValue);
             }
 
             //
@@ -923,7 +953,7 @@ namespace libAstroGrep
                //add the file to the hit list
                if (!_fileNameDisplayed)
                {
-                  _grepHit = new HitObject(file) { Index = Greps.Count };
+                  _grepHit = new HitObject(file) { Index = Greps.Count, DetectedEncoding = encoding };
                   Greps.Add(_grepHit);
                   OnFileHit(file, _grepHit.Index);
                }
@@ -994,7 +1024,7 @@ namespace libAstroGrep
       }
 
 
-      static readonly List<string> validTexts = new List<string> { " ", "<", "$", "+", "*", "[", "{", "(", ".", "?", "!", ",", ":", ";", "-", "\\", "/", "'", "\"", Environment.NewLine, "\r\n", "\r", "\n" };
+      static readonly List<string> validTexts = new List<string> { " ", "<", ">", "$", "+", "*", "[", "]", "{", "}", "(", ")", ".", "?", "!", ",", ":", ";", "-", "\\", "/", "'", "\"", Environment.NewLine, "\r\n", "\r", "\n" };
 
       /// <summary>
       /// Validate a start text.
@@ -1007,6 +1037,7 @@ namespace libAstroGrep
       /// [Curtis_Beard]		08/21/2007	ADD: '/' character and Environment.NewLine
       /// [Andrew_Radford]    09/08/2009  CHG: refactored to use list, combined begin and end text methods
       /// [Curtis_Beard]		02/17/2012	CHG: check end text as well
+      /// [Curtis_Beard]		03/24/2014	FIX: 41/53, add ending >, ], }, ) values
       /// </history>
       private static bool IsValidText(string text, bool checkEndText)
       {
@@ -1057,37 +1088,11 @@ namespace libAstroGrep
       /// </history>
       private bool DoesPassHitCountCheck(HitObject hit)
       {
-         // disabled
-         if (FileFilterSpec.FileHitCount == 0)
+         if (userFilterCount <= 0)
             return true;
 
-         // turned on, only passes if current count is more than specified
-         if (FileFilterSpec.FileHitCount > 0 && (hit != null && hit.HitCount >= FileFilterSpec.FileHitCount))
+         if (userFilterCount > 0 && (hit != null && hit.HitCount >= userFilterCount))
             return true;
-
-         return false;
-      }
-
-      /// <summary>
-      /// Determines if a given value is within the given list.
-      /// </summary>
-      /// <param name="value">Value to find</param>
-      /// <param name="list">List to check</param>
-      /// <param name="separator">List item separator</param>
-      /// <returns>True if found, False otherwise</returns>
-      /// <history>
-      /// [Curtis_Beard]		09/05/2007	Created
-      /// </history>
-      static private bool IsInList(string value, string list, char separator)
-      {
-         string[] items = list.ToLower().Split(separator);
-         value = value.ToLower();
-
-         foreach (string item in items)
-         {
-            if (item.Equals(value))
-               return true;
-         }
 
          return false;
       }
@@ -1100,31 +1105,33 @@ namespace libAstroGrep
       /// <returns>true if valid, false otherwise</returns>
       /// <history>
       /// [Curtis_Beard]      09/17/2013    FIX: 45, check against a specific extension when only 3 characters is defined (*.txt can return things like *.txtabc due to .net GetFiles)
+      /// [Curtis_Beard]      05/08/2014    FIX: 55, handle when no . in searchPattern (e.g. *)
       /// </history>
       private bool StriktMatch(string fileExtension, string searchPattern)
       {
-          bool isStriktMatch = false;
+         bool isStriktMatch = false;
 
-          string extension = searchPattern.Substring(searchPattern.LastIndexOf('.'));
+         int index = searchPattern.LastIndexOf('.');
+         string extension = index > -1 ? searchPattern.Substring(index) : searchPattern;
 
-          if (String.IsNullOrEmpty(extension))
-          {
-              isStriktMatch = true;
-          }
-          else if (extension.IndexOfAny(new char[] { '*', '?' }) != -1)
-          {
-              isStriktMatch = true;
-          }
-          else if (String.Compare(fileExtension, extension, true) == 0)
-          {
-              isStriktMatch = true;
-          }
-          else
-          {
-              isStriktMatch = false;
-          }
+         if (String.IsNullOrEmpty(extension))
+         {
+            isStriktMatch = true;
+         }
+         else if (extension.IndexOfAny(new char[] { '*', '?' }) != -1)
+         {
+            isStriktMatch = true;
+         }
+         else if (String.Compare(fileExtension, extension, true) == 0)
+         {
+            isStriktMatch = true;
+         }
+         else
+         {
+            isStriktMatch = false;
+         }
 
-          return isStriktMatch;
+         return isStriktMatch;
       }
 
       /// <summary>
@@ -1132,21 +1139,20 @@ namespace libAstroGrep
       /// If DetectFileEncoding is false, fall back to using Encoding.Default like before.
       /// </summary>
       /// <param name="sampleBytes">sample byts of current file</param>
+      /// <param name="usedEncoder">The used encoder name</param>
       /// <returns>Encoding detected, otherwise if disabled use Encoding.Default</returns>
       /// <history>
       /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
       /// </history>
-      private System.Text.Encoding DetectEncoding(byte[] sampleBytes)
+      private System.Text.Encoding DetectEncoding(byte[] sampleBytes, out string usedEncoder)
       {
          if (SearchSpec.DetectFileEncoding)
          {
-            //if (AlwaysUseEncoding != null)
-            //   return AlwaysUseEncoding;
-
-            return EncodingDetector.Detect(sampleBytes, defaultEncoding: System.Text.Encoding.Default);
+            return EncodingDetector.Detect(sampleBytes, out usedEncoder, defaultEncoding: System.Text.Encoding.Default);
          }
 
          // this is the encoding previous versions used (so it is an option to return to that)
+         usedEncoder = "Default";
          return System.Text.Encoding.Default;
       }
       #endregion
@@ -1249,14 +1255,16 @@ namespace libAstroGrep
       /// Raise file filtered event.
       /// </summary>
       /// <param name="file">FileInfo object</param>
+      /// <param name="filterItem">FilterItem file was filtered on</param>
+      /// <param name="value">Current value causing filtering</param>
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// </history>
-      protected virtual void OnFileFiltered(FileInfo file, string type)
+      protected virtual void OnFileFiltered(FileInfo file, FilterItem filterItem, string value)
       {
          if (FileFiltered != null)
          {
-            FileFiltered(file, type);
+            FileFiltered(file, filterItem, value);
          }
       }
 
@@ -1264,14 +1272,16 @@ namespace libAstroGrep
       /// Raise directory filtered event.
       /// </summary>
       /// <param name="dir">DirectoryInfo object</param>
+      /// <param name="filterItem">FilterItem directory was filtered on</param>
+      /// <param name="value">Current value causing filtering</param>
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// </history>
-      protected virtual void OnDirectoryFiltered(DirectoryInfo dir, string type)
+      protected virtual void OnDirectoryFiltered(DirectoryInfo dir, FilterItem filterItem, string value)
       {
          if (DirectoryFiltered != null)
          {
-            DirectoryFiltered(dir, type);
+            DirectoryFiltered(dir, filterItem, value);
          }
       }
 
@@ -1287,6 +1297,23 @@ namespace libAstroGrep
          if (SearchingFileByPlugin != null)
          {
             SearchingFileByPlugin(pluginName);
+         }
+      }
+
+      /// <summary>
+      /// Raise file encoding detected event.
+      /// </summary>
+      /// <param name="file">Current FileInfo</param>
+      /// <param name="encoding">Detected encoding</param>
+      /// <param name="encoderName">The detected encoder's name</param>
+      /// <history>
+      /// [Curtis_Beard]	   12/01/2014	Initial
+      /// </history>
+      protected virtual void OnFileEncodingDetected(FileInfo file, System.Text.Encoding encoding, string encoderName)
+      {
+         if (FileEncodingDetected != null)
+         {
+            FileEncodingDetected(file, encoding, encoderName);
          }
       }
       #endregion

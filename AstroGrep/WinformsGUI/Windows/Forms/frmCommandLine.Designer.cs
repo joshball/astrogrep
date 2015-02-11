@@ -29,32 +29,18 @@
       private void InitializeComponent()
       {
          System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmCommandLine));
-         this.txtDisplay = new System.Windows.Forms.TextBox();
          this.btnOK = new System.Windows.Forms.Button();
+         this.lstArguments = new System.Windows.Forms.ListView();
+         this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.SuspendLayout();
-         // 
-         // txtDisplay
-         // 
-         this.txtDisplay.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                     | System.Windows.Forms.AnchorStyles.Left)
-                     | System.Windows.Forms.AnchorStyles.Right)));
-         this.txtDisplay.BackColor = System.Drawing.SystemColors.Window;
-         this.txtDisplay.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-         this.txtDisplay.Location = new System.Drawing.Point(12, 12);
-         this.txtDisplay.Multiline = true;
-         this.txtDisplay.Name = "txtDisplay";
-         this.txtDisplay.ReadOnly = true;
-         this.txtDisplay.Size = new System.Drawing.Size(464, 264);
-         this.txtDisplay.TabIndex = 0;
-         this.txtDisplay.TabStop = false;
-         this.txtDisplay.WordWrap = false;
          // 
          // btnOK
          // 
          this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
          this.btnOK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
          this.btnOK.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.btnOK.Location = new System.Drawing.Point(401, 282);
+         this.btnOK.Location = new System.Drawing.Point(547, 326);
          this.btnOK.Name = "btnOK";
          this.btnOK.Size = new System.Drawing.Size(75, 23);
          this.btnOK.TabIndex = 1;
@@ -62,15 +48,42 @@
          this.btnOK.UseVisualStyleBackColor = true;
          this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
          // 
+         // lstArguments
+         // 
+         this.lstArguments.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+         this.lstArguments.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+         this.lstArguments.FullRowSelect = true;
+         this.lstArguments.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+         this.lstArguments.Location = new System.Drawing.Point(12, 12);
+         this.lstArguments.Name = "lstArguments";
+         this.lstArguments.Size = new System.Drawing.Size(610, 308);
+         this.lstArguments.TabIndex = 2;
+         this.lstArguments.UseCompatibleStateImageBehavior = false;
+         this.lstArguments.View = System.Windows.Forms.View.Details;
+         // 
+         // columnHeader1
+         // 
+         this.columnHeader1.Text = "";
+         this.columnHeader1.Width = 275;
+         // 
+         // columnHeader2
+         // 
+         this.columnHeader2.Text = "";
+         this.columnHeader2.Width = 300;
+         // 
          // frmCommandLine
          // 
          this.AcceptButton = this.btnOK;
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.CancelButton = this.btnOK;
-         this.ClientSize = new System.Drawing.Size(488, 317);
+         this.ClientSize = new System.Drawing.Size(634, 361);
+         this.Controls.Add(this.lstArguments);
          this.Controls.Add(this.btnOK);
-         this.Controls.Add(this.txtDisplay);
          this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
          this.MaximizeBox = false;
          this.MinimizeBox = false;
@@ -79,13 +92,14 @@
          this.Text = "AstroGrep";
          this.Load += new System.EventHandler(this.frmCommandLine_Load);
          this.ResumeLayout(false);
-         this.PerformLayout();
 
       }
 
       #endregion
 
-      private System.Windows.Forms.TextBox txtDisplay;
       private System.Windows.Forms.Button btnOK;
+      private System.Windows.Forms.ListView lstArguments;
+      private System.Windows.Forms.ColumnHeader columnHeader1;
+      private System.Windows.Forms.ColumnHeader columnHeader2;
    }
 }

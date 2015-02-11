@@ -36,15 +36,17 @@ namespace AstroGrep.Windows.Forms
    /// </remarks>
    /// <history>
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+   /// [Curtis_Beard]	   11/11/2014	CHG: use FilterItem
    /// </history>
    public partial class frmExclusions : Form
    {
-      private List<ExclusionItem> exclusionItems = new List<ExclusionItem>();
+      private List<FilterItem> filterItems = new List<FilterItem>();
+      private bool inhibitAutoCheck;
 
       /// <summary>
       /// Gets the Exclusion list from this dialog.
       /// </summary>
-      public List<ExclusionItem> ExclusionItems { get { return exclusionItems; } }
+      public List<FilterItem> FilterItems { get { return filterItems; } }
 
       /// <summary>
       /// Create the instance of this form.
@@ -52,11 +54,11 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]		03/07/2012	ADD: 3131609, exclusions
       /// </history>
-      public frmExclusions(List<ExclusionItem> items)
+      public frmExclusions(List<FilterItem> items)
       {
          InitializeComponent();
 
-         exclusionItems = items;
+         filterItems = items;
 
          API.ListViewExtensions.SetTheme(lstExclusions);
       }
@@ -68,6 +70,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/11/2014	CHG: add category column
       /// </history>
       private void frmExclusions_Load(object sender, EventArgs e)
       {
@@ -75,9 +78,10 @@ namespace AstroGrep.Windows.Forms
 
          // set column text
          lstExclusions.Columns[0].Text = Language.GetGenericText("Exclusions.Enabled", "Enabled");
-         lstExclusions.Columns[1].Text = Language.GetGenericText("Exclusions.Type", "Type");
-         lstExclusions.Columns[2].Text = Language.GetGenericText("Exclusions.Value", "Value");
-         lstExclusions.Columns[3].Text = Language.GetGenericText("Exclusions.Option", "Option");
+         lstExclusions.Columns[1].Text = Language.GetGenericText("Exclusions.Category", "Category");
+         lstExclusions.Columns[2].Text = Language.GetGenericText("Exclusions.Type", "Type");
+         lstExclusions.Columns[3].Text = Language.GetGenericText("Exclusions.Value", "Value");
+         lstExclusions.Columns[4].Text = Language.GetGenericText("Exclusions.Option", "Option");
 
          LoadExclusions();
 
@@ -105,21 +109,11 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/11/2014	CHG: use FilterItem
       /// </history>
       private void btnOK_Click(object sender, EventArgs e)
       {
-         // save current list
-         if (exclusionItems == null)
-         {
-            exclusionItems = new List<ExclusionItem>();
-         }
-         exclusionItems.Clear();
-         foreach (ListViewItem listItem in lstExclusions.Items)
-         {
-            var item = listItem.Tag as ExclusionItem;
-            item.Enabled = listItem.Checked;
-            exclusionItems.Add(item);
-         }
+         filterItems = GetCurrentFilterItems();
 
          this.DialogResult = DialogResult.OK;
          this.Close();
@@ -155,16 +149,17 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/11/2014	CHG: use FilterItem, pass all current FilterItems to add/edit form
       /// </history>
       private void btnEdit_Click(object sender, EventArgs e)
       {
          if (lstExclusions.SelectedItems.Count > 0)
          {
             // get currently selected exclusion
-            var item = lstExclusions.SelectedItems[0].Tag as ExclusionItem;
+            var item = lstExclusions.SelectedItems[0].Tag as FilterItem;
             item.Enabled = lstExclusions.SelectedItems[0].Checked;
 
-            var dlg = new frmAddEditExclusions(item);
+            var dlg = new frmAddEditExclusions(GetCurrentFilterItems(), item);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                item = dlg.CurrentItem;
@@ -175,6 +170,7 @@ namespace AstroGrep.Windows.Forms
                lstExclusions.SelectedItems[0].SubItems[1].Text = listItem.SubItems[1].Text;
                lstExclusions.SelectedItems[0].SubItems[2].Text = listItem.SubItems[2].Text;
                lstExclusions.SelectedItems[0].SubItems[3].Text = listItem.SubItems[3].Text;
+               lstExclusions.SelectedItems[0].SubItems[4].Text = listItem.SubItems[4].Text;
 
                SetButtonState();
             }
@@ -190,10 +186,11 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/11/2014	CHG: use FilterItem, pass all current FilterItems to add/edit form
       /// </history>
       private void btnAdd_Click(object sender, EventArgs e)
       {
-         var dlg = new frmAddEditExclusions(null);
+         var dlg = new frmAddEditExclusions(GetCurrentFilterItems(), null);
          if (dlg.ShowDialog(this) == DialogResult.OK)
          {
             // create new entry
@@ -287,13 +284,14 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/11/2014	CHG: use FilterItem
       /// </history>
       private void LoadExclusions()
       {
-         if (exclusionItems != null && exclusionItems.Count > 0)
+         if (filterItems != null && filterItems.Count > 0)
          {
             lstExclusions.BeginUpdate();
-            foreach (ExclusionItem item in exclusionItems)
+            foreach (FilterItem item in filterItems)
             {
                lstExclusions.Items.Add(GetListViewItem(item));
             }
@@ -302,21 +300,36 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// Get the list view item from the given ExclusionItem object.
+      /// Get the list view item from the given FilterItem object.
       /// </summary>
-      /// <param name="item">ExclusionItem object</param>
+      /// <param name="item">FilterItem object</param>
       /// <returns>ListViewItem object</returns>
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/11/2014	CHG: use FilterItem
       /// </history>
-      private ListViewItem GetListViewItem(ExclusionItem item)
+      private ListViewItem GetListViewItem(FilterItem item)
       {
          ListViewItem listItem = new ListViewItem();
          listItem.Tag = item;
          listItem.Checked = item.Enabled;
-         listItem.SubItems.Add(Language.GetGenericText("Exclusions." + item.Type.ToString()));
-         listItem.SubItems.Add(item.Value);
-         listItem.SubItems.Add(string.Format("{0}{1}", Language.GetGenericText("Exclusions." + item.Option.ToString()), item.IgnoreCase ? Language.GetGenericText("Exclusions.IgnoreCase") : ""));
+         listItem.SubItems.Add(Language.GetGenericText("Exclusions." + item.FilterType.Category.ToString(), item.FilterType.Category.ToString()));
+         listItem.SubItems.Add(Language.GetGenericText("Exclusions." + item.FilterType.SubCategory.ToString(), item.FilterType.SubCategory.ToString()));
+         
+         string valueText = item.Value;         
+         string optionText = Language.GetGenericText("Exclusions." + item.ValueOption.ToString());
+         string additionalInfo = string.Empty;
+         if (item.ValueIgnoreCase)
+         {
+            additionalInfo = Language.GetGenericText("Exclusions.IgnoreCase");
+         }
+         else if (item.FilterType.Category == FilterType.Categories.File && item.FilterType.SubCategory == FilterType.SubCategories.Size && !string.IsNullOrEmpty(item.ValueSizeOption))
+         {
+            valueText = string.Format("{0} {1}", AstroGrep.Core.Convertors.ConvertFileSizeForDisplay(item.Value, item.ValueSizeOption), item.ValueSizeOption);
+         }
+
+         listItem.SubItems.Add(valueText);
+         listItem.SubItems.Add(string.Format("{0}{1}", optionText, additionalInfo));
 
          return listItem;
       }
@@ -333,8 +346,91 @@ namespace AstroGrep.Windows.Forms
       {
          lstExclusions.Items.Clear();
 
-         exclusionItems = ExclusionItem.ConvertStringToExclusions(Constants.DefaultExclusions);
+         filterItems = FilterItem.ConvertStringToFilterItems(Constants.DefaultFilterItems);
          LoadExclusions();
+      }
+      
+      /// <summary>
+      /// Handle not changing checked state of item when double clicking to edit it.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   03/04/2014	FIX: 52, don't change check state when double clicking to edit
+      /// </history>
+      private void lstExclusions_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+      {
+         inhibitAutoCheck = true;
+      }
+
+      /// <summary>
+      /// Handle not changing checked state of item when double clicking to edit it.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   03/04/2014	FIX: 52, don't change check state when double clicking to edit
+      /// </history>
+      private void lstExclusions_ItemCheck(object sender, System.Windows.Forms.ItemCheckEventArgs e)
+      {
+         if (inhibitAutoCheck)
+         {
+            e.NewValue = e.CurrentValue;
+         }
+      }
+
+      /// <summary>
+      /// Handle not changing checked state of item when double clicking to edit it.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   03/04/2014	FIX: 52, don't change check state when double clicking to edit
+      /// </history>
+      private void lstExclusions_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+      {
+         inhibitAutoCheck = false;
+      }
+
+      /// <summary>
+      /// Handles ListView Column Click event to allow Enabled column to toggle all checkboxes.
+      /// </summary>
+      /// <param name="sender">lstExclusions listview</param>
+      /// <param name="e">column click arguments</param>
+      /// <history>
+      /// [Curtis_Beard]	   08/13/2014	ADD: 79, allow Enabled column to toggle all checkboxes
+      /// </history>
+      private void lstExclusions_ColumnClick(object sender, ColumnClickEventArgs e)
+      {
+         // enabled column
+         if (e.Column == 0)
+         {
+            bool allChecked = (lstExclusions.CheckedItems.Count == lstExclusions.Items.Count);
+            foreach (ListViewItem item in lstExclusions.Items)
+            {
+               item.Checked = !allChecked;
+            }
+         }
+      }
+
+      /// <summary>
+      /// Get a list of FilterItems that match the currently displayed FilterItems in this screen.
+      /// </summary>
+      /// <returns>List of FilterItems</returns>
+      /// <history>
+      /// [Curtis_Beard]	   11/06/2014	CHG: use FilterItem
+      /// </history>
+      private List<FilterItem> GetCurrentFilterItems()
+      {
+         var list = new List<FilterItem>(lstExclusions.Items.Count);
+         foreach (ListViewItem listItem in lstExclusions.Items)
+         {
+            var item = listItem.Tag as FilterItem;
+            item.Enabled = listItem.Checked;
+            list.Add(item);
+         }
+
+         return list;
       }
    }
 }

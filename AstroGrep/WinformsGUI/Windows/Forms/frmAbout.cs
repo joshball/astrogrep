@@ -1,10 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
-using System.Net;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 
 using AstroGrep.Core;
@@ -40,11 +37,11 @@ namespace AstroGrep.Windows.Forms
    /// [Curtis_Beard]	   01/11/2005	.Net Conversion/Cleanup
    /// [Curtis_Beard]	   11/03/2005	CHG: set hover text to link
    /// [Andrew_Radford]    17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
+   /// [Curtis_Beard]	   05/06/2014	CHG: removed updater code
    /// </history>
 	public partial class frmAbout : Form
 	{
       private System.ComponentModel.IContainer components;
-      private delegate void UpdateMessageCallBack(string message, string newestVersion);
 
       /// <summary>
       /// Creates an instance of the frmAbout class.
@@ -175,104 +172,6 @@ namespace AstroGrep.Windows.Forms
          lnkHomePage.Text = string.Format(lnkHomePage.Text, Constants.ProductName);
          lnkHomePage.Links.Add(0, lnkHomePage.Text.Length, "http://astrogrep.sourceforge.net/");
          CopyrightLabel.Text = string.Format("Copyright (C) 2002-{0} AstroComma Inc.", DateTime.Now.Year.ToString());
-
-         // start update process on separate thread
-         Thread _thread = new Thread(CheckForUpdate) { IsBackground = true };
-         _thread.Start();
-      }
-
-      /// <summary>
-      /// Preform the update process.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]	   02/07/2012	Initial: 3485450, add check for updates
-      /// </history>
-      private void CheckForUpdate()
-      {
-         try
-         {
-            WebRequest webReq = WebRequest.Create("http://astrogrep.sourceforge.net/version.html");
-            webReq.Proxy = WebRequest.GetSystemWebProxy();
-            webReq.Timeout = 4000;
-
-            using (WebResponse webRes = webReq.GetResponse())
-            {
-               // Pipe the stream to a higher level stream reader with the required encoding format. 
-               StringBuilder sbResult = new StringBuilder();
-               using (StreamReader readStream = new StreamReader(webRes.GetResponseStream(), Encoding.UTF8))
-               {
-                  // Read 256 charcters at a time.    
-                  int bufferSize = 256;
-                  Char[] read = new Char[bufferSize];
-                  int count;
-                  do
-                  {
-                     // append the 256 characters to the string builder
-                     count = readStream.Read(read, 0, bufferSize);
-                     sbResult.Append(read, 0, count);
-                  } while (count > 0);
-               }
-
-               // newest version
-               Version newestVersion = new Version(sbResult.ToString());
-
-               // current version
-               Version currentVersion = AstroGrep.Constants.ProductVersion;
-
-               if (currentVersion.CompareTo(newestVersion) < 0)
-               {
-                  UpdateMessage("", newestVersion.ToString(3));
-               }
-               else
-               {
-                  UpdateMessage(string.Format(Language.GetGenericText("Update.Current"), Constants.ProductName, currentVersion.ToString(3)), string.Empty);
-               }
-            }
-         }
-         catch
-         {
-            UpdateMessage(Language.GetGenericText("Update.Error"), string.Empty);
-         }
-      }
-
-      /// <summary>
-      /// Display a message to the user (thread safe).
-      /// </summary>
-      /// <param name="message">message to display</param>
-      /// <param name="newestVersion">newest version, string.empty if not a new version</param>
-      /// <history>
-      /// [Curtis_Beard]	   02/07/2012	Initial: 3485450, add check for updates
-      /// </history>
-      private void UpdateMessage(string message, string newestVersion)
-      {
-         if (lblVersionCheck.InvokeRequired)
-         {
-            UpdateMessageCallBack _delegate = UpdateMessage;
-            lblVersionCheck.Invoke(_delegate, new object[2] { message, newestVersion });
-            return;
-         }
-
-         lblVersionCheck.Text = message;
-         if (!string.IsNullOrEmpty(newestVersion))
-         {
-            lnkDownload.Visible = true;
-            lnkDownload.Left = lblVersionCheck.Left;
-            lblVersionCheck.Visible = false;
-            lnkDownload.Text = string.Format(Language.GetGenericText("Update.Latest"), Constants.ProductName, newestVersion);
-         }
-      }
-
-      /// <summary>
-      /// Launch default browser to download file.
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]	   02/07/2012	Initial: 3485450, add check for updates
-      /// </history>
-      private void lnkDownload_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-      {
-         System.Diagnostics.Process.Start("http://astrogrep.sourceforge.net/download/");
       }
    }
 }

@@ -48,13 +48,12 @@ namespace Plugin.MicrosoftWord
       private object __WordSelection;
 
       private const string PLUGIN_NAME = "Microsoft Word";
-      private const string PLUGIN_VERSION = "1.1.3";
+      private const string PLUGIN_VERSION = "1.1.4";
       private const string PLUGIN_AUTHOR = "The AstroGrep Team";
       private const string PLUGIN_DESCRIPTION = "Searches Microsoft Word documents for specified text.  Line numbers are shown as (Line,Page).  Currently doesn't support Regular Expressions or Context lines.";
       private const string PLUGIN_EXTENSIONS = ".doc,.docx";
 
       private readonly object MISSING_VALUE = Missing.Value;
-      private readonly string NEW_LINE = Environment.NewLine;
       #endregion
 
       #region Class Level
@@ -89,7 +88,6 @@ namespace Plugin.MicrosoftWord
       /// </history>
       public void Dispose()
       {
-
          if (__WordType != null && __WordApplication != null)
          {
             // Close the application.
@@ -334,6 +332,8 @@ namespace Plugin.MicrosoftWord
       /// <history>
       /// [Curtis_Beard]      07/28/2006  Created
       /// [Curtis_Beard]      05/25/2007  ADD: support for Exception object
+      /// [Curtis_Beard]      08/19/2014  CHG: 58, detect Word version to specify readonly mode
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
       /// </history>
       public HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex)
       {
@@ -362,8 +362,13 @@ namespace Plugin.MicrosoftWord
                   //else
                   //   _spacer = new string(' ', MARGINSIZE);
 
-                  // Open a given Word document as readonly
-                  object wordDocument = OpenDocument(path, true);
+                  // Open a given Word document as readonly 
+                  // Note: Word 2003+ requires write mode since reading mode doesn't allow use of home/end keys to select text)
+                  object appversion = __WordApplication.GetType().InvokeMember("Version", BindingFlags.GetProperty, null, __WordApplication, null);
+                  double version = 0;
+                  double.TryParse(appversion.ToString(), out version);
+                  bool useReadOnly = version >= 12.00 ? false : true;
+                  object wordDocument = OpenDocument(path, useReadOnly);
 
                   // Get Selection Property
                   __WordSelection = __WordApplication.GetType().InvokeMember("Selection", BindingFlags.GetProperty,
@@ -439,7 +444,7 @@ namespace Plugin.MicrosoftWord
                         // End If
 
                         // add line
-                        hit.Add(_spacer + line + NEW_LINE, lineNum, colNum);
+                        hit.Add(_spacer, line, lineNum, colNum);
 
                         // add context lines after
                         // if (__contextLines > 0){
@@ -515,25 +520,25 @@ namespace Plugin.MicrosoftWord
          wdExtend = 1
       }
 
-      /// <summary>
-      /// Checks to see if the given line is already recognized as a hit.
-      /// </summary>
-      /// <param name="line">line to check</param>
-      /// <param name="hit">HitObject containing all previous hits</param>
-      /// <returns>True if found, False otherwise</returns>
-      /// <history>
-      /// [Curtis_Beard]      07/28/2006  Created
-      /// </history>
-      private bool HitExists(string line, HitObject hit)
-      {
-         for (int i = 0; i < hit.LineCount; i++)
-         {
-            if (hit.RetrieveLine(i).IndexOf(line) > -1)
-               return true;
-         }
+      ///// <summary>
+      ///// Checks to see if the given line is already recognized as a hit.
+      ///// </summary>
+      ///// <param name="line">line to check</param>
+      ///// <param name="hit">HitObject containing all previous hits</param>
+      ///// <returns>True if found, False otherwise</returns>
+      ///// <history>
+      ///// [Curtis_Beard]      07/28/2006  Created
+      ///// </history>
+      //private bool HitExists(string line, HitObject hit)
+      //{
+      //   for (int i = 0; i < hit.LineCount; i++)
+      //   {
+      //      if (hit.RetrieveLine(i).IndexOf(line) > -1)
+      //         return true;
+      //   }
 
-         return false;
-      }
+      //   return false;
+      //}
 
       /// <summary>
       /// Releases the selection object from memory.
