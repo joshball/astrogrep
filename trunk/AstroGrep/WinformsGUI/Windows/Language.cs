@@ -304,28 +304,28 @@ namespace AstroGrep.Windows
          return string.Empty;
       }
 
-      /// <summary>
-      /// Sets the given menuitem's text property.
-      /// </summary>
-      /// <param name="item">MenuItem to set</param>
-      /// <param name="index">Index of item's parent MenuItem</param>
-      /// <history>
-      /// [Curtis_Beard]		07/31/2006	Created
-      /// </history>
-      public static void SetMenuItemText(MenuItem item, int index)
-      {
-         if (__RootNode != null)
-         {
-            string formName = item.GetMainMenu().GetForm().Name;
-            XmlNode node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']/menu[@index='" + index + "']/menuitem[@index='" + item.Index + "']");
+      ///// <summary>
+      ///// Sets the given menuitem's text property.
+      ///// </summary>
+      ///// <param name="item">MenuItem to set</param>
+      ///// <param name="index">Index of item's parent MenuItem</param>
+      ///// <history>
+      ///// [Curtis_Beard]		07/31/2006	Created
+      ///// </history>
+      //public static void SetMenuItemText(MenuItem item, int index)
+      //{
+      //   if (__RootNode != null)
+      //   {
+      //      string formName = item.GetMainMenu().GetForm().Name;
+      //      XmlNode node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']/menu[@index='" + index + "']/menuitem[@index='" + item.Index + "']");
 
-            if (node != null)
-            {
-               if (node.Attributes["value"] != null)
-                  item.Text = node.Attributes["value"].Value;
-            }
-         }
-      }
+      //      if (node != null)
+      //      {
+      //         if (node.Attributes["value"] != null)
+      //            item.Text = node.Attributes["value"].Value;
+      //      }
+      //   }
+      //}
 
       /// <summary>
       /// Sets the given context menuitem's text property.
@@ -480,9 +480,71 @@ namespace AstroGrep.Windows
                   {
                      item.Text = menuNode.Attributes["value"].Value;
 
-                     ProcessMenuItem(item, item.Index);
+                     //ProcessMenuItem(item, item.Index);
+                     ProcessMainMenuItem(item);
                   }
                }
+            }
+         }
+      }
+
+      private static void ProcessMainMenuItem(MenuItem mainMenuItem)
+      {
+         if (mainMenuItem.MenuItems != null && mainMenuItem.MenuItems.Count > 0)
+         {
+            foreach (MenuItem item in mainMenuItem.MenuItems)
+            {
+               ProcessMenuItems(item, mainMenuItem.Index);
+            }
+         }
+      }
+
+      private static void ProcessMenuItems(MenuItem menuItem, int mainMenuIndex)
+      {
+         if (menuItem.MenuItems.Count == 0)
+         {
+            SetMenuItemText(menuItem, mainMenuIndex);
+         }
+         else
+         {
+            // set text, then process children
+            SetMenuItemText(menuItem, mainMenuIndex);
+
+            foreach (MenuItem subItem in menuItem.MenuItems)
+            {
+               ProcessMenuItems(subItem, mainMenuIndex);
+            }
+         }
+      }
+
+      private static void SetMenuItemText(MenuItem item, int mainMenuIndex)
+      {
+         if (__RootNode != null)
+         {
+            string formName = item.GetMainMenu().GetForm().Name;
+            MenuItem mainMenuItem = item.GetMainMenu().MenuItems[mainMenuIndex];
+            Menu parentItem = item.Parent;
+
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+            // start at current level
+            builder.Insert(0, string.Format("/menuitem[@index='{0}']", item.Index));
+
+            while (parentItem != null && parentItem is MenuItem && mainMenuItem != (parentItem as MenuItem))
+            {
+               MenuItem currentItem = parentItem as MenuItem;
+               builder.Insert(0, string.Format("/menuitem[@index='{0}']", currentItem.Index));
+
+               parentItem = currentItem.Parent;
+            }
+
+            builder.Insert(0, string.Format("screen[@name='{0}']/menu[@index='{1}']", formName, mainMenuIndex));
+
+            XmlNode node = __RootNode.SelectSingleNode(builder.ToString());
+            if (node != null)
+            {
+               if (node.Attributes["value"] != null)
+                  item.Text = node.Attributes["value"].Value;
             }
          }
       }
@@ -623,26 +685,26 @@ namespace AstroGrep.Windows
          SetToolStripItemText(control, tip);
       }
 
-      /// <summary>
-      /// Processa given MenuItem to set its text property.
-      /// </summary>
-      /// <param name="item">MenuItem to process</param>
-      /// <param name="index">Index of MenuItem's parent</param>
-      /// <history>
-      /// [Curtis_Beard]		07/31/2006	Created
-      /// </history>
-      private static void ProcessMenuItem(MenuItem item, int index)
-      {
-         if (item.MenuItems.Count == 0)
-            SetMenuItemText(item, index);
-         else
-         {
-            foreach (MenuItem child in item.MenuItems)
-               ProcessMenuItem(child, index);
+      ///// <summary>
+      ///// Processa given MenuItem to set its text property.
+      ///// </summary>
+      ///// <param name="item">MenuItem to process</param>
+      ///// <param name="index">Index of MenuItem's parent</param>
+      ///// <history>
+      ///// [Curtis_Beard]		07/31/2006	Created
+      ///// </history>
+      //private static void ProcessMenuItem(MenuItem item, int index)
+      //{
+      //   if (item.MenuItems.Count == 0)
+      //      SetMenuItemText(item, index);
+      //   else
+      //   {
+      //      foreach (MenuItem child in item.MenuItems)
+      //         ProcessMenuItem(child, index);
 
-            //SetMenuItemText(item, index);
-         }
-      }
+      //      //SetMenuItemText(item, index);
+      //   }
+      //}
 
       /// <summary>
       /// Set a given form's text property.

@@ -8,22 +8,37 @@ namespace AstroGrep.Windows
    /// Parses and allocates command line arguments in a predefined way.
    /// 
    /// The following command line arguments are valid:
-   /// [/spath="value"]       - Start Path
-   /// [/stypes="value"]      - File Types
-   /// [/stext="value"]       - Search Text
-   /// [/local]               - Store config files in local directory
-   /// [/e]                   - Use regular expressions
-   /// [/c]                   - Case sensitive
-   /// [/w]                   - Whole Word
-   /// [/r]                   - Recursive search (search subfolders)
-   /// [/n]                   - Negation
-   /// [/l]                   - Line numbers
-   /// [/f]                   - File names only
-   /// [/cl="value"]          - Number of context lines
-   /// [/sh]                  - Skip hidden files and folders
-   /// [/ss]                  - Skip system files and directories
-   /// [/s]                   - Start searching immediately
-   /// [/?, /h, /help]        - Display command line arguments
+   /// [/spath="value"]                - Start Path
+   /// [/stypes="value"]               - File Types
+   /// [/stext="value"]                - Search Text
+   /// [/local]                        - Store config files in local directory
+   /// [/e]                            - Use regular expressions
+   /// [/c]                            - Case sensitive
+   /// [/w]                            - Whole Word
+   /// [/r]                            - Recursive search (search subfolders)
+   /// [/n]                            - Negation
+   /// [/l]                            - Line numbers
+   /// [/f]                            - File names only
+   /// [/cl="value"]                   - Number of context lines
+   /// [/sh]                           - Skip hidden files and folders
+   /// [/ss]                           - Skip system files and folders
+   /// [/shf]                          - Skip hidden files
+   /// [/shd]                          - Skip hidden folders
+   /// [/ssf]                          - Skip system files
+   /// [/ssd]                          - Skip system folders
+   /// [/srf]                          - Skip ReadOny files
+   /// [/s]                            - Start searching immediately
+   /// [/opath="value"]                - Save results to path (/s implied)
+   /// [/otype="value"]                - Save results type (json,html,xml,txt[default])
+   /// [/exit]                         - Exit application after search
+   /// [/dmf="operator|value"]         - File Date Modified (=,!=,&gt;,&lt;,&gt;=,&lt;=|MM/DD/YYYY)
+   /// [/dmd="operator|value"]         - Directory Date Modified (=,!=,&gt;,&lt;,&gt;=,&lt;=|MM/DD/YYYY)
+   /// [/dcf="operator|value"]         - File Date Created (=,!=,&gt;,&lt;,&gt;=,&lt;=|MM/DD/YYYY)
+   /// [/dcd="operator|value"]         - Directory Date Created (=,!=,&gt;,&lt;,&gt;=,&lt;=|MM/DD/YYYY)
+   /// [/minfsize="operator|value"]    - Minimum file size (=,!=,&gt;,&lt;,&gt;=,&lt;=|bytes)
+   /// [/maxfsize="operator|value"]    - Maximum file size (=,!=,&gt;,&lt;,&gt;=,&lt;=|bytes)
+   /// [/minfc="value"]                - Minimum file count   
+   /// [/?, /h, /help]                 - Display command line arguments
    /// </summary>
    /// <remarks>
    ///   AstroGrep File Searching Utility. Written by Theodore L. Ward
@@ -48,6 +63,7 @@ namespace AstroGrep.Windows
    /// </remarks>
    /// <history>
    /// 	[Curtis_Beard]		07/25/2006	ADD: 1492221, command line parameters
+   /// 	[Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
    /// </history>
    public class CommandLineProcessing
    {
@@ -57,6 +73,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]		07/26/2006	Created
       /// [Curtis_Beard]		09/26/2012	ADD: display help option
+      /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
       /// </history>
       public struct CommandLineArguments
       {
@@ -101,15 +118,54 @@ namespace AstroGrep.Windows
          /// <summary></summary>
          public int ContextLines;
          /// <summary></summary>
-         public bool SkipHidden;
+         public bool SkipHiddenFile;
          /// <summary></summary>
-         public bool SkipSystem;
+         public bool SkipHiddenDirectory;
+         /// <summary></summary>
+         public bool SkipSystemFile;
+         /// <summary></summary>
+         public bool SkipSystemDirectory;
 
          /// <summary></summary>
          public bool StoreDataLocal;
 
          /// <summary></summary>
          public bool DisplayHelp;
+
+         /// <summary></summary>
+         public string OutputPath;
+         /// <summary></summary>
+         public string OutputType;
+         /// <summary></summary>
+         public bool ExitAfterSearch;
+         /// <summary></summary>
+         public ValueOptionPair DateModifiedFile;
+         /// <summary></summary>
+         public ValueOptionPair DateModifiedDirectory;
+         /// <summary></summary>
+         public ValueOptionPair DateCreatedFile;
+         /// <summary></summary>
+         public ValueOptionPair DateCreatedDirectory;
+         /// <summary></summary>
+         public ValueOptionPair MinFileSize;
+         /// <summary></summary>
+         public ValueOptionPair MaxFileSize;
+         /// <summary></summary>
+         public int MinFileCount;
+         /// <summary></summary>
+         public bool ReadOnlyFile;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public class ValueOptionPair
+      {
+         /// <summary></summary>
+         public libAstroGrep.FilterType.ValueOptions ValueOption { get; set; }
+
+         /// <summary></summary>
+         public object Value { get; set; }
       }
 
       /// <summary>
@@ -180,6 +236,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]		07/26/2006	Created
       /// [Curtis_Beard]		09/26/2012	ADD: display help option
+      /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
       /// </history>
       private static void InitializeArgs(ref CommandLineArguments args)
       {
@@ -208,12 +265,31 @@ namespace AstroGrep.Windows
          args.UseLineNumbers = false;
          args.IsFileNamesOnly = false;
          args.ContextLines = -1;
-         args.SkipHidden = false;
-         args.SkipSystem = false;
+         args.SkipHiddenFile = false;
+         args.SkipHiddenDirectory = false;
+         args.SkipSystemFile = false;
+         args.SkipSystemDirectory = false;
 
          args.StoreDataLocal = false;
 
          args.DisplayHelp = false;
+
+         args.OutputPath = string.Empty;
+         args.OutputType = string.Empty;
+         args.ExitAfterSearch = false;
+
+         args.DateModifiedFile = null;
+         args.DateModifiedDirectory = null;
+
+         args.DateCreatedFile = null;
+         args.DateCreatedDirectory = null;
+
+         args.MinFileSize = null;
+         args.MaxFileSize = null;
+
+         args.MinFileCount = 0;
+
+         args.ReadOnlyFile = false;
       }
 
       /// <summary>
@@ -225,6 +301,7 @@ namespace AstroGrep.Windows
       /// [Curtis_Beard]		07/26/2006	Created
       /// [Curtis_Beard]		05/18/2007	CHG: use new command line arguments
       /// [Curtis_Beard]		09/26/2012	ADD: display help option
+      /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
       /// </history>
       private static void ProcessFlags(Arguments myArgs, ref CommandLineArguments args)
       {
@@ -265,10 +342,36 @@ namespace AstroGrep.Windows
          }
 
          if (myArgs["sh"] != null)
-            args.SkipHidden = true;
+         {
+            args.SkipHiddenFile = true;
+            args.SkipHiddenDirectory = true;
+         }
 
          if (myArgs["ss"] != null)
-            args.SkipSystem = true;
+         {
+            args.SkipSystemFile = true;
+            args.SkipSystemDirectory = true;
+         }
+
+         if (myArgs["shf"] != null)
+         {
+            args.SkipHiddenFile = true;
+         }
+
+         if (myArgs["shd"] != null)
+         {
+            args.SkipHiddenDirectory = true;
+         }
+
+         if (myArgs["ssf"] != null)
+         {
+            args.SkipSystemFile = true;
+         }
+
+         if (myArgs["ssd"] != null)
+         {
+            args.SkipSystemDirectory = true;
+         }
 
          if (myArgs["spath"] != null)
          {
@@ -301,6 +404,168 @@ namespace AstroGrep.Windows
          {
             args.DisplayHelp = true;
          }
+
+         if (myArgs["opath"] != null)
+         {
+            args.OutputPath = myArgs["opath"];
+
+            // default to txt (override by supplying outputtype)
+            args.OutputType = "txt";
+
+            // since they want to save results, then we have to start search
+            args.StartSearch = true;
+         }
+
+         if (myArgs["otype"] != null)
+         {
+            args.OutputType = myArgs["otype"].ToLower();
+
+            // set default path if not defined
+            if (string.IsNullOrEmpty(args.OutputPath))
+            {
+               args.OutputPath = System.IO.Path.Combine(AstroGrep.Constants.ProductLocation, string.Format("results.{0}", args.OutputType));
+            }
+
+            // since they want to save results, then we have to start search
+            args.StartSearch = true;
+         }
+
+         if (myArgs["exit"] != null)
+         {
+            args.ExitAfterSearch = true;
+         }
+
+         if (myArgs["dmf"] != null)
+         {
+            string[] values = myArgs["dmf"].Split('|');
+            if (values.Length == 2)
+            {
+               libAstroGrep.FilterType.ValueOptions valueOption = GetValueOptionFromOperator(values[0]);
+               DateTime value = DateTime.MinValue;
+               if (DateTime.TryParse(values[1], out value) && valueOption != libAstroGrep.FilterType.ValueOptions.None)
+               {
+                  args.DateModifiedFile = new ValueOptionPair() { Value = value, ValueOption = valueOption };
+               }
+            }
+         }
+
+         if (myArgs["dmd"] != null)
+         {
+            string[] values = myArgs["dmd"].Split('|');
+            if (values.Length == 2)
+            {
+               libAstroGrep.FilterType.ValueOptions valueOption = GetValueOptionFromOperator(values[0]);
+               DateTime value = DateTime.MinValue;
+               if (DateTime.TryParse(values[1], out value) && valueOption != libAstroGrep.FilterType.ValueOptions.None)
+               {
+                  args.DateModifiedDirectory = new ValueOptionPair() { Value = value, ValueOption = valueOption };
+               }
+            }
+         }
+
+         if (myArgs["dcf"] != null)
+         {
+            string[] values = myArgs["dcf"].Split('|');
+            if (values.Length == 2)
+            {
+               libAstroGrep.FilterType.ValueOptions valueOption = GetValueOptionFromOperator(values[0]);
+               DateTime value = DateTime.MinValue;
+               if (DateTime.TryParse(values[1], out value) && valueOption != libAstroGrep.FilterType.ValueOptions.None)
+               {
+                  args.DateCreatedFile = new ValueOptionPair() { Value = value, ValueOption = valueOption };
+               }
+            }
+         }
+
+         if (myArgs["dcd"] != null)
+         {
+            string[] values = myArgs["dcd"].Split('|');
+            if (values.Length == 2)
+            {
+               libAstroGrep.FilterType.ValueOptions valueOption = GetValueOptionFromOperator(values[0]);
+               DateTime value = DateTime.MinValue;
+               if (DateTime.TryParse(values[1], out value) && valueOption != libAstroGrep.FilterType.ValueOptions.None)
+               {
+                  args.DateCreatedDirectory = new ValueOptionPair() { Value = value, ValueOption = valueOption };
+               }
+            }
+         }
+
+         if (myArgs["minfsize"] != null)
+         {
+            string[] values = myArgs["minfsize"].Split('|');
+            if (values.Length == 2)
+            {
+               libAstroGrep.FilterType.ValueOptions valueOption = GetValueOptionFromOperator(values[0]);
+               long value = 0;
+               if (Int64.TryParse(values[1], out value) && valueOption != libAstroGrep.FilterType.ValueOptions.None)
+               {
+                  args.MinFileSize = new ValueOptionPair() { Value = value, ValueOption = valueOption };
+               }
+            }
+         }
+
+         if (myArgs["maxfsize"] != null)
+         {
+            string[] values = myArgs["maxfsize"].Split('|');
+            if (values.Length == 2)
+            {
+               libAstroGrep.FilterType.ValueOptions valueOption = GetValueOptionFromOperator(values[0]);
+               long value = 0;
+               if (Int64.TryParse(values[1], out value) && valueOption != libAstroGrep.FilterType.ValueOptions.None)
+               {
+                  args.MaxFileSize = new ValueOptionPair() { Value = value, ValueOption = valueOption };
+               }
+            }
+         }
+
+         if (myArgs["minfc"] != null)
+         {
+            int value = 0;
+            if (Int32.TryParse(myArgs["minfc"], out value))
+            {
+               args.MinFileCount = value;
+            }
+         }
+
+         if (myArgs["srf"] != null)
+         {
+            args.ReadOnlyFile = true;
+         }
+      }
+
+      /// <summary>
+      /// Convert a string operator to a FilterType.ValueOptions enum.
+      /// </summary>
+      /// <param name="op">string value of operator (supports =,!=,&lt;,&gt;,&lt;=,&gt;=)</param>
+      /// <returns>FilterType.ValueOptions enum value</returns>
+      private static libAstroGrep.FilterType.ValueOptions GetValueOptionFromOperator(string op)
+      {
+         libAstroGrep.FilterType.ValueOptions valueOption = libAstroGrep.FilterType.ValueOptions.None;
+
+         switch (op)
+         {
+            case "=":
+               valueOption = libAstroGrep.FilterType.ValueOptions.Equals;
+               break;
+            case "!=":
+               valueOption = libAstroGrep.FilterType.ValueOptions.NotEquals;
+               break;
+            case ">":
+               valueOption = libAstroGrep.FilterType.ValueOptions.GreaterThan;
+               break;
+            case ">=":
+               valueOption = libAstroGrep.FilterType.ValueOptions.GreaterThanEquals;
+               break;
+            case "<":
+               valueOption = libAstroGrep.FilterType.ValueOptions.LessThan;
+               break;
+            case "<=":
+               valueOption = libAstroGrep.FilterType.ValueOptions.LessThanEquals;
+               break;
+         }
+
+         return valueOption;
       }
    }
 

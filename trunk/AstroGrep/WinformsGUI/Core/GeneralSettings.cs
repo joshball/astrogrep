@@ -41,6 +41,8 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
    /// [Curtis_Beard]	   10/28/2012	ADD: 3575509, results word wrap
    /// [Curtis_Beard]	   10/28/2012	ADD: 3479503, ability to change file list font
+   /// [Curtis_Beard]		10/27/2014	CHG: 88, add file extension column
+   /// [Curtis_Beard]		11/11/2014	CHG: 85, remove leading white space
    /// </history>
    public sealed class GeneralSettings
    {
@@ -79,6 +81,7 @@ namespace AstroGrep.Core
       private int columnDate = 150;
       private int columnCount = 60;
       private int columnSize = 80;
+      private int columnFileExt = 120;
 
       private string searchStartPaths = string.Empty;
       private string searchFilters = string.Format("*.*{0}*.txt{0}*.java{0}*.htm, *.html{0}*.jsp, *.asp{0}*.js, *.inc{0}*.htm, *.html, *.jsp, *.asp{0}*.sql{0}*.bas, *.cls, *.vb{0}*.cs{0}*.cpp, *.c, *.h{0}*.asm", Constants.SEARCH_ENTRIES_SEPARATOR);
@@ -97,6 +100,10 @@ namespace AstroGrep.Core
       private string filePanelFont = string.Format("Microsoft Sans Serif{0}8.25{0}Regular", Constants.FONT_SEPARATOR);
 
       private bool detectFileEncoding = true;
+
+      private bool removeLeadingWhiteSpace = false;
+
+      private string fileEncodings = string.Empty;
       #endregion
       
       /// <summary>
@@ -322,6 +329,15 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
+      /// Gets/Sets the window's file list file extension column value.
+      /// </summary>
+      static public int WindowFileColumnFileExtWidth
+      {
+         get { return MySettings.columnFileExt; }
+         set { MySettings.columnFileExt = value; }
+      }
+
+      /// <summary>
       /// Gets/Sets the search starting paths.
       /// </summary>
       static public string SearchStarts
@@ -418,6 +434,24 @@ namespace AstroGrep.Core
       {
          get { return MySettings.detectFileEncoding; }
          set { MySettings.detectFileEncoding = value; }
+      }
+
+      /// <summary>
+      /// Gets/sets whether to remove leading white space from lines in file output area.
+      /// </summary>
+      static public bool RemoveLeadingWhiteSpace
+      {
+         get { return MySettings.removeLeadingWhiteSpace; }
+         set { MySettings.removeLeadingWhiteSpace = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the user specified file encodings.
+      /// </summary>
+      static public string FileEncodings
+      {
+         get { return MySettings.fileEncodings; }
+         set { MySettings.fileEncodings = value; }
       }
    }
 }

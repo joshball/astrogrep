@@ -127,6 +127,7 @@
     <Compile Include="Core\PluginSettings.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\SearchInterfaces.cs" />
     <Compile Include="Core\SearchSettings.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -154,10 +155,19 @@
     <Compile Include="Windows\Controls\ColorButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Windows\Controls\FilterValueType.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\FilterValueType.Designer.cs">
+      <DependentUpon>FilterValueType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Controls\PictureButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Windows\Controls\SplitButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\VistaFolderBrowserDialog.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Windows\Forms\frmAbout.cs">
@@ -165,6 +175,12 @@
     </Compile>
     <Compile Include="Windows\Forms\frmAbout.Designer.cs">
       <DependentUpon>frmAbout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Forms\frmAddEditFileEncoding.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmAddEditFileEncoding.Designer.cs">
+      <DependentUpon>frmAddEditFileEncoding.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\Forms\frmAddEditTextEditor.cs">
       <SubType>Form</SubType>
@@ -177,6 +193,18 @@
     </Compile>
     <Compile Include="Windows\Forms\frmAddEditExclusions.Designer.cs">
       <DependentUpon>frmAddEditExclusions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Forms\frmCheckForUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmCheckForUpdate.Designer.cs">
+      <DependentUpon>frmCheckForUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Forms\frmCheckForUpdateTemp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Forms\frmCheckForUpdateTemp.Designer.cs">
+      <DependentUpon>frmCheckForUpdateTemp.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\Forms\frmCommandLine.cs">
       <SubType>Form</SubType>
@@ -227,6 +255,7 @@
     <Compile Include="Windows\ListViewItemComparer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Windows\ListViewMouseWheelMoveMessageFilter.cs" />
     <Compile Include="Windows\Printing.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -255,9 +284,15 @@
       <DependentUpon>ColorButton.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Controls\FilterValueType.resx">
+      <DependentUpon>FilterValueType.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmAddEditFileEncoding.resx">
+      <DependentUpon>frmAddEditFileEncoding.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmAddEditTextEditor.resx">
       <DependentUpon>frmAddEditTextEditor.cs</DependentUpon>
@@ -266,6 +301,12 @@
     <EmbeddedResource Include="Windows\Forms\frmAddEditExclusions.resx">
       <DependentUpon>frmAddEditExclusions.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmCheckForUpdate.resx">
+      <DependentUpon>frmCheckForUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Forms\frmCheckForUpdateTemp.resx">
+      <DependentUpon>frmCheckForUpdateTemp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmCommandLine.resx">
       <DependentUpon>frmCommandLine.cs</DependentUpon>

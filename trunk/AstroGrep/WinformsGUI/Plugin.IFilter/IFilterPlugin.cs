@@ -53,7 +53,7 @@ namespace Plugin.IFilter
       /// </summary>
       public string Version
       {
-         get { return "1.0.0"; }
+         get { return "1.0.1"; }
       }
 
       /// <summary>
@@ -195,6 +195,7 @@ namespace Plugin.IFilter
       /// <returns>Hitobject containing grep results, null on error</returns>
       /// <history>
       /// [Curtis_Beard]      10/17/2012  Created
+      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
       /// </history>
       public HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex)
       {
@@ -252,8 +253,7 @@ namespace Plugin.IFilter
                            }
                         }
 
-                        //hit.Add(line + Environment.NewLine, i, regCol[0].Index + 1);
-                        hit.Add(line + Environment.NewLine, 0, 0);   // currently use 0,0 for all hits since we parsed out the text
+                        hit.Add(string.Empty, line, 0, 0);   // currently use 0,0 for all hits since we parsed out the text
                         hit.SetHitCount(regCol.Count);
                      }
                   }
@@ -311,8 +311,7 @@ namespace Plugin.IFilter
                               break;
                            }
                         }
-                        //hit.Add(line + Environment.NewLine, i, posInStr + 1);
-                        hit.Add(line + Environment.NewLine, 0, 0);   // currently use 0,0 for all hits since we parsed out the text
+                        hit.Add(string.Empty, line, 0, 0);   // currently use 0,0 for all hits since we parsed out the text
                         hit.SetHitCount(RetrieveLineHitCount(line, searchSpec));
                      }
                   }
@@ -332,6 +331,7 @@ namespace Plugin.IFilter
       /// <history>
       /// [Curtis_Beard]      12/06/2005	Created
       /// [Curtis_Beard]      01/12/2007	FIX: check for correct position of IndexOf
+      /// [Curtis_Beard]      03/24/2014	CHG: use common WholeWordOnly method in Grep object.
       /// </history>
       private int RetrieveLineHitCount(string line, ISearchSpec searchSpec)
       {
@@ -356,7 +356,7 @@ namespace Plugin.IFilter
             // do a check to see if begin and end are valid for wholeword searches
             bool _highlight;
             if (searchSpec.UseWholeWordMatching)
-               _highlight = WholeWordOnly(_begin, _end);
+               _highlight = libAstroGrep.Grep.WholeWordOnly(_begin, _end);
             else
                _highlight = true;
 
@@ -375,56 +375,6 @@ namespace Plugin.IFilter
          }
 
          return _count;
-      }
-
-      static readonly List<string> validTexts = new List<string> { " ", "<", "$", "+", "*", "[", "{", "(", ".", "?", "!", ",", ":", ";", "-", "\\", "/", "'", "\"", Environment.NewLine, "\r\n", "\r", "\n" };
-
-      /// <summary>
-      /// Validate a start text.
-      /// </summary>
-      /// <param name="text">text to validate</param>
-      /// <param name="checkEndText">true if checking end, false if checking beginning</param>
-      /// <returns>True - valid, False - otherwise</returns>
-      /// <history>
-      /// [Curtis_Beard]		12/06/2005	Created
-      /// [Curtis_Beard]		02/09/2007	FIX: 1655533, update whole word matching
-      /// [Curtis_Beard]		08/21/2007	ADD: '/' character and Environment.NewLine
-      /// [Andrew_Radford]      09/08/2009  CHG: refactored to use list, combined begin and end text methods
-      /// [Curtis_Beard]		02/17/2012	CHG: check end text as well
-      /// </history>
-      private bool IsValidText(string text, bool checkEndText)
-      {
-         if (string.IsNullOrEmpty(text))
-            return true;
-
-         bool found = false;
-         validTexts.ForEach(s =>
-         {
-            if (checkEndText)
-            {
-               if (text.EndsWith(s))
-                  found = true;
-            }
-            else if (text.StartsWith(s))
-               found = true;
-         });
-         return found;
-      }
-
-      /// <summary>
-      ///   Check to see if the begin/end text around searched text is valid
-      ///   for a whole word search
-      /// </summary>
-      /// <param name="beginText">Text in front of searched text</param>
-      /// <param name="endText">Text behind searched text</param>
-      /// <returns>True - valid, False - otherwise</returns>
-      /// <history>
-      ///   [Curtis_Beard]	   01/27/2005	Created
-      /// 	[Curtis_Beard]	   02/17/2012	CHG: check for valid endswith as well
-      /// </history>
-      private bool WholeWordOnly(string beginText, string endText)
-      {
-         return (IsValidText(beginText, true) && IsValidText(endText, false));
       }
    }
 }

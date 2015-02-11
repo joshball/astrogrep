@@ -15,17 +15,9 @@
       <control name="chkWholeWordOnly" value="&amp;Whole Word" tooltip="Only match entire words (not parts of words)" />
       <control name="chkCaseSensitive" value="&amp;Case Sensitive" tooltip="Match upper and lower case letters exactly" />
       <control name="chkRegularExpressions" value="Regular &amp;Expressions" tooltip="Use &quot;regular expression&quot; matching" />
-      <control name="chkSkipHidden" value="Skip Hidden Files/Directories" tooltip="Ignore files/directories marked as hidden" />
-      <control name="chkSkipSystem" value="Skip System Files/Directories" tooltip="Ignore files/directories marked as system" />
       <control name="lnkSearchOptions" value="Search Options {0}" />
       <control name="picBrowse" tooltip="Browse..." />
-      <control name="label1" value="Modified After:" />
-      <control name="label2" value="Modified Before:" />
-      <control name="label3" value="Min Size:" />
-      <control name="label4" value="Max Size:" />
-      <control name="lblMinFileCount" value="Minimum File Count" tooltip="Only show files with count greater or equal to this number" />
-      <control name="txtMinFileCount" tooltip="Only show files with count greater or equal to this number" />
-      <control name="lnkExclusions" value="Exclusions..." />
+      <control name="lnkExclusions" value="Exclusions" />
       <control name="lstFileNames">
          <menuitem index="0" value="Copy All" />
          <menuitem index="1" value="Copy Name" />
@@ -48,25 +40,44 @@
       </control>
 
       <menu index="0" value="&amp;File">
-         <menuitem index="0" value="Select Sea&amp;rch Path" />
+         <menuitem index="0" value="&amp;New Window" />
          <menuitem index="1" value="-" />
-         <menuitem index="2" value="&amp;Save Results..." />
-         <menuitem index="3" value="&amp;Print Results..." />
-         <menuitem index="4" value="-" />
-         <menuitem index="5" value="E&amp;xit" />
+         <menuitem index="2" value="Select Sea&amp;rch Path..." />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="&amp;Save Results..." />
+         <menuitem index="5" value="&amp;Print Results..." />
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="E&amp;xit" />
       </menu>
       <menu index="1" value="&amp;Edit">
          <menuitem index="0" value="&amp;Select All Files" />
          <menuitem index="1" value="&amp;Open Selected Files" />
       </menu>
-      <menu index="2" value="&amp;Tools">
-         <menuitem index="0" value="&amp;Clear Most Recently Used Lists" />
+      <menu index="2" value="&amp;View">
+         <menuitem index="0" value="&amp;Status Messages" />
+         <menuitem index="1" value="&amp;Exclusion Messages" />
+         <menuitem index="2" value="E&amp;rror Messages" />
+         <menuitem index="3" value="&amp;All Messages" />
+      </menu>
+      <menu index="3" value="&amp;Tools">
+         <menuitem index="0" value="&amp;Clear Most Recently Used Lists">
+            <menuitem index="0" value="Search Path"/>
+            <menuitem index="1" value="File Types"/>
+            <menuitem index="2" value="Search Text"/>
+            <menuitem index="3" value="-"/>
+            <menuitem index="4" value="All"/>
+         </menuitem>
          <menuitem index="1" value="-" />
          <menuitem index="2" value="&amp;Save Search Options" />
-         <menuitem index="3" value="&amp;Options..." />
+         <menuitem index="3" value="&amp;Options" />
       </menu>
-      <menu index="3" value="&amp;Help">
-         <menuitem index="0" value="&amp;About..." />
+      <menu index="4" value="&amp;Help">
+         <menuitem index="0" value="&amp;View Help" />
+         <menuitem index="1" value="&amp;Regular Expressions" />
+         <menuitem index="2" value="-" />
+         <menuitem index="3" value="&amp;Check for Updates..." />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="&amp;About AstroGrep" />
       </menu>
       
       <!-- status bar items default state-->
@@ -79,7 +90,7 @@
    <screen name="frmAbout" value="About {0}">
       <control name="lnkHomePage" value="{0} Home Page" />
       <control name="cmdOK" value="&amp;OK" />
-      <control name="lblVersionCheck" value="Checking for updates..." />
+      <!--<control name="lblVersionCheck" value="Checking for updates..." />-->
    </screen>
    
    <screen name="frmAddEditTextEditor" value="Text Editors">
@@ -129,6 +140,12 @@
       <control name="grpFileList" value="File List" />
       <control name="btnFileFindFont" value="Find Font..."/>
       <control name="chkDetectFileEncoding" value="Detect &amp;file encoding."/>
+      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Remove Leading White Space"/>
+
+      <control name="tabFileEncoding" value="File Encoding" />
+      <control name="btnFileEncodingAdd" value="&amp;Add..."/>
+      <control name="btnFileEncodingEdit" value="&amp;Edit..."/>
+      <control name="btnFileEncodingDelete" value="&amp;Delete"/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -149,6 +166,7 @@
    </screen>
 
    <screen name="frmAddEditExclusions" value="Exclusions">
+      <control name="lblCategory" value="Category" />
       <control name="lblType" value="Type" />
       <control name="lblOptions" value="Options" />
       <control name="lblValue" value="Value" />
@@ -164,6 +182,24 @@
    <screen name="frmDisplayMessages" value="AstroGrep">
       <control name="btnOK" value="&amp;OK"/>
    </screen>
+
+   <screen name="frmLogDisplay" value="Messages">
+      <control name="sbtnStatus" value="Status"/>
+      <control name="sbtnExclusions" value="Exclusion"/>
+      <control name="sbtnError" value="Error"/>
+   </screen>
+
+   <screen name="frmCheckForUpdateTemp" value="Check for Updates">
+      <control name="lblVersionCheck" value="Checking for updates..." />
+   </screen>
+
+   <screen name="frmAddEditFileEncoding" value="File Encoding">
+      <control name="picBrowse" tooltip="Browse..." />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="&amp;Cancel" />
+      <control name="lblFilePath" value="File Path" />
+      <control name="lblEncoding" value="Encoding" />
+   </screen>
    
    <generic>
       <text name="Browse" value="Browse..."/>
@@ -175,7 +211,6 @@
       <text name="SaveSaved" value="Results saved"/>
       
       <text name="PrintTypeSelected" value="Selected Items"/>
-      <text name="PrintTypeCurrent" value="Current Hit"/>
       <text name="PrintTypeFile" value="File List"/>
       <text name="PrintTypeAll" value="All Hits"/>
       <text name="PrintErrorPageSettings" value="An error occurred while trying to load the Page Settings. Make sure you currently have access to a printer. A printer must be connected and accessible for Printing to work."/>
@@ -195,16 +230,17 @@
       <text name="VerifyErrorGeneric" value="Unable to validate specified parameters.  Please verify they are valid."/>
       <text name="VerifyErrorFileHitCount" value="The minimum file count must be greater than or equal to {0}."/>
       
-      <text name="SearchGenericError" value="An error occurred searching: {0}"/>
-      <text name="SearchFileError" value="An error occurred searching file: {0}. ({1})"/>
+      <text name="SearchGenericError" value="An error occurred searching."/>
+      <text name="SearchFileError" value="An error occurred searching file: {0}."/>
       <text name="SearchCancelled" value="Search Cancelled"/>
       <text name="SearchFinished" value="Search Finished"/>
       <text name="SearchStarted" value="Search Started"/>
       <text name="SearchSearching" value="Searching {0}"/>
       <text name="SearchSearchingByPlugin" value="Plugin {0} was used to search the file." />
       <text name="SearchExplorerItem" value="Search using {0}..."/>
-      
-      <text name="ResultsPreviewText" value="(21)  Example results line and, match, displayed"/>
+
+      <text name="ResultsPreviewSpacerText" value="(21)"/>
+      <text name="ResultsPreviewText" value="&#x9;Example results line and, match, displayed"/>
       <text name="ResultsPreviewTextMatch" value="match"/>
       
       <text name="ColorOtherText" value="&amp;Custom..."/>
@@ -227,6 +263,7 @@
       <text name="ResultsColumnDate" value="Date Modified"/>
       <text name="ResultsColumnCount" value="Count"/>
       <text name="ResultsColumnSize" value="Size"/>
+      <text name="ResultsColumnFileExt" value="File Extension"/>
       
       <text name="ResultsStatusTotalCount" value="Total: {0}"/>
       <text name="ResultsStatusFileCount" value="File: {0}"/>
@@ -241,33 +278,63 @@
       <text name="PluginsColumnExtensions" value="Extensions"/>
 
       <text name="Update.Current" value="{0} is up to date ({1})"/>
+      <text name="Update.NewVersion" value="Version {1} of {0} is available."/>
       <text name="Update.Latest" value="Download {0} update {1}"/>
       <text name="Update.Error" value="Update check failed"/>
 
       <text name="Exclusions.Enabled" value="Enabled"/>
+      <text name="Exclusions.Category" value="Category"/>
       <text name="Exclusions.Type" value="Type"/>
       <text name="Exclusions.Value" value="Value"/>
       <text name="Exclusions.Option" value="Options"/>
 
-      <text name="Exclusions.FileExtension" value="File Extension"/>
-      <text name="Exclusions.FileName" value="File Name"/>
-      <text name="Exclusions.FilePath" value="File Path"/>
-      <text name="Exclusions.DirectoryName" value="Directory Name"/>
-      <text name="Exclusions.DirectoryPath" value="Directory Path"/>
+      <text name="Exclusions.File" value="File"/>
+      <text name="Exclusions.Directory" value="Directory"/>
 
+      <text name="Exclusions.Name" value="Name"/>
+      <text name="Exclusions.Path" value="Path"/>
+      <text name="Exclusions.Hidden" value="Is Hidden"/>
+      <text name="Exclusions.System" value="Is System"/>
+      <text name="Exclusions.DateModified" value="Date Modified"/>
+      <text name="Exclusions.DateCreated" value="Date Created"/>
+      <text name="Exclusions.Extension" value="Extension"/>
+      <text name="Exclusions.Size" value="Size"/>
+      <text name="Exclusions.Binary" value="Is Binary"/>
+      <text name="Exclusions.MinimumHitCount" value="Minimum Count"/>
+      <text name="Exclusions.ReadOnly" value="Is ReadOnly"/>
+            
       <text name="Exclusions.None" value=""/>
       <text name="Exclusions.Equals" value="Equals"/>
       <text name="Exclusions.Contains" value="Contains"/>
       <text name="Exclusions.StartsWith" value="Starts With"/>
       <text name="Exclusions.EndsWith" value="Ends With"/>
+      <text name="Exclusions.NotEquals" value="Not Equals"/>
+      <text name="Exclusions.GreaterThan" value="Greater Than"/>
+      <text name="Exclusions.GreaterThanEquals" value="Greater Than Equals"/>
+      <text name="Exclusions.LessThan" value="Less Than"/>
+      <text name="Exclusions.LessThanEquals" value="Less Than Equals"/>
       <text name="Exclusions.IgnoreCase" value=" (ignore case)"/>
 
+      <text name="Exclusions.Error.NoCategory" value="Please select a category."/>
       <text name="Exclusions.Error.NoType" value="Please select a type."/>
       <text name="Exclusions.Error.NoValue" value="Please enter a value."/>
-      <text name="Exclusions.Error.InvalidExtensionFormat" value="Invalid file extension format. The format is .xxx"/>
+      <!--<text name="Exclusions.Error.InvalidExtensionFormat" value="Invalid file extension format. The format is .xxx"/>-->
       <text name="Exclusions.Error.InvalidOptions" value="Please select a valid options value."/>
-
+      <text name="Exclusions.Error.TypeCategoryLimit" value="Sorry, you can't have more than 1 {0} type under the {1} category."/>
+      
       <text name="ExclusionErrorMessageText" value="Your search yielded items that were either excluded or caused an error.  &#xA;You can view these items by double clicking the associated status bar item in the bottom right corner. &#xA;&#xA;You can disable this message in the Options."/>
+
+      <text name="LogDisplay.Column.Date" value="Date"/>
+      <text name="LogDisplay.Column.Type" value="Type"/>
+      <text name="LogDisplay.Column.Value" value="Value"/>
+      <text name="LogDisplay.Column.Details" value="Details"/>
+      <text name="LogDisplay.Status" value="Status"/>
+      <text name="LogDisplay.Exclusion" value="Exclusion"/>
+      <text name="LogDisplay.Error" value="Error"/>
+
+      <text name="FileEncoding.Enabled" value="Enabled"/>
+      <text name="FileEncoding.FilePath" value="File Path"/>
+      <text name="FileEncoding.Encoding" value="Encoding"/>
    </generic>
    
 </language>

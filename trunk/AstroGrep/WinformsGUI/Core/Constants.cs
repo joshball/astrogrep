@@ -32,6 +32,8 @@ namespace AstroGrep
    /// [Curtis_Beard]	   01/31/2012	CHG: 1947760, update default exclude list to exclude images (bmp,gif,jpg,jpeg,png)
    /// [Curtis_Beard]		02/24/2012	Created: 3488321, ability to change results font
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+   /// [Curtis_Beard]		10/27/2014	CHG: 88, add file extension column
+   /// [Mark_Guerra]       11/06/2014  CHG: 91, exclude compiled java classes and compiled windows html help files (class,chm)
    /// </history>
    public class Constants
    {
@@ -61,14 +63,16 @@ namespace AstroGrep
       public const int COLUMN_INDEX_FILE = 0;
       /// <summary>Directory Index</summary>
       public const int COLUMN_INDEX_DIRECTORY = 1;
+      /// <summary>File Extension Index</summary>
+      public const int COLUMN_INDEX_FILE_EXT = 2;
       /// <summary>Date Index</summary>
-      public const int COLUMN_INDEX_DATE = 2;
+      public const int COLUMN_INDEX_DATE = 3;
       /// <summary>Size Index</summary>
-      public const int COLUMN_INDEX_SIZE = 3;
+      public const int COLUMN_INDEX_SIZE = 4;
       /// <summary>Count Index</summary>
-      public const int COLUMN_INDEX_COUNT = 4;
+      public const int COLUMN_INDEX_COUNT = 5;
       /// <summary>Grep Index Index</summary>
-      public const int COLUMN_INDEX_GREP_INDEX  = 5;   //Must be last
+      public const int COLUMN_INDEX_GREP_INDEX  = 6;   //Must be last
 
       /// <summary>Identifier for all file types</summary>
       public const string ALL_FILE_TYPES = "*";
@@ -77,7 +81,7 @@ namespace AstroGrep
       public static string DEFAULT_LANGUAGE = "en-us";
 
       /// <summary>Default extension exclusion list</summary>
-      private static string DEFAULT_EXTENSION_EXCLUDE_LIST = ".exe;.dll;.pdb;.msi;.sys;.ppt;.gif;.jpg;.jpeg;.png;.bmp";
+      private static string DEFAULT_EXTENSION_EXCLUDE_LIST = ".exe;.dll;.pdb;.msi;.sys;.ppt;.gif;.jpg;.jpeg;.png;.bmp;.class;.chm";
 
       /// <summary>Product name</summary>
       public const string ProductName = "AstroGrep";
@@ -90,6 +94,17 @@ namespace AstroGrep
             System.IO.FileInfo file = new System.IO.FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             return file.Directory.FullName;
+         }
+      }
+
+      /// <summary>Product FullName to executing file.</summary>
+      public static string ProductFullName
+      {
+         get
+         {
+            System.IO.FileInfo file = new System.IO.FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            return file.FullName;
          }
       }
 
@@ -110,42 +125,44 @@ namespace AstroGrep
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+      /// [Curtis_Beard]	   11/06/2014	CHG: update to FilterItem
       /// </history>
-      public static string DefaultExclusions
+      public static string DefaultFilterItems
       {
          get
          {
-            return libAstroGrep.ExclusionItem.ConvertExclusionsToString(GetDefaultExclusionsList());
+            return libAstroGrep.FilterItem.ConvertFilterItemsToString(GetDefaultFilterItemsList());
          }
       }
 
       /// <summary>
-      /// Converts the default extensions list to the new ExclusionItem list.
+      /// Converts the default extensions list to the a FilterItem list.
       /// </summary>
-      /// <returns>List of ExclusionItem objects</returns>
+      /// <returns>List of FilterItems</returns>
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// [Curtis_Beard]	   09/18/2013	ADD: 56, add suggested default directory names to exclude for common apps
+      /// [Curtis_Beard]	   11/06/2014	CHG: update to FilterItem
       /// </history>
-      private static System.Collections.Generic.List<libAstroGrep.ExclusionItem> GetDefaultExclusionsList()
+      private static System.Collections.Generic.List<libAstroGrep.FilterItem> GetDefaultFilterItemsList()
       {
-         var list = new System.Collections.Generic.List<libAstroGrep.ExclusionItem>();
+         var list = new System.Collections.Generic.List<libAstroGrep.FilterItem>();
 
          // default extensions
          var exts = DEFAULT_EXTENSION_EXCLUDE_LIST.Split(';');
          foreach (var ext in exts)
          {
-            var item = new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.FileExtension, ext, libAstroGrep.ExclusionItem.OptionsTypes.None, false);
+            var item = new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Extension), ext, libAstroGrep.FilterType.ValueOptions.None, false, true);
             list.Add(item);
          }
 
          // default directory names to ignore (Git, Mercurial, SVN, CVS, Eclipse Metadata, Eclipse Settings)
-         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".git", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
-         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".hg", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
-         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".svn", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
-         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".cvs", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
-         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".metadata", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
-         list.Add(new libAstroGrep.ExclusionItem(true, libAstroGrep.ExclusionItem.ExclusionTypes.DirectoryName, ".settings", libAstroGrep.ExclusionItem.OptionsTypes.Equals, false));
+         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".git", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
+         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".hg", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
+         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".svn", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
+         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".cvs", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
+         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".metadata", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
+         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".settings", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
 
          return list;
       }

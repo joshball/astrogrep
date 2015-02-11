@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -133,6 +135,7 @@ namespace AstroGrep.Output
       /// [Curtis_Beard]		10/30/2012	CHG: use year replacement for copyright
       /// [Curtis_Beard]		10/30/2012	ADD: file hit count, CHG: recurse to Subfolders
       /// [Curtis_Beard]		02/12/2014	CHG: handle file search only better, add totalHits as parameter
+      /// [Curtis_Beard]      11/11/2014	ADD: export all filteritems
       /// </history>
       public static string ReplaceSearchOptions(string text, Grep grep, int totalHits)
       {
@@ -150,43 +153,29 @@ namespace AstroGrep.Output
          text = text.Replace("%%negation%%", "Negation: " + spec.UseNegation);
          text = text.Replace("%%linenumbers%%", "Line Numbers: " + spec.IncludeLineNumbers);
          text = text.Replace("%%contextlines%%", "Context Lines: " + spec.ContextLines);
-         text = text.Replace("%%skiphidden%%", "Skip Hidden Files/Directories: " + grep.FileFilterSpec.SkipHiddenFiles);
-         text = text.Replace("%%skipsystem%%", "Skip System Files/Directories: " + grep.FileFilterSpec.SkipSystemFiles);
 
-         string modDateStart = string.Empty;
-         if (grep.FileFilterSpec.DateModifiedStart != DateTimePicker.MinimumDateTime)
+         // filter items
+         StringBuilder filterBuilder = new StringBuilder();
+         if (grep.FileFilterSpec.FilterItems != null)
          {
-            modDateStart = "Modified Date Start: " + grep.FileFilterSpec.DateModifiedStart + "<br/>";
+            filterBuilder.Append("Exclusions:<br/>");
+            foreach (FilterItem item in grep.FileFilterSpec.FilterItems)
+            {
+               string option = item.ValueOption.ToString();
+               if (item.ValueOption == FilterType.ValueOptions.None)
+               {
+                  option = string.Empty;
+               }
+               filterBuilder.AppendFormat("<span class=\"indent\">{0} -> {1}: {2} {3} {4}</span><br/>", 
+                  item.FilterType.Category, 
+                  item.FilterType.SubCategory, 
+                  item.Value, 
+                  option, 
+                  !string.IsNullOrEmpty(option) && item.ValueIgnoreCase ? " (ignore case)" : string.Empty
+               );
+            }
          }
-         text = text.Replace("%%moddatestart%%", modDateStart);
-
-         string modDateEnd = string.Empty;
-         if (grep.FileFilterSpec.DateModifiedEnd != DateTimePicker.MaximumDateTime)
-         {
-            modDateEnd = "Modified Date End: " + grep.FileFilterSpec.DateModifiedEnd + "<br/>";
-         }         
-         text = text.Replace("%%moddateend%%", modDateEnd);
-
-         string minSize = string.Empty;
-         if (grep.FileFilterSpec.FileSizeMin != long.MinValue)
-         {
-            minSize = "Min File Size: " + grep.FileFilterSpec.FileSizeMin + "<br/>";
-         }
-         text = text.Replace("%%filesizemin%%", minSize);
-
-         string maxSize = string.Empty;
-         if (grep.FileFilterSpec.FileSizeMax != long.MaxValue)
-         {
-            maxSize = "Max File Size: " + grep.FileFilterSpec.FileSizeMax + "<br/>";
-         }         
-         text = text.Replace("%%filesizemax%%", maxSize);
-
-         string fileHitCount = string.Empty;
-         if (grep.FileFilterSpec.FileHitCount > 0)
-         {
-             fileHitCount = "Minimum File Count: " + grep.FileFilterSpec.FileHitCount + "<br/>";
-         }
-         text = text.Replace("%%filehitcount%%", fileHitCount);
+         text = text.Replace("%%exclusions%%", filterBuilder.ToString());
 
          // %%searchmessage%%
          string searchMessage = string.Empty;
@@ -216,6 +205,7 @@ namespace AstroGrep.Output
       /// <returns>Line with search text highlighted</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
+      /// [Curtis_Beard]		11/11/2014	CHG: escape any html characters
       /// </history>
       private static string HighlightNormal(string line, Grep grep)
       {
@@ -244,7 +234,7 @@ namespace AstroGrep.Output
                var _text = _tempLine.Substring(_pos, _searchText.Length);
                var _end = _tempLine.Substring(_pos + _searchText.Length);
 
-               _newLine += _begin;
+               _newLine += WebUtility.HtmlEncode(_begin);
 
                // do a check to see if begin and end are valid for wholeword searches
                if (grep.SearchSpec.UseWholeWordMatching)
@@ -254,9 +244,9 @@ namespace AstroGrep.Output
 
                // set highlight color for searched text
                if (_highlight)
-                  _newLine += string.Format("<span class=\"searchtext\">{0}</span>", _text);
+                  _newLine += string.Format("<span class=\"searchtext\">{0}</span>", WebUtility.HtmlEncode(_text));
                else
-                  _newLine += _text;
+                  _newLine += WebUtility.HtmlEncode(_text);
 
                // Check remaining string for other hits in same line
                if (grep.SearchSpec.UseCaseSensitivity)
@@ -267,11 +257,11 @@ namespace AstroGrep.Output
                // set default color for end, if no more hits in line
                _tempLine = _end;
                if (_pos < 0)
-                  _newLine += _end;
+                  _newLine += WebUtility.HtmlEncode(_end);
             }
          }
          else
-            _newLine += _textToSearch;
+            _newLine += WebUtility.HtmlEncode(_textToSearch);
          
          return _newLine;
       }
@@ -285,6 +275,7 @@ namespace AstroGrep.Output
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
       /// [Curtis_Beard]	   05/18/2006	FIX: 1723815, use correct whole word matching regex
+      /// [Curtis_Beard]		11/11/2014	CHG: escape any html characters
       /// </history>
       private static string HighlightRegEx(string line, Grep grep)
       {
@@ -331,23 +322,23 @@ namespace AstroGrep.Output
             //  a system beep
             _tempstring = _textToSearch.Substring(_lastPos, _item.Index - _lastPos);
             if (!_tempstring.Equals(string.Empty))
-               _newLine += _tempstring;
+               _newLine += WebUtility.HtmlEncode(_tempstring);
 
             // set the hit text
-            _newLine += string.Format("<span class=\"searchtext\">{0}</span>", _textToSearch.Substring(_item.Index, _item.Length));
+            _newLine += string.Format("<span class=\"searchtext\">{0}</span>", WebUtility.HtmlEncode(_textToSearch.Substring(_item.Index, _item.Length)));
 
             // set the end text
             if (_counter + 1 >= _col.Count)
             {
                // no more hits so just set the rest
-               _newLine += _textToSearch.Substring(_item.Index + _item.Length);
+               _newLine += WebUtility.HtmlEncode(_textToSearch.Substring(_item.Index + _item.Length));
 
                _lastPos = _item.Index + _item.Length;
             }
             else
             {
                // another hit so just set inbetween
-               _newLine += _textToSearch.Substring(_item.Index + _item.Length, _col[_counter + 1].Index - (_item.Index + _item.Length));
+               _newLine += WebUtility.HtmlEncode(_textToSearch.Substring(_item.Index + _item.Length, _col[_counter + 1].Index - (_item.Index + _item.Length)));
                _lastPos = _col[_counter + 1].Index;
             }
          }
@@ -355,7 +346,7 @@ namespace AstroGrep.Output
          if (_col.Count == 0)
          {
             // no match, just a context line
-            _newLine += _textToSearch;
+            _newLine += WebUtility.HtmlEncode(_textToSearch);
          }
 
          return _newLine;
