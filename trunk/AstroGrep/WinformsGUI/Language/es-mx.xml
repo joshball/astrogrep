@@ -104,6 +104,7 @@
       <control name="btnOK" value="&amp;Autorización" />
       <control name="lblMultiTypes" value="Tipos separadas con carácter |."/>
       <control name="lblTabSize" value="ficha tamaño" />
+      <control name="chkUseQuotesAroundFileName" value="&amp;Usar comillas alrededor de archivo."/>
    </screen>
    
    <screen name="frmOptions" value="Opciones">
@@ -139,7 +140,8 @@
       <control name="grpFileList" value="Lista de archivos" />
       <control name="btnFileFindFont" value="Buscar fuente..."/>
       <control name="chkDetectFileEncoding" value="Detectar la codificación del archivo."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Remove Leading White Space"/>
+      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Quitar el espacio"/>
+      <control name="chkSaveMessagesPosition" value="Guardar mensajes &amp;posición de la ventana."/>
 
       <control name="tabFileEncoding" value="codificación de archivos" />
       <control name="btnFileEncodingAdd" value="A&amp;gregar..."/>

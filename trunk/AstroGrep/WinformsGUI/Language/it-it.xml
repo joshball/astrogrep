@@ -94,10 +94,7 @@
    
    <screen name="frmAddEditTextEditor" value="Editor di testo">
       <control name="lblAllTypesMessage" value="Per tutti i tipi di file sconosciuti è possibile utilizzare un editor di testo inserendo * come tipo di file." />
-      <control name="lblCmdOptions" value="Opzioni da riga di comando:
-  %1 - File
-  %2 - Numero riga
-  %3 - Colonna" />
+      <control name="lblCmdOptions" value="Opzioni da riga di comando:&#xD;&#xA;  %1 - File&#xD;&#xA;  %2 - Numero riga&#xD;&#xA;  %3 - Colonna" />
       <control name="lblCmdOptionsView" value="Anteprima: {0}" />
       <control name="btnBrowse" tooltip="Sfoglia..." />
       <control name="lblCmdLineArgs" value="Riga di comando" />
@@ -107,6 +104,7 @@
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Tipi separate con | carattere."/>
       <control name="lblTabSize" value="scheda Dimensioni" />
+      <control name="chkUseQuotesAroundFileName" value="&amp;Usa virgolette intorno di file."/>
    </screen>
    
    <screen name="frmOptions" value="Opzioni">
@@ -142,7 +140,8 @@
       <control name="grpFileList" value="Elenco dei file" />
       <control name="btnFileFindFont" value="Trova font..."/>
       <control name="chkDetectFileEncoding" value="Rileva la codifica del file."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Remove Leading White Space"/>
+      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Rimuovere spazi bianchi"/>
+      <control name="chkSaveMessagesPosition" value="Salvare i messaggi &amp;posizione della finestra."/>      
 
       <control name="tabFileEncoding" value="Codifica File" />
       <control name="btnFileEncodingAdd" value="&amp;Aggiungi..."/>

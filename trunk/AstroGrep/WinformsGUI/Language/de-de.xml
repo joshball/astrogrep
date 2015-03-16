@@ -104,6 +104,7 @@
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Separate Typen mit | Charakter."/>
       <control name="lblTabSize" value="Tabgröße" />
+      <control name="chkUseQuotesAroundFileName" value="&amp;Verwenden Sie Anführungszeichen um Datei."/>
    </screen>
 
    <screen name="frmOptions" value="Einstellungen">
@@ -139,7 +140,8 @@
       <control name="grpFileList" value="Dateiliste" />
       <control name="btnFileFindFont" value="Schriftart suchen..."/>
       <control name="chkDetectFileEncoding" value="Detect-Datei-Codierung."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Remove Leading White Space"/>
+      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Entfernen Sie Leerraum"/>
+      <control name="chkSaveMessagesPosition" value="&amp;Nachrichten speichern Fensterposition."/>
 
       <control name="tabFileEncoding" value="Dateikodierung" />
       <control name="btnFileEncodingAdd" value="&amp;Hinzufügen..."/>

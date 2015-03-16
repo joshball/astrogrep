@@ -48,7 +48,7 @@
          this.btnOK.Location = new System.Drawing.Point(236, 161);
          this.btnOK.Name = "btnOK";
          this.btnOK.Size = new System.Drawing.Size(75, 23);
-         this.btnOK.TabIndex = 0;
+         this.btnOK.TabIndex = 4;
          this.btnOK.Text = "&OK";
          this.btnOK.UseVisualStyleBackColor = true;
          this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
@@ -61,7 +61,7 @@
          this.btnCancel.Location = new System.Drawing.Point(317, 161);
          this.btnCancel.Name = "btnCancel";
          this.btnCancel.Size = new System.Drawing.Size(75, 23);
-         this.btnCancel.TabIndex = 1;
+         this.btnCancel.TabIndex = 5;
          this.btnCancel.Text = "&Cancel";
          this.btnCancel.UseVisualStyleBackColor = true;
          this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -73,7 +73,7 @@
          this.txtFile.Location = new System.Drawing.Point(15, 28);
          this.txtFile.Name = "txtFile";
          this.txtFile.Size = new System.Drawing.Size(353, 20);
-         this.txtFile.TabIndex = 2;
+         this.txtFile.TabIndex = 1;
          // 
          // cboEncodings
          // 
@@ -92,7 +92,7 @@
          this.lblFilePath.Location = new System.Drawing.Point(12, 9);
          this.lblFilePath.Name = "lblFilePath";
          this.lblFilePath.Size = new System.Drawing.Size(48, 13);
-         this.lblFilePath.TabIndex = 4;
+         this.lblFilePath.TabIndex = 0;
          this.lblFilePath.Text = "File Path";
          // 
          // lblEncoding
@@ -101,7 +101,7 @@
          this.lblEncoding.Location = new System.Drawing.Point(12, 68);
          this.lblEncoding.Name = "lblEncoding";
          this.lblEncoding.Size = new System.Drawing.Size(52, 13);
-         this.lblEncoding.TabIndex = 5;
+         this.lblEncoding.TabIndex = 2;
          this.lblEncoding.Text = "Encoding";
          // 
          // picBrowse

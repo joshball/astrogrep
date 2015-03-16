@@ -57,7 +57,6 @@ namespace AstroGrep.Windows.Forms
       private readonly List<LogItem> LogItems = new List<LogItem>();
       private List<FilterItem> __FilterItems = new List<FilterItem>();
       private CommandLineProcessing.CommandLineArguments __CommandLineArgs = new CommandLineProcessing.CommandLineArguments();
-      private bool isSearching = false;
 
       private System.ComponentModel.IContainer components;
 
@@ -99,6 +98,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      02/09/2012	FIX: 3486074, set modification date end to max value
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
       /// [Curtis_Beard]	   09/18/2013	ADD: 58, add drag/drop support for path
+      /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
       /// </history>
       public frmMain()
       {
@@ -140,6 +140,16 @@ namespace AstroGrep.Windows.Forms
          //sbStatusPanel.DoubleClick += new EventHandler(sbStatusPanel_DoubleClick);
          sbErrorCountPanel.DoubleClick += new EventHandler(sbErrorCountPanel_DoubleClick);
          sbFilterCountPanel.DoubleClick += new EventHandler(sbFilterCountPanel_DoubleClick);
+
+         // ugly hack for now to fix Medium text DPI issues 
+         using (var graphics = this.CreateGraphics())
+         {
+            if (API.GetCurrentDPIFontScalingSize(graphics) == API.DPIFontScalingSizes.Medium)
+            {
+               btnCancel.Height += 3;
+               PanelOptionsContainer.Size = new Size(201, PanelOptionsContainer.Size.Height);
+            }
+         }
       }
 
       #region Form Events
@@ -738,10 +748,11 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   12/07/2005	CHG: Use column constant
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488322, use hand cursor for results view to signal click
       /// [Curtis_Beard]	   09/28/2012	CHG: only attempt file show when 1 item is selected (prevents flickering and loading on all deselect)
+      /// [Curtis_Beard]	   02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
       /// </history>
       private void lstFileNames_SelectedIndexChanged(object sender, System.EventArgs e)
       {
-         if (lstFileNames.SelectedItems.Count == 1 && !isSearching)
+         if (lstFileNames.SelectedItems.Count == 1)
          {
             // set to hand cursor so users get a hint that they can double click
             if (txtHits.Cursor != Cursors.Hand)
@@ -1058,10 +1069,13 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   06/28/2007	Created
+      /// [Curtis_Beard]	   03/02/2015	FIX: 63, fix issue when window doesn't fit on a screen (like when a screen is removed)
       /// </history>
       private void LoadWindowSettings()
       {
          int _state = Core.GeneralSettings.WindowState;
+
+         Rectangle defaultBounds = this.Bounds;
 
          // set the top/left
          if (Core.GeneralSettings.WindowTop != -1)
@@ -1074,6 +1088,12 @@ namespace AstroGrep.Windows.Forms
             Width = Core.GeneralSettings.WindowWidth;
          if (Core.GeneralSettings.WindowHeight != -1)
             Height = Core.GeneralSettings.WindowHeight;
+
+         // form can't find a screen to fit on, so reset to center screen on primary screen
+         if (!Screen.AllScreens.Any(s => s.WorkingArea.IntersectsWith(this.Bounds)))
+         {
+            this.Bounds = defaultBounds;
+         }
 
          if (_state != -1 && _state == (int)FormWindowState.Maximized)
          {
@@ -1434,24 +1454,24 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard] 	   12/06/2005	CHG: call WholeWordOnly from Grep class
       /// [Curtis_Beard] 	   04/21/2006	CHG: highlight regular expression searches
       /// [Curtis_Beard] 	   09/28/2006	FIX: use grep object for settings instead of gui items
-      /// [Ed_Jakubowski]     05/20/2009  CHG: Skip highlight if hitCount = 0
-      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
-      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space, add newline for display, fix windows sounds for empty text
-      /// [Curtis_Beard]      11/26/2014	FIX: don't highlight found text that is part of the spacer text
+      /// [Ed_Jakubowski]	   05/20/2009   CHG: Skip highlight if hitCount = 0
+      /// [Curtis_Beard]	   01/24/2012	CHG: allow back color use again since using .Net v2+
+      /// [Curtis_Beard]       10/27/2014	CHG: 85, remove leading white space, add newline for display, fix windows sounds for empty text
+      /// [Curtis_Beard]       11/26/2014	FIX: don't highlight found text that is part of the spacer text
+      /// [Curtis_Beard]       02/24/2015	CHG: remove hit line restriction until proper fix for long loading
+      /// [Curtis_Beard]       03/04/2015	CHG: move standard code to function to cleanup this function.
+      /// [Curtis_Beard]       03/05/2015	FIX: 64/35, clear text field before anything to not have left over content.
       /// </history>
       private void HighlightText(HitObject hit)
       {
-         if (hit.HitCount == 0)
-            return;
-
-         string _searchText = __Grep.SearchSpec.SearchText;
-         string _tempLine;
-         string _end;
-
-         // Clear the contents
+         // Clear and reset
          txtHits.Text = string.Empty;
          txtHits.ForeColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
          txtHits.BackColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
+         txtHits.SelectionFont = txtHits.Font;
+
+         if (hit.HitCount == 0)
+            return;
 
          if (__Grep.SearchSpec.UseRegularExpressions)
          {
@@ -1459,115 +1479,16 @@ namespace AstroGrep.Windows.Forms
          }
          else
          {
-            // Loop through hits and highlight search for text
-            int _index = 0;
-            int maxLines = 5000;
-            if (hit.LineCount < maxLines)
-               maxLines = hit.LineCount;
-
-            for (_index = 0; _index < maxLines; _index++)
-            {
-               // Retrieve hit text
-               string _textToSearch = hit.RetrieveLine(_index);
-               string spacerText = hit.RetrieveSpacerText(_index);
-
-               if (GeneralSettings.RemoveLeadingWhiteSpace)
-               {
-                  _textToSearch = _textToSearch.TrimStart();
-               }
-
-               _textToSearch = string.Format("{0}{1}", spacerText, _textToSearch);
-
-               // Set default font
-               txtHits.SelectionFont = txtHits.Font;
-
-               _tempLine = _textToSearch;
-
-               // attempt to locate the text in the line
-               int _pos = 0;
-               if (__Grep.SearchSpec.UseCaseSensitivity)
-               {
-                  _pos = _tempLine.IndexOf(_searchText, spacerText.Length);
-               }
-               else
-               {
-                  _pos = _tempLine.ToLower().IndexOf(_searchText.ToLower(), spacerText.Length);
-               }
-
-               if (_pos > -1)
-               {
-                  do
-                  {
-                     //
-                     // retrieve parts of text
-                     string _begin = _tempLine.Substring(0, _pos);
-                     string _text = _tempLine.Substring(_pos, _searchText.Length);
-                     _end = _tempLine.Substring(_pos + _searchText.Length);
-
-                     // set default color for starting text
-                     txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-                     txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-                     txtHits.SelectedText = _begin;
-
-                     // do a check to see if begin and end are valid for wholeword searches
-                     bool _highlight;
-                     if (__Grep.SearchSpec.UseWholeWordMatching)
-                     {
-                        _highlight = Grep.WholeWordOnly(_begin, _end);
-                     }
-                     else
-                     {
-                        _highlight = true;
-                     }
-
-                     // set highlight color for searched text
-                     if (_highlight)
-                     {
-                        txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-                        txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
-                     }
-                     txtHits.SelectedText = _text;
-
-                     // Check remaining string for other hits in same line
-                     if (__Grep.SearchSpec.UseCaseSensitivity)
-                     {
-                        _pos = _end.IndexOf(_searchText);
-                     }
-                     else
-                     {
-                        _pos = _end.ToLower().IndexOf(_searchText.ToLower());
-                     }
-
-                     // set default color for end, if no more hits in line
-                     _tempLine = _end;
-                     if (_pos < 0)
-                     {
-                        txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-                        txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-                        if (!string.IsNullOrEmpty(_end))
-                        {
-                           txtHits.SelectedText = _end;
-                        }
-                     }
-
-                  } while (_pos > -1);
-               }
-               else
-               {
-                  // set default color, no search text found
-                  txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-                  txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-                  if (!string.IsNullOrEmpty(_textToSearch))
-                  {
-                     txtHits.SelectedText = _textToSearch;
-                  }
-               }
-
-               txtHits.SelectedText = Environment.NewLine;
-            }
+            HighlightTextStandard(hit);
          }
 
-         if (!txtHits.WordWrap)
+         // adjust line length based on WordWrap selection
+         if (txtHits.WordWrap && txtHits.RightMargin != 0)
+         {
+            // reset right margin to allow wrapping
+            txtHits.RightMargin = 0;
+         }
+         else if (!txtHits.WordWrap)
          {
             // check for really long lines
             var width = TextRenderer.MeasureText(txtHits.Text, txtHits.Font).Width;
@@ -1575,6 +1496,107 @@ namespace AstroGrep.Windows.Forms
             {
                txtHits.RightMargin = width;
             }
+         }
+      }
+
+      /// <summary>
+      /// Highlight the searched text in the results when not using regular expressions.
+      /// </summary>
+      /// <param name="hit">Hit Object containing results</param>
+      /// <history>
+      /// [Curtis_Beard]       03/04/2015	CHG: move standard code to function to cleanup top level function.
+      /// [Curtis_Beard]       03/04/2015	FIX: make empty check to stop potential for windows sound
+      /// </history>
+      private void HighlightTextStandard(HitObject hit)
+      {
+         // Loop through hits and highlight search for text
+         string _searchText = __Grep.SearchSpec.SearchText;
+         string _tempLine = string.Empty;
+         int maxLines = hit.LineCount;
+
+         // Set default font
+         txtHits.SelectionFont = txtHits.Font;
+
+         for (int i = 0; i < maxLines; i++)
+         {
+            // Retrieve hit text
+            string _textToSearch = hit.RetrieveLine(i);
+            string spacerText = hit.RetrieveSpacerText(i);
+
+            if (GeneralSettings.RemoveLeadingWhiteSpace)
+            {
+               _textToSearch = _textToSearch.TrimStart();
+            }
+
+            _textToSearch = string.Format("{0}{1}", spacerText, _textToSearch);
+
+            _tempLine = _textToSearch;
+
+            // attempt to locate the text in the line
+            int _pos = _tempLine.IndexOf(_searchText, spacerText.Length, __Grep.SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+
+            if (_pos > -1)
+            {
+               do
+               {
+                  //
+                  // retrieve parts of text
+                  string _begin = _tempLine.Substring(0, _pos);
+                  string _text = _tempLine.Substring(_pos, _searchText.Length);
+                  string _end = _tempLine.Substring(_pos + _searchText.Length);
+
+                  // set default color for starting text
+                  txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
+                  txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                  if (!string.IsNullOrEmpty(_begin))
+                  {
+                     txtHits.SelectedText = _begin;
+                  }
+
+                  // do a check to see if begin and end are valid for wholeword searches
+                  bool _highlight = true;
+                  if (__Grep.SearchSpec.UseWholeWordMatching)
+                  {
+                     _highlight = Grep.WholeWordOnly(_begin, _end);
+                  }
+
+                  // set highlight color for searched text
+                  if (_highlight)
+                  {
+                     txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
+                     txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
+                  }
+                  txtHits.SelectedText = _text;
+
+                  // Check remaining string for other hits in same line
+                  _pos = _end.IndexOf(_searchText, __Grep.SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+
+                  // set default color for end, if no more hits in line
+                  _tempLine = _end;
+                  if (_pos < 0)
+                  {
+                     txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+                     txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+                     if (!string.IsNullOrEmpty(_end))
+                     {
+                        txtHits.SelectedText = _end;
+                     }
+                  }
+
+               } while (_pos > -1);
+            }
+            else
+            {
+               // set default color, no search text found
+               txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
+               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
+               if (!string.IsNullOrEmpty(_textToSearch))
+               {
+                  txtHits.SelectedText = _textToSearch;
+               }
+            }
+
+            txtHits.SelectedText = Environment.NewLine;
          }
       }
 
@@ -1591,25 +1613,24 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
       /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space, add newline for display, fix windows sounds for empty text
       /// [Curtis_Beard]      11/26/2014	FIX: don't highlight found text that is part of the spacer text
+      /// [Curtis_Beard]      03/05/2015	FIX: issue with windows sound, cleanup logic for whole word/case sensitive
       /// </history>
       private void HighlightTextRegEx(HitObject hit)
       {
          string _textToSearch = string.Empty;
          string spacerText = string.Empty;
          string _tempString = string.Empty;
-         int _index = 0;
          int _lastPos = 0;
-         int _counter = 0;
          Regex _regEx = new Regex(__Grep.SearchSpec.SearchText);
          MatchCollection _col;
          Match _item;
 
          // Loop through hits and highlight search for text
-         for (_index = 0; _index < hit.LineCount; _index++)
+         for (int i = 0; i < hit.LineCount; i++)
          {
             // Retrieve hit text
-            _textToSearch = hit.RetrieveLine(_index);
-            spacerText = hit.RetrieveSpacerText(_index);
+            _textToSearch = hit.RetrieveLine(i);
+            spacerText = hit.RetrieveSpacerText(i);
 
             if (GeneralSettings.RemoveLeadingWhiteSpace)
             {
@@ -1618,36 +1639,16 @@ namespace AstroGrep.Windows.Forms
 
             _textToSearch = string.Format("{0}{1}", spacerText, _textToSearch);
 
-            // Set default font
-            txtHits.SelectionFont = txtHits.Font;
-
-            // find all reg ex matches in line
-            if (__Grep.SearchSpec.UseCaseSensitivity && __Grep.SearchSpec.UseWholeWordMatching)
-            {
-               _regEx = new Regex("\\b" + __Grep.SearchSpec.SearchText + "\\b");
-               _col = _regEx.Matches(_textToSearch, spacerText.Length);
-            }
-            else if (__Grep.SearchSpec.UseCaseSensitivity)
-            {
-               _regEx = new Regex(__Grep.SearchSpec.SearchText);
-               _col = _regEx.Matches(_textToSearch, spacerText.Length);
-            }
-            else if (__Grep.SearchSpec.UseWholeWordMatching)
-            {
-               _regEx = new Regex("\\b" + __Grep.SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
-               _col = _regEx.Matches(_textToSearch, spacerText.Length);
-            }
-            else
-            {
-               _regEx = new Regex(__Grep.SearchSpec.SearchText, RegexOptions.IgnoreCase);
-               _col = _regEx.Matches(_textToSearch, spacerText.Length);
-            }
+            string pattern = string.Format("{0}{1}{0}", __Grep.SearchSpec.UseWholeWordMatching ? "\\b" : string.Empty, __Grep.SearchSpec.SearchText);
+            RegexOptions options = __Grep.SearchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase;
+            _regEx = new Regex(pattern, options);
+            _col = _regEx.Matches(_textToSearch);
 
             // loop through the matches
             _lastPos = 0;
-            for (_counter = 0; _counter < _col.Count; _counter++)
+            for (int j = 0; j < _col.Count; j++)
             {
-               _item = _col[_counter];
+               _item = _col[j];
 
                // set the start text
                txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
@@ -1664,22 +1665,34 @@ namespace AstroGrep.Windows.Forms
                // set the hit text
                txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
                txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
-               txtHits.SelectedText = _textToSearch.Substring(_item.Index, _item.Length);
+               string selectedText = _textToSearch.Substring(_item.Index, _item.Length);
+               if (!string.IsNullOrEmpty(selectedText))
+               {
+                  txtHits.SelectedText = selectedText;
+               }
 
                // set the end text
                txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
                txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-               if (_counter + 1 >= _col.Count)
+               if (j + 1 >= _col.Count)
                {
                   //  no more hits so just set the rest
-                  txtHits.SelectedText = _textToSearch.Substring(_item.Index + _item.Length);
+                  selectedText = _textToSearch.Substring(_item.Index + _item.Length);
+                  if (!string.IsNullOrEmpty(selectedText))
+                  {
+                     txtHits.SelectedText = selectedText;
+                  }
                   _lastPos = _item.Index + _item.Length;
                }
                else
                {
                   // another hit so just set inbetween
-                  txtHits.SelectedText = _textToSearch.Substring(_item.Index + _item.Length, _col[_counter + 1].Index - (_item.Index + _item.Length));
-                  _lastPos = _col[_counter + 1].Index;
+                  selectedText = _textToSearch.Substring(_item.Index + _item.Length, _col[j + 1].Index - (_item.Index + _item.Length));
+                  if (!string.IsNullOrEmpty(selectedText))
+                  {
+                     txtHits.SelectedText = selectedText;
+                  }
+                  _lastPos = _col[j + 1].Index;
                }
             }
 
@@ -1817,24 +1830,23 @@ namespace AstroGrep.Windows.Forms
       /// <returns>file name or truncated file name if to long</returns>
       /// <history>
       /// [Curtis_Beard]	   04/21/2006	Created, fixes bug 1367852
+      /// [Curtis_Beard]	   03/16/2015	CHG: cleanup variable names and apply using logic
       /// </history>
       private string TruncateFileName(System.IO.FileInfo file, StatusStrip status)
       {
+         string name = file.FullName;
          const int EXTRA = 20;     //used for spacing of the sizer
-         Graphics g = status.CreateGraphics();
-         int _strLen = 0;
-         string _name = file.FullName;
-
-         _strLen = Convert.ToInt32(g.MeasureString(_name, status.Font).Width);
-         if (_strLen >= (status.Width - EXTRA))
+         using (Graphics g = status.CreateGraphics())
          {
-            // truncate to just the root name and the file name (for now)
-            _name = file.Directory.Root.Name + @"...\" + file.Name;
+            int width = Convert.ToInt32(g.MeasureString(name, status.Font).Width);
+            if (width >= (status.Width - EXTRA))
+            {
+               // truncate to just the root name and the file name (for now)
+               name = file.Directory.Root.Name + @"...\" + file.Name;
+            }
          }
 
-         g.Dispose();
-
-         return _name;
+         return name;
       }
 
       /// <summary>
@@ -2235,6 +2247,14 @@ namespace AstroGrep.Windows.Forms
          }
       }
 
+      /// <summary>
+      /// Gets a list of FilterItems that are the given FilterType.
+      /// </summary>
+      /// <param name="ft">Desired FilterType</param>
+      /// <returns>List of FilterItems</returns>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options
+      /// </history>
       private List<FilterItem> GetFilterItemsByFilterType(FilterType ft)
       {
          return __FilterItems.FindAll(f => f.FilterType == ft);
@@ -2557,6 +2577,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   01/11/2005	.Net Conversion
       /// [Curtis_Beard]	   12/07/2005	CHG: Use column constant
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
+      /// [Curtis_Beard]	   03/16/2015	CHG: check for null HitObject
       /// </history>
       private void mnuOpenSelected_Click(object sender, System.EventArgs e)
       {
@@ -2568,12 +2589,15 @@ namespace AstroGrep.Windows.Forms
             // retrieve hit object
             hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
 
-            // retrieve the filename
-            path = hit.FilePath;
+            if (hit != null)
+            {
+               // retrieve the filename
+               path = hit.FilePath;
 
-            // open the default editor at first hit
-            int index = hit.RetrieveFirstHitIndex();
-            TextEditors.EditFile(path, hit.RetrieveLineNumber(index), hit.RetrieveColumn(index), hit.RetrieveLine(index));
+               // open the default editor at first hit
+               int index = hit.RetrieveFirstHitIndex();
+               TextEditors.EditFile(path, hit.RetrieveLineNumber(index), hit.RetrieveColumn(index), hit.RetrieveLine(index));
+            }
          }
       }
 
@@ -3270,12 +3294,12 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]		07/12/2006	Created
       /// [Curtis_Beard]		08/07/2007  ADD: 1741735, display any search errors
-      /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]	    12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]	    02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
       /// </history>
       private void ReceiveSearchCancel()
       {
          RestoreTaskBarProgress();
-         isSearching = false;
 
          const string languageLookupText = "SearchCancelled";
          LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, languageLookupText));
@@ -3297,12 +3321,13 @@ namespace AstroGrep.Windows.Forms
       /// [Ed_Jakubowski]		05/20/2009  ADD: Display the Count
       /// [Curtis_Beard]		01/30/2012  CHG: use language class for count text
       /// [Curtis_Beard]		04/08/2014	CHG: 74, command line exit, save options
-      /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]	    12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]	    02/24/2015	CHG: only attempt file show when 1 item is selected (prevents flickering and loading on all deselect)
+      /// [Curtis_Beard]	    02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
       /// </history>
       private void ReceiveSearchComplete()
       {
          RestoreTaskBarProgress();
-         isSearching = false;
 
          const string languageLookupText = "SearchFinished";
          LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, languageLookupText));
@@ -3389,6 +3414,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   09/27/2012	ADD: 1741735, better error handling display
       /// [Curtis_Beard]	   12/06/2012	CHG: 1741735, rework to use common LogItems
       /// [Curtis_Beard]	   11/11/2014	CHG: use new log items viewer form
+      /// [Curtis_Beard]	   03/03/2015	CHG: 93, used saved window position if enabled, add bounds check
       /// </history>
       private void DisplaySearchMessages(LogItem.LogItemTypes? displayType)
       {
@@ -3407,8 +3433,22 @@ namespace AstroGrep.Windows.Forms
 
                frm.DefaultFilterType = displayType;
                frm.StartPosition = FormStartPosition.Manual;
-               frm.Location = new Point(this.Left + 20, this.Bottom - frm.Height - stbStatus.Height - 20);
-               frm.Size = new Size(this.Width - 40, frm.Height);
+
+               Rectangle defaultBounds = new Rectangle(this.Left + 20, this.Bottom - frm.Height - stbStatus.Height - 20, this.Width - 40, frm.Height);
+
+               int width = Core.GeneralSettings.LogDisplaySavePosition && Core.GeneralSettings.LogDisplayWidth != -1 ? Core.GeneralSettings.LogDisplayWidth : defaultBounds.Width;
+               int height = Core.GeneralSettings.LogDisplaySavePosition && Core.GeneralSettings.LogDisplayHeight != -1 ? Core.GeneralSettings.LogDisplayHeight : defaultBounds.Height;
+               int left = Core.GeneralSettings.LogDisplaySavePosition && Core.GeneralSettings.LogDisplayLeft != -1 ? Core.GeneralSettings.LogDisplayLeft : defaultBounds.X;
+               int top = Core.GeneralSettings.LogDisplaySavePosition && Core.GeneralSettings.LogDisplayTop != -1 ? Core.GeneralSettings.LogDisplayTop : defaultBounds.Y;
+               
+               frm.Bounds = new Rectangle(left, top, width, height);
+
+               // form can't find a screen to fit on, so reset to default on primary screen
+               if (!Screen.AllScreens.Any(s => s.WorkingArea.IntersectsWith(frm.Bounds)))
+               {
+                  frm.Bounds = defaultBounds;
+               }
+
                frm.ShowDialog(this);
             }
          }
@@ -3614,12 +3654,13 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		11/22/2006	CHG: Remove use of browse in combobox
       /// [Curtis_Beard]		08/07/2007  ADD: 1741735, better search error handling
       /// [Curtis_Beard]		08/21/2007  FIX: 1778467, make sure file pattern is correct if a '\' is present
-      /// [Curtis_Beard]	   01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
+      /// [Curtis_Beard]		01/31/2012	CHG: 3424154/1816655, allow multiple starting directories
       /// [Curtis_Beard]		02/07/2012  CHG: 1741735, report full error message
-      /// [Curtis_Beard]	   02/24/2012	CHG: 3488322, use hand cursor for results view to signal click
-      /// [Curtis_Beard]	   10/30/2012	ADD: 28, search within results
-      /// [Curtis_Beard]	   12/01/2014	ADD: support for encoding detection event
-      /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]		02/24/2012	CHG: 3488322, use hand cursor for results view to signal click
+      /// [Curtis_Beard]		10/30/2012	ADD: 28, search within results
+      /// [Curtis_Beard]		12/01/2014	ADD: support for encoding detection event
+      /// [Curtis_Beard]		12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]		02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
       /// </history>
       private void StartSearch(bool searchWithInResults)
       {
@@ -3685,14 +3726,12 @@ namespace AstroGrep.Windows.Forms
             __Grep.FileEncodingDetected += ReceiveFileEncodingDetected;
 
             Windows.API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.Indeterminate);
-            isSearching = true;
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, "SearchStarted"));
             __Grep.BeginExecute();
          }
          catch (Exception ex)
          {
             RestoreTaskBarProgress();
-            isSearching = false;
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Error, "SearchGenericError", string.Format("{0}||{1}", string.Empty, ex.Message)));
 
             string message = string.Format(Language.GetGenericText("SearchGenericError"), ex.Message);

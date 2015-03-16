@@ -115,6 +115,7 @@ namespace AstroGrep.Windows.Forms
       private ColumnHeader clhEncoding;
       private bool inhibitFileEncodingAutoCheck;
       private CheckBox chkDetectFileEncoding;
+      private CheckBox chkSaveMessagesPosition;
 
       /// <summary>
       /// Required designer variable.
@@ -130,9 +131,6 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       public frmOptions()
       {
-         //
-         // Required for Windows Form Designer support
-         //
          InitializeComponent();
 
          __RightClickEnabled = Shortcuts.IsSearchOption();
@@ -195,6 +193,15 @@ namespace AstroGrep.Windows.Forms
          this.cboLanguage = new System.Windows.Forms.ComboBox();
          this.cboPathMRUCount = new System.Windows.Forms.ComboBox();
          this.lblStoredPaths = new System.Windows.Forms.Label();
+         this.tabFileEncoding = new System.Windows.Forms.TabPage();
+         this.chkDetectFileEncoding = new System.Windows.Forms.CheckBox();
+         this.btnFileEncodingDelete = new System.Windows.Forms.Button();
+         this.btnFileEncodingEdit = new System.Windows.Forms.Button();
+         this.btnFileEncodingAdd = new System.Windows.Forms.Button();
+         this.lstFiles = new System.Windows.Forms.ListView();
+         this.clhEnabled = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.clhFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+         this.clhEncoding = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.tabTextEditors = new System.Windows.Forms.TabPage();
          this.btnEdit = new System.Windows.Forms.Button();
          this.btnRemove = new System.Windows.Forms.Button();
@@ -215,9 +222,13 @@ namespace AstroGrep.Windows.Forms
          this.chkWordWrap = new System.Windows.Forms.CheckBox();
          this.lblCurrentFont = new System.Windows.Forms.Label();
          this.btnFindFont = new System.Windows.Forms.Button();
+         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
+         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
          this.lblResultsWindowBack = new System.Windows.Forms.Label();
          this.lblResultsWindowFore = new System.Windows.Forms.Label();
          this.grpResultMatch = new System.Windows.Forms.GroupBox();
+         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
+         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
          this.BackColorLabel = new System.Windows.Forms.Label();
          this.ForeColorLabel = new System.Windows.Forms.Label();
          this.tabPlugins = new System.Windows.Forms.TabPage();
@@ -237,23 +248,12 @@ namespace AstroGrep.Windows.Forms
          this.PluginsColumnExt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.btnOK = new System.Windows.Forms.Button();
          this.btnCancel = new System.Windows.Forms.Button();
-         this.tabFileEncoding = new System.Windows.Forms.TabPage();
-         this.lstFiles = new System.Windows.Forms.ListView();
-         this.clhEnabled = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-         this.clhFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-         this.clhEncoding = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-         this.btnFileEncodingAdd = new System.Windows.Forms.Button();
-         this.btnFileEncodingEdit = new System.Windows.Forms.Button();
-         this.btnFileEncodingDelete = new System.Windows.Forms.Button();
-         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
-         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
-         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
-         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
-         this.chkDetectFileEncoding = new System.Windows.Forms.CheckBox();
+         this.chkSaveMessagesPosition = new System.Windows.Forms.CheckBox();
          this.tbcOptions.SuspendLayout();
          this.tabGeneral.SuspendLayout();
          this.ShortcutGroup.SuspendLayout();
          this.LanguageGroup.SuspendLayout();
+         this.tabFileEncoding.SuspendLayout();
          this.tabTextEditors.SuspendLayout();
          this.tabResults.SuspendLayout();
          this.grpFileList.SuspendLayout();
@@ -261,7 +261,6 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.SuspendLayout();
          this.tabPlugins.SuspendLayout();
          this.PluginDetailsGroup.SuspendLayout();
-         this.tabFileEncoding.SuspendLayout();
          this.SuspendLayout();
          // 
          // tbcOptions
@@ -283,6 +282,7 @@ namespace AstroGrep.Windows.Forms
          // 
          // tabGeneral
          // 
+         this.tabGeneral.Controls.Add(this.chkSaveMessagesPosition);
          this.tabGeneral.Controls.Add(this.chkSaveSearchOptions);
          this.tabGeneral.Controls.Add(this.chkShowExclusionErrorMessage);
          this.tabGeneral.Controls.Add(this.ShortcutGroup);
@@ -309,7 +309,7 @@ namespace AstroGrep.Windows.Forms
          // chkShowExclusionErrorMessage
          // 
          this.chkShowExclusionErrorMessage.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-         this.chkShowExclusionErrorMessage.Location = new System.Drawing.Point(8, 213);
+         this.chkShowExclusionErrorMessage.Location = new System.Drawing.Point(8, 236);
          this.chkShowExclusionErrorMessage.Name = "chkShowExclusionErrorMessage";
          this.chkShowExclusionErrorMessage.Size = new System.Drawing.Size(472, 35);
          this.chkShowExclusionErrorMessage.TabIndex = 36;
@@ -432,6 +432,102 @@ namespace AstroGrep.Windows.Forms
          this.lblStoredPaths.TabIndex = 32;
          this.lblStoredPaths.Text = "Number of most recently used paths to store";
          this.lblStoredPaths.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+         // 
+         // tabFileEncoding
+         // 
+         this.tabFileEncoding.Controls.Add(this.chkDetectFileEncoding);
+         this.tabFileEncoding.Controls.Add(this.btnFileEncodingDelete);
+         this.tabFileEncoding.Controls.Add(this.btnFileEncodingEdit);
+         this.tabFileEncoding.Controls.Add(this.btnFileEncodingAdd);
+         this.tabFileEncoding.Controls.Add(this.lstFiles);
+         this.tabFileEncoding.Location = new System.Drawing.Point(4, 22);
+         this.tabFileEncoding.Name = "tabFileEncoding";
+         this.tabFileEncoding.Size = new System.Drawing.Size(553, 348);
+         this.tabFileEncoding.TabIndex = 4;
+         this.tabFileEncoding.Text = "File Encoding";
+         this.tabFileEncoding.UseVisualStyleBackColor = true;
+         // 
+         // chkDetectFileEncoding
+         // 
+         this.chkDetectFileEncoding.AutoSize = true;
+         this.chkDetectFileEncoding.Location = new System.Drawing.Point(8, 9);
+         this.chkDetectFileEncoding.Name = "chkDetectFileEncoding";
+         this.chkDetectFileEncoding.Size = new System.Drawing.Size(124, 17);
+         this.chkDetectFileEncoding.TabIndex = 39;
+         this.chkDetectFileEncoding.Text = "Detect file encoding.";
+         this.chkDetectFileEncoding.UseVisualStyleBackColor = true;
+         // 
+         // btnFileEncodingDelete
+         // 
+         this.btnFileEncodingDelete.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnFileEncodingDelete.Location = new System.Drawing.Point(184, 310);
+         this.btnFileEncodingDelete.Name = "btnFileEncodingDelete";
+         this.btnFileEncodingDelete.Size = new System.Drawing.Size(75, 23);
+         this.btnFileEncodingDelete.TabIndex = 4;
+         this.btnFileEncodingDelete.Text = "&Delete";
+         this.btnFileEncodingDelete.UseVisualStyleBackColor = true;
+         this.btnFileEncodingDelete.Click += new System.EventHandler(this.btnFileEncodingDelete_Click);
+         // 
+         // btnFileEncodingEdit
+         // 
+         this.btnFileEncodingEdit.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnFileEncodingEdit.Location = new System.Drawing.Point(96, 310);
+         this.btnFileEncodingEdit.Name = "btnFileEncodingEdit";
+         this.btnFileEncodingEdit.Size = new System.Drawing.Size(75, 23);
+         this.btnFileEncodingEdit.TabIndex = 3;
+         this.btnFileEncodingEdit.Text = "&Edit...";
+         this.btnFileEncodingEdit.UseVisualStyleBackColor = true;
+         this.btnFileEncodingEdit.Click += new System.EventHandler(this.btnFileEncodingEdit_Click);
+         // 
+         // btnFileEncodingAdd
+         // 
+         this.btnFileEncodingAdd.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnFileEncodingAdd.Location = new System.Drawing.Point(8, 310);
+         this.btnFileEncodingAdd.Name = "btnFileEncodingAdd";
+         this.btnFileEncodingAdd.Size = new System.Drawing.Size(75, 23);
+         this.btnFileEncodingAdd.TabIndex = 2;
+         this.btnFileEncodingAdd.Text = "&Add...";
+         this.btnFileEncodingAdd.UseVisualStyleBackColor = true;
+         this.btnFileEncodingAdd.Click += new System.EventHandler(this.btnFileEncodingAdd_Click);
+         // 
+         // lstFiles
+         // 
+         this.lstFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+         this.lstFiles.CheckBoxes = true;
+         this.lstFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.clhEnabled,
+            this.clhFile,
+            this.clhEncoding});
+         this.lstFiles.FullRowSelect = true;
+         this.lstFiles.HideSelection = false;
+         this.lstFiles.Location = new System.Drawing.Point(8, 32);
+         this.lstFiles.Name = "lstFiles";
+         this.lstFiles.Size = new System.Drawing.Size(537, 258);
+         this.lstFiles.TabIndex = 1;
+         this.lstFiles.UseCompatibleStateImageBehavior = false;
+         this.lstFiles.View = System.Windows.Forms.View.Details;
+         this.lstFiles.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lstFiles_ColumnClick);
+         this.lstFiles.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.lstFiles_ItemCheck);
+         this.lstFiles.SelectedIndexChanged += new System.EventHandler(this.lstFiles_SelectedIndexChanged);
+         this.lstFiles.DoubleClick += new System.EventHandler(this.lstFiles_DoubleClick);
+         this.lstFiles.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstFiles_KeyDown);
+         this.lstFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lstFiles_MouseDown);
+         this.lstFiles.MouseUp += new System.Windows.Forms.MouseEventHandler(this.lstFiles_MouseUp);
+         // 
+         // clhEnabled
+         // 
+         this.clhEnabled.Text = "Enabled";
+         // 
+         // clhFile
+         // 
+         this.clhFile.Text = "File";
+         this.clhFile.Width = 326;
+         // 
+         // clhEncoding
+         // 
+         this.clhEncoding.Text = "Encoding";
+         this.clhEncoding.Width = 143;
          // 
          // tabTextEditors
          // 
@@ -649,6 +745,22 @@ namespace AstroGrep.Windows.Forms
          this.btnFindFont.UseVisualStyleBackColor = true;
          this.btnFindFont.Click += new System.EventHandler(this.btnFindFont_Click);
          // 
+         // btnResultsWindowBackColor
+         // 
+         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(441, 24);
+         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
+         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.btnResultsWindowBackColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowBackColor.TabIndex = 22;
+         // 
+         // btnResultsWindowForeColor
+         // 
+         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
+         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
+         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.btnResultsWindowForeColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowForeColor.TabIndex = 21;
+         // 
          // lblResultsWindowBack
          // 
          this.lblResultsWindowBack.Location = new System.Drawing.Point(305, 24);
@@ -681,6 +793,22 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.TabIndex = 23;
          this.grpResultMatch.TabStop = false;
          this.grpResultMatch.Text = "Results Match";
+         // 
+         // BackColorButton
+         // 
+         this.BackColorButton.Location = new System.Drawing.Point(441, 24);
+         this.BackColorButton.Name = "BackColorButton";
+         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.BackColorButton.Size = new System.Drawing.Size(75, 23);
+         this.BackColorButton.TabIndex = 18;
+         // 
+         // ForeColorButton
+         // 
+         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
+         this.ForeColorButton.Name = "ForeColorButton";
+         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.ForeColorButton.Size = new System.Drawing.Size(75, 23);
+         this.ForeColorButton.TabIndex = 17;
          // 
          // BackColorLabel
          // 
@@ -862,133 +990,15 @@ namespace AstroGrep.Windows.Forms
          this.btnCancel.Text = "&Cancel";
          this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
          // 
-         // tabFileEncoding
+         // chkSaveMessagesPosition
          // 
-         this.tabFileEncoding.Controls.Add(this.chkDetectFileEncoding);
-         this.tabFileEncoding.Controls.Add(this.btnFileEncodingDelete);
-         this.tabFileEncoding.Controls.Add(this.btnFileEncodingEdit);
-         this.tabFileEncoding.Controls.Add(this.btnFileEncodingAdd);
-         this.tabFileEncoding.Controls.Add(this.lstFiles);
-         this.tabFileEncoding.Location = new System.Drawing.Point(4, 22);
-         this.tabFileEncoding.Name = "tabFileEncoding";
-         this.tabFileEncoding.Size = new System.Drawing.Size(553, 348);
-         this.tabFileEncoding.TabIndex = 4;
-         this.tabFileEncoding.Text = "File Encoding";
-         this.tabFileEncoding.UseVisualStyleBackColor = true;
-         // 
-         // lstFiles
-         // 
-         this.lstFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-         this.lstFiles.CheckBoxes = true;
-         this.lstFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.clhEnabled,
-            this.clhFile,
-            this.clhEncoding});
-         this.lstFiles.FullRowSelect = true;
-         this.lstFiles.HideSelection = false;
-         this.lstFiles.Location = new System.Drawing.Point(8, 32);
-         this.lstFiles.Name = "lstFiles";
-         this.lstFiles.Size = new System.Drawing.Size(537, 258);
-         this.lstFiles.TabIndex = 1;
-         this.lstFiles.UseCompatibleStateImageBehavior = false;
-         this.lstFiles.View = System.Windows.Forms.View.Details;
-         this.lstFiles.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lstFiles_ColumnClick);
-         this.lstFiles.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.lstFiles_ItemCheck);
-         this.lstFiles.SelectedIndexChanged += new System.EventHandler(this.lstFiles_SelectedIndexChanged);
-         this.lstFiles.DoubleClick += new System.EventHandler(this.lstFiles_DoubleClick);
-         this.lstFiles.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstFiles_KeyDown);
-         this.lstFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lstFiles_MouseDown);
-         this.lstFiles.MouseUp += new System.Windows.Forms.MouseEventHandler(this.lstFiles_MouseUp);
-         // 
-         // clhEnabled
-         // 
-         this.clhEnabled.Text = "Enabled";
-         // 
-         // clhFile
-         // 
-         this.clhFile.Text = "File";
-         this.clhFile.Width = 326;
-         // 
-         // clhEncoding
-         // 
-         this.clhEncoding.Text = "Encoding";
-         this.clhEncoding.Width = 143;
-         // 
-         // btnFileEncodingAdd
-         // 
-         this.btnFileEncodingAdd.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.btnFileEncodingAdd.Location = new System.Drawing.Point(8, 310);
-         this.btnFileEncodingAdd.Name = "btnFileEncodingAdd";
-         this.btnFileEncodingAdd.Size = new System.Drawing.Size(75, 23);
-         this.btnFileEncodingAdd.TabIndex = 2;
-         this.btnFileEncodingAdd.Text = "&Add...";
-         this.btnFileEncodingAdd.UseVisualStyleBackColor = true;
-         this.btnFileEncodingAdd.Click += new System.EventHandler(this.btnFileEncodingAdd_Click);
-         // 
-         // btnFileEncodingEdit
-         // 
-         this.btnFileEncodingEdit.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.btnFileEncodingEdit.Location = new System.Drawing.Point(96, 310);
-         this.btnFileEncodingEdit.Name = "btnFileEncodingEdit";
-         this.btnFileEncodingEdit.Size = new System.Drawing.Size(75, 23);
-         this.btnFileEncodingEdit.TabIndex = 3;
-         this.btnFileEncodingEdit.Text = "&Edit...";
-         this.btnFileEncodingEdit.UseVisualStyleBackColor = true;
-         this.btnFileEncodingEdit.Click += new System.EventHandler(this.btnFileEncodingEdit_Click);
-         // 
-         // btnFileEncodingDelete
-         // 
-         this.btnFileEncodingDelete.FlatStyle = System.Windows.Forms.FlatStyle.System;
-         this.btnFileEncodingDelete.Location = new System.Drawing.Point(184, 310);
-         this.btnFileEncodingDelete.Name = "btnFileEncodingDelete";
-         this.btnFileEncodingDelete.Size = new System.Drawing.Size(75, 23);
-         this.btnFileEncodingDelete.TabIndex = 4;
-         this.btnFileEncodingDelete.Text = "&Delete";
-         this.btnFileEncodingDelete.UseVisualStyleBackColor = true;
-         this.btnFileEncodingDelete.Click += new System.EventHandler(this.btnFileEncodingDelete_Click);
-         // 
-         // btnResultsWindowBackColor
-         // 
-         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(441, 24);
-         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
-         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-         this.btnResultsWindowBackColor.Size = new System.Drawing.Size(75, 23);
-         this.btnResultsWindowBackColor.TabIndex = 22;
-         // 
-         // btnResultsWindowForeColor
-         // 
-         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
-         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
-         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-         this.btnResultsWindowForeColor.Size = new System.Drawing.Size(75, 23);
-         this.btnResultsWindowForeColor.TabIndex = 21;
-         // 
-         // BackColorButton
-         // 
-         this.BackColorButton.Location = new System.Drawing.Point(441, 24);
-         this.BackColorButton.Name = "BackColorButton";
-         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-         this.BackColorButton.Size = new System.Drawing.Size(75, 23);
-         this.BackColorButton.TabIndex = 18;
-         // 
-         // ForeColorButton
-         // 
-         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
-         this.ForeColorButton.Name = "ForeColorButton";
-         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-         this.ForeColorButton.Size = new System.Drawing.Size(75, 23);
-         this.ForeColorButton.TabIndex = 17;
-         // 
-         // chkDetectFileEncoding
-         // 
-         this.chkDetectFileEncoding.AutoSize = true;
-         this.chkDetectFileEncoding.Location = new System.Drawing.Point(8, 9);
-         this.chkDetectFileEncoding.Name = "chkDetectFileEncoding";
-         this.chkDetectFileEncoding.Size = new System.Drawing.Size(124, 17);
-         this.chkDetectFileEncoding.TabIndex = 39;
-         this.chkDetectFileEncoding.Text = "Detect file encoding.";
-         this.chkDetectFileEncoding.UseVisualStyleBackColor = true;
+         this.chkSaveMessagesPosition.AutoSize = true;
+         this.chkSaveMessagesPosition.Location = new System.Drawing.Point(8, 213);
+         this.chkSaveMessagesPosition.Name = "chkSaveMessagesPosition";
+         this.chkSaveMessagesPosition.Size = new System.Drawing.Size(182, 17);
+         this.chkSaveMessagesPosition.TabIndex = 38;
+         this.chkSaveMessagesPosition.Text = "Save messages window position.";
+         this.chkSaveMessagesPosition.UseVisualStyleBackColor = true;
          // 
          // frmOptions
          // 
@@ -1012,6 +1022,8 @@ namespace AstroGrep.Windows.Forms
          this.tabGeneral.PerformLayout();
          this.ShortcutGroup.ResumeLayout(false);
          this.LanguageGroup.ResumeLayout(false);
+         this.tabFileEncoding.ResumeLayout(false);
+         this.tabFileEncoding.PerformLayout();
          this.tabTextEditors.ResumeLayout(false);
          this.tabResults.ResumeLayout(false);
          this.grpFileList.ResumeLayout(false);
@@ -1021,8 +1033,6 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.ResumeLayout(false);
          this.tabPlugins.ResumeLayout(false);
          this.PluginDetailsGroup.ResumeLayout(false);
-         this.tabFileEncoding.ResumeLayout(false);
-         this.tabFileEncoding.PerformLayout();
          this.ResumeLayout(false);
 
       }
@@ -1057,6 +1067,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
       /// [Curtis_Beard]	   09/16/2014	ADD: installer check to hide desktop/start menu options
       /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
+      /// [Curtis_Beard]      03/03/2015	CHG: 93, option to save messages form position
       /// </history>
       private void frmOptions_Load(object sender, System.EventArgs e)
       {
@@ -1078,7 +1089,7 @@ namespace AstroGrep.Windows.Forms
          chkWordWrap.Visible = false;//hide until we can figure out the best way to detect mouse clicks for word wrapped lines in frmMain.
          chkDetectFileEncoding.Checked = Core.GeneralSettings.DetectFileEncoding;
          chkRemoveLeadingWhiteSpace.Checked = Core.GeneralSettings.RemoveLeadingWhiteSpace;
-
+         chkSaveMessagesPosition.Checked = Core.GeneralSettings.LogDisplaySavePosition;
 
          // ColorButton init
          ForeColorButton.SelectedColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
@@ -1254,6 +1265,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="editors">TextEditor array, can be nothing</param>
       /// <history>
       /// [Curtis_Beard]	   07/10/2006	Created
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, support use quotes around file name
       /// </history>
       private void LoadEditors(TextEditor[] editors)
       {
@@ -1268,6 +1280,7 @@ namespace AstroGrep.Windows.Forms
                item.SubItems.Add(editor.Arguments);
                item.SubItems.Add(editor.TabSize.ToString());
                item.Selected = true;
+               item.Tag = editor;
                TextEditorsList.Items.Add(item);
             }
             TextEditorsList.EndUpdate();
@@ -1279,6 +1292,7 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   07/10/2006	Created
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, support use quotes around file name
       /// </history>
       private void SaveEditors()
       {
@@ -1292,12 +1306,7 @@ namespace AstroGrep.Windows.Forms
          int index = 0;
          foreach (ListViewItem item in TextEditorsList.Items)
          {
-            TextEditor editor = new TextEditor();
-            editor.FileType = item.Text;
-            editor.Editor = item.SubItems[1].Text;
-            editor.Arguments = item.SubItems[2].Text;
-            editor.TabSize = Convert.ToInt32(item.SubItems[3].Text);
-            editors[index] = editor;
+            editors[index] = item.Tag as TextEditor;
             index += 1;
          }
 
@@ -1410,6 +1419,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
       /// [Curtis_Beard]	   09/16/2014	ADD: installer check for desktop/start menu options processing
       /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
+      /// [Curtis_Beard]      03/03/2015	CHG: 93, option to save messages form position
       /// </history>
       private void btnOK_Click(object sender, System.EventArgs e)
       {
@@ -1426,6 +1436,7 @@ namespace AstroGrep.Windows.Forms
          Core.GeneralSettings.FilePanelFont = Convertors.ConvertFontToString(__FileFont);
          Core.GeneralSettings.DetectFileEncoding = chkDetectFileEncoding.Checked;
          Core.GeneralSettings.RemoveLeadingWhiteSpace = chkRemoveLeadingWhiteSpace.Checked;
+         Core.GeneralSettings.LogDisplaySavePosition = chkSaveMessagesPosition.Checked;
 
          // Only load new language on a change
          LanguageItem item = (LanguageItem)cboLanguage.SelectedItem;
@@ -1491,6 +1502,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		07/20/2006	Created
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, support use quotes around file name
       /// </history>
       private void btnAdd_Click(object sender, System.EventArgs e)
       {
@@ -1505,6 +1517,7 @@ namespace AstroGrep.Windows.Forms
             {
                // create new entry
                ListViewItem item = new ListViewItem();
+               item.Tag = dlg.Editor;
                item.Text = dlg.Editor.FileType;
                item.SubItems.Add(dlg.Editor.Editor);
                item.SubItems.Add(dlg.Editor.Arguments);
@@ -1526,6 +1539,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]		07/20/2006	Created
       /// [Curtis_Beard]		08/13/2014	FIX: better detection of file types
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, support use quotes around file name
       /// </history>
       private void btnEdit_Click(object sender, System.EventArgs e)
       {
@@ -1539,12 +1553,13 @@ namespace AstroGrep.Windows.Forms
                // set values
                dlg.IsAdd = false;
                dlg.IsAllTypesDefined = IsAllTypesDefined();
-               dlg.Editor = new TextEditor(item.Text, item.SubItems[1].Text, item.SubItems[2].Text, Convert.ToInt32(item.SubItems[3].Text));
+               dlg.Editor = item.Tag as TextEditor;
                dlg.ExistingFileTypes = GetExistingFileTypes();
 
                if (dlg.ShowDialog(this) == DialogResult.OK)
                {
                   // get values
+                  TextEditorsList.SelectedItems[0].Tag = dlg.Editor;
                   TextEditorsList.SelectedItems[0].Text = dlg.Editor.FileType;
                   TextEditorsList.SelectedItems[0].SubItems[1].Text = dlg.Editor.Editor;
                   TextEditorsList.SelectedItems[0].SubItems[2].Text = dlg.Editor.Arguments;

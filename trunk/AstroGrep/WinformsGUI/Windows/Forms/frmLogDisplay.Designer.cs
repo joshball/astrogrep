@@ -157,6 +157,7 @@
          this.ShowInTaskbar = false;
          this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
          this.Text = "Log Display";
+         this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLogDisplay_FormClosing);
          this.Load += new System.EventHandler(this.frmLogDisplay_Load);
          this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.frmLogDisplay_KeyUp);
          this.toolStrip1.ResumeLayout(false);

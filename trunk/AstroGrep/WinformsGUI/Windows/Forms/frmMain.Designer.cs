@@ -522,7 +522,7 @@ namespace AstroGrep.Windows.Forms
          this.lblSearchHeading.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
          this.lblSearchHeading.Location = new System.Drawing.Point(1, 0);
          this.lblSearchHeading.Name = "lblSearchHeading";
-         this.lblSearchHeading.Size = new System.Drawing.Size(198, 16);
+         this.lblSearchHeading.Size = new System.Drawing.Size(199, 16);
          this.lblSearchHeading.TabIndex = 0;
          this.lblSearchHeading.Text = "AstroGrep Search";
          this.lblSearchHeading.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -654,7 +654,7 @@ namespace AstroGrep.Windows.Forms
          // 
          this.splitLeftRight.Location = new System.Drawing.Point(240, 0);
          this.splitLeftRight.MinExtra = 100;
-         this.splitLeftRight.MinSize = 280;
+         this.splitLeftRight.MinSize = 290;
          this.splitLeftRight.Name = "splitLeftRight";
          this.splitLeftRight.Size = new System.Drawing.Size(8, 430);
          this.splitLeftRight.TabIndex = 2;

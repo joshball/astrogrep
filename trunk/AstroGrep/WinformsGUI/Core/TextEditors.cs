@@ -82,7 +82,7 @@ namespace AstroGrep.Core
                      if (currentType != Constants.ALL_FILE_TYPES && !currentType.StartsWith(".") && file.Extension.StartsWith("."))
                         currentType = string.Format(".{0}", currentType);
 
-                     if (currentType.IndexOf(file.Extension, StringComparison.InvariantCultureIgnoreCase) > -1)
+                     if (currentType.IndexOf(file.Extension, StringComparison.OrdinalIgnoreCase) > -1)
                      {
                         // use this editor
                         editorToUse = editor;
@@ -143,7 +143,7 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
-      /// Load the specified text editors from the registry.
+      /// Loads the user specified text editors.
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   07/10/2006   Created
@@ -189,8 +189,7 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
-      /// Saves the given Array of TextEditor objects to the registry and updates the
-      /// TextEditors array.
+      /// Saves the given Array of TextEditor objects.
       /// </summary>
       /// <param name="editors">Array of TextEditor objects</param>
       /// <history>
@@ -251,6 +250,7 @@ namespace AstroGrep.Core
       /// [Curtis_Beard]	   07/10/2006	ADD: Initial
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
       /// [Curtis_Beard]	   08/13/2014	ADD: 80, add ability to open default app when no editor is specified
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, check editor for using quotes around file name, cleanup
       /// </history>
       private static void OpenEditor(TextEditor textEditor, string path, int line, int column)
       {
@@ -272,27 +272,16 @@ namespace AstroGrep.Core
                //  %1 with filename 
                //  %2 with line number
                //  %3 with column
-               string _text = textEditor.Arguments;
-               if (_text.IndexOf("\"") == -1)
+               string args = textEditor.Arguments;
+               if (textEditor.UseQuotesAroundFileName)
                {
-                  // only include quotes around path if not defined in command line
-                  _text = _text.Replace("%1", "\"" + path + "\"");
+                  path = "\"" + path + "\"";
                }
-               else
-               {
-                  _text = _text.Replace("%1", path);
-               }
-               _text = _text.Replace("%2", line.ToString());
-               _text = _text.Replace("%3", column.ToString());
+               args = args.Replace("%1", path);
+               args = args.Replace("%2", line.ToString());
+               args = args.Replace("%3", column.ToString());
 
-               // Check to see if editor needs quotes around it
-               string _editor = textEditor.Editor;
-               if (_editor.IndexOf(".exe") > 0)
-               {
-                  _editor = "\"" + _editor + "\"";
-               }
-
-               System.Diagnostics.Process.Start(_editor, _text);
+               System.Diagnostics.Process.Start(textEditor.Editor, args);
             }
          }
          catch (Exception ex)
