@@ -52,6 +52,7 @@ namespace libAstroGrep
    public class Grep
    {
       private Thread _thread;
+      private int userFilterCount = 0;
 
       #region Public Events and Delegates
       /// <summary>File being searched</summary>
@@ -140,9 +141,7 @@ namespace libAstroGrep
       /// <summary>The Search specification.</summary>
       public ISearchSpec SearchSpec { get; private set; }
 
-      #endregion
-
-      private int userFilterCount = 0;
+      #endregion      
 
       /// <summary>
       /// Initializes a new instance of the Grep class.
@@ -211,6 +210,7 @@ namespace libAstroGrep
       /// </history>
       public void Execute()
       {
+         // search only specified file paths (usually used for search in results)
          if (SearchSpec.StartFilePaths != null && SearchSpec.StartFilePaths.Length > 0)
          {
             foreach (string path in SearchSpec.StartFilePaths)
@@ -229,12 +229,10 @@ namespace libAstroGrep
             }
             else
             {
-               string[] filters = FileFilterSpec.FileFilter.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
-               
-               // remove any duplicates
-               List<string> fileFilters = filters.Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+               // file filter defined, so separate, remove empty values, remove duplicates, and search each directory with that file filter
+               List<string> filters = FileFilterSpec.FileFilter.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
 
-               foreach (var filter in fileFilters)
+               foreach (var filter in filters)
                {
                   foreach (var dir in SearchSpec.StartDirectories)
                   {
@@ -497,6 +495,7 @@ namespace libAstroGrep
       /// [Curtis_Beard]		08/19/2014	FIX: 57, escape search text when whole word is enabled but not regular expressions
       /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space, remove use of newline so each line is in hit object
       /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// [Curtis_Beard]		03/05/2015	FIX: 64/35, if whole word doesn't pass our check but does pass regex, make it fail.  Code cleanup.
       /// </history>
       private void SearchFileContents(FileInfo file)
       {
@@ -680,37 +679,23 @@ namespace libAstroGrep
                {
                   _lineNumber += 1;
 
-                  int _posInStr;
+                  int _posInStr = -1;
                   if (SearchSpec.UseRegularExpressions)
                   {
-                     _posInStr = -1;
+                     //_posInStr = -1;
                      if (textLine.Length > 0)
                      {
-                        if (SearchSpec.UseCaseSensitivity && SearchSpec.UseWholeWordMatching)
-                        {
-                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b");
-                           _regularExpCol = _regularExp.Matches(textLine);
-                        }
-                        else if (SearchSpec.UseCaseSensitivity)
-                        {
-                           _regularExp = new Regex(SearchSpec.SearchText);
-                           _regularExpCol = _regularExp.Matches(textLine);
-                        }
-                        else if (SearchSpec.UseWholeWordMatching)
-                        {
-                           _regularExp = new Regex("\\b" + SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
-                           _regularExpCol = _regularExp.Matches(textLine);
-                        }
-                        else
-                        {
-                           _regularExp = new Regex(SearchSpec.SearchText, RegexOptions.IgnoreCase);
-                           _regularExpCol = _regularExp.Matches(textLine);
-                        }
+                        string pattern = string.Format("{0}{1}{0}", SearchSpec.UseWholeWordMatching ? "\\b" : string.Empty, SearchSpec.SearchText);
+                        RegexOptions options = SearchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase;
+                        _regularExp = new Regex(pattern, options);
+                        _regularExpCol = _regularExp.Matches(textLine);
 
                         if (_regularExpCol.Count > 0)
                         {
                            if (SearchSpec.UseNegation)
+                           {
                               _hitOccurred = true;
+                           }
 
                            _posInStr = 1;
                         }
@@ -718,58 +703,31 @@ namespace libAstroGrep
                   }
                   else
                   {
-                     if (SearchSpec.UseCaseSensitivity)
+                     // If we are looking for whole worlds only, perform the check.
+                     if (SearchSpec.UseWholeWordMatching)
                      {
-                        // Need to escape these characters in SearchText:
-                        // < $ + * [ { ( ) .
-                        // with a preceeding \
-
-                        // If we are looking for whole worlds only, perform the check.
-                        if (SearchSpec.UseWholeWordMatching)
+                        //_posInStr = -1;
+                        _regularExp = new Regex("\\b" + Regex.Escape(SearchSpec.SearchText) + "\\b", SearchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase);
+                        
+                        // if match is found, also check against our internal line hit count method to be sure they are in sync
+                        Match mtc = _regularExp.Match(textLine);
+                        if (mtc != null && mtc.Success && RetrieveLineHitCount(textLine, SearchSpec.SearchText) > 0)
                         {
-                           _regularExp = new Regex("\\b" + Regex.Escape(SearchSpec.SearchText) + "\\b");
-                           Match mtc = _regularExp.Match(textLine);
-                           if (mtc != null && mtc.Success)
+                           if (SearchSpec.UseNegation)
                            {
-                              if (SearchSpec.UseNegation)
-                                 _hitOccurred = true;
-
-                              _posInStr = mtc.Index;
-                           }
-                           else
-                              _posInStr = -1;
-                        }
-                        else
-                        {
-                           _posInStr = textLine.IndexOf(SearchSpec.SearchText);
-
-                           if (SearchSpec.UseNegation && _posInStr > -1)
                               _hitOccurred = true;
+                           }
+
+                           _posInStr = mtc.Index;
                         }
                      }
                      else
                      {
-                        // If we are looking for whole worlds only, perform the check.
-                        if (SearchSpec.UseWholeWordMatching)
-                        {
-                           _regularExp = new Regex("\\b" + Regex.Escape(SearchSpec.SearchText) + "\\b", RegexOptions.IgnoreCase);
-                           Match mtc = _regularExp.Match(textLine);
-                           if (mtc != null && mtc.Success)
-                           {
-                              if (SearchSpec.UseNegation)
-                                 _hitOccurred = true;
+                        _posInStr = textLine.IndexOf(SearchSpec.SearchText, SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 
-                              _posInStr = mtc.Index;
-                           }
-                           else
-                              _posInStr = -1;
-                        }
-                        else
+                        if (SearchSpec.UseNegation && _posInStr > -1)
                         {
-                           _posInStr = textLine.ToLower().IndexOf(SearchSpec.SearchText.ToLower());
-
-                           if (SearchSpec.UseNegation && _posInStr > -1)
-                              _hitOccurred = true;
+                           _hitOccurred = true;
                         }
                      }
                   }
@@ -883,7 +841,7 @@ namespace libAstroGrep
                      }
                      else
                      {
-                        //determine number of hits in single line
+                        // determine number of hits in single line
                         _grepHit.SetHitCount(RetrieveLineHitCount(textLine, SearchSpec.SearchText));
                      }
 
@@ -978,6 +936,7 @@ namespace libAstroGrep
       /// <history>
       /// [Curtis_Beard]      12/06/2005	Created
       /// [Curtis_Beard]      01/12/2007	FIX: check for correct position of IndexOf
+      /// [Curtis_Beard]      03/05/2015	FIX: cleanup logic for whole word/case sensitive
       /// </history>
       private int RetrieveLineHitCount(string line, string searchText)
       {
@@ -987,11 +946,7 @@ namespace libAstroGrep
 
          string _tempLine = line;
 
-         // attempt to locate the text in the line
-         if (SearchSpec.UseCaseSensitivity)
-            _pos = _tempLine.IndexOf(searchText);
-         else
-            _pos = _tempLine.ToLower().IndexOf(searchText.ToLower());
+         _pos = _tempLine.IndexOf(searchText, SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 
          while (_pos > -1)
          {
@@ -1011,10 +966,7 @@ namespace libAstroGrep
                _count += 1;
 
             // Check remaining string for other hits in same line
-            if (SearchSpec.UseCaseSensitivity)
-               _pos = _end.IndexOf(searchText);
-            else
-               _pos = _end.ToLower().IndexOf(searchText.ToLower());
+            _pos = _end.IndexOf(searchText, SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 
             // update the temp line with the next part to search (if any)
             _tempLine = _end;
@@ -1023,11 +975,16 @@ namespace libAstroGrep
          return _count;
       }
 
-
-      static readonly List<string> validTexts = new List<string> { " ", "<", ">", "$", "+", "*", "[", "]", "{", "}", "(", ")", ".", "?", "!", ",", ":", ";", "-", "\\", "/", "'", "\"", Environment.NewLine, "\r\n", "\r", "\n" };
+      /// <summary>
+      /// Valid begin/end text strings.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		03/05/2015	FIX: 64/35, add = as valid start/end text
+      /// </history>
+      static readonly List<string> validTexts = new List<string> { " ", "<", ">", "$", "+", "*", "[", "]", "{", "}", "(", ")", ".", "?", "!", ",", ":", ";", "-", "\\", "/", "'", "\"", Environment.NewLine, "\r\n", "\r", "\n", "=" };
 
       /// <summary>
-      /// Validate a start text.
+      /// Validate a start/end text.
       /// </summary>
       /// <param name="text">text to validate</param>
       /// <returns>True - valid, False - otherwise</returns>
@@ -1057,7 +1014,6 @@ namespace libAstroGrep
          });
          return found;
       }
-
 
       /// <summary>
       /// Unload any plugins that are enabled and available.

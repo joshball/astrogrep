@@ -11,8 +11,8 @@
 !include "FileFunc.nsh"
 
 !define MUI_COMPONENTSPAGE_SMALLDESC
-!define INS_VERSION 4.3.2.0
-!define APP_VERSION "4.3.2"
+!define INS_VERSION 4.3.3.0
+!define APP_VERSION "4.3.3"
 
 ;--------------------------------
 ;Variables

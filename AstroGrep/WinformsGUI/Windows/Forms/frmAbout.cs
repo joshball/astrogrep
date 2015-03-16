@@ -69,36 +69,40 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      11/03/2005  Created
       /// [Curtis_Beard]      09/12/2006  CHG: Implement panel paint instead of form
       /// [Curtis_Beard]	   02/07/2012  CHG: 3485450, add check for updates
+      /// [Curtis_Beard]	   03/02/2015   FIX: 49, graphical glitch when using 125% dpi setting
       /// </history>
       private void HeaderPanel_Paint(object sender, PaintEventArgs e)
       {
          const int _borderBuffer = 10;
 
-         using (Graphics _graphics = e.Graphics)
+         using (Graphics graphics = e.Graphics)
          {
-            _graphics.SmoothingMode = SmoothingMode.HighQuality;
-            _graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphics.SmoothingMode = SmoothingMode.HighQuality;
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
             // Gradient the panel
             using (LinearGradientBrush _gradientBrush = new LinearGradientBrush(new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height), Core.Common.ASTROGREP_ORANGE, Color.White, LinearGradientMode.ForwardDiagonal))
             {
-               _graphics.FillRectangle(_gradientBrush, new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height));
+               graphics.FillRectangle(_gradientBrush, new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height));
             }
 
             // Draw picture
             int picX = _borderBuffer;
-            int picY = _borderBuffer + 20;
-            _graphics.DrawImage(picIcon.Image, picX, picY);
+            int picY = (HeaderPanel.Height - picIcon.Height) / 2;
+            graphics.DrawImage(picIcon.Image, picX, picY);
 
             // Draw text
+            int dpiChange = 0;
+            if (Windows.API.GetCurrentDPIFontScalingSize(graphics) == API.DPIFontScalingSizes.Medium)
+            {
+                dpiChange = -5;
+            }
             int _xCorner = _borderBuffer + picIcon.Width + 10;
-            int _yCorner = _borderBuffer + 15;
-            _graphics.DrawString(Constants.ProductName, HeaderPanel.Font, Brushes.Black, _xCorner, _yCorner);
-            _graphics.DrawString(Constants.ProductVersion.ToString(3), new Font("Microsoft Sans Serif", 8.25F), Brushes.Black, _xCorner, _yCorner + 30);
+            graphics.DrawString(string.Format("{0} {1}", Constants.ProductName, Constants.ProductVersion.ToString(3)), HeaderPanel.Font, Brushes.Black, _xCorner, picY + dpiChange);
 
             // Draw a bottom border line
-            _graphics.DrawLine(SystemPens.ControlDark, 0, HeaderPanel.Height - 2, HeaderPanel.Width, HeaderPanel.Height - 2);
-            _graphics.DrawLine(SystemPens.ControlLightLight, 0, HeaderPanel.Height - 1, HeaderPanel.Width, HeaderPanel.Height - 1);
+            graphics.DrawLine(SystemPens.ControlDark, 0, HeaderPanel.Height - 2, HeaderPanel.Width, HeaderPanel.Height - 2);
+            graphics.DrawLine(SystemPens.ControlLightLight, 0, HeaderPanel.Height - 1, HeaderPanel.Width, HeaderPanel.Height - 1);
          }
       }
 

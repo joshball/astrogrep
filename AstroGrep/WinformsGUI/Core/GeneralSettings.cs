@@ -43,6 +43,8 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]	   10/28/2012	ADD: 3479503, ability to change file list font
    /// [Curtis_Beard]		10/27/2014	CHG: 88, add file extension column
    /// [Curtis_Beard]		11/11/2014	CHG: 85, remove leading white space
+   /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting (increase search panel width)
+   /// [Curtis_Beard]		03/06/2015	CHG: default texteditor is created instead of using delimeter which is now private
    /// </history>
    public sealed class GeneralSettings
    {
@@ -56,7 +58,7 @@ namespace AstroGrep.Core
       private static GeneralSettings __MySettings = null;
       
       private const string VERSION = "1.0";
-      private const int DEFAULT_SEARCH_PANEL_WIDTH = 280;
+      private const int DEFAULT_SEARCH_PANEL_WIDTH = 290;
 
       private string resultsForeColor = string.Format("0{0}0{0}0{0}255", Constants.COLOR_SEPARATOR);
       private string resultsBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
@@ -83,11 +85,21 @@ namespace AstroGrep.Core
       private int columnSize = 80;
       private int columnFileExt = 120;
 
+      private bool logDisplaySaveWindowPosition = true;
+      private int columnLogDisplayDate = 175;
+      private int columnLogDisplayType = 86;
+      private int columnLogDisplayValue = 600;
+      private int columnLogDisplayDetails = 425;
+      private int logDisplayTop = -1;
+      private int logDisplayLeft = -1;
+      private int logDisplayWidth = -1;
+      private int logDisplayHeight = -1;
+
       private string searchStartPaths = string.Empty;
       private string searchFilters = string.Format("*.*{0}*.txt{0}*.java{0}*.htm, *.html{0}*.jsp, *.asp{0}*.js, *.inc{0}*.htm, *.html, *.jsp, *.asp{0}*.sql{0}*.bas, *.cls, *.vb{0}*.cs{0}*.cpp, *.c, *.h{0}*.asm", Constants.SEARCH_ENTRIES_SEPARATOR);
       private string searchTexts = string.Empty;
 
-      private string textEditors = string.Format("notepad{0}%1{0}*{0}0", TextEditor.DELIMETER);
+      private string textEditors = (new TextEditor("*", "notepad", "%1", 0)).ToString();
 
       private bool showSearchOptions = false;
 
@@ -335,6 +347,87 @@ namespace AstroGrep.Core
       {
          get { return MySettings.columnFileExt; }
          set { MySettings.columnFileExt = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's date column width value.
+      /// </summary>
+      static public int LogDisplayColumnDateWidth
+      {
+         get { return MySettings.columnLogDisplayDate; }
+         set { MySettings.columnLogDisplayDate = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's type column width value.
+      /// </summary>
+      static public int LogDisplayColumnTypeWidth
+      {
+         get { return MySettings.columnLogDisplayType; }
+         set { MySettings.columnLogDisplayType = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's value column width value.
+      /// </summary>
+      static public int LogDisplayColumnValueWidth
+      {
+         get { return MySettings.columnLogDisplayValue; }
+         set { MySettings.columnLogDisplayValue = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's details column width value.
+      /// </summary>
+      static public int LogDisplayColumnDetailsWidth
+      {
+         get { return MySettings.columnLogDisplayDetails; }
+         set { MySettings.columnLogDisplayDetails = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's top value.
+      /// </summary>
+      static public int LogDisplayTop
+      {
+         get { return MySettings.logDisplayTop; }
+         set { MySettings.logDisplayTop = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's left value.
+      /// </summary>
+      static public int LogDisplayLeft
+      {
+         get { return MySettings.logDisplayLeft; }
+         set { MySettings.logDisplayLeft = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's width value.
+      /// </summary>
+      static public int LogDisplayWidth
+      {
+         get { return MySettings.logDisplayWidth; }
+         set { MySettings.logDisplayWidth = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the LogDisplay's height value.
+      /// </summary>
+      static public int LogDisplayHeight
+      {
+         get { return MySettings.logDisplayHeight; }
+         set { MySettings.logDisplayHeight = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets whether to save the log display form's window position.
+      /// </summary>
+      static public bool LogDisplaySavePosition
+      {
+         get { return MySettings.logDisplaySaveWindowPosition; }
+         set { MySettings.logDisplaySaveWindowPosition = value; }
       }
 
       /// <summary>

@@ -69,10 +69,9 @@ namespace libAstroGrep
       /// Initializes a new instance of the HitObject class.
       /// </summary>
       /// <param name="path">File path</param>
-      public HitObject(string path)
+      public HitObject(string path) : this(new FileInfo(path))
       {
-         HitCount = 0;
-         __File = new FileInfo(path);
+          
       }
       #endregion
 

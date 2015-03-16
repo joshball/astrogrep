@@ -59,6 +59,56 @@ namespace AstroGrep.Windows
          StrFormatByteSize(filesize, sb, sb.Capacity);
          return sb.ToString();
       }
+      
+      /// <summary>
+      /// DPI Font scaling sizes.
+      /// </summary>
+      public enum DPIFontScalingSizes
+      {
+         /// <summary>Normal 100% font scaling</summary>
+         Normal = 0,
+         /// <summary>Medium 125% font scaling</summary>
+         Medium = 1,
+         /// <summary>Large 150% font scaling</summary>
+         Large = 2,
+         /// <summary>Other font scaling values</summary>
+         Other
+      }
+
+      /// <summary>
+      /// Gets the current Window's DPI setting.
+      /// </summary>
+      /// <param name="g">Current graphics context</param>
+      /// <returns>DPIFontScalingSize value</returns>
+      /// <remarks>We don't close the Graphics parameter here and rely on calling method to handle it since it could be used later.</remarks>
+      /// <history>
+      /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
+      /// </history>
+      public static DPIFontScalingSizes GetCurrentDPIFontScalingSize(Graphics g)
+      {
+         DPIFontScalingSizes size = DPIFontScalingSizes.Normal;
+
+         float dpiX = g.DpiX;
+
+         if (dpiX == 96.0)
+         {
+            size = DPIFontScalingSizes.Normal;
+         }
+         if (dpiX == 120.0)
+         {
+            size = DPIFontScalingSizes.Medium;
+         }
+         else if (dpiX == 144.0)
+         {
+            size = DPIFontScalingSizes.Large;
+         }
+         else 
+         {
+            size = DPIFontScalingSizes.Other;
+         }
+
+         return size;
+      }
 
       #endregion
 

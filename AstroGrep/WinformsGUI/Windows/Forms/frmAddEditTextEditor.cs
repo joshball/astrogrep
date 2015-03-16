@@ -44,9 +44,6 @@ namespace AstroGrep.Windows.Forms
       private List<string> __ExistingFileTypes = null;
       #endregion
 
-
-      private System.ComponentModel.IContainer components;
-
       /// <summary>
       /// Creates an instance of the frmAddEditTextEditor class.
       /// </summary>
@@ -55,9 +52,6 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       public frmAddEditTextEditor()
       {
-         //
-         // Required for Windows Form Designer support
-         //
          InitializeComponent();
       }
 
@@ -132,7 +126,8 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		07/21/2006	Created
-      /// [Justin_Dearing]      11/01/2007	REMOVE unneccessary code
+      /// [Justin_Dearing]    11/01/2007	REMOVE unneccessary code
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, add support for using quotes around file name
       /// </history>
       private void frmAddEditTextEditor_Load(object sender, System.EventArgs e)
       {
@@ -142,6 +137,7 @@ namespace AstroGrep.Windows.Forms
             txtFileType.Text = Editor.FileType;
             txtTextEditorLocation.Text = Editor.Editor;
             txtCmdLineArgs.Text = Editor.Arguments;
+            chkUseQuotesAroundFileName.Checked = Editor.UseQuotesAroundFileName;
             updwnTabSize.Value = Editor.TabSize;
          }
 
@@ -153,7 +149,7 @@ namespace AstroGrep.Windows.Forms
          //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
          Language.ProcessForm(this, HoverTips);
 
-         lblCmdOptionsView.Text = RetrieveCmdLineViewText();
+         UpdateCmdLinePreview();
       }
 
       /// <summary>
@@ -271,7 +267,7 @@ namespace AstroGrep.Windows.Forms
          }
 
          // load values from text boxes
-         __Editor = new TextEditor(txtFileType.Text, txtTextEditorLocation.Text, txtCmdLineArgs.Text, Convert.ToInt32(updwnTabSize.Value));
+         __Editor = new TextEditor(txtFileType.Text, txtTextEditorLocation.Text, txtCmdLineArgs.Text, Convert.ToInt32(updwnTabSize.Value), chkUseQuotesAroundFileName.Checked);
 
          this.DialogResult = DialogResult.OK;
          this.Close();
@@ -297,6 +293,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		03/06/2015	rename preview function
       /// </history>
       private void btnBrowse_Click(object sender, System.EventArgs e)
       {
@@ -308,7 +305,7 @@ namespace AstroGrep.Windows.Forms
          if (dlg.ShowDialog(this) == DialogResult.OK)
          {
             txtTextEditorLocation.Text = dlg.FileName;
-            lblCmdOptionsView.Text = RetrieveCmdLineViewText();
+            UpdateCmdLinePreview();
          }
 
          dlg.Dispose();
@@ -321,10 +318,11 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]		03/06/2015	rename preview function
       /// </history>
       private void txtCmdLineArgs_TextChanged(object sender, System.EventArgs e)
       {
-         lblCmdOptionsView.Text = RetrieveCmdLineViewText();
+         UpdateCmdLinePreview();
       }
 
       /// <summary>
@@ -334,10 +332,24 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Justin_Dearing]		11/01/2007	Created
+      /// [Curtis_Beard]		03/06/2015	rename preview function
       /// </history>
-      void txtTextEditorLocation_TextChanged(object sender, EventArgs e)
+      private void txtTextEditorLocation_TextChanged(object sender, EventArgs e)
       {
-         lblCmdOptionsView.Text = RetrieveCmdLineViewText();
+         UpdateCmdLinePreview();
+      }
+
+      /// <summary>
+      /// Update the preview display.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, add support for using quotes around file name
+      /// </history>
+      private void chkUseQuotesAroundFileName_CheckedChanged(object sender, EventArgs e)
+      {
+         UpdateCmdLinePreview();
       }
 
       /// <summary>
@@ -370,31 +382,37 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      06/13/2005	ADD: Better cmd line arg support
       /// [Curtis_Beard]      07/26/2006	ADD: 1512026, column
       /// [Justin_Dearing]    11/01/2007	ADD: Preview will show editor name.
+      /// [Curtis_Beard]		03/06/2015	FIX: 65, add support for using quotes around file name, rename function
       /// </history>
-      private string RetrieveCmdLineViewText()
+      private void UpdateCmdLinePreview()
       {
-         const string _previewText = "Preview: \"{0} {1}\"";
-         string _editor = "";
-         string _editorPath = txtTextEditorLocation.Text;
-         string _text = txtCmdLineArgs.Text;
+         const string previewText = "Preview: {0} {1}";
+         string editor = string.Empty;
+         string editorPath = txtTextEditorLocation.Text;
+         string args = txtCmdLineArgs.Text;
 
          try
          {
-            if (!string.IsNullOrEmpty(_editorPath))
+            if (!string.IsNullOrEmpty(editorPath))
             {
-               _editor = System.IO.Path.GetFileName(_editorPath);
+               editor = System.IO.Path.GetFileName(editorPath);
             }
          }
          catch
          {
-            _editor = "";
+            editor = string.Empty;
          }
 
-         _text = _text.Replace("%1", "file.txt");
-         _text = _text.Replace("%2", "450");
-         _text = _text.Replace("%3", "11");
+         string path = @"c:\file path\filename.txt";
+         if (chkUseQuotesAroundFileName.Checked)
+         {
+            path = "\"" + path + "\"";
+         }
+         args = args.Replace("%1", path);
+         args = args.Replace("%2", "450");
+         args = args.Replace("%3", "11");
 
-         return string.Format(_previewText, _editor, _text);
+         lblCmdOptionsView.Text = string.Format(previewText, editor, args);
       }
       #endregion
    }

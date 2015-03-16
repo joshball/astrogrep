@@ -105,6 +105,7 @@
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Separate types with | character."/>
       <control name="lblTabSize" value="Tab Size" />
+      <control name="chkUseQuotesAroundFileName" value="&amp;Use quotes around file."/>
    </screen>
    
    <screen name="frmOptions" value="Options">
@@ -141,6 +142,7 @@
       <control name="btnFileFindFont" value="Find Font..."/>
       <control name="chkDetectFileEncoding" value="Detect &amp;file encoding."/>
       <control name="chkRemoveLeadingWhiteSpace" value="&amp;Remove Leading White Space"/>
+      <control name="chkSaveMessagesPosition" value="Save messages &amp;window position."/>
 
       <control name="tabFileEncoding" value="File Encoding" />
       <control name="btnFileEncodingAdd" value="&amp;Add..."/>

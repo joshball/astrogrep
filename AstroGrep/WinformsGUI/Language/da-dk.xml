@@ -104,6 +104,7 @@
       <control name="btnOK" value="&amp;OK" />
       <control name="lblMultiTypes" value="Separate typer med | karakter."/>
       <control name="lblTabSize" value="fanen størrelse" />
+      <control name="chkUseQuotesAroundFileName" value="&amp;Brug anførselstegn omkring fil."/>
    </screen>
    
    <screen name="frmOptions" value="Indstillinger">
@@ -139,7 +140,8 @@
       <control name="grpFileList" value="Filliste" />
       <control name="btnFileFindFont" value="Find skrift..."/>
       <control name="chkDetectFileEncoding" value="Detect filkodningen."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Remove Leading White Space"/>
+      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Fjern Førende White Space"/>
+      <control name="chkSaveMessagesPosition" value="&amp;Gem meddelelser vindue position."/>
 
       <control name="tabFileEncoding" value="Filkodning" />
       <control name="btnFileEncodingAdd" value="&amp;Tilføj..."/>

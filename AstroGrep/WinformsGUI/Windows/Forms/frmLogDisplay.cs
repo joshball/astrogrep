@@ -79,19 +79,6 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// Handles the OK button click event.
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]	   12/06/2012	ADD: 1741735, initial dialog for filterable log items viewer.
-      /// </history>
-      private void btnOK_Click(object sender, EventArgs e)
-      {
-         this.Close();
-      }
-
-      /// <summary>
       /// Setup the form.
       /// </summary>
       /// <param name="sender">system parameter</param>
@@ -99,6 +86,8 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   12/06/2012	ADD: 1741735, initial dialog for filterable log items viewer.
       /// [Curtis_Beard]	   11/11/2014	CHG: set width of columns, language calls for column names, support null for DefaultFilterType
+      /// [Curtis_Beard]	   03/02/2015	CHG: add counts to tabs
+      /// [Curtis_Beard]      03/03/2015	CHG: 93, load column widths from user settings
       /// </history>
       private void frmLogDisplay_Load(object sender, EventArgs e)
       {
@@ -110,14 +99,22 @@ namespace AstroGrep.Windows.Forms
 
          Language.ProcessForm(this);
 
+         // column names aren't supported in Language class
          lstLog.Columns[0].Text = Language.GetGenericText("LogDisplay.Column.Date", "Date");
          lstLog.Columns[1].Text = Language.GetGenericText("LogDisplay.Column.Type", "Type");
          lstLog.Columns[2].Text = Language.GetGenericText("LogDisplay.Column.Value", "Value");
          lstLog.Columns[3].Text = Language.GetGenericText("LogDisplay.Column.Details", "Details");
 
-         lstLog.Columns[0].Width = 175;
-         lstLog.Columns[2].Width = 600;
-         lstLog.Columns[3].Width = 425;
+         // set column widths from user settings
+         lstLog.Columns[0].Width = Core.GeneralSettings.LogDisplayColumnDateWidth;
+         lstLog.Columns[1].Width = Core.GeneralSettings.LogDisplayColumnTypeWidth;
+         lstLog.Columns[2].Width = Core.GeneralSettings.LogDisplayColumnValueWidth;
+         lstLog.Columns[3].Width = Core.GeneralSettings.LogDisplayColumnDetailsWidth;
+
+         // do counts after Language.ProcessForm to get language specific text.
+         sbtnStatus.Text = string.Format("{0} ({1})", sbtnStatus.Text, LogItems.FindAll(l=>l.ItemType == LogItem.LogItemTypes.Status).Count);
+         sbtnExclusions.Text = string.Format("{0} ({1})", sbtnExclusions.Text, LogItems.FindAll(l => l.ItemType == LogItem.LogItemTypes.Exclusion).Count);
+         sbtnError.Text = string.Format("{0} ({1})", sbtnError.Text, LogItems.FindAll(l => l.ItemType == LogItem.LogItemTypes.Error).Count);
 
          if (DefaultFilterType.HasValue)
          {
@@ -176,6 +173,14 @@ namespace AstroGrep.Windows.Forms
          }
       }
 
+      /// <summary>
+      /// Handle the listview's key down event (item selection and item copy).
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   12/06/2012	ADD: 1741735, initial dialog for filterable log items viewer.
+      /// </history>
       private void lstLog_KeyDown(object sender, KeyEventArgs e)
       {
          //ctrl+c  Copy to clipboard
@@ -203,7 +208,7 @@ namespace AstroGrep.Windows.Forms
             }
             catch (Exception ex)
             {
-               MessageBox.Show("Exception: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               MessageBox.Show(this, "Exception: " + ex.Message, Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
          }
 
@@ -243,8 +248,7 @@ namespace AstroGrep.Windows.Forms
                e.Graphics.FillRectangle(new SolidBrush(ProfessionalColors.ButtonCheckedHighlight), bounds);
 
                // draw border around button
-               bounds.Height -= 1;
-               bounds.Width -= 1;
+               bounds.Inflate(-1, -1);
                e.Graphics.DrawRectangle(new Pen(ProfessionalColors.ButtonCheckedHighlightBorder), bounds);
             }
             else
@@ -261,10 +265,12 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   12/06/2012	ADD: 1741735, initial dialog for filterable log items viewer.
       /// [Curtis_Beard]	   11/11/2014	CHG: format details display for exclusions
+      /// [Curtis_Beard]	   03/02/2015	CHG: set sort to null before add
       /// </history>
       private void AddLogItemType(LogItem.LogItemTypes type)
       {
          lstLog.BeginUpdate();
+         lstLog.ListViewItemSorter = null;
 
          foreach (LogItem item in LogItems)
          {
@@ -325,10 +331,12 @@ namespace AstroGrep.Windows.Forms
       /// <param name="type">LogItemType to remove</param>
       /// <history>
       /// [Curtis_Beard]	   12/06/2012	ADD: 1741735, initial dialog for filterable log items viewer.
+      /// [Curtis_Beard]	   03/02/2015	CHG: set sort to null before remove
       /// </history>
       private void RemoveLogItemType(LogItem.LogItemTypes type)
       {
          lstLog.BeginUpdate();
+         lstLog.ListViewItemSorter = null;
 
          foreach (ListViewItem lstItem in lstLog.Items)
          {
@@ -449,6 +457,30 @@ namespace AstroGrep.Windows.Forms
             LogItem yItem = (y as ListViewItem).Tag as LogItem;
 
             return xItem.Date.CompareTo(yItem.Date);
+         }
+      }
+
+      /// <summary>
+      /// Save column widths and window position (if enabled).
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]      03/03/2015	CHG: 93, save form position and column widths
+      /// </history>
+      private void frmLogDisplay_FormClosing(object sender, FormClosingEventArgs e)
+      {
+         Core.GeneralSettings.LogDisplayColumnDateWidth = lstLog.Columns[0].Width;
+         Core.GeneralSettings.LogDisplayColumnTypeWidth = lstLog.Columns[1].Width;
+         Core.GeneralSettings.LogDisplayColumnValueWidth = lstLog.Columns[2].Width;
+         Core.GeneralSettings.LogDisplayColumnDetailsWidth = lstLog.Columns[3].Width;
+
+         if (Core.GeneralSettings.LogDisplaySavePosition)
+         {
+            Core.GeneralSettings.LogDisplayTop = this.Top;
+            Core.GeneralSettings.LogDisplayLeft = this.Left;
+            Core.GeneralSettings.LogDisplayWidth = this.Width;
+            Core.GeneralSettings.LogDisplayHeight = this.Height;
          }
       }
    }
