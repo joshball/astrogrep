@@ -67,6 +67,7 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   12/06/2012	ADD: 1741735, initial dialog for filterable log items viewer.
+      /// [Curtis_Beard]	   03/19/2015	CHG: use system look for toolbar on Windows XP.
       /// </history>
       public frmLogDisplay()
       {
@@ -75,7 +76,15 @@ namespace AstroGrep.Windows.Forms
          DefaultFilterType = null;
 
          // use custom renderer to have background show selected state better than default (using default color though).
-         toolStrip1.Renderer = new MyRenderer();
+         if (API.IsWindowsVistaOrLater)
+         {
+            toolStrip1.Renderer = new MyRenderer();
+         }
+         else
+         {
+            // for xp show a more system look
+            toolStrip1.RenderMode = ToolStripRenderMode.System;
+         }
       }
 
       /// <summary>

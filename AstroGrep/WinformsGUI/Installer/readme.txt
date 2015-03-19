@@ -17,3 +17,4 @@ Other
 - Added missed translation for Remove Leading White Space in Options->Results
 - Fixed an edge case that could cause the a window sound to play when highlighting text
 - Fixed some tab order issues with Text Editors and File Encodings add/edit window
+- Adjusted look of toolbar of messages window in Windows XP
