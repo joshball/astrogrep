@@ -3725,7 +3725,7 @@ namespace AstroGrep.Windows.Forms
             __Grep.SearchingFileByPlugin += ReceiveSearchingFileByPlugin;
             __Grep.FileEncodingDetected += ReceiveFileEncodingDetected;
 
-            Windows.API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.Indeterminate);
+            API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.Indeterminate);
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, "SearchStarted"));
             __Grep.BeginExecute();
          }
@@ -4061,7 +4061,7 @@ namespace AstroGrep.Windows.Forms
             return;
          }
 
-         Windows.API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.NoProgress);
+         API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.NoProgress);
       }
       #endregion
    }
