@@ -32,6 +32,17 @@ namespace AstroGrep.Windows
          }
       }
 
+      /// <summary>
+      /// Determines if current operating system is Windows 7+.
+      /// </summary>
+      public static bool IsWindows7OrLater
+      {
+         get
+         {
+            return Environment.OSVersion.Version >= new Version(6, 1);
+         }
+      }
+
       #region File Size Display
 
       /// <summary>
@@ -2190,24 +2201,27 @@ namespace AstroGrep.Windows
       #region Windows 7+ TaskBar Progress
 
       /// <summary>
-      /// 
+      /// Helper class to set taskbar progress on Windows 7+ systems.
       /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	   03/19/2015	FIX: 67, correct instance declaration when not supported
+      /// </history>
       public static class TaskbarProgress
       {
          /// <summary>
-         /// 
+         /// Available taskbar progress states
          /// </summary>
          public enum TaskbarStates
          {
-            /// <summary></summary>
+            /// <summary>No progress displayed</summary>
             NoProgress = 0,
-            /// <summary></summary>
+            /// <summary>Indeterminate </summary>
             Indeterminate = 0x1,
-            /// <summary></summary>
+            /// <summary>Normal</summary>
             Normal = 0x2,
-            /// <summary></summary>
+            /// <summary>Error</summary>
             Error = 0x4,
-            /// <summary></summary>
+            /// <summary>Paused</summary>
             Paused = 0x8
          }
 
@@ -2246,14 +2260,14 @@ namespace AstroGrep.Windows
          {
          }
 
-         private static ITaskbarList3 taskbarInstance = (ITaskbarList3)new TaskbarInstance();
-         private static bool taskbarSupported = Environment.OSVersion.Version >= new Version(6, 1);
+         private static bool taskbarSupported = IsWindows7OrLater;
+         private static ITaskbarList3 taskbarInstance = taskbarSupported ? (ITaskbarList3)new TaskbarInstance() : null;
 
          /// <summary>
-         /// 
+         /// Sets the state of the taskbar progress.
          /// </summary>
-         /// <param name="windowHandle"></param>
-         /// <param name="taskbarState"></param>
+         /// <param name="windowHandle">current form handle</param>
+         /// <param name="taskbarState">desired state</param>
          public static void SetState(IntPtr windowHandle, TaskbarStates taskbarState)
          {
             if (taskbarSupported)
@@ -2263,11 +2277,11 @@ namespace AstroGrep.Windows
          }
 
          /// <summary>
-         /// 
+         /// Sets the value of the taskbar progress.
          /// </summary>
-         /// <param name="windowHandle"></param>
-         /// <param name="progressValue"></param>
-         /// <param name="progressMax"></param>
+         /// <param name="windowHandle">currnet form handle</param>
+         /// <param name="progressValue">desired progress value</param>
+         /// <param name="progressMax">maximum progress value</param>
          public static void SetValue(IntPtr windowHandle, double progressValue, double progressMax)
          {
             if (taskbarSupported)

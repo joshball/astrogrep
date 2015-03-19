@@ -1,6 +1,7 @@
 ﻿Changelog for AstroGrep v4.3.3
 ===================================================================
 Bugs
+-67: Unhandled exception if I click "search"
 -65: Slash in Command Line for Text Editor doesn't work (adds text editor option to specify quotes around the file)
 -64: Whole Word sometimes lists a non matched file.
 -63: Multi monitor issue when additional monitor is removed (that was showing app)
