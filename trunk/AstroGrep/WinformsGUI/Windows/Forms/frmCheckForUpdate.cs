@@ -259,7 +259,7 @@ namespace AstroGrep.Windows.Forms
 
                string file = string.Format("AstroGrep_Setup_v{0}.exe", newestVersion);
                string remoteFile = string.Format("http://downloads.sourceforge.net/astrogrep/{0}", file);
-               string localFile = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.ProductName), file);
+               string localFile = Path.Combine(Constants.DataDirectory, file);
                installFile = localFile;
 
                if (File.Exists(localFile))

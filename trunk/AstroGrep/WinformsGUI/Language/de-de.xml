@@ -8,14 +8,14 @@
       <control name="lblSearchPath" value="Suchpfad" />
       <control name="lblContextLines" value="Kontextzeilen" tooltip="Zeigt Zeilen über und unter dem Fund an." />
       <control name="txtContextLines" tooltip="Zeigt Zeilen über und unter dem Fund an." />
-      <control name="chkLineNumbers" value="&amp;Zeilennummerierung" tooltip="Fügt die zugegörige Zeilennummer zu jedem Fund hinzu." />
       <control name="chkNegation" value="&amp;Negierung" tooltip="Suche nach Dateien, die den Suchtext nicht enthalten." />
       <control name="chkFileNamesOnly" value="&amp;Zeige nur Dateinamen" tooltip="Zeigt nur die Dateinamen an, in welchen der Suchtext vorkommt (kann für große Dateien schneller sein)" />
       <control name="chkRecurse" value="&amp;Rekursiv" tooltip="Suche auch in Unterverzeichnissen" />
       <control name="chkWholeWordOnly" value="&amp;Ganzes Wörter" tooltip="Nur nach ganzen Wörtern suchen (nicht nach Teilworten)" />
       <control name="chkCaseSensitive" value="&amp;Groß-/Kleinschreibung beachten" tooltip="Achtet genau auf groß- und kleingeschriebene Buchstaben" />
       <control name="chkRegularExpressions" value="Reguläre &amp;Ausdrücke" tooltip="Benutzt &quot;Reguläre Ausdrücke&quot; zur Suche" />
-      <control name="lnkSearchOptions" value="Such-Einstellungen {0}" />
+      <control name="chkAllResultsAfterSearch" value="&amp;Alle Ergebnisse anzeigen Suche nach" tooltip="Einen Überblick über die Ergebnisse zusammen in der Vorschau nach einer Suche." />
+      <control name="lblSearchOptions" value="Such-Einstellungen" />
       <control name="picBrowse" tooltip="Durchsuchen..." />
       <control name="lnkExclusions" value="Ausschlüsse" />
       <control name="lstFileNames">
@@ -58,6 +58,18 @@
          <menuitem index="1" value="Ausschluss &amp;Nachrichten" />
          <menuitem index="2" value="&amp;Fehlermeldungen" />
          <menuitem index="3" value="&amp;Alle Nachrichten" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="&amp;Zoom">
+            <menuitem index="0" value="zoomen (Ctrl+Mouse Wheel Up)"/>
+            <menuitem index="1" value="verkleinern (Ctrl+Mouse Wheel Down)"/>
+            <menuitem index="2" value="Wiederherstellung Standard-Zoom"/>
+         </menuitem>
+         <menuitem index="6" value="Zeilennummern" />
+         <menuitem index="7" value="Zeilenumbruch" />
+         <menuitem index="8" value="&amp;Entfernen Sie Leerraum"/>
+         <menuitem index="9" value="Gesamte Datei" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Alle Ergebnisse" />
       </menu>
       <menu index="3" value="&amp;Werkzeuge">
          <menuitem index="0" value="&amp;Zuletzt benutzte Listen löschen">
@@ -74,10 +86,11 @@
       <menu index="4" value="&amp;Hilfe">
          <menuitem index="0" value="&amp;Hilfe-" />
          <menuitem index="1" value="&amp;reguläre Ausdrücke" />
-         <menuitem index="2" value="-" />
-         <menuitem index="3" value="&amp;prüfen Aktuelles..." />
-         <menuitem index="4" value="-" />
-         <menuitem index="5" value="&amp;Über AstroGrep" />
+         <menuitem index="2" value="&amp;Logdatei" />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="&amp;prüfen Aktuelles..." />
+         <menuitem index="5" value="-" />
+         <menuitem index="6" value="&amp;Über AstroGrep" />
       </menu>
 
       <!-- status bar items default state-->
@@ -116,6 +129,7 @@
       <control name="lblResultPreview" value="Ergebnisvorschau" />
       <control name="lblResultsWindowBack" value="Hintergrundfarbe" />
       <control name="lblResultsWindowFore" value="Vordergrundfarbe" />
+      <control name="lblResultsContextForeColor" value="Kontext Vordergrund" />
       <control name="grpResultWindow" value="Ergebnisfenster" />
       <control name="BackColorLabel" value="Hintergrundfarbe" />
       <control name="ForeColorLabel" value="Vordergrundfarbe" />
@@ -140,7 +154,6 @@
       <control name="grpFileList" value="Dateiliste" />
       <control name="btnFileFindFont" value="Schriftart suchen..."/>
       <control name="chkDetectFileEncoding" value="Detect-Datei-Codierung."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Entfernen Sie Leerraum"/>
       <control name="chkSaveMessagesPosition" value="&amp;Nachrichten speichern Fensterposition."/>
 
       <control name="tabFileEncoding" value="Dateikodierung" />
@@ -180,10 +193,6 @@
       <control name="btnOK" value="&amp;OK"/>
    </screen>
 
-   <screen name="frmDisplayMessages" value="AstroGrep">
-      <control name="btnOK" value="&amp;OK"/>
-   </screen>
-
    <screen name="frmLogDisplay" value="Nachrichten">
       <control name="sbtnStatus" value="Stellenwert"/>
       <control name="sbtnExclusions" value="Ausschlüsse"/>
@@ -214,7 +223,7 @@
 
       <text name="PrintTypeSelected" value="Objekt auswählen"/>
       <text name="PrintTypeFile" value="Dateiliste"/>
-      <text name="PrintTypeAll" value="Alle Treffer"/>
+      <text name="PrintTypeAll" value="Alle"/>
       <text name="PrintErrorPageSettings" value="Es trat ein Fehler auf, während des Versuchs die Seiteneinstellung zu laden. Stellen Sie sicher, daß Sie Zugriff auf einen Drucker haben. Ein Drucker muss angeschlossen und zugänglich sein, damit gedruckt werden kann."/>
       <text name="PrintErrorPreview" value="Es trat ein Fehler auf, während des Versuchs das Dokument für die Druckvorschau zu laden. Stellen Sie sicher, daß Sie Zugriff auf einen Drucker haben. Ein Drucker muss angeschlossen und zugänglich sein, damit gedruckt werden kann."/>
       <text name="PrintErrorPrint" value="Es trat ein Fehler auf, während des Versuchs das Dokument für das Drucken zu laden. Stellen Sie sicher, daß Sie Zugriff auf einen Drucker haben. Ein Drucker muss angeschlossen und zugänglich sein, damit gedruckt werden kann."/>
@@ -272,6 +281,7 @@
       <text name="ResultsStatusFilterCount" value="Ausschlüsse: {0}"/>
       <text name="ResultsStatusErrorCount" value="Störung: {0}"/>
 
+      <text name="ResultsContextMenu.OpenFileCurrentLine" value="Öffnen Sie die Datei im aktuellen Zeile"/>
       <text name="ResultsContextMenu.Copy" value="Kopieren"/>
       <text name="ResultsContextMenu.SelectAll" value="Alles auswählen"/>
 

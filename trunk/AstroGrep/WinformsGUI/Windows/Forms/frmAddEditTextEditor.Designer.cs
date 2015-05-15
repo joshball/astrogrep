@@ -170,7 +170,7 @@ namespace AstroGrep.Windows.Forms
          // 
          // updwnTabSize
          // 
-         this.updwnTabSize.Location = new System.Drawing.Point(6, 220);
+         this.updwnTabSize.Location = new System.Drawing.Point(6, 222);
          this.updwnTabSize.Maximum = new decimal(new int[] {
             10,
             0,
@@ -240,7 +240,7 @@ namespace AstroGrep.Windows.Forms
          // 
          this.txtTextEditorLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-         this.txtTextEditorLocation.Location = new System.Drawing.Point(6, 32);
+         this.txtTextEditorLocation.Location = new System.Drawing.Point(6, 34);
          this.txtTextEditorLocation.Name = "txtTextEditorLocation";
          this.txtTextEditorLocation.Size = new System.Drawing.Size(387, 20);
          this.txtTextEditorLocation.TabIndex = 6;
@@ -251,7 +251,7 @@ namespace AstroGrep.Windows.Forms
          this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
          this.btnBrowse.Cursor = System.Windows.Forms.Cursors.Hand;
          this.btnBrowse.Image = ((System.Drawing.Image)(resources.GetObject("btnBrowse.Image")));
-         this.btnBrowse.Location = new System.Drawing.Point(405, 34);
+         this.btnBrowse.Location = new System.Drawing.Point(405, 36);
          this.btnBrowse.Name = "btnBrowse";
          this.btnBrowse.Size = new System.Drawing.Size(16, 16);
          this.btnBrowse.TabIndex = 10;

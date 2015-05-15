@@ -267,19 +267,20 @@ namespace libAstroGrep
       /// </history>
       private static Encoding DetectEncodingUsingMozillaUCD(Byte[] bytes)
       {
-         Ude.ICharsetDetector cdet = new Ude.CharsetDetector();
-         
-         cdet.Feed(bytes, 0, bytes.Length);
-         cdet.DataEnd();
+         try
+         {
+            Ude.ICharsetDetector cdet = new Ude.CharsetDetector();
+            cdet.Feed(bytes, 0, bytes.Length);
+            cdet.DataEnd();
 
-         if (cdet.Charset != null)
-         {
-            return Encoding.GetEncoding(cdet.Charset);
+            if (cdet.Charset != null)
+            {
+               return Encoding.GetEncoding(cdet.Charset);
+            }
          }
-         else
-         {
-            return null;
-         }
+         catch { }
+
+         return null;
       }
 
       #endregion

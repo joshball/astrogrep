@@ -36,6 +36,7 @@ namespace Plugin.MicrosoftWord
    /// [Curtis_Beard]      07/28/2006	Created
    /// [Curtis_Beard]      05/25/2007  CHG: properly call methods (makes it work with Word 2007)
    /// [Curtis_Beard]      08/21/2007  CHG: use const string for extensions
+   /// [Curtis_Beard]      03/31/2015	CHG: rework Grep/Matches
    /// </history>
    public class MicrosoftWordPlugin : IDisposable, IAstroGrepPlugin
    {
@@ -48,7 +49,7 @@ namespace Plugin.MicrosoftWord
       private object __WordSelection;
 
       private const string PLUGIN_NAME = "Microsoft Word";
-      private const string PLUGIN_VERSION = "1.1.4";
+      private const string PLUGIN_VERSION = "1.2.0";
       private const string PLUGIN_AUTHOR = "The AstroGrep Team";
       private const string PLUGIN_DESCRIPTION = "Searches Microsoft Word documents for specified text.  Line numbers are shown as (Line,Page).  Currently doesn't support Regular Expressions or Context lines.";
       private const string PLUGIN_EXTENSIONS = ".doc,.docx";
@@ -314,28 +315,9 @@ namespace Plugin.MicrosoftWord
       /// <history>
       /// [Curtis_Beard]      07/28/2006  Created
       /// [Curtis_Beard]      05/25/2007  ADD: support for Exception object
+      /// [Curtis_Beard]      03/31/2015	CHG: rework Grep/Matches
       /// </history>
-      public HitObject Grep(FileInfo file, ISearchSpec searchSpec, ref Exception ex)
-      {
-         return Grep(file.FullName, searchSpec, ref ex);
-      }
-
-
-
-      /// <summary>
-      /// Searches the given file for the given search text.
-      /// </summary>
-      /// <param name="path">Fully qualified file path</param>
-		/// <param name="searchSpec">ISearchSpec interface value</param>
-      /// <param name="ex">Exception holder if error occurs</param>
-      /// <returns>Hitobject containing grep results, null on error</returns>
-      /// <history>
-      /// [Curtis_Beard]      07/28/2006  Created
-      /// [Curtis_Beard]      05/25/2007  ADD: support for Exception object
-      /// [Curtis_Beard]      08/19/2014  CHG: 58, detect Word version to specify readonly mode
-      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
-      /// </history>
-      public HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex)
+      public MatchResult Grep(FileInfo file, ISearchSpec searchSpec, ref Exception ex)
       {
          // initialize Exception object to null
          ex = null;
@@ -344,14 +326,14 @@ namespace Plugin.MicrosoftWord
          {
             try
             {
-               if (File.Exists(path))
+               if (file.Exists)
                {
-                  const int MARGINSIZE = 4;
+                  //const int MARGINSIZE = 4;
                   int count = 0;
-                  HitObject hit = null;
+                  MatchResult match = null;
                   int prevLine = 0;
                   int prevPage = 0;
-                  string _spacer = new string(' ', MARGINSIZE);
+                  //string _spacer = new string(' ', MARGINSIZE);
                   //string _contextSpacer = string.Empty;
 
                   //if (searchSpec.ContextLines > 0)
@@ -368,7 +350,7 @@ namespace Plugin.MicrosoftWord
                   double version = 0;
                   double.TryParse(appversion.ToString(), out version);
                   bool useReadOnly = version >= 12.00 ? false : true;
-                  object wordDocument = OpenDocument(path, useReadOnly);
+                  object wordDocument = OpenDocument(file.FullName, useReadOnly);
 
                   // Get Selection Property
                   __WordSelection = __WordApplication.GetType().InvokeMember("Selection", BindingFlags.GetProperty,
@@ -396,7 +378,7 @@ namespace Plugin.MicrosoftWord
                      if (count == 1)
                      {
                         // create hit object
-                        hit = new HitObject(path);
+                        match = new MatchResult(file);
                      }
 
                      // since a hit was found and only displaying file names, quickly exit
@@ -410,21 +392,21 @@ namespace Plugin.MicrosoftWord
                      int pageNum = (int)Information(range, WdInformation.wdActiveEndPageNumber);
                      string line = GetFindTextLine(start);
 
-                     // don't add a hit if (on same line
+                     // don't add a hit if on same line
                      if (!(prevLine == lineNum && prevPage == pageNum))
                      {
                         // check for line numbers
-                        if (searchSpec.IncludeLineNumbers)
-                        {
-                           // setup line header
-                           _spacer = "(" + string.Format("{0},{1}", lineNum, pageNum);
-                           if (_spacer.Length <= 5)
-                           {
-                              _spacer = _spacer + new string(' ', 6 - _spacer.Length);
-                           }
-                           _spacer = _spacer + ") ";
-                           //_contextSpacer = "(" + new string(' ', _spacer.Length - 3) + ") ";
-                        }
+                        //if (searchSpec.IncludeLineNumbers)
+                        //{
+                        //   // setup line header
+                        //   _spacer = "(" + string.Format("{0},{1}", lineNum, pageNum);
+                        //   if (_spacer.Length <= 5)
+                        //   {
+                        //      _spacer = _spacer + new string(' ', 6 - _spacer.Length);
+                        //   }
+                        //   _spacer = _spacer + ") ";
+                        //   //_contextSpacer = "(" + new string(' ', _spacer.Length - 3) + ") ";
+                        //}
 
                         //  remove any odd characters from the text
                         line = RemoveSpecialCharacters(line);
@@ -444,7 +426,18 @@ namespace Plugin.MicrosoftWord
                         // End If
 
                         // add line
-                        hit.Add(_spacer, line, lineNum, colNum);
+                        MatchResultLine matchLine = new MatchResultLine()
+                        {
+                           HasMatch = true,
+                           ColumnNumber = colNum,
+                           LineNumber = lineNum,
+                           Line = line
+                        };
+                        var lineMatches = libAstroGrep.Grep.RetrieveLineMatches(line, searchSpec);
+                        match.SetHitCount(lineMatches.Count);
+                        matchLine.Matches = lineMatches;
+                        match.Matches.Add(matchLine);
+                        //match.Add(_spacer, line, lineNum, colNum);
 
                         // add context lines after
                         // if (__contextLines > 0){
@@ -460,7 +453,7 @@ namespace Plugin.MicrosoftWord
                         //    Next
                         // End If
                      }
-                     hit.SetHitCount();
+                     //match.SetHitCount();
 
                      prevLine = lineNum;
                      prevPage = pageNum;
@@ -472,11 +465,11 @@ namespace Plugin.MicrosoftWord
                   ReleaseSelection();
                   CloseDocument(wordDocument);
 
-                  return hit;
+                  return match;
                }
                else
                {
-                  string msg = string.Format("File does not exist: {0}", path);
+                  string msg = string.Format("File does not exist: {0}", file.FullName);
                   ex = new Exception(msg);
                   Trace(msg);
                }

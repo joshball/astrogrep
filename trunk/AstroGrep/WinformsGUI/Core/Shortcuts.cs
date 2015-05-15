@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 
+using AstroGrep.Core.Logging;
 using AstroGrep.Windows;
 
 namespace AstroGrep.Core
@@ -126,6 +127,7 @@ namespace AstroGrep.Core
         /// <history>
         /// [Curtis_Beard]		09/05/2006	Created
         /// [Curtis_Beard]		10/05/2012	CHG: use ShellLink class to create real shortcut files.
+        /// [Curtis_Beard]	  04/08/2015	CHG: add logging
         /// </history>
         private static void CreateApplicationShortcut(string location, bool create)
         {
@@ -150,7 +152,7 @@ namespace AstroGrep.Core
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                   LogClient.Instance.Logger.Error("Unable to create shortcut at {0} with message {1}", location, ex.Message);
                 }
             }
             else
@@ -169,7 +171,7 @@ namespace AstroGrep.Core
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                   LogClient.Instance.Logger.Error("Unable to delete shortcut at {0} with message {1}", location, ex.Message);
                 }
             }
         }

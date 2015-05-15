@@ -70,7 +70,7 @@
          // 
          this.cboTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cboTypes.FormattingEnabled = true;
-         this.cboTypes.Location = new System.Drawing.Point(12, 79);
+         this.cboTypes.Location = new System.Drawing.Point(12, 80);
          this.cboTypes.Name = "cboTypes";
          this.cboTypes.Size = new System.Drawing.Size(252, 21);
          this.cboTypes.TabIndex = 2;

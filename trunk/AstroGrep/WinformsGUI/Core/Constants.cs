@@ -1,4 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+
+using libAstroGrep;
 
 namespace AstroGrep
 {
@@ -34,6 +38,8 @@ namespace AstroGrep
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
    /// [Curtis_Beard]		10/27/2014	CHG: 88, add file extension column
    /// [Mark_Guerra]       11/06/2014  CHG: 91, exclude compiled java classes and compiled windows html help files (class,chm)
+   /// [Curtis_Beard]	   04/08/2015	CHG: add logging
+   /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
    /// </history>
    public class Constants
    {
@@ -48,13 +54,9 @@ namespace AstroGrep
       /// <summary>Separator for colors</summary>
       public static string COLOR_SEPARATOR = "-";
       /// <summary>Separator for fonts</summary>
-      public static string FONT_SEPARATOR = "||";
-      /// <summary>Separator for text editor</summary>
-      public static string TEXT_EDITOR_SEPARATOR = "|;;|";
+      public static string FONT_SEPARATOR = "||";      
       /// <summary>Separator for text editor file types</summary>
       public static string TEXT_EDITOR_TYPE_SEPARATOR = "|";
-      /// <summary>Separator for plugins</summary>
-      public static string PLUGIN_SEPARATOR = "|;;|";
       /// <summary>Separator for plugin arguments</summary>
       public static string PLUGIN_ARGS_SEPARATOR = "|@@|";
 
@@ -86,12 +88,18 @@ namespace AstroGrep
       /// <summary>Product name</summary>
       public const string ProductName = "AstroGrep";
 
+      /// <summary>Default search panel width</summary>
+      public const int DEFAULT_SEARCH_PANEL_WIDTH = 290;
+
+      /// <summary>Default search panel width when under medium font size dpi setting</summary>
+      public const int DEFAULT_SEARCH_PANEL_WIDTH_MEDIUM_FONT = 345;
+
       /// <summary>Product Location</summary>
       public static string ProductLocation
       {
          get
          {
-            System.IO.FileInfo file = new System.IO.FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            FileInfo file = new FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             return file.Directory.FullName;
          }
@@ -102,7 +110,7 @@ namespace AstroGrep
       {
          get
          {
-            System.IO.FileInfo file = new System.IO.FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            FileInfo file = new FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             return file.FullName;
          }
@@ -121,6 +129,59 @@ namespace AstroGrep
       }
 
       /// <summary>
+      /// Retrieves the current data directory for storing user settings, logs, etc.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	  04/08/2015	ADD: logging
+      /// </history>
+      public static string DataDirectory
+      {
+         get
+         {
+            string path = string.Empty;
+
+            if (Core.Common.StoreDataLocal)
+            {
+               path = ProductLocation;
+            }
+            else
+            {
+               path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.ProductName);
+            }
+
+            return path;
+         }
+      }
+
+      /// <summary>
+      /// Retrieves the log file's full name.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	  04/08/2015	ADD: logging
+      /// </history>
+      public static string LogFile
+      {
+         get
+         {
+            return Path.Combine(DataDirectory, "Log", ProductName + ".log");
+         }
+      }
+
+      /// <summary>
+      /// Retrieves the log archive file's full name.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	  04/08/2015	ADD: logging
+      /// </history>
+      public static string LogFileArchive
+      {
+         get
+         {
+            return Path.Combine(DataDirectory, "Log", ProductName + ".{#}.log");
+         }
+      }
+
+      /// <summary>
       /// Gets the default exclusions
       /// </summary>
       /// <history>
@@ -131,7 +192,7 @@ namespace AstroGrep
       {
          get
          {
-            return libAstroGrep.FilterItem.ConvertFilterItemsToString(GetDefaultFilterItemsList());
+            return FilterItem.ConvertFilterItemsToString(GetDefaultFilterItemsList());
          }
       }
 
@@ -144,25 +205,25 @@ namespace AstroGrep
       /// [Curtis_Beard]	   09/18/2013	ADD: 56, add suggested default directory names to exclude for common apps
       /// [Curtis_Beard]	   11/06/2014	CHG: update to FilterItem
       /// </history>
-      private static System.Collections.Generic.List<libAstroGrep.FilterItem> GetDefaultFilterItemsList()
+      private static List<FilterItem> GetDefaultFilterItemsList()
       {
-         var list = new System.Collections.Generic.List<libAstroGrep.FilterItem>();
+         var list = new List<FilterItem>();
 
          // default extensions
          var exts = DEFAULT_EXTENSION_EXCLUDE_LIST.Split(';');
          foreach (var ext in exts)
          {
-            var item = new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.File, libAstroGrep.FilterType.SubCategories.Extension), ext, libAstroGrep.FilterType.ValueOptions.None, false, true);
+            var item = new FilterItem(new FilterType(FilterType.Categories.File, FilterType.SubCategories.Extension), ext, FilterType.ValueOptions.None, false, true);
             list.Add(item);
          }
 
          // default directory names to ignore (Git, Mercurial, SVN, CVS, Eclipse Metadata, Eclipse Settings)
-         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".git", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
-         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".hg", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
-         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".svn", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
-         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".cvs", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
-         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".metadata", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
-         list.Add(new libAstroGrep.FilterItem(new libAstroGrep.FilterType(libAstroGrep.FilterType.Categories.Directory, libAstroGrep.FilterType.SubCategories.Name), ".settings", libAstroGrep.FilterType.ValueOptions.Equals, false, true));
+         list.Add(new FilterItem(new FilterType(FilterType.Categories.Directory, FilterType.SubCategories.Name), ".git", FilterType.ValueOptions.Equals, false, true));
+         list.Add(new FilterItem(new FilterType(FilterType.Categories.Directory, FilterType.SubCategories.Name), ".hg", FilterType.ValueOptions.Equals, false, true));
+         list.Add(new FilterItem(new FilterType(FilterType.Categories.Directory, FilterType.SubCategories.Name), ".svn", FilterType.ValueOptions.Equals, false, true));
+         list.Add(new FilterItem(new FilterType(FilterType.Categories.Directory, FilterType.SubCategories.Name), ".cvs", FilterType.ValueOptions.Equals, false, true));
+         list.Add(new FilterItem(new FilterType(FilterType.Categories.Directory, FilterType.SubCategories.Name), ".metadata", FilterType.ValueOptions.Equals, false, true));
+         list.Add(new FilterItem(new FilterType(FilterType.Categories.Directory, FilterType.SubCategories.Name), ".settings", FilterType.ValueOptions.Equals, false, true));
 
          return list;
       }

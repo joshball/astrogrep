@@ -8,14 +8,14 @@
       <control name="lblSearchPath" value="Percorso di ricerca" />
       <control name="lblContextLines" value="Righe di contesto" tooltip="Numero di righe da visualizzare sopra e sotto la parola trovata" />
       <control name="txtContextLines" tooltip="Numero di righe da visualizzare sopra e sotto la parola trovata" />
-      <control name="chkLineNumbers" value="&amp;Numero riga" tooltip="Visualizza il numero di riga prima di ogni corripondenza" />
       <control name="chkNegation" value="&amp;Esclusione" tooltip="Trova i file che non contengono il testo cercato" />
       <control name="chkFileNamesOnly" value="&amp;Visualizza solo nomi dei file" tooltip="Visualizza solo i nomi dei file contenenti corrispondenze (operazione consigliata con file di grandi dimensioni)" />
       <control name="chkRecurse" value="&amp;Controlla le sottocartelle" tooltip="Ricerca nelle sottocartelle" />
       <control name="chkWholeWordOnly" value="&amp;Solo parole intere" tooltip="Ricerca solo parole intere, non porzioni di termini" />
       <control name="chkCaseSensitive" value="&amp;Maiuscole/minuscole" tooltip="Attiva la distinzione tra maiuscole e minuscole durante la ricerca" />
       <control name="chkRegularExpressions" value="Espressione &amp;regolare" tooltip="Esegue una ricerca per &apos;espressioni regolari&apos;" />
-      <control name="lnkSearchOptions" value="Opzioni di ricerca  {0}" />
+      <control name="chkAllResultsAfterSearch" value="&amp;Mostra tutti i risultati dopo la ricerca" tooltip="Mostra tutti i risultati insieme nell'anteprima dopo una ricerca." />
+      <control name="lblSearchOptions" value="Opzioni di ricerca" />
       <control name="picBrowse" tooltip="Sfoglia..." />
       <control name="lnkExclusions" value="Esclusioni" />
       <control name="lstFileNames">
@@ -58,6 +58,18 @@
          <menuitem index="1" value="Messaggi di &amp;esclusione" />
          <menuitem index="2" value="Messaggi di e&amp;rrore" />
          <menuitem index="3" value="&amp;Tutti i messaggi" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="la &amp;zumata">
+            <menuitem index="0" value="ingrandire (Ctrl+Mouse Wheel Up)"/>
+            <menuitem index="1" value="diminuire (Ctrl+Mouse Wheel Down)"/>
+            <menuitem index="2" value="ripristinare zoom predefinito"/>
+         </menuitem>
+         <menuitem index="6" value="Numeri di riga" />
+         <menuitem index="7" value="A capo automatico" />
+         <menuitem index="8" value="&amp;Rimuovere spazi bianchi"/>
+         <menuitem index="9" value="Intero file" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Tutti i risultati" />
       </menu>
       <menu index="3" value="St&amp;rumenti">
          <menuitem index="0" value="&amp;Cancella elenchi usati di recente">
@@ -74,10 +86,11 @@
       <menu index="4" value="&amp;Guida">
          <menuitem index="0" value="&amp;Visualizza Aiuto" />
          <menuitem index="1" value="&amp;Espressioni regolari" />
-         <menuitem index="2" value="-" />
-         <menuitem index="3" value="&amp;Controlla aggiornamenti..." />
-         <menuitem index="4" value="-" />
-         <menuitem index="5" value="&amp;Informazioni su AstroGrep" />
+         <menuitem index="2" value="&amp;File di log" />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="&amp;Controlla aggiornamenti..." />
+         <menuitem index="5" value="-" />
+         <menuitem index="6" value="&amp;Informazioni su AstroGrep" />
       </menu>
 
       <!-- status bar items default state-->
@@ -116,6 +129,7 @@
       <control name="lblResultPreview" value="Anteprima risultati" />
       <control name="lblResultsWindowBack" value="Colore sfondo" />
       <control name="lblResultsWindowFore" value="Colore carattere" />
+      <control name="lblResultsContextForeColor" value="Contesto in primo piano" />
       <control name="grpResultWindow" value="Finestra risultati" />
       <control name="BackColorLabel" value="Colore sfondo" />
       <control name="ForeColorLabel" value="Colore carattere" />
@@ -140,7 +154,6 @@
       <control name="grpFileList" value="Elenco dei file" />
       <control name="btnFileFindFont" value="Trova font..."/>
       <control name="chkDetectFileEncoding" value="Rileva la codifica del file."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Rimuovere spazi bianchi"/>
       <control name="chkSaveMessagesPosition" value="Salvare i messaggi &amp;posizione della finestra."/>      
 
       <control name="tabFileEncoding" value="Codifica File" />
@@ -180,10 +193,6 @@
       <control name="btnOK" value="&amp;OK"/>
    </screen>
 
-   <screen name="frmDisplayMessages" value="AstroGrep">
-      <control name="btnOK" value="&amp;OK"/>
-   </screen>
-
    <screen name="frmLogDisplay" value="Messaggi">
       <control name="sbtnStatus" value="Stato"/>
       <control name="sbtnExclusions" value="Esclusioni"/>
@@ -215,7 +224,7 @@
       <text name="PrintTypeSelected" value="Elementi selezionati"/>
       <text name="PrintTypeCurrent" value="Risultato attuale"/>
       <text name="PrintTypeFile" value="Elenco file"/>
-      <text name="PrintTypeAll" value="Tutti i risultati"/>
+      <text name="PrintTypeAll" value="Tutto"/>
       <text name="PrintErrorPageSettings" value="Errore durante il tentativo di caricamento delle Impostazioni della pagina. Assicurarsi di poter accedere alla stampante. La stampante deve essere collegata e accessibile perché l&apos;operazione di stampa abbia luogo."/>
       <text name="PrintErrorPreview" value="Errore durante il tentativo di caricamento del documento di anteprima di stampa. Assicurarsi di poter accedere alla stampante. La stampante deve essere collegata e accessibile perché l&apos;operazione di stampa abbia luogo."/>
       <text name="PrintErrorPrint" value="Errore durante il tentativo di caricamento del documento di stampa. Assicurarsi di poter accedere alla stampante. La stampante deve essere collegata e accessibile perché l&apos;operazione di stampa abbia luogo."/>
@@ -249,12 +258,9 @@
       <text name="ColorOtherText" value="&amp;Personalizza..."/>
       <!-- todo: color names -->
       
-      <text name="TextEditorsErrorNoCmdLineForFile" value="Non è stato specificato alcun argomento della riga di comando per il nome file.
-Specificare l'argomento del file in Strumenti->Opzioni."/>
-      <text name="TextEditorsErrorNotDefined" value="Non è stato definito alcun editor di testo né per il file specificato né per 'tutti i tipi di file'.
-Definire un editor di testo in Strumenti->Opzioni"/>
-      <text name="TextEditorsErrorGeneric" value="Errore durante la modifica del file {0}.
-È stato rilevato il seguente problema: {1}"/>
+      <text name="TextEditorsErrorNoCmdLineForFile" value="Non è stato specificato alcun argomento della riga di comando per il nome file. &#xD;&#xA; Specificare l'argomento del file in Strumenti->Opzioni."/>
+      <text name="TextEditorsErrorNotDefined" value="Non è stato definito alcun editor di testo né per il file specificato né per 'tutti i tipi di file'. &#xD;&#xA; Definire un editor di testo in Strumenti->Opzioni"/>
+      <text name="TextEditorsErrorGeneric" value="Errore durante la modifica del file {0}.&#xD;&#xA; È stato rilevato il seguente problema: {1}"/>
       <text name="TextEditorsBrowseTitle" value="Selezionare l'eseguibile dell'editor di testo"/>
       <text name="TextEditorsAllTypesDefined" value="L'editor di testo per 'tutti i tipi di file' è già stato specificato."/>
       <text name="TextEditorsColumnFileType" value="Tipo file"/>
@@ -276,6 +282,7 @@ Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="ResultsStatusFilterCount" value="Esclusioni: {0}"/>
       <text name="ResultsStatusErrorCount" value="Errore: {0}"/>
 
+      <text name="ResultsContextMenu.OpenFileCurrentLine" value="Apri il file in linea corrente"/>
       <text name="ResultsContextMenu.Copy" value="Copiare"/>
       <text name="ResultsContextMenu.SelectAll" value="Seleziona tutto"/>
       

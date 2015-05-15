@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
@@ -292,8 +293,6 @@ namespace AstroGrep.Windows
 
                if (controlNode != null)
                {
-                  //found control node
-
                   //text
                   if (controlNode.Attributes["value"] != null)
                      return controlNode.Attributes["value"].Value;
@@ -303,29 +302,6 @@ namespace AstroGrep.Windows
 
          return string.Empty;
       }
-
-      ///// <summary>
-      ///// Sets the given menuitem's text property.
-      ///// </summary>
-      ///// <param name="item">MenuItem to set</param>
-      ///// <param name="index">Index of item's parent MenuItem</param>
-      ///// <history>
-      ///// [Curtis_Beard]		07/31/2006	Created
-      ///// </history>
-      //public static void SetMenuItemText(MenuItem item, int index)
-      //{
-      //   if (__RootNode != null)
-      //   {
-      //      string formName = item.GetMainMenu().GetForm().Name;
-      //      XmlNode node = __RootNode.SelectSingleNode("screen[@name='" + formName + "']/menu[@index='" + index + "']/menuitem[@index='" + item.Index + "']");
-
-      //      if (node != null)
-      //      {
-      //         if (node.Attributes["value"] != null)
-      //            item.Text = node.Attributes["value"].Value;
-      //      }
-      //   }
-      //}
 
       /// <summary>
       /// Sets the given context menuitem's text property.
@@ -379,23 +355,6 @@ namespace AstroGrep.Windows
                   }
                }
             }
-         }
-      }
-
-      /// <summary>
-      /// Retrieves the top most control (parent) of the given control.
-      /// </summary>
-      /// <param name="ctrl">Control to find parent</param>
-      /// <returns>Control that is the top most parent of the given control</returns>
-      private static Control GetParentControl(Control ctrl)
-      {
-         if (ctrl.Parent == null)
-         {
-            return ctrl;
-         }
-         else
-         {
-            return GetParentControl(ctrl.Parent);
          }
       }
 
@@ -480,13 +439,32 @@ namespace AstroGrep.Windows
                   {
                      item.Text = menuNode.Attributes["value"].Value;
 
-                     //ProcessMenuItem(item, item.Index);
                      ProcessMainMenuItem(item);
+                  }
+               }
+            }
+
+            //process menu strip items on form
+            if (frm.MainMenuStrip != null)
+            {
+               for (int i = 0; i < frm.MainMenuStrip.Items.Count; i++)
+               {
+                  ToolStripMenuItem item = frm.MainMenuStrip.Items[i] as ToolStripMenuItem;
+                  XmlNode menuNode = __RootNode.SelectSingleNode("screen[@name='" + frm.Name + "']/menu[@index='" + i + "']");
+
+                  if (menuNode != null && menuNode.Attributes["value"] != null)
+                  {
+                     item.Text = menuNode.Attributes["value"].Value;
+                     List<int> indexes = new List<int>();
+                     indexes.Add(i);
+                     ProcessMainToolStripMenuItem(item, indexes);
                   }
                }
             }
          }
       }
+
+      #region MenuItem Methods
 
       private static void ProcessMainMenuItem(MenuItem mainMenuItem)
       {
@@ -548,6 +526,79 @@ namespace AstroGrep.Windows
             }
          }
       }
+
+      #endregion
+
+      #region ToolStrip Methods
+
+      private static void ProcessMainToolStripMenuItem(ToolStripMenuItem mainMenuItem, List<int> indexes)
+      {
+         if (mainMenuItem.DropDownItems != null && mainMenuItem.DropDownItems.Count > 0)
+         {
+            for (int i = 0; i < mainMenuItem.DropDownItems.Count; i++)
+            {
+               indexes.Add(i);
+               ProcessToolStripMenuItems(mainMenuItem.DropDownItems[i], indexes);
+               indexes.RemoveAt(indexes.Count - 1);
+            }
+         }
+      }
+
+      private static void ProcessToolStripMenuItems(ToolStripItem menuItem, List<int> indexes)
+      {
+         if ((menuItem is ToolStripMenuItem && ((menuItem as ToolStripMenuItem).DropDownItems == null || (menuItem as ToolStripMenuItem).DropDownItems.Count == 0)) || menuItem is ToolStripSeparator)
+         {
+            SetToolStripMenuItemText(menuItem, indexes);
+         }
+         else
+         {
+            // set text, then process children
+            SetToolStripMenuItemText(menuItem, indexes);
+
+            if (menuItem is ToolStripMenuItem)
+            {
+               var item = menuItem as ToolStripMenuItem;
+               for (int i = 0; i < item.DropDownItems.Count; i++)
+               {
+                  indexes.Add(i);
+                  SetToolStripMenuItemText(item.DropDownItems[i], indexes);
+                  indexes.RemoveAt(indexes.Count - 1);
+               }
+            }
+         }
+      }
+
+      private static void SetToolStripMenuItemText(ToolStripItem item, List<int> indexes)
+      {
+         if (__RootNode != null)
+         {
+            string formName = string.Empty;
+            ToolStrip owner = item.Owner;
+            while (owner is ToolStripDropDownMenu)
+            {
+               owner = (owner as ToolStripDropDownMenu).OwnerItem.Owner;
+            }
+            formName = owner.FindForm().Name;
+
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+            builder.AppendFormat("screen[@name='{0}']", formName);
+
+            for (int i = 0; i < indexes.Count; i++)
+            {
+               builder.AppendFormat("/menu{0}[@index='{1}']", i == 0 ? string.Empty : "item", indexes[i]);
+            }
+
+            XmlNode node = __RootNode.SelectSingleNode(builder.ToString());
+            if (node != null)
+            {
+               if (node.Attributes["value"] != null)
+                  item.Text = node.Attributes["value"].Value;
+            }
+         }
+      }
+
+      #endregion
 
       /// <summary>
       /// Generates an xml document for the given form with all controls.
@@ -913,6 +964,23 @@ namespace AstroGrep.Windows
             }
          }
          catch {}
+      }
+
+      /// <summary>
+      /// Retrieves the top most control (parent) of the given control.
+      /// </summary>
+      /// <param name="ctrl">Control to find parent</param>
+      /// <returns>Control that is the top most parent of the given control</returns>
+      private static Control GetParentControl(Control ctrl)
+      {
+         if (ctrl.Parent == null)
+         {
+            return ctrl;
+         }
+         else
+         {
+            return GetParentControl(ctrl.Parent);
+         }
       }
       #endregion
    }

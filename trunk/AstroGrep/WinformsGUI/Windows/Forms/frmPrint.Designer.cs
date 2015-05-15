@@ -6,19 +6,18 @@ using System.Collections;
 
 namespace AstroGrep.Windows.Forms
 {
-	public partial class frmPrint
-	{
-		#region Windows Form Designer generated code
-		private ListView __listView;
-private System.Windows.Forms.Button cmdPrint;
-private System.Windows.Forms.Button cmdPreview;
-private System.Windows.Forms.Button cmdPageSetup;
-private System.Windows.Forms.Button cmdCancel;
-private System.Windows.Forms.Label lblSelect;
-private System.Windows.Forms.ListBox lstPrintTypes;
-private System.ComponentModel.Container components = null;
+   public partial class frmPrint
+   {
+      #region Windows Form Designer generated code
+      private System.Windows.Forms.Button cmdPrint;
+      private System.Windows.Forms.Button cmdPreview;
+      private System.Windows.Forms.Button cmdPageSetup;
+      private System.Windows.Forms.Button cmdCancel;
+      private System.Windows.Forms.Label lblSelect;
+      private System.Windows.Forms.ListBox lstPrintTypes;
+      private System.ComponentModel.Container components = null;
 
-		private void InitializeComponent()
+      private void InitializeComponent()
       {
          this.cmdPrint = new System.Windows.Forms.Button();
          this.cmdPreview = new System.Windows.Forms.Button();
@@ -108,22 +107,22 @@ private System.ComponentModel.Container components = null;
          this.ResumeLayout(false);
 
       }
-		#endregion
+      #endregion
 
       /// <summary>
       /// Dispose form.
       /// </summary>
       /// <param name="disposing">system parameter</param>
-		protected override void Dispose( bool disposing )
+      protected override void Dispose(bool disposing)
       {
-         if( disposing )
+         if (disposing)
          {
-            if(components != null)
+            if (components != null)
             {
                components.Dispose();
             }
          }
-         base.Dispose( disposing );
+         base.Dispose(disposing);
       }
-	}
+   }
 }

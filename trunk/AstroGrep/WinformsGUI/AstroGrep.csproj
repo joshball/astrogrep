@@ -90,6 +90,16 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.1.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\packages\AvalonEdit.5.0.2\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NLog, Version=3.2.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.3.2.0.0\lib\net40\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -102,9 +112,12 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
@@ -120,6 +133,8 @@
     <Compile Include="Core\GeneralSettings.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\Logging\ILogClient.cs" />
+    <Compile Include="Core\Logging\LogClient.cs" />
     <Compile Include="Core\LogItem.cs" />
     <Compile Include="Core\PluginManager.cs">
       <SubType>Code</SubType>
@@ -139,11 +154,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\TextEditors.cs" />
-    <Compile Include="Output\HitListExport.cs" />
     <Compile Include="Output\HTMLHelper.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Output\JSONHelper.cs" />
+    <Compile Include="Output\MatchResultsExport.cs" />
     <Compile Include="Plugin.IFilter\IFilter.Win32.cs" />
     <Compile Include="Plugin.IFilter\IFilterPlugin.cs" />
     <Compile Include="Plugin.MicrosoftWord\MicrosoftWordPlugin.cs">
@@ -152,6 +167,11 @@
     <Compile Include="Windows\CommandLineProcessing.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Windows\Controls\AvalonEdit\AllResultHighlighter.cs" />
+    <Compile Include="Windows\Controls\AvalonEdit\CustomLineNumberMargin.cs" />
+    <Compile Include="Windows\Controls\AvalonEdit\TextEditorEx.cs" />
+    <Compile Include="Windows\Controls\AvalonEdit\LineNumber.cs" />
+    <Compile Include="Windows\Controls\AvalonEdit\ResultHighlighter.cs" />
     <Compile Include="Windows\Controls\ColorButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -212,12 +232,6 @@
     <Compile Include="Windows\Forms\frmCommandLine.Designer.cs">
       <DependentUpon>frmCommandLine.cs</DependentUpon>
     </Compile>
-    <Compile Include="Windows\Forms\frmDisplayMessages.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Windows\Forms\frmDisplayMessages.Designer.cs">
-      <DependentUpon>frmDisplayMessages.cs</DependentUpon>
-    </Compile>
     <Compile Include="Windows\Forms\frmExclusions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -239,6 +253,9 @@
     <Compile Include="Windows\Forms\frmOptions.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Forms\frmOptions.Designer.cs">
+      <DependentUpon>frmOptions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Forms\frmPrint.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -256,9 +273,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Windows\ListViewMouseWheelMoveMessageFilter.cs" />
-    <Compile Include="Windows\Printing.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Windows\Program.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -312,10 +326,6 @@
       <DependentUpon>frmCommandLine.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Forms\frmDisplayMessages.resx">
-      <DependentUpon>frmDisplayMessages.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Forms\frmExclusions.resx">
       <DependentUpon>frmExclusions.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -363,6 +373,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Mono\Bundle.bat" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

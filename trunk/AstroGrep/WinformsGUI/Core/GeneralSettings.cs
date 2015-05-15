@@ -45,6 +45,8 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]		11/11/2014	CHG: 85, remove leading white space
    /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting (increase search panel width)
    /// [Curtis_Beard]		03/06/2015	CHG: default texteditor is created instead of using delimeter which is now private
+   /// [Curtis_Beard]	   04/08/2015	ADD: 20, option to show entire file contents
+   /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
    /// </history>
    public sealed class GeneralSettings
    {
@@ -58,10 +60,10 @@ namespace AstroGrep.Core
       private static GeneralSettings __MySettings = null;
       
       private const string VERSION = "1.0";
-      private const int DEFAULT_SEARCH_PANEL_WIDTH = 290;
 
       private string resultsForeColor = string.Format("0{0}0{0}0{0}255", Constants.COLOR_SEPARATOR);
       private string resultsBackColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
+      private string resultsContextForeColor = string.Format("192{0}192{0}192{0}255", Constants.COLOR_SEPARATOR);
       private string matchForeColor = string.Format("255{0}255{0}255{0}255", Constants.COLOR_SEPARATOR);
       private string matchBackColor = string.Format("251{0}127{0}6{0}255", Constants.COLOR_SEPARATOR);
       private string resultsFont = string.Format("Lucida Console{0}9.75{0}Regular", Constants.FONT_SEPARATOR);
@@ -76,7 +78,7 @@ namespace AstroGrep.Core
       private int windowHeight = 600;
       private int windowState = -1;
       
-      private int searchPanelWidth = DEFAULT_SEARCH_PANEL_WIDTH;
+      private int searchPanelWidth = Constants.DEFAULT_SEARCH_PANEL_WIDTH;
       private int filePanelHeight = DEFAULT_FILE_PANEL_HEIGHT;
       private int columnFile = 100;
       private int columnLocation = 200;
@@ -101,8 +103,6 @@ namespace AstroGrep.Core
 
       private string textEditors = (new TextEditor("*", "notepad", "%1", 0)).ToString();
 
-      private bool showSearchOptions = false;
-
       private bool showExclusionErrorMessage = true;
         
       private bool saveSearchOptionsOnExit = true;
@@ -116,6 +116,8 @@ namespace AstroGrep.Core
       private bool removeLeadingWhiteSpace = false;
 
       private string fileEncodings = string.Empty;
+
+      private bool showEntireFile = false;
       #endregion
       
       /// <summary>
@@ -141,16 +143,7 @@ namespace AstroGrep.Core
       {
          get
          {
-            if (Core.Common.StoreDataLocal)
-            {
-               return Path.Combine(Constants.ProductLocation, "AstroGrep.general.config");
-            }
-            else
-            {
-               string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.ProductName);
-
-               return Path.Combine(path, "AstroGrep.general.config");
-            }
+            return Path.Combine(Constants.DataDirectory, "AstroGrep.general.config");
          }
       }
 
@@ -179,6 +172,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.resultsBackColor; }
          set { MySettings.resultsBackColor = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets the result context line fore color.
+      /// </summary>
+      static public string ResultsContextForeColor
+      {
+         get { return MySettings.resultsContextForeColor; }
+         set { MySettings.resultsContextForeColor = value; }
       }
 
       /// <summary>
@@ -279,8 +281,8 @@ namespace AstroGrep.Core
          get { return MySettings.searchPanelWidth; }
          set 
          { 
-            if (value < DEFAULT_SEARCH_PANEL_WIDTH) 
-               value = DEFAULT_SEARCH_PANEL_WIDTH;
+            if (value < Constants.DEFAULT_SEARCH_PANEL_WIDTH)
+               value = Constants.DEFAULT_SEARCH_PANEL_WIDTH;
 
             MySettings.searchPanelWidth = value; 
          }
@@ -467,15 +469,6 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
-      /// Gets/Sets display of search options.
-      /// </summary>
-      static public bool ShowSearchOptions
-      {
-         get { return MySettings.showSearchOptions; }
-         set { MySettings.showSearchOptions = value; }
-      }
-
-      /// <summary>
       /// Gets/Sets results font.
       /// </summary>
       static public string ResultsFont
@@ -545,6 +538,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.fileEncodings; }
          set { MySettings.fileEncodings = value; }
+      }
+
+      /// <summary>
+      /// Show entire file contents.
+      /// </summary>
+      static public bool ShowEntireFile
+      {
+         get { return MySettings.showEntireFile; }
+         set { MySettings.showEntireFile = value; }
       }
    }
 }

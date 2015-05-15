@@ -30,6 +30,7 @@ namespace libAstroGrep.Plugin
    /// [Curtis_Beard]		07/27/2006	Created
    /// [Curtis_Beard]		05/25/2007	ADD: Grep now supports returning an Exception object.
    /// [Curtis_Beard]		10/17/2012	CHG: add IsFileExtensionSupported method, cleanup
+   /// [Curtis_Beard]      03/31/2015	CHG: rework Grep/Matches
    /// </history>
    public interface IAstroGrepPlugin
    {
@@ -57,17 +58,8 @@ namespace libAstroGrep.Plugin
       /// </summary>
       /// <param name="file">FileInfo containing current file</param>
       /// <param name="ex">Contains an Exception if one occurred</param>
-      /// <returns>HitObject containing valid hit</returns>
-      HitObject Grep(System.IO.FileInfo file, ISearchSpec searchSpec, ref Exception ex);
-
-      /// <summary>
-      /// Method that performs grep.
-      /// </summary>
-      /// <param name="path">Fully qualified file path</param>
-      /// <param name="searchProperties"></param>
-      /// <param name="ex">Contains an Exception if one occurred</param>
-      /// <returns>HitObject containing valid hit</returns>
-      HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex);
+      /// <returns>MatchResult containing valid match</returns>
+      MatchResult Grep(System.IO.FileInfo file, ISearchSpec searchSpec, ref Exception ex);
 
       /// <summary>
       /// Determines if given file is supported by current plugin.

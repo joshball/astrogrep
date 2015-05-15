@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using AstroGrep.Core.Logging;
 using libAstroGrep.Plugin;
 
 namespace AstroGrep.Core
@@ -36,6 +37,7 @@ namespace AstroGrep.Core
    public class PluginManager
    {
       private static List<PluginWrapper> __PluginCollection = new List<PluginWrapper>();
+      private const string DELIMETER = "|;;|";
 
       #region Public Methods
       /// <summary>
@@ -154,7 +156,7 @@ namespace AstroGrep.Core
          }
 
          // enable/disable plugins based on saved state (if found)
-         string[] plugins = Common.SplitByString(Core.PluginSettings.Plugins, Constants.PLUGIN_SEPARATOR);
+         string[] plugins = Common.SplitByString(Core.PluginSettings.Plugins, DELIMETER);
          foreach (string plugin in plugins)
          {
             string[] values = Common.SplitByString(plugin, Constants.PLUGIN_ARGS_SEPARATOR);
@@ -193,7 +195,9 @@ namespace AstroGrep.Core
          for (int i = 0; i < __PluginCollection.Count; i++)
          {
             if (plugins.Length > 0)
-               plugins.Append(Constants.PLUGIN_SEPARATOR);
+            {
+               plugins.Append(DELIMETER);
+            }
 
             plugins.AppendFormat("{1}{0}{2}{0}{3}{0}{4}", Constants.PLUGIN_ARGS_SEPARATOR, __PluginCollection[i].Plugin.Name, __PluginCollection[i].Plugin.Version, __PluginCollection[i].Enabled.ToString(), i);
          }
@@ -227,6 +231,7 @@ namespace AstroGrep.Core
       /// <history>
       /// [Curtis_Beard]		09/08/2006	Created
       /// [Curtis_Beard]		06/28/2007	CHG: make all plugins external and enabled by default
+      /// [Curtis_Beard]	   04/08/2015	CHG: add logging
       /// </history>
       private static PluginWrapper LoadPlugin(string path)
       {
@@ -262,7 +267,10 @@ namespace AstroGrep.Core
                }
             }
          }
-         catch { }
+         catch (Exception ex) 
+         {
+            LogClient.Instance.Logger.Error("Unable to load plugin at {0} with message {1}", path, ex.Message);
+         }
 
          return null;
       }

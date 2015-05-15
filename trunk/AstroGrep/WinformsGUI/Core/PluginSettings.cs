@@ -66,16 +66,7 @@ namespace AstroGrep.Core
       {
          get
          {
-            if (Core.Common.StoreDataLocal)
-            {
-               return Path.Combine(Constants.ProductLocation, "AstroGrep.plugins.config");
-            }
-            else
-            {
-               string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.ProductName);
-
-               return Path.Combine(path, "AstroGrep.plugins.config");
-            }
+            return Path.Combine(Constants.DataDirectory, "AstroGrep.plugins.config");
          }
       }
 

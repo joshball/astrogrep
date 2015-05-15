@@ -42,6 +42,7 @@ namespace AstroGrep.Core
       /// <history>
       /// [Curtis_Beard]		12/01/2014	Moved from frmMain.cs
       /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// [Curtis_Beard]      04/07/2015	CHG: remove line numbers
       /// </history>
       public struct SearchSpec : ISearchSpec
       {
@@ -74,9 +75,6 @@ namespace AstroGrep.Core
 
          /// <summary>enable only processing the file up until one match is found</summary>
          public bool ReturnOnlyFileNames { get; set; }
-
-         /// <summary>enable including line numbers</summary>
-         public bool IncludeLineNumbers { get; set; }
 
          /// <summary>enable detecting the file encoding (false uses Encoding.Default)</summary>
          public bool DetectFileEncoding { get; set; }
