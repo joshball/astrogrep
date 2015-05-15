@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file was created by NSISDialogDesigner 1.4.0.0
+http://coolsoft.altervista.org/nsisdialogdesigner
+Do not edit manually!
+-->
+<Dialog Name="DotNetForm" Title=".Net Framework" Subtitle="Checking that the .Net Framework is installed.">
+  <Label Name="lblStatus" Location="28, 41" Size="380, 23" TabIndex="0" />
+  <Label Name="lblDescription" Location="28, 18" Size="380, 23" Text="Checking .Net Framework Version..." TabIndex="1" />
+</Dialog>

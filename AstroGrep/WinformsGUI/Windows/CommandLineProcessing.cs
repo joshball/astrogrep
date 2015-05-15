@@ -2,6 +2,8 @@ using System;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 
+using AstroGrep.Core.Logging;
+
 namespace AstroGrep.Windows
 {
    /// <summary>
@@ -176,6 +178,7 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]		07/26/2006	Created
       /// [Curtis_Beard]		05/08/2007	ADD: 1590157, support project file
+      /// [Curtis_Beard]	  04/08/2015	CHG: add logging
       /// </history>
       public static CommandLineArguments Process(string[] CommandLineArgs)
       {
@@ -198,12 +201,12 @@ namespace AstroGrep.Windows
             if (arg1.EndsWith("\""))
                arg1 = arg1.Substring(0, arg1.Length - 1);
 
-            // check for a project file
-            if (arg1.EndsWith(".agproj"))
-            {
-               args.ProjectFile = arg1;
-               args.IsProjectFile = true;
-            }
+            //// check for a project file
+            //if (arg1.EndsWith(".agproj"))
+            //{
+            //   args.ProjectFile = arg1;
+            //   args.IsProjectFile = true;
+            //}
 
             // check for a directory
             if (!args.IsProjectFile && System.IO.Directory.Exists(arg1))
@@ -224,6 +227,11 @@ namespace AstroGrep.Windows
             args.AnyArguments = true;
 
             ProcessFlags(myArgs, ref args);
+         }
+
+         if (CommandLineArgs.Length > 1)
+         {
+            LogClient.Instance.Logger.Info("Processed command line arguments: {0}", string.Join(", ", CommandLineArgs));
          }
 
          return args;

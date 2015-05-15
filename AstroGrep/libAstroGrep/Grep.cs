@@ -10,7 +10,7 @@ namespace libAstroGrep
 {
    /// <summary>
    /// Searches files, given a starting directory, for a given search text.  Results 
-   /// are populated into a List of HitObjects which contain information 
+   /// are populated into a List of MatchResults which contain information 
    /// about the file, line numbers, and the actual lines which the search text was
    /// found.
    /// </summary>
@@ -69,9 +69,9 @@ namespace libAstroGrep
       public event FileHitHandler FileHit;
 
       /// <summary>Line containing search text was found</summary>
-      /// <param name="hit">HitObject containing the information about the find</param>
+      /// <param name="match">MatchResult containing the information about the find</param>
       /// <param name="index">Position in collection of lines</param>
-      public delegate void LineHitHandler(HitObject hit, int index);
+      public delegate void LineHitHandler(MatchResult match, int index);
       /// <summary>Line containing search text was found</summary>
       public event LineHitHandler LineHit;
 
@@ -129,8 +129,8 @@ namespace libAstroGrep
 
       #region Public Properties
 
-      /// <summary>Retrieves all HitObjects for grep</summary>
-      public IList<HitObject> Greps { get; private set; }
+      /// <summary>Retrieves all MatchResults for grep</summary>
+      public IList<MatchResult> MatchResults { get; private set; }
 
       /// <summary>The PluginCollection containing IAstroGrepPlugins.</summary>
       public List<PluginWrapper> Plugins { get; set; }
@@ -154,7 +154,7 @@ namespace libAstroGrep
       {
          SearchSpec = searchSpec;
          FileFilterSpec = filterSpec;
-         Greps = new List<HitObject>();
+         MatchResults = new List<MatchResult>();
 
          if (FileFilterSpec.FilterItems != null)
          {
@@ -244,22 +244,19 @@ namespace libAstroGrep
       }
 
       /// <summary>
-      /// Retrieve a specified hitObject form the hash table
+      /// Retrieve a specified MatchResult.
       /// </summary>
-      /// <param name="index">the key in the hash table</param>
-      /// <returns>HitObject at given index.  On error returns nothing.</returns>
+      /// <param name="index">the index of the List</param>
+      /// <returns>MatchResult at given index.  On error returns nothing.</returns>
       /// <history>
       /// [Curtis_Beard]      09/08/2005	Created
       /// </history>
-      public HitObject RetrieveHitObject(int index)
+      public MatchResult RetrieveMatchResult(int index)
       {
-         try
-         {
-            return Greps[index];
-         }
-         catch { }
+         if (index < 0 || index > MatchResults.Count - 1)
+            return null;
 
-         return null;
+         return MatchResults[index];
       }
 
       /// <summary>
@@ -414,10 +411,12 @@ namespace libAstroGrep
             else if (string.IsNullOrEmpty(SearchSpec.SearchText))
             {
                // return a 'file hit' if the search text is empty
-               var _grepHit = new HitObject(SourceFile) { Index = Greps.Count };
-               _grepHit.Add(string.Empty, string.Empty, 0);
-               Greps.Add(_grepHit);
-               OnFileHit(SourceFile, _grepHit.Index);
+               var match = new MatchResult(SourceFile) { Index = MatchResults.Count };
+               var matchLine = new MatchResultLine();
+               match.Matches.Add(matchLine);
+               MatchResults.Add(match);
+
+               OnFileHit(SourceFile, match.Index);
             }
             else
             {
@@ -496,10 +495,10 @@ namespace libAstroGrep
       /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space, remove use of newline so each line is in hit object
       /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
       /// [Curtis_Beard]		03/05/2015	FIX: 64/35, if whole word doesn't pass our check but does pass regex, make it fail.  Code cleanup.
+      /// [Curtis_Beard]		04/02/2015	CHG: remove line number logic and always include line number in MatchResultLine.
       /// </history>
       private void SearchFileContents(FileInfo file)
       {
-         const int MARGINSIZE = 4;
 
          // Raise SearchFile Event
          OnSearchingFile(file);
@@ -507,7 +506,7 @@ namespace libAstroGrep
          FileStream _stream = null;
          StreamReader _reader = null;
          int _lineNumber = 0;
-         HitObject _grepHit = null;
+         MatchResult match = null;
          Regex _regularExp;
          MatchCollection _regularExpCol = null;
          bool _hitOccurred = false;
@@ -515,8 +514,6 @@ namespace libAstroGrep
          var _context = new string[11];
          int _contextIndex = 0;
          int _lastHit = 0;
-         string _contextSpacer = string.Empty;
-         string _spacer;
          int userFilterCount = 0;
 
          try
@@ -543,7 +540,7 @@ namespace libAstroGrep
                      if (Plugins[i].Plugin.Load())
                      {
                         OnSearchingFileByPlugin(Plugins[i].Plugin.Name);
-                        _grepHit = Plugins[i].Plugin.Grep(file, SearchSpec, ref pluginEx);
+                        match = Plugins[i].Plugin.Grep(file, SearchSpec, ref pluginEx);
                      }
                      else
                      {
@@ -556,30 +553,32 @@ namespace libAstroGrep
                      if (pluginEx == null)
                      {
                         // check for a hit
-                        if (_grepHit != null)
+                        if (match != null)
                         {
+                           match.FromPlugin = true;
+
                            // only perform is not using negation
                            if (!SearchSpec.UseNegation)
                            {
-                              if (DoesPassHitCountCheck(_grepHit))
+                              if (DoesPassHitCountCheck(match))
                               {
-                                 _grepHit.Index = Greps.Count;
-                                 Greps.Add(_grepHit);
-                                 OnFileHit(file, _grepHit.Index);
+                                 match.Index = MatchResults.Count;
+                                 MatchResults.Add(match);
+                                 OnFileHit(file, match.Index);
 
                                  if (SearchSpec.ReturnOnlyFileNames)
-                                    _grepHit.SetHitCount();
+                                    match.SetHitCount();
 
-                                 OnLineHit(_grepHit, _grepHit.Index);
+                                 OnLineHit(match, match.Index);
                               }
                            }
                         }
                         else if (SearchSpec.UseNegation)
                         {
                            // no hit but using negation so create one
-                           _grepHit = new HitObject(file) { Index = Greps.Count };
-                           Greps.Add(_grepHit);
-                           OnFileHit(file, _grepHit.Index);
+                           match = new MatchResult(file) { Index = MatchResults.Count, FromPlugin = true };
+                           MatchResults.Add(match);
+                           OnFileHit(file, match.Index);
                         }
                      }
                      else
@@ -659,16 +658,6 @@ namespace libAstroGrep
             _stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             _reader = new StreamReader(_stream, encoding);
 
-            // Default spacer (left margin) values. If Line Numbers are on,
-            // these will be reset within the loop to include line numbers.
-            if (SearchSpec.ContextLines > 0)
-            {
-               _contextSpacer = new string(char.Parse(" "), MARGINSIZE);
-               _spacer = _contextSpacer.Substring(MARGINSIZE - 2) + "> ";
-            }
-            else
-               _spacer = new string(char.Parse(" "), MARGINSIZE);
-
             do
             {
                string textLine = _reader.ReadLine();
@@ -682,7 +671,6 @@ namespace libAstroGrep
                   int _posInStr = -1;
                   if (SearchSpec.UseRegularExpressions)
                   {
-                     //_posInStr = -1;
                      if (textLine.Length > 0)
                      {
                         string pattern = string.Format("{0}{1}{0}", SearchSpec.UseWholeWordMatching ? "\\b" : string.Empty, SearchSpec.SearchText);
@@ -706,12 +694,11 @@ namespace libAstroGrep
                      // If we are looking for whole worlds only, perform the check.
                      if (SearchSpec.UseWholeWordMatching)
                      {
-                        //_posInStr = -1;
                         _regularExp = new Regex("\\b" + Regex.Escape(SearchSpec.SearchText) + "\\b", SearchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase);
                         
                         // if match is found, also check against our internal line hit count method to be sure they are in sync
                         Match mtc = _regularExp.Match(textLine);
-                        if (mtc != null && mtc.Success && RetrieveLineHitCount(textLine, SearchSpec.SearchText) > 0)
+                        if (mtc != null && mtc.Success && RetrieveLineMatches(textLine, SearchSpec).Count > 0)
                         {
                            if (SearchSpec.UseNegation)
                            {
@@ -742,16 +729,16 @@ namespace libAstroGrep
                         break;
 
                      // create new hit and add to collection
-                     if (_grepHit == null)
+                     if (match == null)
                      {
-                        _grepHit = new HitObject(file) { Index = Greps.Count, DetectedEncoding = encoding };
-                        Greps.Add(_grepHit);
+                        match = new MatchResult(file) { Index = MatchResults.Count, DetectedEncoding = encoding };
+                        MatchResults.Add(match);
                      }
 
                      // don't show until passes count check
-                     if (!_fileNameDisplayed && DoesPassHitCountCheck(_grepHit))
+                     if (!_fileNameDisplayed && DoesPassHitCountCheck(match))
                      {
-                        OnFileHit(file, _grepHit.Index);
+                        OnFileHit(file, match.Index);
 
                         _fileNameDisplayed = true;
                      }
@@ -761,40 +748,32 @@ namespace libAstroGrep
                      {
                         if (!_fileNameDisplayed)
                         {
-                           OnFileHit(file, _grepHit.Index);
+                           OnFileHit(file, match.Index);
 
                            _fileNameDisplayed = true;
                         }
 
                         //notify that at least 1 hit is in file
-                        _grepHit.SetHitCount();
-                        OnLineHit(_grepHit, _grepHit.Index);
+                        match.SetHitCount();
+                        OnLineHit(match, match.Index);
 
                         break;
                      }
 
-                     // Set up line number, or just an indention in front of the line.
-                     if (SearchSpec.IncludeLineNumbers)
-                     {
-                        _spacer = "(" + _lineNumber.ToString().Trim();
-                        if (_spacer.Length <= 5)
-                           _spacer = _spacer + new string(char.Parse(" "), 6 - _spacer.Length);
-
-                        _spacer = _spacer + ") ";
-                        _contextSpacer = "(" + new string(char.Parse(" "), _spacer.Length - 3) + ") ";
-                     }
 
                      // Display context lines if applicable.
                      if (SearchSpec.ContextLines > 0 && _lastHit == 0)
                      {
-                        if (_grepHit.LineCount > 0)
+                        if (match.Matches.Count > 0)
                         {
                            // Insert a blank space before the context lines.
-                           int _pos = _grepHit.Add(string.Empty, string.Empty, -1);
+                           var matchLine = new MatchResultLine() { Line = string.Empty, LineNumber = -1 };
+                           match.Matches.Add(matchLine);
+                           int _pos = match.Matches.Count - 1;
 
-                           if (DoesPassHitCountCheck(_grepHit))
+                           if (DoesPassHitCountCheck(match))
                            {
-                              OnLineHit(_grepHit, _pos);
+                              OnLineHit(match, _pos);
                            }
                         }
 
@@ -811,11 +790,13 @@ namespace libAstroGrep
                            if (_lineNumber > tempPosInStr)
                            {
                               // Add the context line.
-                              int _pos = _grepHit.Add(_contextSpacer, _context[_contextIndex], _lineNumber - tempPosInStr);
+                              var matchLine = new MatchResultLine() { Line = _context[_contextIndex], LineNumber = _lineNumber - tempPosInStr };
+                              match.Matches.Add(matchLine);
+                              int _pos = match.Matches.Count - 1;
 
-                              if (DoesPassHitCountCheck(_grepHit))
+                              if (DoesPassHitCountCheck(match))
                               {
-                                 OnLineHit(_grepHit, _pos);
+                                 OnLineHit(match, _pos);
                               }
                            }
                         }
@@ -826,28 +807,31 @@ namespace libAstroGrep
                      //
                      // Add the actual "hit".
                      //
-                     // set first hit column position
-                     if (SearchSpec.UseRegularExpressions)
-                     {
-                        // zero based
-                        _posInStr = _regularExpCol[0].Index;
-                     }
-                     _posInStr += 1;
-                     int _index = _grepHit.Add(_spacer, textLine, _lineNumber, _posInStr);
+                     var matchLineFound = new MatchResultLine() { Line = textLine, LineNumber = _lineNumber, HasMatch = true };
 
                      if (SearchSpec.UseRegularExpressions)
                      {
-                        _grepHit.SetHitCount(_regularExpCol.Count);
+                        _posInStr = _regularExpCol[0].Index;
+                        match.SetHitCount(_regularExpCol.Count);
+                        
+                        foreach (Match regExMatch in _regularExpCol)
+                        {
+                           matchLineFound.Matches.Add(new MatchResultLineMatch(regExMatch.Index, regExMatch.Length));
+                        }
                      }
                      else
                      {
-                        // determine number of hits in single line
-                        _grepHit.SetHitCount(RetrieveLineHitCount(textLine, SearchSpec.SearchText));
+                        var lineMatches = RetrieveLineMatches(textLine, SearchSpec);
+                        match.SetHitCount(lineMatches.Count);
+                        matchLineFound.Matches = lineMatches;
                      }
+                     matchLineFound.ColumnNumber = _posInStr + 1;
+                     match.Matches.Add(matchLineFound);
+                     int _index = match.Matches.Count - 1;
 
-                     if (DoesPassHitCountCheck(_grepHit))
+                     if (DoesPassHitCountCheck(match))
                      {
-                        OnLineHit(_grepHit, _index);
+                        OnLineHit(match, _index);
                      }
                   }
                   else if (_lastHit > 0 && SearchSpec.ContextLines > 0)
@@ -856,11 +840,13 @@ namespace libAstroGrep
                      // We didn't find a hit, but since lastHit is > 0, we
                      // need to display this context line.
                      //***************************************************
-                     int _index = _grepHit.Add(_contextSpacer, textLine, _lineNumber);
+                     var matchLine = new MatchResultLine() { Line = textLine, LineNumber = _lineNumber };
+                     match.Matches.Add(matchLine);
+                     int _index = match.Matches.Count - 1;
 
-                     if (DoesPassHitCountCheck(_grepHit))
+                     if (DoesPassHitCountCheck(match))
                      {
-                        OnLineHit(_grepHit, _index);
+                        OnLineHit(match, _index);
                      }
                      _lastHit -= 1;
 
@@ -881,24 +867,24 @@ namespace libAstroGrep
             while (true);
 
             // send event file/line hit if we haven't yet but it should be
-            if (!_fileNameDisplayed && _grepHit != null && DoesPassHitCountCheck(_grepHit))
+            if (!_fileNameDisplayed && match != null && DoesPassHitCountCheck(match))
             {
                // need to display it
-               OnFileHit(file, _grepHit.Index);
-               OnLineHit(_grepHit, _grepHit.Index);
+               OnFileHit(file, match.Index);
+               OnLineHit(match, match.Index);
             }
 
             // send event for file filtered if it fails the file hit count filter
-            if (!SearchSpec.UseNegation && !SearchSpec.ReturnOnlyFileNames && _grepHit != null && !DoesPassHitCountCheck(_grepHit))
+            if (!SearchSpec.UseNegation && !SearchSpec.ReturnOnlyFileNames && match != null && !DoesPassHitCountCheck(match))
             {
                // remove from grep collection only if
                // not negation
                // not filenames only
                // actually have a hit
                // doesn't pass the hit count filter
-               Greps.RemoveAt(Greps.Count - 1);
+               MatchResults.RemoveAt(MatchResults.Count - 1);
 
-               string filterValue = _grepHit.HitCount.ToString();
+               string filterValue = match.HitCount.ToString();
                FilterItem filterItem = new FilterItem(new FilterType(FilterType.Categories.File, FilterType.SubCategories.MinimumHitCount), userFilterCount.ToString(), FilterType.ValueOptions.None, false, true);
                OnFileFiltered(file, filterItem, filterValue);
             }
@@ -911,9 +897,9 @@ namespace libAstroGrep
                //add the file to the hit list
                if (!_fileNameDisplayed)
                {
-                  _grepHit = new HitObject(file) { Index = Greps.Count, DetectedEncoding = encoding };
-                  Greps.Add(_grepHit);
-                  OnFileHit(file, _grepHit.Index);
+                  match = new MatchResult(file) { Index = MatchResults.Count, DetectedEncoding = encoding };
+                  MatchResults.Add(match);
+                  OnFileHit(file, match.Index);
                }
             }
          }
@@ -931,48 +917,43 @@ namespace libAstroGrep
       /// Retrieves the number of instances of searchText in the given line
       /// </summary>
       /// <param name="line">Line of text to search</param>
-      /// <param name="searchText">Text to search for</param>
+      /// <param name="searchSpec">Current ISearchSpec interface</param>
       /// <returns>Count of how many instances</returns>
       /// <history>
       /// [Curtis_Beard]      12/06/2005	Created
       /// [Curtis_Beard]      01/12/2007	FIX: check for correct position of IndexOf
       /// [Curtis_Beard]      03/05/2015	FIX: cleanup logic for whole word/case sensitive
       /// </history>
-      private int RetrieveLineHitCount(string line, string searchText)
+      public static List<MatchResultLineMatch> RetrieveLineMatches(string line, ISearchSpec searchSpec)
       {
-         int _count = 0;
-         string _end;
-         int _pos = -1;
+         List<MatchResultLineMatch> lineMatches = new List<MatchResultLineMatch>();
+         int pos = line.IndexOf(searchSpec.SearchText, searchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 
-         string _tempLine = line;
-
-         _pos = _tempLine.IndexOf(searchText, SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
-
-         while (_pos > -1)
+         while (pos > -1)
          {
             // retrieve parts of text
-            string _begin = _tempLine.Substring(0, _pos);
-            _end = _tempLine.Substring(_pos + searchText.Length);
+            string begin = line.Substring(0, pos);
+            string end = line.Substring(pos + searchSpec.SearchText.Length);
 
             // do a check to see if begin and end are valid for wholeword searches
-            bool _highlight;
-            if (SearchSpec.UseWholeWordMatching)
-               _highlight = WholeWordOnly(_begin, _end);
-            else
-               _highlight = true;
+            bool _highlight = true;
+            if (searchSpec.UseWholeWordMatching)
+            {
+               _highlight = WholeWordOnly(begin, end);
+            }
 
             // found a hit
             if (_highlight)
-               _count += 1;
+            {
+               MatchResultLineMatch lineMatch = new MatchResultLineMatch(pos, searchSpec.SearchText.Length);
+               lineMatches.Add(lineMatch);
+            }
 
             // Check remaining string for other hits in same line
-            _pos = _end.IndexOf(searchText, SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
-
-            // update the temp line with the next part to search (if any)
-            _tempLine = _end;
+            pos = line.IndexOf(searchSpec.SearchText, pos + 1, searchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
          }
 
-         return _count;
+         return lineMatches;
       }
 
       /// <summary>
@@ -1035,19 +1016,19 @@ namespace libAstroGrep
       }
 
       /// <summary>
-      /// Determines if current hit count passes the file hit count filter.
+      /// Determines if current match count passes the file hit count filter.
       /// </summary>
-      /// <param name="hit">Current HitObject</param>
-      /// <returns>true if hit count valid, false if not</returns>
+      /// <param name="hit">Current MatchResult</param>
+      /// <returns>true if match count valid, false if not</returns>
       /// <history>
       /// [Curtis_Beard]      10/12/2012  Created: 32, implement file hit count
       /// </history>
-      private bool DoesPassHitCountCheck(HitObject hit)
+      private bool DoesPassHitCountCheck(MatchResult match)
       {
          if (userFilterCount <= 0)
             return true;
 
-         if (userFilterCount > 0 && (hit != null && hit.HitCount >= userFilterCount))
+         if (userFilterCount > 0 && (match != null && match.HitCount >= userFilterCount))
             return true;
 
          return false;
@@ -1179,7 +1160,7 @@ namespace libAstroGrep
       /// Raise file hit event.
       /// </summary>
       /// <param name="file">FileInfo object that was found to contain a hit</param>
-      /// <param name="index">Index into array of HitObjects</param>
+      /// <param name="index">Index into array of MatchResults</param>
       /// <history>
       /// [Curtis_Beard]      05/25/2007  Created
       /// </history>
@@ -1194,16 +1175,16 @@ namespace libAstroGrep
       /// <summary>
       /// Raise line hit event.
       /// </summary>
-      /// <param name="hit">HitObject containing line hit</param>
+      /// <param name="match">MatchResult containing line hit</param>
       /// <param name="index">Index to line</param>
       /// <history>
       /// [Curtis_Beard]      05/25/2007  Created
       /// </history>
-      protected virtual void OnLineHit(HitObject hit, int index)
+      protected virtual void OnLineHit(MatchResult match, int index)
       {
          if (LineHit != null)
          {
-            LineHit(hit, index);
+            LineHit(match, index);
          }
       }
 

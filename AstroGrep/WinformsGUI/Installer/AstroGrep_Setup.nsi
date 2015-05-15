@@ -7,12 +7,13 @@
 ;
 ;--------------------------------
 !include WordFunc.nsh
-!include "MUI.nsh"
+!include "MUI2.nsh"
 !include "FileFunc.nsh"
+!include "DotNetForm.nsdinc"
 
 !define MUI_COMPONENTSPAGE_SMALLDESC
-!define INS_VERSION 4.3.3.0
-!define APP_VERSION "4.3.3"
+!define INS_VERSION 4.4.0.0
+!define APP_VERSION "4.4.0"
 
 ;--------------------------------
 ;Variables
@@ -55,6 +56,7 @@
 ;--------------------------------
 	!insertmacro MUI_PAGE_WELCOME
 	!insertmacro MUI_PAGE_LICENSE "license.txt"
+	Page custom fnc_DotNetForm_Show
 	!insertmacro MUI_PAGE_COMPONENTS
 	!insertmacro MUI_PAGE_DIRECTORY
 	
@@ -91,17 +93,65 @@
 	!insertmacro MUI_LANGUAGE "Italian"
 	!insertmacro MUI_LANGUAGE "Spanish"
 	
-	LangString MessageDotNetNotFound ${LANG_ENGLISH} "Microsoft .NET Framework is not installed."
-	LangString MessageDotNetNotFound ${LANG_DANISH} "Microsoft NET Framework er ikke installeret."
-	LangString MessageDotNetNotFound ${LANG_GERMAN} "Microsoft NET Framework ist nicht installiert."
-	LangString MessageDotNetNotFound ${LANG_ITALIAN} "Microsoft NET Framework non è installato."
-	LangString MessageDotNetNotFound ${LANG_SPANISH} "Microsoft NET Framework no está instalado."
+	;LangString MessageDotNetNotFound ${LANG_ENGLISH} "Microsoft .NET Framework is not installed."
+	;LangString MessageDotNetNotFound ${LANG_DANISH} "Microsoft NET Framework er ikke installeret."
+	;LangString MessageDotNetNotFound ${LANG_GERMAN} "Microsoft NET Framework ist nicht installiert."
+	;LangString MessageDotNetNotFound ${LANG_ITALIAN} "Microsoft NET Framework non è installato."
+	;LangString MessageDotNetNotFound ${LANG_SPANISH} "Microsoft NET Framework no está instalado."
 	
-	LangString MessageDotNetBadVersion ${LANG_ENGLISH} "Microsoft .NET Framework v4.0 or newer is required. You have $1."
-	LangString MessageDotNetBadVersion ${LANG_DANISH} "Microsoft NET Framework v4.0 eller nyere er påkrævet. Du har $1."
-	LangString MessageDotNetBadVersion ${LANG_GERMAN} "Microsoft NET Framework v4.0 oder höher erforderlich. Sie haben $1."
-	LangString MessageDotNetBadVersion ${LANG_ITALIAN} "È richiesto Microsoft NET Framework v4.0 o più recente. Hai $1."
-	LangString MessageDotNetBadVersion ${LANG_SPANISH} "Se requiere Microsoft NET Framework v4.0 o posterior. Usted tiene $1."
+	;LangString MessageDotNetBadVersion ${LANG_ENGLISH} "Microsoft .NET Framework v4.0 or newer is required. You have $1."
+	;LangString MessageDotNetBadVersion ${LANG_DANISH} "Microsoft NET Framework v4.0 eller nyere er påkrævet. Du har $1."
+	;LangString MessageDotNetBadVersion ${LANG_GERMAN} "Microsoft NET Framework v4.0 oder höher erforderlich. Sie haben $1."
+	;LangString MessageDotNetBadVersion ${LANG_ITALIAN} "È richiesto Microsoft NET Framework v4.0 o più recente. Hai $1."
+	;LangString MessageDotNetBadVersion ${LANG_SPANISH} "Se requiere Microsoft NET Framework v4.0 o posterior. Usted tiene $1."
+	
+	LangString MessageDotNetRequires ${LANG_ENGLISH} "Microsoft .NET Framework v4.0 or newer is required."
+	LangString MessageDotNetRequires ${LANG_DANISH} "Microsoft NET Framework v4.0 eller nyere er påkrævet."
+	LangString MessageDotNetRequires ${LANG_GERMAN} "Microsoft NET Framework v4.0 oder höher erforderlich."
+	LangString MessageDotNetRequires ${LANG_ITALIAN} "È richiesto Microsoft NET Framework v4.0 o più recente."
+	LangString MessageDotNetRequires ${LANG_SPANISH} "Se requiere Microsoft NET Framework v4.0 o posterior."
+	
+	LangString MessageDotNetChecking ${LANG_ENGLISH} "Checking for version 4.0 or newer..."
+	LangString MessageDotNetChecking ${LANG_DANISH} "Kontrol for version 4.0 eller nyere ..."
+	LangString MessageDotNetChecking ${LANG_GERMAN} "Überprüfen auf Version 4.0 oder neuer ..."
+	LangString MessageDotNetChecking ${LANG_ITALIAN} "Controllo versione 4.0 o più recente ..."
+	LangString MessageDotNetChecking ${LANG_SPANISH} "Comprobación de la versión 4.0 o más reciente ..."
+	
+	LangString MessageDotNetFound ${LANG_ENGLISH} "v4.0 or newer found."
+	LangString MessageDotNetFound ${LANG_DANISH} "v4.0 eller nyere fundet."
+	LangString MessageDotNetFound ${LANG_GERMAN} "v4.0 oder höher gefunden."
+	LangString MessageDotNetFound ${LANG_ITALIAN} "v4.0 o più recente trovato."
+	LangString MessageDotNetFound ${LANG_SPANISH} "v4.0 o más reciente encontrado."
+	
+	LangString MessageDotNetNotFound ${LANG_ENGLISH} "Microsoft .NET Framework is not installed. Downloading..."
+	LangString MessageDotNetNotFound ${LANG_DANISH} "Microsoft NET Framework er ikke installeret. Downloading..."
+	LangString MessageDotNetNotFound ${LANG_GERMAN} "Microsoft NET Framework ist nicht installiert. Herunterladen..."
+	LangString MessageDotNetNotFound ${LANG_ITALIAN} "Microsoft NET Framework non è installato. Download..."
+	LangString MessageDotNetNotFound ${LANG_SPANISH} "Microsoft NET Framework no está instalado. Descarga..."
+	
+	LangString MessageDotNetDownloading ${LANG_ENGLISH} "Downloading from Microsoft..."
+	LangString MessageDotNetDownloading ${LANG_DANISH} "Downloading fra Microsoft ..."
+	LangString MessageDotNetDownloading ${LANG_GERMAN} "Herunterladen von Microsoft ..."
+	LangString MessageDotNetDownloading ${LANG_ITALIAN} "Download da Microsoft ..."
+	LangString MessageDotNetDownloading ${LANG_SPANISH} "Descarga de Microsoft ..."
+	
+	LangString MessageDotNetInstalling ${LANG_ENGLISH} "Download successful, installing..."
+	LangString MessageDotNetInstalling ${LANG_DANISH} "Hente en succes, installation ..."
+	LangString MessageDotNetInstalling ${LANG_GERMAN} "Erfolgreichen Herunterladen, der Installation von ..."
+	LangString MessageDotNetInstalling ${LANG_ITALIAN} "Scarica di successo, l'installazione ..."
+	LangString MessageDotNetInstalling ${LANG_SPANISH} "Descarga éxito, la instalación de ..."
+	
+	LangString MessageDotNetSuccess ${LANG_ENGLISH} "Installation completed."
+	LangString MessageDotNetSuccess ${LANG_DANISH} "Installation afsluttet."
+	LangString MessageDotNetSuccess ${LANG_GERMAN} "Installation abgeschlossen."
+	LangString MessageDotNetSuccess ${LANG_ITALIAN} "L'installazione completata."
+	LangString MessageDotNetSuccess ${LANG_SPANISH} "Completó la instalación."
+	
+	LangString MessageDotNetFailure ${LANG_ENGLISH} "Unable to download .NET Framework.  AstroGrep can be installed, but will not function without the Framework!"
+	LangString MessageDotNetFailure ${LANG_DANISH} "Kan ikke downloade .NET Framework. AstroGrep kan installeres, men vil ikke fungere uden ramme!"
+	LangString MessageDotNetFailure ${LANG_GERMAN} "Können Sie .NET Framework herunterladen. AstroGrep installiert werden kann, aber nicht ohne Rahmen funktionieren!"
+	LangString MessageDotNetFailure ${LANG_ITALIAN} "Impossibile scaricare .NET Framework. AstroGrep può essere installato, ma non funziona senza il quadro!"
+	LangString MessageDotNetFailure ${LANG_SPANISH} "No se puede descargar .NET Framework. AstroGrep se puede instalar, pero no funcionará sin el Marco!"
 	
 	LangString TITLE_SecRequired ${LANG_ENGLISH} "AstroGrep (required)"
 	LangString TITLE_SecRequired ${LANG_DANISH} "AstroGrep (påkrævet)"
@@ -157,13 +207,14 @@
 Function .onInit
 	!insertmacro MUI_LANGDLL_DISPLAY
 	
-	Call IsDotNETVersion4Installed
-	Pop $1
+	;Call IsDotNETVersion4Installed
+	;Pop $1
 
-	${If} $1 != 1
-		MessageBox MB_OK|MB_ICONSTOP $(MessageDotNetBadVersion)
-		Abort
-	${EndIf}
+	;${If} $1 != 1
+	;	MessageBox MB_OK|MB_ICONSTOP $(MessageDotNetBadVersion)
+	;	Abort
+	;${EndIf}
+	
 FunctionEnd
 	
 ;--------------------------------
@@ -184,6 +235,8 @@ Section $(TITLE_SecRequired) SecRequired
   File "..\bin\release\libAstroGrep.dll"
   File "..\bin\release\AstroGrep.AdminProcess.exe"
   File "..\bin\release\AstroGrep.AdminProcess.exe.config"
+  File "..\bin\release\ICSharpCode.AvalonEdit.dll"
+  File "..\bin\release\NLog.dll"
   File "license.txt"
   File "readme.txt"
   
@@ -268,6 +321,8 @@ Section "Uninstall"
 	; Remove files and uninstaller
     Delete $INSTDIR\license.txt
 	Delete $INSTDIR\readme.txt
+	Delete $INSTDIR\ICSharpCode.AvalonEdit.dll
+	Delete $INSTDIR\NLog.dll
 	Delete $INSTDIR\AstroGrep.AdminProcess.exe.config
 	Delete $INSTDIR\AstroGrep.AdminProcess.exe
 	Delete $INSTDIR\libAstroGrep.dll
@@ -317,16 +372,16 @@ SectionEnd
 ;--------------------------------
 ;determines .net4 installed
 ;--------------------------------
-Function IsDotNETVersion4Installed
-
-	Push $1
-		
-	ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Install
-	IntOp $1 $0 & 1
-
-	Exch $1
-	
-FunctionEnd
+;Function IsDotNETVersion4Installed
+;
+;	Push $1
+;		
+;	ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Install
+;	IntOp $1 $0 & 1
+;
+;	Exch $1
+;	
+;FunctionEnd
 
 ;--------------------------------
 ;associates .agproj files with 

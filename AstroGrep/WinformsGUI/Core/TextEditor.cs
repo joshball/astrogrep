@@ -203,6 +203,7 @@ namespace AstroGrep
       /// [Curtis_Beard]		07/21/2006	Created
       /// [Curtis_Beard]		10/12/2012	ADD: tab size
       /// [Curtis_Beard]		03/06/2015	FIX: 65, add boolean for using quotes
+      /// [Curtis_Beard]		04/07/2015	CHG: fix issue with length checks so that all values are processed if found
       /// </history>
       public static TextEditor FromString(string classAsString)
       {
@@ -219,7 +220,7 @@ namespace AstroGrep
                editor.FileType = values[2];
             }
             
-            if (values.Length == 4)
+            if (values.Length >= 4)
             {
                int size = 0;
                if (int.TryParse(values[3], out size))
@@ -228,7 +229,7 @@ namespace AstroGrep
                }
             }
             
-            if (values.Length == 5)
+            if (values.Length >= 5)
             {
                bool useQuotes = true;
                if (bool.TryParse(values[4], out useQuotes))

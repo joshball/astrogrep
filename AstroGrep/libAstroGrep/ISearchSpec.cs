@@ -28,6 +28,7 @@ namespace libAstroGrep
    /// </remarks>
    /// <history>
    /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+   /// [Curtis_Beard]      04/02/2015	CHG: remove line numbers option
    /// </history>
    public interface ISearchSpec
    {
@@ -61,8 +62,6 @@ namespace libAstroGrep
       /// <summary>Whether to return only file names for grep results</summary>
       bool ReturnOnlyFileNames { get; }
 
-      /// <summary>Sets including line numbers as part of a line</summary>
-      bool IncludeLineNumbers { get; }
 
       /// <summary>Sets whether to detect file encoding or use default encoding (previous versions)</summary>
       bool DetectFileEncoding { get; }

@@ -35,6 +35,7 @@ namespace Plugin.IFilter
    /// </remarks>
    /// <history>
    /// [Curtis_Beard]      10/17/2012  Created
+   /// [Curtis_Beard]      03/31/2015	CHG: rework Grep/Matches
    /// </history>
    public class IFilterPlugin : IAstroGrepPlugin
    {
@@ -53,7 +54,7 @@ namespace Plugin.IFilter
       /// </summary>
       public string Version
       {
-         get { return "1.0.1"; }
+         get { return "1.1.0"; }
       }
 
       /// <summary>
@@ -180,32 +181,17 @@ namespace Plugin.IFilter
       /// <returns>Hitobject containing grep results, null if on error</returns>
       /// <history>
       /// [Curtis_Beard]      10/17/2012  Created
+      /// [Curtis_Beard]      03/31/2015	CHG: rework Grep/Matches
       /// </history>
-      public HitObject Grep(FileInfo file, ISearchSpec searchSpec, ref Exception ex)
-      {
-         return Grep(file.FullName, searchSpec, ref ex);
-      }
-
-      /// <summary>
-      /// Searches the given file for the given search text.
-      /// </summary>
-      /// <param name="path">Fully qualified file path</param>
-      /// <param name="searchSpec">ISearchSpec interface value</param>
-      /// <param name="ex">Exception holder if error occurs</param>
-      /// <returns>Hitobject containing grep results, null on error</returns>
-      /// <history>
-      /// [Curtis_Beard]      10/17/2012  Created
-      /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space
-      /// </history>
-      public HitObject Grep(string path, ISearchSpec searchSpec, ref Exception ex)
+      public MatchResult Grep(FileInfo file, ISearchSpec searchSpec, ref Exception ex)
       {
          // initialize Exception object to null
          ex = null;
-         HitObject hit = null;
+         MatchResult match = null;
 
-         if (Parser.IsParseable(path))
+         if (Parser.IsParseable(file.FullName))
          {
-            string fileContent = Parser.Parse(path);
+            string fileContent = Parser.Parse(file.FullName);
 
             if (!string.IsNullOrEmpty(fileContent))
             {
@@ -214,167 +200,81 @@ namespace Plugin.IFilter
                {
                   string line = lines[i];
 
+                  int posInStr = -1;
+                  Regex reg = null;
+                  MatchCollection regCol = null;
+
                   if (searchSpec.UseRegularExpressions)
                   {
-                     Regex reg;
-                     MatchCollection regCol;
-
-                     if (searchSpec.UseCaseSensitivity && searchSpec.UseWholeWordMatching)
-                     {
-                        reg = new Regex("\\b" + searchSpec.SearchText + "\\b");
-                        regCol = reg.Matches(line);
-                     }
-                     else if (searchSpec.UseCaseSensitivity)
-                     {
-                        reg = new Regex(searchSpec.SearchText);
-                        regCol = reg.Matches(line);
-                     }
-                     else if (searchSpec.UseWholeWordMatching)
-                     {
-                        reg = new Regex("\\b" + searchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
-                        regCol = reg.Matches(line);
-                     }
-                     else
-                     {
-                        reg = new Regex(searchSpec.SearchText, RegexOptions.IgnoreCase);
-                        regCol = reg.Matches(line);
-                     }
+                     string pattern = string.Format("{0}{1}{0}", searchSpec.UseWholeWordMatching ? "\\b" : string.Empty, searchSpec.SearchText);
+                     RegexOptions options = searchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase;
+                     reg = new Regex(pattern, options);
+                     regCol = reg.Matches(line);
 
                      if (regCol.Count > 0)
                      {
-                        if (hit == null)
-                        {
-                           hit = new HitObject(path);
-
-                           // found hit in file so just return 
-                           if (searchSpec.ReturnOnlyFileNames)
-                           {
-                              break;
-                           }
-                        }
-
-                        hit.Add(string.Empty, line, 0, 0);   // currently use 0,0 for all hits since we parsed out the text
-                        hit.SetHitCount(regCol.Count);
+                        posInStr = 1;
                      }
                   }
                   else
                   {
-                     int posInStr = -1;
-                     if (searchSpec.UseCaseSensitivity)
+                     // If we are looking for whole worlds only, perform the check.
+                     if (searchSpec.UseWholeWordMatching)
                      {
-                        // Need to escape these characters in SearchText:
-                        // < $ + * [ { ( ) .
-                        // with a preceeding \
+                        reg = new Regex("\\b" + Regex.Escape(searchSpec.SearchText) + "\\b", searchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase);
 
-                        // If we are looking for whole worlds only, perform the check.
-                        if (searchSpec.UseWholeWordMatching)
+                        // if match is found, also check against our internal line hit count method to be sure they are in sync
+                        Match mtc = reg.Match(line);
+                        if (mtc != null && mtc.Success && libAstroGrep.Grep.RetrieveLineMatches(line, searchSpec).Count > 0)
                         {
-                           Regex reg = new Regex("\\b" + searchSpec.SearchText + "\\b");
-                           Match mtc = reg.Match(line);
-                           if (mtc != null && mtc.Success)
-                           {
-                              posInStr = mtc.Index;
-                           }
-                        }
-                        else
-                        {
-                           posInStr = line.IndexOf(searchSpec.SearchText);
+                           posInStr = mtc.Index;
                         }
                      }
                      else
                      {
-                        // If we are looking for whole worlds only, perform the check.
-                        if (searchSpec.UseWholeWordMatching)
-                        {
-                           Regex reg = new Regex("\\b" + searchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
-                           Match mtc = reg.Match(line);
-                           if (mtc != null && mtc.Success)
-                           {
-                              posInStr = mtc.Index;
-                           }
-                        }
-                        else
-                        {
-                           posInStr = line.ToLower().IndexOf(searchSpec.SearchText.ToLower());
-                        }
+                        posInStr = line.IndexOf(searchSpec.SearchText, searchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
                      }
+                  }
 
-                     if (posInStr > -1)
+                  if (posInStr > -1)
+                  {
+                     if (match == null)
                      {
-                        if (hit == null)
-                        {
-                           hit = new HitObject(path);
+                        match = new MatchResult(file);
 
-                           // found hit in file so just return 
-                           if (searchSpec.ReturnOnlyFileNames)
-                           {
-                              break;
-                           }
+                        // found hit in file so just return 
+                        if (searchSpec.ReturnOnlyFileNames)
+                        {
+                           break;
                         }
-                        hit.Add(string.Empty, line, 0, 0);   // currently use 0,0 for all hits since we parsed out the text
-                        hit.SetHitCount(RetrieveLineHitCount(line, searchSpec));
                      }
+
+                     var matchLineFound = new MatchResultLine() { Line = line, LineNumber = -1, HasMatch = true };
+
+                     if (searchSpec.UseRegularExpressions)
+                     {
+                        posInStr = regCol[0].Index;
+                        match.SetHitCount(regCol.Count);
+
+                        foreach (Match regExMatch in regCol)
+                        {
+                           matchLineFound.Matches.Add(new MatchResultLineMatch(regExMatch.Index, regExMatch.Length));
+                        }
+                     }
+                     else
+                     {
+                        var lineMatches = libAstroGrep.Grep.RetrieveLineMatches(line, searchSpec);
+                        match.SetHitCount(lineMatches.Count);
+                        matchLineFound.Matches = lineMatches;
+                     }
+                     matchLineFound.ColumnNumber = 1;
+                     match.Matches.Add(matchLineFound);
                   }
                }
             }
          }
 
-         return hit;
-      }
-
-      /// <summary>
-      /// Retrieves the number of instances of searchText in the given line
-      /// </summary>
-      /// <param name="line">Line of text to search</param>
-      /// <param name="searchSpec">ISearchSpec interface value</param>
-      /// <returns>Count of how many instances</returns>
-      /// <history>
-      /// [Curtis_Beard]      12/06/2005	Created
-      /// [Curtis_Beard]      01/12/2007	FIX: check for correct position of IndexOf
-      /// [Curtis_Beard]      03/24/2014	CHG: use common WholeWordOnly method in Grep object.
-      /// </history>
-      private int RetrieveLineHitCount(string line, ISearchSpec searchSpec)
-      {
-         int _count = 0;
-         string _end;
-         int _pos = -1;
-
-         string _tempLine = line;
-
-         // attempt to locate the text in the line
-         if (searchSpec.UseCaseSensitivity)
-            _pos = _tempLine.IndexOf(searchSpec.SearchText);
-         else
-            _pos = _tempLine.ToLower().IndexOf(searchSpec.SearchText.ToLower());
-
-         while (_pos > -1)
-         {
-            // retrieve parts of text
-            string _begin = _tempLine.Substring(0, _pos);
-            _end = _tempLine.Substring(_pos + searchSpec.SearchText.Length);
-
-            // do a check to see if begin and end are valid for wholeword searches
-            bool _highlight;
-            if (searchSpec.UseWholeWordMatching)
-               _highlight = libAstroGrep.Grep.WholeWordOnly(_begin, _end);
-            else
-               _highlight = true;
-
-            // found a hit
-            if (_highlight)
-               _count += 1;
-
-            // Check remaining string for other hits in same line
-            if (searchSpec.UseCaseSensitivity)
-               _pos = _end.IndexOf(searchSpec.SearchText);
-            else
-               _pos = _end.ToLower().IndexOf(searchSpec.SearchText.ToLower());
-
-            // update the temp line with the next part to search (if any)
-            _tempLine = _end;
-         }
-
-         return _count;
+         return match;
       }
    }
 }

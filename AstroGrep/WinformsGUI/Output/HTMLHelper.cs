@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using AstroGrep.Core;
+using AstroGrep.Core.Logging;
 using libAstroGrep;
 
 namespace AstroGrep.Output
@@ -73,7 +74,10 @@ namespace AstroGrep.Output
 
             return _contents;            
          }
-         catch {}
+         catch (Exception ex)
+         {
+            LogClient.Instance.Logger.Error("Unable to load html file contents from resource at {0} with message {1}", fileName, ex.Message);
+         }
 
          return string.Empty;
       }
@@ -128,6 +132,8 @@ namespace AstroGrep.Output
       /// <param name="text">Text containing holders</param>
       /// <param name="grep">Grep object containing settings</param>
       /// <param name="totalHits">Number of total hits</param>
+      /// <param name="showLineNumbers">Determines whether to show line numbers</param>
+      /// <param name="removeLeadingWhiteSpace">Determines whether to remove leading white space</param>
       /// <returns>Text with holders replaced</returns>
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
@@ -137,7 +143,7 @@ namespace AstroGrep.Output
       /// [Curtis_Beard]		02/12/2014	CHG: handle file search only better, add totalHits as parameter
       /// [Curtis_Beard]      11/11/2014	ADD: export all filteritems
       /// </history>
-      public static string ReplaceSearchOptions(string text, Grep grep, int totalHits)
+      public static string ReplaceSearchOptions(string text, Grep grep, int totalHits, bool showLineNumbers, bool removeLeadingWhiteSpace)
       {
          var spec = grep.SearchSpec;
 
@@ -151,7 +157,8 @@ namespace AstroGrep.Output
          text = text.Replace("%%recurse%%", "Subfolders: " + spec.SearchInSubfolders);
          text = text.Replace("%%filenameonly%%", "Show File Names Only: " + spec.ReturnOnlyFileNames);
          text = text.Replace("%%negation%%", "Negation: " + spec.UseNegation);
-         text = text.Replace("%%linenumbers%%", "Line Numbers: " + spec.IncludeLineNumbers);
+         text = text.Replace("%%linenumbers%%", "Line Numbers: " + showLineNumbers);
+         text = text.Replace("%%removeleadingwhitespace%%", "Remove Leading White Space: " + removeLeadingWhiteSpace);
          text = text.Replace("%%contextlines%%", "Context Lines: " + spec.ContextLines);
 
          // filter items
@@ -183,11 +190,11 @@ namespace AstroGrep.Output
          {
             if (grep.SearchSpec.ReturnOnlyFileNames)
             {
-               searchMessage = string.Format("{0} was {1}found in {2} file{3}", spec.SearchText, spec.UseNegation ? "not " : "", grep.Greps.Count, grep.Greps.Count > 1 ? "s" : "");
+               searchMessage = string.Format("{0} was {1}found in {2} file{3}", spec.SearchText, spec.UseNegation ? "not " : "", grep.MatchResults.Count, grep.MatchResults.Count > 1 ? "s" : "");
             }
             else
             {
-               searchMessage = string.Format("{0} was found {1} time{2} in {3} file{4}", spec.SearchText, totalHits, totalHits > 1 ? "s" : "", grep.Greps.Count, grep.Greps.Count > 1 ? "s" : "");
+               searchMessage = string.Format("{0} was found {1} time{2} in {3} file{4}", spec.SearchText, totalHits, totalHits > 1 ? "s" : "", grep.MatchResults.Count, grep.MatchResults.Count > 1 ? "s" : "");
             }
          }
          text = text.Replace("%%searchmessage%%", searchMessage);
@@ -206,64 +213,62 @@ namespace AstroGrep.Output
       /// <history>
       /// [Curtis_Beard]		09/05/2006	Created
       /// [Curtis_Beard]		11/11/2014	CHG: escape any html characters
+      /// [Curtis_Beard]		04/13/2015	CHG: code cleanup
       /// </history>
       private static string HighlightNormal(string line, Grep grep)
       {
-         var _searchText = grep.SearchSpec.SearchText;
-         int _pos = 0;
-         string _newLine = string.Empty;
-
-         // Retrieve hit text
-         string _textToSearch = line;
-         var _tempLine = _textToSearch;
+         StringBuilder newLine = new StringBuilder();
+         string searchText = grep.SearchSpec.SearchText;
+         string tempLine = line;
 
          // attempt to locate the text in the line
-         if (grep.SearchSpec.UseCaseSensitivity)
-            _pos = _tempLine.IndexOf(_searchText);
-         else
-            _pos = _tempLine.ToLower().IndexOf(_searchText.ToLower());
+         int pos = tempLine.IndexOf(searchText, grep.SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 
-         if (_pos > -1)
+         if (pos > -1)
          {
-            while (_pos > -1)
+            while (pos > -1)
             {
-               bool _highlight = false;
-
                //retrieve parts of text
-               var _begin = _tempLine.Substring(0, _pos);
-               var _text = _tempLine.Substring(_pos, _searchText.Length);
-               var _end = _tempLine.Substring(_pos + _searchText.Length);
+               var begin = tempLine.Substring(0, pos);
+               var text = tempLine.Substring(pos, searchText.Length);
+               var end = tempLine.Substring(pos + searchText.Length);
 
-               _newLine += WebUtility.HtmlEncode(_begin);
+               newLine.Append(WebUtility.HtmlEncode(begin));
 
                // do a check to see if begin and end are valid for wholeword searches
+               bool highlight = true;
                if (grep.SearchSpec.UseWholeWordMatching)
-                  _highlight = Grep.WholeWordOnly(_begin, _end);
-               else
-                  _highlight = true;
+               {
+                  highlight = Grep.WholeWordOnly(begin, end);
+               }
 
                // set highlight color for searched text
-               if (_highlight)
-                  _newLine += string.Format("<span class=\"searchtext\">{0}</span>", WebUtility.HtmlEncode(_text));
+               if (highlight)
+               {
+                  newLine.AppendFormat("<span class=\"searchtext\">{0}</span>", WebUtility.HtmlEncode(text));
+               }
                else
-                  _newLine += WebUtility.HtmlEncode(_text);
+               {
+                  newLine.Append(WebUtility.HtmlEncode(text));
+               }
 
                // Check remaining string for other hits in same line
-               if (grep.SearchSpec.UseCaseSensitivity)
-                  _pos = _end.IndexOf(_searchText);
-               else
-                  _pos = _end.ToLower().IndexOf(_searchText.ToLower());
+               pos = end.IndexOf(searchText, grep.SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
 
                // set default color for end, if no more hits in line
-               _tempLine = _end;
-               if (_pos < 0)
-                  _newLine += WebUtility.HtmlEncode(_end);
+               tempLine = end;
+               if (pos < 0)
+               {
+                  newLine.Append(WebUtility.HtmlEncode(end));
+               }
             }
          }
          else
-            _newLine += WebUtility.HtmlEncode(_textToSearch);
-         
-         return _newLine;
+         {
+            newLine.Append(WebUtility.HtmlEncode(tempLine));
+         }
+
+         return newLine.ToString();
       }
 
       /// <summary>
@@ -276,80 +281,62 @@ namespace AstroGrep.Output
       /// [Curtis_Beard]		09/05/2006	Created
       /// [Curtis_Beard]	   05/18/2006	FIX: 1723815, use correct whole word matching regex
       /// [Curtis_Beard]		11/11/2014	CHG: escape any html characters
+      /// [Curtis_Beard]		04/13/2015	CHG: code cleanup
       /// </history>
       private static string HighlightRegEx(string line, Grep grep)
       {
-          string _tempstring;
-         int _lastPos = 0;
-         int _counter = 0;
-         Regex _regEx;
-         MatchCollection _col;
-         Match _item;
-         string _newLine = string.Empty;
-
-         //Retrieve hit text
-         string _textToSearch = line;
+         string tempString = string.Empty;
+         int lastPos = 0;
+         Regex regEx;
+         MatchCollection matchCollection;
+         Match match;
+         StringBuilder newLine = new StringBuilder();
 
          // find all reg ex matches in line
-         if (grep.SearchSpec.UseCaseSensitivity && grep.SearchSpec.UseWholeWordMatching)
-         {
-             _regEx = new Regex("\\b" + grep.SearchSpec.SearchText + "\\b");
-            _col = _regEx.Matches(_textToSearch);
-         }
-         else if (grep.SearchSpec.UseCaseSensitivity)
-         {
-             _regEx = new Regex(grep.SearchSpec.SearchText);
-            _col = _regEx.Matches(_textToSearch);
-         }
-         else if (grep.SearchSpec.UseWholeWordMatching)
-         {
-             _regEx = new Regex("\\b" + grep.SearchSpec.SearchText + "\\b", RegexOptions.IgnoreCase);
-            _col = _regEx.Matches(_textToSearch);
-         }
-         else
-         {
-             _regEx = new Regex(grep.SearchSpec.SearchText, RegexOptions.IgnoreCase);
-            _col = _regEx.Matches(_textToSearch);
-         }
+         string pattern = string.Format("{0}{1}{0}", grep.SearchSpec.UseWholeWordMatching ? "\\b" : string.Empty, grep.SearchSpec.SearchText);
+         RegexOptions options = grep.SearchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase;
+         regEx = new Regex(pattern, options);
+         matchCollection = regEx.Matches(line);
 
          // loop through the matches
-         _lastPos = 0;
-         for (_counter = 0; _counter < _col.Count; _counter++)
+         for (int i = 0; i < matchCollection.Count; i++)
          {
-            _item = _col[_counter];
+            match = matchCollection[i];
 
             // check for empty string to prevent assigning nothing to selection text preventing
             //  a system beep
-            _tempstring = _textToSearch.Substring(_lastPos, _item.Index - _lastPos);
-            if (!_tempstring.Equals(string.Empty))
-               _newLine += WebUtility.HtmlEncode(_tempstring);
+            tempString = line.Substring(lastPos, match.Index - lastPos);
+            if (!tempString.Equals(string.Empty))
+            {
+               newLine.Append(WebUtility.HtmlEncode(tempString));
+            }
 
             // set the hit text
-            _newLine += string.Format("<span class=\"searchtext\">{0}</span>", WebUtility.HtmlEncode(_textToSearch.Substring(_item.Index, _item.Length)));
+            newLine.AppendFormat("<span class=\"searchtext\">{0}</span>", WebUtility.HtmlEncode(line.Substring(match.Index, match.Length)));
 
             // set the end text
-            if (_counter + 1 >= _col.Count)
+            if (i + 1 >= matchCollection.Count)
             {
                // no more hits so just set the rest
-               _newLine += WebUtility.HtmlEncode(_textToSearch.Substring(_item.Index + _item.Length));
+               newLine.Append(WebUtility.HtmlEncode(line.Substring(match.Index + match.Length)));
 
-               _lastPos = _item.Index + _item.Length;
+               lastPos = match.Index + match.Length;
             }
             else
             {
                // another hit so just set inbetween
-               _newLine += WebUtility.HtmlEncode(_textToSearch.Substring(_item.Index + _item.Length, _col[_counter + 1].Index - (_item.Index + _item.Length)));
-               _lastPos = _col[_counter + 1].Index;
+               newLine.Append(WebUtility.HtmlEncode(line.Substring(match.Index + match.Length, matchCollection[i + 1].Index - (match.Index + match.Length))));
+               lastPos = matchCollection[i + 1].Index;
             }
          }
 
-         if (_col.Count == 0)
+         if (matchCollection.Count == 0)
          {
             // no match, just a context line
-            _newLine += WebUtility.HtmlEncode(_textToSearch);
+            newLine.Append(WebUtility.HtmlEncode(line));
          }
 
-         return _newLine;
+         return newLine.ToString();
       }
       #endregion
 	}

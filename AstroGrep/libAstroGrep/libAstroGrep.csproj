@@ -43,6 +43,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Encoding\EncodingDetector.cs" />
     <Compile Include="Encoding\EncodingTools.cs" />
     <Compile Include="Encoding\FileEncoding.cs" />
@@ -126,9 +127,11 @@
     <Compile Include="Filtering\FilterItem.cs" />
     <Compile Include="Filtering\FilterType.cs" />
     <Compile Include="Grep.cs" />
-    <Compile Include="HitObject.cs" />
     <Compile Include="IFileFilterSpec.cs" />
     <Compile Include="ISearchSpec.cs" />
+    <Compile Include="MatchResult.cs" />
+    <Compile Include="MatchResultLine.cs" />
+    <Compile Include="MatchResultLineMatch.cs" />
     <Compile Include="Plugin\IAstroGrepPlugin.cs" />
     <Compile Include="Plugin\PluginCollection.cs" />
     <Compile Include="Plugin\PluginWrapper.cs" />

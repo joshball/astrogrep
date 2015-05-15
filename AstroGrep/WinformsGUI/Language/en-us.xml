@@ -8,14 +8,14 @@
       <control name="lblSearchPath" value="Search Path" />
       <control name="lblContextLines" value="Context Lines" tooltip="Show lines above and below the word matched" />
       <control name="txtContextLines" tooltip="Show lines above and below the word matched" />
-      <control name="chkLineNumbers" value="&amp;Line Numbers" tooltip="Include line numbers before each match" />
       <control name="chkNegation" value="&amp;Negation" tooltip="Find the files without the Search Text in them" />
       <control name="chkFileNamesOnly" value="Show File Names &amp;Only" tooltip="Show names but not contents of files that have matches (may be faster on large files)" />
       <control name="chkRecurse" value="Search Su&amp;bfolders" tooltip="Search in subfolders" />
       <control name="chkWholeWordOnly" value="&amp;Whole Word" tooltip="Only match entire words (not parts of words)" />
       <control name="chkCaseSensitive" value="&amp;Case Sensitive" tooltip="Match upper and lower case letters exactly" />
       <control name="chkRegularExpressions" value="Regular &amp;Expressions" tooltip="Use &quot;regular expression&quot; matching" />
-      <control name="lnkSearchOptions" value="Search Options {0}" />
+      <control name="chkAllResultsAfterSearch" value="&amp;Show all results after search" tooltip="Shows all the results together in the preview after a search." />
+      <control name="lblSearchOptions" value="Search Options" />
       <control name="picBrowse" tooltip="Browse..." />
       <control name="lnkExclusions" value="Exclusions" />
       <control name="lstFileNames">
@@ -58,6 +58,18 @@
          <menuitem index="1" value="&amp;Exclusion Messages" />
          <menuitem index="2" value="E&amp;rror Messages" />
          <menuitem index="3" value="&amp;All Messages" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="&amp;Zoom">
+            <menuitem index="0" value="Zoom In (Ctrl+Mouse Wheel Up)"/>
+            <menuitem index="1" value="Zoom Out (Ctrl+Mouse Wheel Down)"/>
+            <menuitem index="2" value="Restore Default Zoom"/>
+         </menuitem>
+         <menuitem index="6" value="Line Numbers" />
+         <menuitem index="7" value="Word Wrap" />
+         <menuitem index="8" value="&amp;Remove Leading White Space"/>
+         <menuitem index="9" value="Entire File" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="All Results" />
       </menu>
       <menu index="3" value="&amp;Tools">
          <menuitem index="0" value="&amp;Clear Most Recently Used Lists">
@@ -74,10 +86,11 @@
       <menu index="4" value="&amp;Help">
          <menuitem index="0" value="&amp;View Help" />
          <menuitem index="1" value="&amp;Regular Expressions" />
-         <menuitem index="2" value="-" />
-         <menuitem index="3" value="&amp;Check for Updates..." />
-         <menuitem index="4" value="-" />
-         <menuitem index="5" value="&amp;About AstroGrep" />
+         <menuitem index="2" value="&amp;Log File" />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="&amp;Check for Updates..." />
+         <menuitem index="5" value="-" />
+         <menuitem index="6" value="&amp;About AstroGrep" />
       </menu>
       
       <!-- status bar items default state-->
@@ -117,6 +130,7 @@
       <control name="lblResultPreview" value="Results Preview" />
       <control name="lblResultsWindowBack" value="Back Color" />
       <control name="lblResultsWindowFore" value="Fore Color" />
+      <control name="lblResultsContextForeColor" value="Context Fore Color" />
       <control name="grpResultWindow" value="Results Window" />
       <control name="BackColorLabel" value="Back Color" />
       <control name="ForeColorLabel" value="Fore Color" />
@@ -141,7 +155,6 @@
       <control name="grpFileList" value="File List" />
       <control name="btnFileFindFont" value="Find Font..."/>
       <control name="chkDetectFileEncoding" value="Detect &amp;file encoding."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Remove Leading White Space"/>
       <control name="chkSaveMessagesPosition" value="Save messages &amp;window position."/>
 
       <control name="tabFileEncoding" value="File Encoding" />
@@ -181,10 +194,6 @@
       <control name="btnOK" value="&amp;OK"/>
    </screen>
 
-   <screen name="frmDisplayMessages" value="AstroGrep">
-      <control name="btnOK" value="&amp;OK"/>
-   </screen>
-
    <screen name="frmLogDisplay" value="Messages">
       <control name="sbtnStatus" value="Status"/>
       <control name="sbtnExclusions" value="Exclusion"/>
@@ -214,7 +223,7 @@
       
       <text name="PrintTypeSelected" value="Selected Items"/>
       <text name="PrintTypeFile" value="File List"/>
-      <text name="PrintTypeAll" value="All Hits"/>
+      <text name="PrintTypeAll" value="All"/>
       <text name="PrintErrorPageSettings" value="An error occurred while trying to load the Page Settings. Make sure you currently have access to a printer. A printer must be connected and accessible for Printing to work."/>
       <text name="PrintErrorPreview" value="An error occurred while trying to load the document for Print Preview. Make sure you currently have access to a printer. A printer must be connected and accessible for Printing to work."/>
       <text name="PrintErrorPrint" value="An error occurred while trying to load the document for Printing. Make sure you currently have access to a printer. A printer must be connected and accessible for Printing to work."/>
@@ -272,6 +281,7 @@
       <text name="ResultsStatusFilterCount" value="Exclusions: {0}"/>
       <text name="ResultsStatusErrorCount" value="Error: {0}"/>
 
+      <text name="ResultsContextMenu.OpenFileCurrentLine" value="Open file at current line"/>
       <text name="ResultsContextMenu.Copy" value="Copy"/>
       <text name="ResultsContextMenu.SelectAll" value="Select All"/>
       

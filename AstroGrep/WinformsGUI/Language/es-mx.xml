@@ -8,14 +8,14 @@
       <control name="lblSearchPath" value="Camino de búsqueda en un fichero" />
       <control name="lblContextLines" value="Líneas del contexto" tooltip="Demostrar las líneas sobre y debajo de la palabra emparejada" />
       <control name="txtContextLines" tooltip="Demostrar las líneas sobre y debajo de la palabra emparejada" />
-      <control name="chkLineNumbers" value="&amp;Línea números" tooltip="Incluir la línea números antes de cada fósforo" />
       <control name="chkNegation" value="&amp;Negación" tooltip="Encontrar los archivos sin el texto de la búsqueda en ellos" />
       <control name="chkFileNamesOnly" value="Nombres del archivo solamente" tooltip="Demostrar los nombres pero no el contenido de los archivos que tienen fósforos (puede ser más rápido en archivos grandes)" />
       <control name="chkRecurse" value="&amp;Directorios secundarios" tooltip="Búsqueda en directorios secundarios" />
       <control name="chkWholeWordOnly" value="&amp;Palabra entera" tooltip="Solamente palabras enteras del fósforo (no piezas de palabras)" />
       <control name="chkCaseSensitive" value="Cas&amp;o sensible" tooltip="La mayúscula y minúscula del fósforo pone letras exactamente" />
       <control name="chkRegularExpressions" value="&amp;Expresiones regulares" tooltip="Utilizar emparejar regular de la expresión" />
-      <control name="lnkSearchOptions" value="Opciones de la búsqueda {0}" />
+      <control name="chkAllResultsAfterSearch" value="&amp;Mostrar todos los resultados" tooltip="Muestra todos los resultados juntos en la vista previa después de una búsqueda." />
+      <control name="lblSearchOptions" value="Opciones de la búsqueda" />
       <control name="picBrowse" tooltip="Hojear..." />
       <control name="lnkExclusions" value="Exclusiones" />
       <control name="lstFileNames">
@@ -58,6 +58,18 @@
          <menuitem index="1" value="Mensajes de e&amp;xclusión" />
          <menuitem index="2" value="Mensajes de e&amp;rror" />
          <menuitem index="3" value="&amp;Todos los mensajes" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="&amp;Zoom">
+            <menuitem index="0" value="acercar (Ctrl+Mouse Wheel Up)"/>
+            <menuitem index="1" value="disminuir el zoom (Ctrl+Mouse Wheel Down)"/>
+            <menuitem index="2" value="restaurar zoom predeterminado"/>
+         </menuitem>
+         <menuitem index="6" value="Números de línea" />
+         <menuitem index="7" value="El ajuste de línea" />
+         <menuitem index="8" value="&amp;Quitar el espacio"/>
+         <menuitem index="9" value="Archivo completo" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Todos los resultados" />
       </menu>
       <menu index="3" value="&amp;Herramientas">
          <menuitem index="0" value="&amp;Despejar la mayoría de las listas usadas recientemente">
@@ -74,10 +86,11 @@
       <menu index="4" value="A&amp;yuda">
          <menuitem index="0" value="&amp;Ver Ayuda" />
          <menuitem index="1" value="&amp;Expresiones regulares" />
-         <menuitem index="2" value="-" />
-         <menuitem index="3" value="&amp;Buscar actualizaciones..." />
-         <menuitem index="4" value="-" />
-         <menuitem index="5" value="&amp;Sobre AstroGrep" />
+         <menuitem index="2" value="&amp;Archivo De Registro" />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="&amp;Buscar actualizaciones..." />
+         <menuitem index="5" value="-" />
+         <menuitem index="6" value="&amp;Sobre AstroGrep" />
       </menu>
 
       <!-- status bar items default state-->
@@ -116,6 +129,7 @@
       <control name="lblResultPreview" value="Inspección previo de los resultados" />
       <control name="lblResultsWindowBack" value="Color trasero" />
       <control name="lblResultsWindowFore" value="Color delantero" />
+      <control name="lblResultsContextForeColor" value="Primer plano contexto" />
       <control name="grpResultWindow" value="Ventana de los resultados" />
       <control name="BackColorLabel" value="Color trasero" />
       <control name="ForeColorLabel" value="Color delantero" />
@@ -140,7 +154,6 @@
       <control name="grpFileList" value="Lista de archivos" />
       <control name="btnFileFindFont" value="Buscar fuente..."/>
       <control name="chkDetectFileEncoding" value="Detectar la codificación del archivo."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Quitar el espacio"/>
       <control name="chkSaveMessagesPosition" value="Guardar mensajes &amp;posición de la ventana."/>
 
       <control name="tabFileEncoding" value="codificación de archivos" />
@@ -180,10 +193,6 @@
       <control name="btnOK" value="&amp;Autorización"/>
    </screen>
 
-   <screen name="frmDisplayMessages" value="AstroGrep">
-      <control name="btnOK" value="&amp;Autorización"/>
-   </screen>
-
    <screen name="frmLogDisplay" value="Mensajes">
       <control name="sbtnStatus" value="Estado"/>
       <control name="sbtnExclusions" value="Exclusiones"/>
@@ -214,7 +223,7 @@
       
       <text name="PrintTypeSelected" value="Artículos seleccionados"/>
       <text name="PrintTypeFile" value="Lista del archivo"/>
-      <text name="PrintTypeAll" value="Todo golpea"/>
+      <text name="PrintTypeAll" value="Todos"/>
       <text name="PrintErrorPageSettings" value="Un error ocurrió mientras que intentaba cargar los ajustes de la página. Te cercioras de actualmente tener acceso a una impresora. Una impresora debe ser conectada y accesible para imprimir al trabajo."/>
       <text name="PrintErrorPreview" value="Un error ocurrió mientras que intentaba cargar el documento para la inspección previo de impresión. Te cercioras de actualmente tener acceso a una impresora. Una impresora debe ser conectada y accesible para imprimir al trabajo."/>
       <text name="PrintErrorPrint" value="Un error ocurrió mientras que intentaba cargar el documento para imprimir. Te cercioras de actualmente tener acceso a una impresora. Una impresora debe ser conectada y accesible para imprimir al trabajo."/>
@@ -272,6 +281,7 @@
       <text name="ResultsStatusFilterCount" value="Exclusiones: {0}"/>
       <text name="ResultsStatusErrorCount" value="Error: {0}"/>
 
+      <text name="ResultsContextMenu.OpenFileCurrentLine" value="Abrir el archivo en la línea actual"/>
       <text name="ResultsContextMenu.Copy" value="Copiar"/>
       <text name="ResultsContextMenu.SelectAll" value="Seleccionar todo"/>
       

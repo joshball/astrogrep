@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
+
+using AstroGrep.Output;
 using libAstroGrep;
 
 namespace AstroGrep.Windows.Forms
@@ -39,40 +41,40 @@ namespace AstroGrep.Windows.Forms
    public partial class frmPrint : Form
    {
       #region Declarations
-      private PrintDocument pdoc = new PrintDocument();
-      private string __document = string.Empty;
       
-      private IList<HitObject> __grepTable;
-      private Font __Font;
-      private int __CurrentChar = 0;
-      private Icon __Icon;
+      private PrintDocument printDocument = new PrintDocument();
+      private string currentContent = string.Empty;
+      private int currentCharIndex = 0;
+
+      private Font printFont;
+      private Icon previewIcon;
+      private MatchResultsExport.ExportSettings settings;
+
       #endregion
 
 
       /// <summary>
       /// Creates an instance of this class setting its private objects
       /// </summary>
-      /// <param name="fileList">Results ListView object</param>
-      /// <param name="greps">Grep Collection as a HashTable</param>
+      /// <param name="settings">Export settings</param>
       /// <param name="font">Font to use during printing</param>
       /// <param name="icon">The icon to use for print preview dialog</param>
       /// <history>
       /// [Curtis_Beard]      11/02/2005	Created
       /// [Curtis_Beard]      10/11/2006	CHG: Added Font object and a Icon
       /// </history>
-      public frmPrint(ListView fileList, IList<HitObject> greps, Font font, Icon icon)
+      public frmPrint(MatchResultsExport.ExportSettings settings, Font font, Icon icon)
       {
          //
          // Required for Windows Form Designer support
          //
          InitializeComponent();
 
-         __listView = fileList;
-         __grepTable = greps;
-         __Font = font;
-         __Icon = icon;
+         this.settings = settings;
+         this.printFont = font;
+         this.previewIcon = icon;
 
-         pdoc.PrintPage += pdoc_PrintPage;
+         printDocument.PrintPage += pdoc_PrintPage;
       }
 
       /// <summary>
@@ -98,10 +100,10 @@ namespace AstroGrep.Windows.Forms
          lstPrintTypes.SelectedIndex = 0;
 
          // Set the default document settings
-         pdoc.DefaultPageSettings.Margins.Left = 25;
-         pdoc.DefaultPageSettings.Margins.Top = 25;
-         pdoc.DefaultPageSettings.Margins.Bottom = 25;
-         pdoc.DefaultPageSettings.Margins.Right = 25;
+         printDocument.DefaultPageSettings.Margins.Left = 25;
+         printDocument.DefaultPageSettings.Margins.Top = 25;
+         printDocument.DefaultPageSettings.Margins.Bottom = 25;
+         printDocument.DefaultPageSettings.Margins.Right = 25;
       }
 
       #region Control Events
@@ -119,10 +121,10 @@ namespace AstroGrep.Windows.Forms
          {
             PrintDialog dialog = new PrintDialog();
             SetDocument();
-            dialog.Document = pdoc;
+            dialog.Document = printDocument;
 
             if (dialog.ShowDialog(this) == DialogResult.OK)
-               pdoc.Print();
+               printDocument.Print();
          }
          catch
          {
@@ -147,13 +149,13 @@ namespace AstroGrep.Windows.Forms
          {
             PrintPreviewDialog ppd = new PrintPreviewDialog();
             SetDocument();
-            ppd.Document = pdoc;
+            ppd.Document = printDocument;
 
             // Set properties of preview dialog
             ppd.StartPosition = FormStartPosition.CenterScreen;
             ppd.Size = new Size(640, 480);
             ppd.FormBorderStyle = FormBorderStyle.Sizable;
-            ppd.Icon = __Icon;
+            ppd.Icon = previewIcon;
             ppd.Text = Language.GetControlText(cmdPreview).Replace("&", string.Empty);
 
             // set initial zoom level to 100%
@@ -183,11 +185,11 @@ namespace AstroGrep.Windows.Forms
 
          try
          {
-            psd.Document = pdoc;
-            psd.PageSettings = pdoc.DefaultPageSettings;
+            psd.Document = printDocument;
+            psd.PageSettings = printDocument.DefaultPageSettings;
 
             if (psd.ShowDialog(this) == DialogResult.OK)
-               pdoc.DefaultPageSettings = psd.PageSettings;
+               printDocument.DefaultPageSettings = psd.PageSettings;
          }
          catch
          {
@@ -240,18 +242,18 @@ namespace AstroGrep.Windows.Forms
 
          // Initialize local variables that contain the bounds of the printing 
          // area rectangle.
-         intPrintAreaHeight = pdoc.DefaultPageSettings.PaperSize.Height - pdoc.DefaultPageSettings.Margins.Top - pdoc.DefaultPageSettings.Margins.Bottom;
-         intPrintAreaWidth = pdoc.DefaultPageSettings.PaperSize.Width - pdoc.DefaultPageSettings.Margins.Left - pdoc.DefaultPageSettings.Margins.Right;
+         intPrintAreaHeight = printDocument.DefaultPageSettings.PaperSize.Height - printDocument.DefaultPageSettings.Margins.Top - printDocument.DefaultPageSettings.Margins.Bottom;
+         intPrintAreaWidth = printDocument.DefaultPageSettings.PaperSize.Width - printDocument.DefaultPageSettings.Margins.Left - printDocument.DefaultPageSettings.Margins.Right;
 
          // Initialize local variables to hold margin values that will serve
          // as the X and Y coordinates for the upper left corner of the printing 
          // area rectangle.
-         marginLeft = pdoc.DefaultPageSettings.Margins.Left; // X coordinate
-         marginTop = pdoc.DefaultPageSettings.Margins.Top; // Y coordinate
+         marginLeft = printDocument.DefaultPageSettings.Margins.Left; // X coordinate
+         marginTop = printDocument.DefaultPageSettings.Margins.Top; // Y coordinate
 
          // If the user selected Landscape mode, swap the printing area height 
          // and width.
-         if (pdoc.DefaultPageSettings.Landscape)
+         if (printDocument.DefaultPageSettings.Landscape)
          {
             int intTemp;
             intTemp = intPrintAreaHeight;
@@ -261,7 +263,7 @@ namespace AstroGrep.Windows.Forms
 
          // Calculate the total number of lines in the document based on the height of
          // the printing area and the height of the font.
-         int intLineCount = Convert.ToInt32(intPrintAreaHeight / __Font.Height);
+         int intLineCount = Convert.ToInt32(intPrintAreaHeight / printFont.Height);
 
          // Initialize the rectangle structure that defines the printing area.
          RectangleF rectPrintingArea = new RectangleF(marginLeft, marginTop, intPrintAreaWidth, intPrintAreaHeight);
@@ -285,29 +287,31 @@ namespace AstroGrep.Windows.Forms
          // static.
          int intLinesFilled;
          int intCharsFitted;
-         e.Graphics.MeasureString(__document.Substring(__CurrentChar), __Font,
+         e.Graphics.MeasureString(currentContent.Substring(currentCharIndex), printFont,
             new SizeF(intPrintAreaWidth, intPrintAreaHeight), fmt,
             out intCharsFitted, out intLinesFilled);
 
          // Print the text to the page.
-         e.Graphics.DrawString(__document.Substring(__CurrentChar), __Font, 
+         e.Graphics.DrawString(currentContent.Substring(currentCharIndex), printFont,
             Brushes.Black, rectPrintingArea, fmt);
 
          // Advance the current char to the last char printed on this page. As 
          // intCurrentChar is a static variable, its value can be used for the next
          // page to be printed. It is advanced by 1 and passed to Mid() to print the
          // next page (see above in MeasureString()).
-         __CurrentChar += intCharsFitted;
+         currentCharIndex += intCharsFitted;
 
          // HasMorePages tells the printing module whether another PrintPage event
          // should be fired.
-         if (__CurrentChar < __document.Length)
+         if (currentCharIndex < currentContent.Length)
+         {
             e.HasMorePages = true;
+         }
          else
          {
             e.HasMorePages = false;
-            // You must explicitly reset intCurrentChar as it is static.
-            __CurrentChar = 0;
+            // You must explicitly reset currentCharCount as it is static.
+            currentCharIndex = 0;
          }
       }
       #endregion
@@ -321,26 +325,25 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   09/10/2005	CHG: create grepPrint object to generate document
       /// [Curtis_Beard]      11/02/2005	CHG: Use try/catch and set doc to error message in catch
       /// [Curtis_Beard]      11/14/2014	CHG: Remove printing of current hit
+      /// [Curtis_Beard]      04/10/2015	ADD: use delegate for print methods
       /// </history>
       private void SetDocument()
       {
          try
          {
-            GrepPrint _printDoc = new GrepPrint(__listView, __grepTable);
-
             switch (lstPrintTypes.SelectedIndex)
             {
                case 0:
-                  __document = _printDoc.PrintSelectedItems();
+                  currentContent = OutputResults(MatchResultsExport.PrintSelected);
                   break;
                case 1:
-                  __document = _printDoc.PrintAllHits();
+                  currentContent = OutputResults(MatchResultsExport.PrintAll);
                   break;
                case 2:
-                  __document = _printDoc.PrintFileList();
+                  currentContent = OutputResults(MatchResultsExport.PrintFileList);
                   break;
                default:
-                  __document = string.Empty;
+                  currentContent = string.Empty;
                   break;
             }
          }
@@ -348,8 +351,21 @@ namespace AstroGrep.Windows.Forms
          {
             // display error to user in document if an error occurred trying to generate
             // the document for printing
-            __document = string.Format(Language.GetGenericText("PrintErrorDocument"), ex.Message);
+            currentContent = string.Format(Language.GetGenericText("PrintErrorDocument"), ex.Message);
          }
+      }
+
+      /// <summary>
+      /// Output results using given export delegate.
+      /// </summary>
+      /// <param name="outputter">Print delegate</param>
+      /// <returns></returns>
+      /// <history>
+      /// [Curtis_Beard]     04/10/2015	ADD: use delegate for print methods
+      /// </history>
+      private string OutputResults(MatchResultsExport.PrintDelegate outputter)
+      {
+         return outputter(settings);
       }
       #endregion
    }

@@ -4,18 +4,18 @@
       <control name="lblSearchHeading" value=" AstroGrep Søgning" />
       <control name="lblSearchText" value="Søge Tekst" />
       <control name="lblFileTypes" value="Fil Typer" />
-      <control name="btnCancel" value="&amp;Afbryd" />
+      <control name="btnCancel" value="&amp;Annuller" />
       <control name="lblSearchPath" value="Søge Sti" />
       <control name="lblContextLines" value="Kontekst Linier" tooltip="Vis linerne over og under fundne match" />
       <control name="txtContextLines" tooltip="Vis linerne over og under fundne match" />
-      <control name="chkLineNumbers" value="&amp;Linienumre" tooltip="Vis linienumre ved hvert match" />
       <control name="chkNegation" value="&amp;Negering" tooltip="Find alle filer der IKKE indeholder søge teksten" />
       <control name="chkFileNamesOnly" value="Vis kun filnavne" tooltip="Vis kun filnavnet og ikke indholdet af søgeresultatet (hurtigere for store filer)" />
       <control name="chkRecurse" value="&amp;Medtag undermapper" tooltip="Søg også i undermapper" />
       <control name="chkWholeWordOnly" value="&amp;Hele Ord" tooltip="Match kun hele ord" />
       <control name="chkCaseSensitive" value="&amp;Case sensitiv" tooltip="Match store og små bogstave præcist" />
       <control name="chkRegularExpressions" value="Regular &amp;Expressions" tooltip="Anvend regular expression matching" />
-      <control name="lnkSearchOptions" value="Søgeparametre {0}" />
+      <control name="chkAllResultsAfterSearch" value="&amp;Vis alle resultater efter søgning" tooltip="Viser alle resultaterne sammen i preview efter en søgning." />
+      <control name="lblSearchOptions" value="Søgeparametre" />
       <control name="picBrowse" tooltip="Gennemse..." />
       <control name="lnkExclusions" value="udelukkelser" />
       <control name="lstFileNames">
@@ -58,6 +58,18 @@
          <menuitem index="1" value="&amp;eksklusionskriterier Beskeder" />
          <menuitem index="2" value="&amp;fejlmeddelelser" />
          <menuitem index="3" value="&amp;alle meddelelser" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="&amp;Zoom">
+            <menuitem index="0" value="zoome ind (Ctrl+Mouse Wheel Up)"/>
+            <menuitem index="1" value="zoome ud (Ctrl+Mouse Wheel Down)"/>
+            <menuitem index="2" value="gendanne standard-zoom"/>
+         </menuitem>
+         <menuitem index="6" value="Linjenumre" />
+         <menuitem index="7" value="Tekstombrydning" />
+         <menuitem index="8" value="&amp;Fjern Førende White Space"/>
+         <menuitem index="9" value="Hele filen" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Alle resultater" />
       </menu>
       <menu index="3" value="&amp;Indstillinger">
          <menuitem index="0" value="&amp;Nulstil Listen Med Seneste Søgninger">
@@ -74,10 +86,11 @@
       <menu index="4" value="&amp;Hjælp">
          <menuitem index="0" value="&amp;Vis Hjælp" />
          <menuitem index="1" value="&amp;Regular Expressions" />
-         <menuitem index="2" value="-" />
-         <menuitem index="3" value="&amp;Tjek for opdateringer..." />
-         <menuitem index="4" value="-" />
-         <menuitem index="5" value="&amp;Om AstroGrep" />
+         <menuitem index="2" value="&amp;logfil" />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="&amp;Tjek for opdateringer..." />
+         <menuitem index="5" value="-" />
+         <menuitem index="6" value="&amp;Om AstroGrep" />
       </menu>
 
       <!-- status bar items default state-->
@@ -116,6 +129,7 @@
       <control name="lblResultPreview" value="Resultat Preview" />
       <control name="lblResultsWindowBack" value="Baggrundsfarve" />
       <control name="lblResultsWindowFore" value="Forgrundsfarve" />
+      <control name="lblResultsContextForeColor" value="Kontekst forgrunden" />
       <control name="grpResultWindow" value="Resultat Vindue" />
       <control name="BackColorLabel" value="Baggrundsfarve" />
       <control name="ForeColorLabel" value="Forgrundsfarve" />
@@ -140,7 +154,6 @@
       <control name="grpFileList" value="Filliste" />
       <control name="btnFileFindFont" value="Find skrift..."/>
       <control name="chkDetectFileEncoding" value="Detect filkodningen."/>
-      <control name="chkRemoveLeadingWhiteSpace" value="&amp;Fjern Førende White Space"/>
       <control name="chkSaveMessagesPosition" value="&amp;Gem meddelelser vindue position."/>
 
       <control name="tabFileEncoding" value="Filkodning" />
@@ -180,10 +193,6 @@
       <control name="btnOK" value="&amp;OK"/>
    </screen>
 
-   <screen name="frmDisplayMessages" value="AstroGrep">
-      <control name="btnOK" value="&amp;OK"/>
-   </screen>
-
    <screen name="frmLogDisplay" value="Beskeder">
       <control name="sbtnStatus" value="Stilling"/>
       <control name="sbtnExclusions" value="Udelukkelser"/>
@@ -214,7 +223,7 @@
       
       <text name="PrintTypeSelected" value="Valgte Emner" />
       <text name="PrintTypeFile" value="Fil Liste" />
-      <text name="PrintTypeAll" value="Alle Hits" />
+      <text name="PrintTypeAll" value="Alle" />
       <text name="PrintErrorPageSettings" value="Der opstod en fejl da sideopsætning blev forsøgt indlæst. Kontroller at du har forbindelse til en printer. Printeren skal være tændt og forbundet, før der kan udskrives." />
       <text name="PrintErrorPreview" value="Der opstod en fejl under udarbejdelse af udskrifts preview. Kontroller at du har forbindelse til en printer. Printeren skal være tændt og forbundet, før der kan udskrives." />
       <text name="PrintErrorPrint" value="Der opstod en fejl ved dannelsen af udskriften. Kontroller at du har forbindelse til en printer. Printeren skal være tændt og forbundet, før der kan udskrives." />
@@ -272,6 +281,7 @@
       <text name="ResultsStatusFilterCount" value="Udelukkelser: {0}"/>
       <text name="ResultsStatusErrorCount" value="Fejl: {0}"/>
 
+      <text name="ResultsContextMenu.OpenFileCurrentLine" value="Åbn fil på nuværende linje"/>
       <text name="ResultsContextMenu.Copy" value="Kopiér"/>
       <text name="ResultsContextMenu.SelectAll" value="Vælg alt"/>
       

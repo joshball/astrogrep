@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 
+using AstroGrep.Core.Logging;
+
 namespace AstroGrep.Core
 {
    /// <summary>
@@ -118,7 +120,7 @@ namespace AstroGrep.Core
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.ToString());
+            LogClient.Instance.Logger.Error("Unable to load settings at {0}, version {1}, message {2}", path, version, ex.Message);
          }
 
          return false;
@@ -195,7 +197,7 @@ namespace AstroGrep.Core
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.ToString());
+            LogClient.Instance.Logger.Error("Unable to save settings at {0}, version {1}, message {2}", path, version, ex.Message);
          }
 
          return false;

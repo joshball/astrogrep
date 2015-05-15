@@ -97,6 +97,21 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
+      /// Converts a string to a SolidColorBrush.
+      /// </summary>
+      /// <param name="color">color values as a string</param>
+      /// <returns>System.Windows.Media.SolidColorBrush</returns>
+      /// <history>
+      /// [Curtis_Beard]		04/15/2015	Created
+      /// </history>
+      public static System.Windows.Media.SolidColorBrush ConvertStringToSolidColorBrush(string color)
+      {
+         System.Drawing.Color dColor = ConvertStringToColor(color);
+
+         return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(dColor.R, dColor.G, dColor.B));
+      }
+
+      /// <summary>
       /// Converts a font to a string.
       /// </summary>
       /// <param name="font">Font</param>

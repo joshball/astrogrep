@@ -392,12 +392,13 @@ namespace libAstroGrep
       /// The function scans first 10KB for 0x0000 sequence
       /// and if found, assumes the file to be binary
       /// </summary>
-      /// <param name="filePath">Path to a file</param>
-      /// <returns>True is file is binary otherwise false</returns>
+      /// <param name="file">FileInfo object</param>
+      /// <returns>True file is binary otherwise false</returns>
       /// <history>
       /// [Curtis_Beard]	   10/31/2014	ADD: exclusions update
+      /// [Curtis_Beard]	   04/08/2015	CHG: make public/static to use in UI
       /// </history>
-      private bool IsBinaryFile(FileInfo file)
+      public static bool IsBinaryFile(FileInfo file)
       {
          try
          {

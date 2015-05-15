@@ -33,6 +33,8 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]      04/25/2007  FIX: 1700029, always get correct config path
    /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
    /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
+   /// [Curtis_Beard]	   04/08/2015	ADD: 54, option to show all results after a search
+   /// [Curtis_Beard]	   05/07/2015	CHG: default context lines to 2 instead of 0
    /// </history>
    public sealed class SearchSettings
    {
@@ -51,7 +53,8 @@ namespace AstroGrep.Core
       private bool fileNamesOnly = false;
       private bool negation = false;
       private bool lineNumbers = true;
-      private int contextLines = 0;
+      private int contextLines = 2;
+      private bool showAllResultsAfterSearch = false;
       
       private string filterItems = Constants.DefaultFilterItems;
 
@@ -93,16 +96,7 @@ namespace AstroGrep.Core
       {
          get
          {
-            if (Core.Common.StoreDataLocal)
-            {
-               return Path.Combine(Constants.ProductLocation, "AstroGrep.search.config");
-            }
-            else
-            {
-               string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.ProductName);
-
-               return Path.Combine(path, "AstroGrep.search.config");
-            }
+            return Path.Combine(Constants.DataDirectory, "AstroGrep.search.config");
          }
       }
 
@@ -194,6 +188,15 @@ namespace AstroGrep.Core
       {
          get { return MySettings.filterItems; }
          set { MySettings.filterItems = value; }
+      }
+
+      /// <summary>
+      /// Show all results after a search.
+      /// </summary>
+      static public bool ShowAllResultsAfterSearch
+      {
+         get { return MySettings.showAllResultsAfterSearch; }
+         set { MySettings.showAllResultsAfterSearch = value; }
       }
 
       #region Deprecated Properties

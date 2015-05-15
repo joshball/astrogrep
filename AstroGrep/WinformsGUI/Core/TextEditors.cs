@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
+using AstroGrep.Core.Logging;
 using AstroGrep.Windows;
 
 namespace AstroGrep.Core
@@ -37,6 +38,7 @@ namespace AstroGrep.Core
    public class TextEditors
    {
       private static TextEditor[] __TextEditors;
+      private const string DELIMETER = "|;;|";
 
       /// <summary>
       /// Edit a file that the user has double clicked on
@@ -52,6 +54,8 @@ namespace AstroGrep.Core
       /// [Curtis_Beard]	   07/20/2006	CHG: Run the text editor associated with the file's extension
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
       /// [Curtis_Beard]      09/28/2012  CHG: 3553474, support multiple file types per editor
+      /// [Curtis_Beard]		04/07/2015	CHG: check for a valid line text before using
+      /// [Curtis_Beard]	   04/08/2015	CHG: add logging
       /// </history>
       public static void EditFile(string path, int line, int column, string lineText)
       {
@@ -116,7 +120,7 @@ namespace AstroGrep.Core
                else
                {
                   // adjust column if tab size is set
-                  if (editorToUse.TabSize > 0 && column > 0)
+                  if (editorToUse.TabSize > 0 && column > 0 && !string.IsNullOrEmpty(lineText))
                   {
                      // count how many tabs before found hit column index
                      int count = 0;
@@ -137,6 +141,8 @@ namespace AstroGrep.Core
          }
          catch (Exception ex)
          {
+            LogClient.Instance.Logger.Error("Unable to open text editor for file {0} at line {1}, column {2}, with text {3} and message {4}", path, line, column, lineText, ex.Message);
+
             MessageBox.Show(String.Format(Language.GetGenericText("TextEditorsErrorGeneric"), path, ex.Message),
                   Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
          }
@@ -156,7 +162,7 @@ namespace AstroGrep.Core
          if (editorsString.Length > 0)
          {
             //parse string for each editor
-            string[] editors = Core.Common.SplitByString(editorsString, Constants.TEXT_EDITOR_SEPARATOR);
+            string[] editors = Core.Common.SplitByString(editorsString, DELIMETER);
             if (editors.Length > 0)
             {
                __TextEditors = new TextEditor[editors.Length];
@@ -208,7 +214,7 @@ namespace AstroGrep.Core
             {
                if (builder.Length > 0)
                {
-                  builder.Append(Constants.TEXT_EDITOR_SEPARATOR);
+                  builder.Append(DELIMETER);
                }
 
                builder.Append(editor.ToString());
@@ -251,6 +257,7 @@ namespace AstroGrep.Core
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
       /// [Curtis_Beard]	   08/13/2014	ADD: 80, add ability to open default app when no editor is specified
       /// [Curtis_Beard]		03/06/2015	FIX: 65, check editor for using quotes around file name, cleanup
+      /// [Curtis_Beard]	   04/08/2015	CHG: add logging
       /// </history>
       private static void OpenEditor(TextEditor textEditor, string path, int line, int column)
       {
@@ -286,6 +293,8 @@ namespace AstroGrep.Core
          }
          catch (Exception ex)
          {
+            LogClient.Instance.Logger.Error("Unable to open text editor for editor {0}, file {1} at line {2}, column {3}, with message {4}", textEditor.ToString(), path, line, column, ex.Message);
+
             MessageBox.Show(String.Format(Language.GetGenericText("TextEditorsErrorGeneric"), path, ex.Message),
                Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
          }

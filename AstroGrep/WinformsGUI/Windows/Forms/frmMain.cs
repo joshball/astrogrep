@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.IO;
 
 using AstroGrep.Core;
+using AstroGrep.Core.Logging;
 using AstroGrep.Output;
 using AstroGrep.Windows.Controls;
 using libAstroGrep;
@@ -43,16 +45,14 @@ namespace AstroGrep.Windows.Forms
    /// [Curtis_Beard]       10/15/2005	CHG: Replace search procedures
    /// [Andrew_Radford]     17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
    /// [Curtis_Beard]	    03/07/2012	ADD: 3131609, exclusions
-   /// [Curtis_Beard]		09/26/2012	CHG: 3572487, move command line logic to program.cs and use property for value
+   /// [Curtis_Beard]       09/26/2012	CHG: 3572487, move command line logic to program.cs and use property for value
    /// </history>
    public partial class frmMain : Form
    {
       #region Declarations
 
-      private bool __OptionsShow = true;
       private int __SortColumn = -1;
       private Grep __Grep = null;
-      private string __SearchOptionsText = "Search Options {0}";
       private int __FileListHeight = Core.GeneralSettings.DEFAULT_FILE_PANEL_HEIGHT;
       private readonly List<LogItem> LogItems = new List<LogItem>();
       private List<FilterItem> __FilterItems = new List<FilterItem>();
@@ -64,7 +64,7 @@ namespace AstroGrep.Windows.Forms
 
       #region Delegate Declarations
 
-      private delegate void UpdateHitCountCallBack(HitObject hit);
+      private delegate void UpdateHitCountCallBack(MatchResult match);
       private delegate void SetSearchStateCallBack(bool enable);
       private delegate void UpdateStatusMessageCallBack(string message);
       private delegate void UpdateStatusCountCallBack(int count);
@@ -74,6 +74,7 @@ namespace AstroGrep.Windows.Forms
       private delegate void DisplaySearchMessagesCallBack(LogItem.LogItemTypes? displayType);
       private delegate void DisplayExclusionErrorMessagesCallBack();
       private delegate void RestoreTaskBarProgressCallBack();
+      private delegate void ShowAllResultsCallBack();
 
       #endregion
 
@@ -98,7 +99,8 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      02/09/2012	FIX: 3486074, set modification date end to max value
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
       /// [Curtis_Beard]	   09/18/2013	ADD: 58, add drag/drop support for path
-      /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
+      /// [Curtis_Beard]	   05/06/2015	CHG: remove events no longer used
+      /// [Curtis_Beard]	   05/14/2015	CHG: move event handlers to designer partial class
       /// </history>
       public frmMain()
       {
@@ -109,47 +111,9 @@ namespace AstroGrep.Windows.Forms
 
          API.ListViewExtensions.SetTheme(lstFileNames);
 
-         // Attach event handlers
-         Resize += frmMain_Resize;
-         Closed += frmMain_Closed;
-         pnlMainSearch.Paint += pnlMainSearch_Paint;
-         pnlSearch.SizeChanged += pnlSearch_SizeChanged;
-         PanelOptionsContainer.Paint += PanelOptionsContainer_Paint;
-         splitLeftRight.Paint += splitLeftRight_Paint;
-         splitUpDown.Paint += splitUpDown_Paint;
-         mnuFile.Select += mnuFile_Select;
-         mnuEdit.Select += mnuEdit_Select;
-         mnuView.Select += mnuView_Select;
-         cboFilePath.DropDown += cboFilePath_DropDown;
-         cboFilePath.DragDrop += cboFilePath_DragDrop;
-         cboFilePath.DragEnter += cboFilePath_DragEnter;
-         cboFilePath.AllowDrop = true;
-         cboFileName.DropDown += cboFileName_DropDown;
-         cboSearchForText.DropDown += cboSearchForText_DropDown;
-         chkNegation.CheckedChanged += chkNegation_CheckedChanged;
-         chkFileNamesOnly.CheckedChanged += chkFileNamesOnly_CheckedChanged;
-         txtHits.MouseDown += txtHits_MouseDown;
-         txtHits.Enter += txtHits_Enter;
-         txtHits.Leave += txtHits_Leave;
-         txtHits.KeyDown += txtHits_KeyDown;
-         lstFileNames.Enter += lstFileNames_Enter;
-         lstFileNames.Leave += lstFileNames_Leave;
-         lstFileNames.MouseDown += lstFileNames_MouseDown;
-         lstFileNames.ColumnClick += lstFileNames_ColumnClick;
-         lstFileNames.ItemDrag += lstFileNames_ItemDrag;
-         //sbStatusPanel.DoubleClick += new EventHandler(sbStatusPanel_DoubleClick);
-         sbErrorCountPanel.DoubleClick += new EventHandler(sbErrorCountPanel_DoubleClick);
-         sbFilterCountPanel.DoubleClick += new EventHandler(sbFilterCountPanel_DoubleClick);
-
-         // ugly hack for now to fix Medium text DPI issues 
-         using (var graphics = this.CreateGraphics())
-         {
-            if (API.GetCurrentDPIFontScalingSize(graphics) == API.DPIFontScalingSizes.Medium)
-            {
-               btnCancel.Height += 3;
-               PanelOptionsContainer.Size = new Size(201, PanelOptionsContainer.Size.Height);
-            }
-         }
+         // enlarge font without changing font family
+         lblSearchHeading.Font = new Font(lblSearchHeading.Font.FontFamily, 12F);
+         lblSearchOptions.Font = new Font(lblSearchOptions.Font.FontFamily, 12F);
       }
 
       #region Form Events
@@ -177,18 +141,10 @@ namespace AstroGrep.Windows.Forms
       {
          // set defaults
          txtContextLines.Maximum = Constants.MAX_CONTEXT_LINES;
-         lnkSearchOptions.Text = __SearchOptionsText;
 
          // Load language
          //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
          Language.ProcessForm(this, this.toolTip1);
-
-         // set member to hold language specified text
-         __SearchOptionsText = lnkSearchOptions.Text;
-
-         // Hide the Search Options
-         __OptionsShow = !Core.GeneralSettings.ShowSearchOptions;
-         ShowSearchOptions();
 
          // Load the general settings
          Legacy.ConvertGeneralSettings();
@@ -209,7 +165,7 @@ namespace AstroGrep.Windows.Forms
          Legacy.DeleteRegistry();
 
          // Load plugins
-         Core.PluginManager.Load();
+         PluginManager.Load();
 
          // set view state of controls
          LoadViewStates();
@@ -222,20 +178,6 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// Handles form resize event.
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]		07/21/2006	Created
-      /// </history>
-      private void frmMain_Resize(object sender, EventArgs e)
-      {
-         splitLeftRight.Invalidate();
-         splitUpDown.Invalidate();
-      }
-
-      /// <summary>
       /// Closed Event - Save settings and exit
       /// </summary>
       /// <param name="sender">System parm</param>
@@ -245,6 +187,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   10/11/2006	CHG: Use common function to remove Browse..., call SaveSettings
       /// [Curtis_Beard]	   11/22/2006	CHG: Remove use of browse in combobox
       /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
+      /// [Curtis_Beard]	   05/15/2015	CHG: add exiting log entry
       /// </history>
       private void frmMain_Closed(object sender, EventArgs e)
       {
@@ -254,6 +197,13 @@ namespace AstroGrep.Windows.Forms
          {
             SaveSearchSettings();
          }
+
+         if (textElementHost != null)
+         {
+            textElementHost.Dispose();
+         }
+
+         LogClient.Instance.Logger.Info("### AstroGrep Exiting ###");
 
          Application.Exit();
       }
@@ -266,6 +216,8 @@ namespace AstroGrep.Windows.Forms
       /// <returns>true if processed, false otherwise</returns>
       /// <history>
       /// [Curtis_Beard]	   10/27/2014	CHG: 87, set focus to search text field for ctrl-f
+      /// [Curtis_Beard]	   05/11/2015	CHG: zoom for TextEditor control
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem and handle zooming key commands
       /// </history>
       protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
       {
@@ -274,46 +226,28 @@ namespace AstroGrep.Windows.Forms
             cboSearchForText.Focus();
             return true;
          }
+         else if (keyData == (Keys.Control | Keys.Add))
+         {
+            ZoomInMenuItem_Click(null, null);
+            return true;
+         }
+         else if (keyData == (Keys.Control | Keys.Subtract))
+         {
+            ZoomOutMenuItem_Click(null, null);
+            return true;
+         }
+         else if (keyData == (Keys.Control | Keys.Divide))
+         {
+            ZoomRestoreMenuItem_Click(null, null);
+            return true;
+         }
 
          return base.ProcessCmdKey(ref msg, keyData);
       }
       #endregion
 
       #region Control Events
-      /// <summary>
-      /// Paint the border for the panel.
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]      11/02/2006  Created
-      /// </history>
-      private void pnlMainSearch_Paint(object sender, PaintEventArgs e)
-      {
-         Rectangle rect = pnlMainSearch.ClientRectangle;
-         rect.Width -= 1;
-         rect.Height -= 1;
-
-         e.Graphics.DrawRectangle(new Pen(SystemColors.ActiveCaption), rect);
-      }
-
-      /// <summary>
-      /// Paint the border for the panel
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]      11/02/2006  Created
-      /// </history>
-      private void PanelOptionsContainer_Paint(object sender, PaintEventArgs e)
-      {
-         Rectangle rect = PanelOptionsContainer.ClientRectangle;
-         rect.Width -= 1;
-         rect.Height -= 1;
-
-         e.Graphics.DrawRectangle(new Pen(SystemColors.ActiveCaption), rect);
-      }
-
+      
       /// <summary>
       /// Resize the comboboxes when the main search panel is resized.
       /// </summary>
@@ -347,86 +281,38 @@ namespace AstroGrep.Windows.Forms
          cboSearchForText.DropDownStyle = ComboBoxStyle.Simple;
          cboSearchForText.DropDownStyle = ComboBoxStyle.DropDown;
          cboSearchForText.Text = temp;
-
-         pnlMainSearch.Invalidate();
-         PanelOptionsContainer.Invalidate();
       }
 
       /// <summary>
-      /// Handles drawing a splitter gripper on the control.
+      /// Handles drawing bottom border line.
       /// </summary>
       /// <param name="sender">system parameter</param>
       /// <param name="e">system parameter</param>
       /// <history>
-      /// [Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]	   05/06/2015	Created
       /// </history>
-      private void splitLeftRight_Paint(object sender, PaintEventArgs e)
+      private void lblSearchOptions_Paint(object sender, PaintEventArgs e)
       {
-         const int RECT_SIZE = 2;
-         const int MAX = 9;
+         var rect = lblSearchOptions.ClientRectangle;
+         rect.Height -= 1;
 
-         Graphics g = e.Graphics;
-         int x1 = Convert.ToInt32(splitLeftRight.Width / 2) - 1;
-         int x2 = x1 + 1;
-         int y1 = Convert.ToInt32(((splitLeftRight.Height - (MAX * 2 * RECT_SIZE)) / 2) + 1);
-         int y2 = y1 + 1;
-         int index = 0;
-
-         do
-         {
-            g.FillRectangle(SystemBrushes.ControlLightLight, new Rectangle(x2, y2, RECT_SIZE, RECT_SIZE));
-            g.FillRectangle(SystemBrushes.ControlDark, new Rectangle(x1, y1, RECT_SIZE, RECT_SIZE));
-
-            y1 = y1 + (2 * RECT_SIZE);
-            y2 = y1 + 1;
-
-            index += 1;
-         } while (index < MAX);
+         e.Graphics.DrawLine(new Pen(Common.ASTROGREP_ORANGE) { Width = 2 }, rect.X, rect.Height, rect.Width, rect.Height);
       }
 
       /// <summary>
-      /// Handles drawing a splitter gripper on the control.
+      /// Handles drawing bottom border line.
       /// </summary>
       /// <param name="sender">system parameter</param>
       /// <param name="e">system parameter</param>
       /// <history>
-      /// [Curtis_Beard]		07/21/2006	Created
+      /// [Curtis_Beard]	   05/06/2015	Created
       /// </history>
-      private void splitUpDown_Paint(object sender, PaintEventArgs e)
+      private void lblSearchHeading_Paint(object sender, PaintEventArgs e)
       {
-         const int RECT_SIZE = 2;
-         const int MAX = 9;
+         var rect = lblSearchHeading.ClientRectangle;
+         rect.Height -= 1;
 
-         Graphics g = e.Graphics;
-         int x1 = Convert.ToInt32(((splitUpDown.Width - (MAX * 2 * RECT_SIZE)) / 2) + 1);
-         int x2 = x1 + 1;
-         int y1 = Convert.ToInt32(splitUpDown.Height / 2) - 1;
-         int y2 = y1 + 1;
-         int index = 0;
-
-         do
-         {
-            g.FillRectangle(SystemBrushes.ControlLightLight, new Rectangle(x2, y2, RECT_SIZE, RECT_SIZE));
-            g.FillRectangle(SystemBrushes.ControlDark, new Rectangle(x1, y1, RECT_SIZE, RECT_SIZE));
-
-            x1 = x1 + (2 * RECT_SIZE);
-            x2 = x1 + 1;
-
-            index += 1;
-         } while (index < MAX);
-      }
-
-      /// <summary>
-      /// Hide/Show the Search Options
-      /// </summary>
-      /// <param name="sender">System parm</param>
-      /// <param name="e">System parm</param>
-      /// <history>
-      /// [Curtis_Beard]	   02/04/2005	Created
-      /// </history>
-      private void lnkSearchOptions_LinkClicked(object sender, System.Windows.Forms.LinkLabelLinkClickedEventArgs e)
-      {
-         ShowSearchOptions();
+         e.Graphics.DrawLine(new Pen(Common.ASTROGREP_ORANGE) { Width = 2 }, rect.X, rect.Height, rect.Width, rect.Height);
       }
 
       /// <summary>
@@ -514,13 +400,11 @@ namespace AstroGrep.Windows.Forms
       {
          if (chkFileNamesOnly.Checked)
          {
-            chkLineNumbers.Enabled = false;
             txtContextLines.Enabled = false;
             lblContextLines.Enabled = false;
          }
          else
          {
-            chkLineNumbers.Enabled = true;
             txtContextLines.Enabled = true;
             lblContextLines.Enabled = true;
          }
@@ -576,134 +460,6 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// txtHits Mouse Down Event - Used to detect a double click
-      /// </summary>
-      /// <param name="sender">System parm</param>
-      /// <param name="e">System parm</param>
-      /// <history>
-      /// [Theodore_Ward]     ??/??/????  Initial
-      /// [Curtis_Beard]	   01/11/2005	.Net Conversion/Replaced with mouse down
-      /// [Curtis_Beard]	   12/07/2005	CHG: Use column constant
-      /// [Curtis_Beard]	   07/03/2006	FIX: 1516777, stop right click to open text editor
-      /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
-      /// </history>
-      private void txtHits_MouseDown(object sender, MouseEventArgs e)
-      {
-         if (e.Button == MouseButtons.Left && e.Clicks == 2)
-         {
-            int lineNumber;
-            int hitLineNumber;
-            int hitColumn;
-            string hitLine = string.Empty;
-
-            // Make sure there is something to click on.
-            if (lstFileNames.SelectedItems.Count == 0)
-               return;
-
-            // retrieve the hit object
-            HitObject hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-
-            // Find out the line number the cursor is on.
-            lineNumber = txtHits.GetLineFromCharIndex(txtHits.SelectionStart);
-            int orgLineNumber = lineNumber;
-
-            // might need to adjust line number when using word wrap
-            /*if (txtHits.WordWrap)
-            {
-               int wrappedCount = 0;
-
-               System.Diagnostics.Debug.WriteLine(string.Format("Starting line number: {0}", lineNumber));
-
-               for (int i = lineNumber; i >= 0; i--)
-               {
-                  int charIndex = txtHits.GetFirstCharIndexFromLine(i);
-                  Point pos = txtHits.GetPositionFromCharIndex(charIndex);
-                  char firstChar = txtHits.GetCharFromPosition(pos);
-                  char secondChar = txtHits.GetCharFromPosition(txtHits.GetPositionFromCharIndex(charIndex + 1));
-                  
-                  string line = hit.RetrieveLine(i);
-                  char lineFirstChar = (!string.IsNullOrEmpty(line) && line.Length > 0) ? line[0] : Char.Parse(" ");
-                  char lineSecondChar = (!string.IsNullOrEmpty(line) && line.Length > 0 && line.Length > 1) ? line[1] : Char.Parse(" ");
-
-                  System.Diagnostics.Debug.WriteLine(string.Format("Character 1:{0}, character 2:{1} at line {2}.  Hit Character 1:{3}, hit character 2:{4}", 
-                     firstChar, secondChar, i, lineFirstChar, lineSecondChar));
-
-                  //if (firstChar != '\n' && firstChar != lineFirstChar)
-                  if (firstChar != '\n' && (firstChar != lineFirstChar || (firstChar == lineFirstChar && secondChar != lineSecondChar)))
-                  {
-                     wrappedCount++;
-                  }
-               }
-
-               lineNumber = lineNumber - wrappedCount;
-               System.Diagnostics.Debug.WriteLine(string.Format("Current line number: {0}, wrapped count: {1}", lineNumber, wrappedCount));
-            }
-
-            // safety check
-            if (lineNumber < 0)
-            {
-               lineNumber = orgLineNumber;
-            }*/
-
-            // Use the cursor's linenumber to get the hit's line number.
-            hitLineNumber = hit.RetrieveLineNumber(lineNumber);
-
-            hitColumn = hit.RetrieveColumn(lineNumber);
-
-            // might need 
-            hitLine = hit.RetrieveLine(lineNumber);
-
-            // Retrieve the filename
-            string path = hit.FilePath;
-
-            // Open the default editor.
-            TextEditors.EditFile(path, hitLineNumber, hitColumn, hitLine);
-         }
-      }
-
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]		03/20/2014	CHG: 73, enter key opens editor of file list
-      /// </history>
-      private void txtHits_KeyDown(object sender, KeyEventArgs e)
-      {
-         if (e.KeyCode == Keys.Enter)
-         {
-            e.SuppressKeyPress = true;
-         }
-      }
-
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]		03/20/2014	CHG: 73, enter key opens editor of file list
-      /// </history>
-      private void txtHits_Leave(object sender, EventArgs e)
-      {
-         AcceptButton = btnSearch;
-      }
-
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]		03/20/2014	CHG: 73, enter key opens editor of file list
-      /// </history>
-      private void txtHits_Enter(object sender, EventArgs e)
-      {
-         AcceptButton = null;
-      }
-
-      /// <summary>
       /// File Name List Double Click Event
       /// </summary>
       /// <param name="sender">System parm</param>
@@ -726,14 +482,17 @@ namespace AstroGrep.Windows.Forms
                return;
 
             // retrieve the hit object
-            HitObject hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+            MatchResult hit = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
 
             // Retrieve the filename
-            string path = hit.FilePath;
+            string path = hit.File.FullName;
 
             // open the default editor at first hit
-            int index = hit.RetrieveFirstHitIndex();
-            TextEditors.EditFile(path, hit.RetrieveLineNumber(index), hit.RetrieveColumn(index), hit.RetrieveLine(index));
+            var matchLine = hit.GetFirstMatch();
+            if (matchLine != null)
+            {
+               TextEditors.EditFile(path, matchLine.LineNumber, matchLine.ColumnNumber, matchLine.Line);
+            }
          }
       }
 
@@ -754,20 +513,19 @@ namespace AstroGrep.Windows.Forms
       {
          if (lstFileNames.SelectedItems.Count == 1)
          {
-            // set to hand cursor so users get a hint that they can double click
-            if (txtHits.Cursor != Cursors.Hand)
-            {
-               txtHits.Cursor = Cursors.Hand;
-            }
-
             // retrieve hit object
-            HitObject hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+            MatchResult match = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
 
-            SetStatusBarEncoding(hit.DetectedEncoding.EncodingName);
+            SetStatusBarEncoding(match.DetectedEncoding != null ? match.DetectedEncoding.EncodingName : string.Empty);
 
-            HighlightText(hit);
-
-            hit = null;
+            if (EntireFileMenuItem.Checked)
+            {
+               ProcessFileForDisplay(match);
+            }
+            else
+            {
+               ProcessMatchForDisplay(match);
+            }
          }
 
          if (lstFileNames.SelectedItems.Count == 0)
@@ -1013,6 +771,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   11/22/2006	CHG: Remove use of browse in combobox
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
       /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
+      /// [Curtis_Beard]	   04/08/2015	CHG: 20/81, load word wrap and entire file options
       /// </history>
       private void LoadSettings()
       {
@@ -1049,10 +808,21 @@ namespace AstroGrep.Windows.Forms
          }
 
          // Results Window
-         txtHits.ForeColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-         txtHits.BackColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
-         txtHits.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
-         txtHits.WordWrap = Core.GeneralSettings.ResultsWordWrap;
+         var foreground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsForeColor);
+         var background = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsBackColor);
+         var contextForeground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsContextForeColor);
+         var font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
+         txtHits.Foreground = foreground;
+         txtHits.Background = background;
+         txtHits.LineNumbersForeground = contextForeground;
+         txtHits.LineNumbersMatchForeground = foreground;
+         txtHits.FontFamily = new System.Windows.Media.FontFamily(font.FontFamily.Name);
+         txtHits.FontSize = font.SizeInPoints * 96 / 72;
+         txtHits.WordWrap = WordWrapMenuItem.Checked = Core.GeneralSettings.ResultsWordWrap;
+
+         // Viewing options
+         RemoveWhiteSpaceMenuItem.Checked = Core.GeneralSettings.RemoveLeadingWhiteSpace;
+         EntireFileMenuItem.Checked = Core.GeneralSettings.ShowEntireFile;
 
          // File list columns
          lstFileNames.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.FilePanelFont);
@@ -1070,6 +840,8 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   06/28/2007	Created
       /// [Curtis_Beard]	   03/02/2015	FIX: 63, fix issue when window doesn't fit on a screen (like when a screen is removed)
+      /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
+      /// [Curtis_Beard]	   05/14/2015	CHG: adjust display of MenuStrip in Windows XP
       /// </history>
       private void LoadWindowSettings()
       {
@@ -1105,6 +877,29 @@ namespace AstroGrep.Windows.Forms
             pnlSearch.Width = Core.GeneralSettings.WindowSearchPanelWidth;
          if (Core.GeneralSettings.WindowFilePanelHeight != -1)
             this.lstFileNames.Height = Core.GeneralSettings.WindowFilePanelHeight;
+
+         // ugly hack for now to fix Medium text DPI issues 
+         using (var graphics = this.CreateGraphics())
+         {
+            if (API.GetCurrentDPIFontScalingSize(graphics) == API.DPIFontScalingSizes.Medium)
+            {
+               LogClient.Instance.Logger.Info("Adjusting display for font scaling mode medium.");
+               btnCancel.Height += 3;// fixes issue where cancel button isn't same height as search
+               
+               // fixes issue with cutoff text in search panel area, making it bigger
+               splitLeftRight.MinSize = Constants.DEFAULT_SEARCH_PANEL_WIDTH_MEDIUM_FONT;
+               if (pnlSearch.Width < Constants.DEFAULT_SEARCH_PANEL_WIDTH_MEDIUM_FONT)
+               {
+                  pnlSearch.Width = Constants.DEFAULT_SEARCH_PANEL_WIDTH_MEDIUM_FONT;
+               }
+            }
+         }
+
+         // for windows xp and below, use the system render mode to make it look better
+         if (!API.IsWindowsVistaOrLater)
+         {
+            MainMenu.RenderMode = ToolStripRenderMode.System;
+         }
       }
 
       /// <summary>
@@ -1114,6 +909,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   10/11/2006	Created
       /// [Curtis_Beard]	   01/31/2012	ADD: save size column width
       /// [Curtis_Beard]		10/27/2014	CHG: 88, add file extension column
+      /// [Curtis_Beard]	   04/08/2015	CHG: 20/81, save word wrap and entire file options
       /// </history>
       private void SaveSettings()
       {
@@ -1135,6 +931,11 @@ namespace AstroGrep.Windows.Forms
          Core.GeneralSettings.SearchStarts = Convertors.GetComboBoxEntriesAsString(cboFilePath);
          Core.GeneralSettings.SearchFilters = Convertors.GetComboBoxEntriesAsString(cboFileName);
          Core.GeneralSettings.SearchTexts = Convertors.GetComboBoxEntriesAsString(cboSearchForText);
+
+         //save view options
+         Core.GeneralSettings.ResultsWordWrap = WordWrapMenuItem.Checked;
+         Core.GeneralSettings.RemoveLeadingWhiteSpace = RemoveWhiteSpaceMenuItem.Checked;
+         Core.GeneralSettings.ShowEntireFile = EntireFileMenuItem.Checked;
 
          Core.GeneralSettings.Save();
       }
@@ -1206,17 +1007,19 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// [Curtis_Beard]	   02/04/2014	FIX: use NumericUpDown's Value property instead of text
+      /// [Curtis_Beard]	   04/08/2015	CHG: 54, show all results option
       /// </history>
       private void LoadSearchSettings()
       {
          chkRegularExpressions.Checked = Core.SearchSettings.UseRegularExpressions;
          chkCaseSensitive.Checked = Core.SearchSettings.UseCaseSensitivity;
          chkWholeWordOnly.Checked = Core.SearchSettings.UseWholeWordMatching;
-         chkLineNumbers.Checked = Core.SearchSettings.IncludeLineNumbers;
+         LineNumbersMenuItem.Checked = txtHits.ShowLineNumbers = Core.SearchSettings.IncludeLineNumbers;
          chkRecurse.Checked = Core.SearchSettings.UseRecursion;
          chkFileNamesOnly.Checked = Core.SearchSettings.ReturnOnlyFileNames;
          txtContextLines.Value = Core.SearchSettings.ContextLines;
          chkNegation.Checked = Core.SearchSettings.UseNegation;
+         chkAllResultsAfterSearch.Checked = Core.SearchSettings.ShowAllResultsAfterSearch;
          __FilterItems = FilterItem.ConvertStringToFilterItems(Core.SearchSettings.FilterItems);
       }
 
@@ -1230,65 +1033,22 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      02/09/2012  ADD: 3424156, size drop down selection
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// [Curtis_Beard]	   02/04/2014	FIX: use NumericUpDown's Value property instead of text
+      /// [Curtis_Beard]	   04/08/2015	CHG: 54, save show all results option
       /// </history>
       private void SaveSearchSettings()
       {
          Core.SearchSettings.UseRegularExpressions = chkRegularExpressions.Checked;
          Core.SearchSettings.UseCaseSensitivity = chkCaseSensitive.Checked;
          Core.SearchSettings.UseWholeWordMatching = chkWholeWordOnly.Checked;
-         Core.SearchSettings.IncludeLineNumbers = chkLineNumbers.Checked;
+         Core.SearchSettings.IncludeLineNumbers = LineNumbersMenuItem.Checked;
          Core.SearchSettings.UseRecursion = chkRecurse.Checked;
          Core.SearchSettings.ReturnOnlyFileNames = chkFileNamesOnly.Checked;
          Core.SearchSettings.ContextLines = Convert.ToInt32(txtContextLines.Value);
          Core.SearchSettings.UseNegation = chkNegation.Checked;
+         Core.SearchSettings.ShowAllResultsAfterSearch = chkAllResultsAfterSearch.Checked;
          Core.SearchSettings.FilterItems = FilterItem.ConvertFilterItemsToString(__FilterItems);
 
          Core.SearchSettings.Save();
-      }
-
-      /// <summary>
-      /// Show/Hide the Search Options Panel
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]	   02/05/2005	Created
-      /// [Curtis_Beard]	   02/24/2012	CHG: 3489693, save state of search options
-      /// </history>
-      private void ShowSearchOptions()
-      {
-         if (__OptionsShow)
-         {
-            // hide and set text
-            lnkSearchOptions.Text = String.Format(__SearchOptionsText, ">>");
-            lnkSearchOptions.LinkBehavior = LinkBehavior.AlwaysUnderline;
-            lnkSearchOptions.BackColor = SystemColors.Window;
-            lnkSearchOptions.LinkColor = SystemColors.HotTrack;
-            lnkSearchOptions.ActiveLinkColor = SystemColors.HotTrack;            
-
-            pnlSearchOptions.BackColor = SystemColors.Window;
-            pnlSearchOptions.BorderStyle = BorderStyle.None;
-            PanelOptionsContainer.Visible = false;
-            pnlSearch.AutoScroll = false;
-
-            __OptionsShow = false;
-         }
-         else
-         {
-            // set text
-            lnkSearchOptions.Text = String.Format(__SearchOptionsText, "<<");
-            lnkSearchOptions.LinkBehavior = LinkBehavior.NeverUnderline;
-            lnkSearchOptions.BackColor = SystemColors.ActiveCaption;
-            lnkSearchOptions.LinkColor = SystemColors.ActiveCaptionText;
-            lnkSearchOptions.ActiveLinkColor = SystemColors.ActiveCaptionText;            
-
-            pnlSearchOptions.BackColor = SystemColors.Window;
-            PanelOptionsContainer.Visible = true;
-            pnlSearch.AutoScroll = true;
-            pnlSearchOptions.BringToFront();
-
-            __OptionsShow = true;
-         }
-
-         Core.GeneralSettings.ShowSearchOptions = __OptionsShow;
       }
 
       /// <summary>
@@ -1446,7 +1206,7 @@ namespace AstroGrep.Windows.Forms
       /// <summary>
       /// Highlight the searched text in the results
       /// </summary>
-      /// <param name="hit">Hit Object containing results</param>
+      /// <param name="match">MatchResult containing results</param>
       /// <history>
       /// [Curtis_Beard]	   01/27/2005	Created
       /// [Curtis_Beard]	   04/12/2005	FIX: 1180741, Don't capitalize hit line
@@ -1456,259 +1216,221 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard] 	   09/28/2006	FIX: use grep object for settings instead of gui items
       /// [Ed_Jakubowski]	   05/20/2009   CHG: Skip highlight if hitCount = 0
       /// [Curtis_Beard]	   01/24/2012	CHG: allow back color use again since using .Net v2+
-      /// [Curtis_Beard]       10/27/2014	CHG: 85, remove leading white space, add newline for display, fix windows sounds for empty text
-      /// [Curtis_Beard]       11/26/2014	FIX: don't highlight found text that is part of the spacer text
-      /// [Curtis_Beard]       02/24/2015	CHG: remove hit line restriction until proper fix for long loading
-      /// [Curtis_Beard]       03/04/2015	CHG: move standard code to function to cleanup this function.
-      /// [Curtis_Beard]       03/05/2015	FIX: 64/35, clear text field before anything to not have left over content.
-      /// </history>
-      private void HighlightText(HitObject hit)
-      {
-         // Clear and reset
-         txtHits.Text = string.Empty;
-         txtHits.ForeColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-         txtHits.BackColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
-         txtHits.SelectionFont = txtHits.Font;
-
-         if (hit.HitCount == 0)
-            return;
-
-         if (__Grep.SearchSpec.UseRegularExpressions)
-         {
-            HighlightTextRegEx(hit);
-         }
-         else
-         {
-            HighlightTextStandard(hit);
-         }
-
-         // adjust line length based on WordWrap selection
-         if (txtHits.WordWrap && txtHits.RightMargin != 0)
-         {
-            // reset right margin to allow wrapping
-            txtHits.RightMargin = 0;
-         }
-         else if (!txtHits.WordWrap)
-         {
-            // check for really long lines
-            var width = TextRenderer.MeasureText(txtHits.Text, txtHits.Font).Width;
-            if (width > 20000)
-            {
-               txtHits.RightMargin = width;
-            }
-         }
-      }
-
-      /// <summary>
-      /// Highlight the searched text in the results when not using regular expressions.
-      /// </summary>
-      /// <param name="hit">Hit Object containing results</param>
-      /// <history>
-      /// [Curtis_Beard]       03/04/2015	CHG: move standard code to function to cleanup top level function.
-      /// [Curtis_Beard]       03/04/2015	FIX: make empty check to stop potential for windows sound
-      /// </history>
-      private void HighlightTextStandard(HitObject hit)
-      {
-         // Loop through hits and highlight search for text
-         string _searchText = __Grep.SearchSpec.SearchText;
-         string _tempLine = string.Empty;
-         int maxLines = hit.LineCount;
-
-         // Set default font
-         txtHits.SelectionFont = txtHits.Font;
-
-         for (int i = 0; i < maxLines; i++)
-         {
-            // Retrieve hit text
-            string _textToSearch = hit.RetrieveLine(i);
-            string spacerText = hit.RetrieveSpacerText(i);
-
-            if (GeneralSettings.RemoveLeadingWhiteSpace)
-            {
-               _textToSearch = _textToSearch.TrimStart();
-            }
-
-            _textToSearch = string.Format("{0}{1}", spacerText, _textToSearch);
-
-            _tempLine = _textToSearch;
-
-            // attempt to locate the text in the line
-            int _pos = _tempLine.IndexOf(_searchText, spacerText.Length, __Grep.SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
-
-            if (_pos > -1)
-            {
-               do
-               {
-                  //
-                  // retrieve parts of text
-                  string _begin = _tempLine.Substring(0, _pos);
-                  string _text = _tempLine.Substring(_pos, _searchText.Length);
-                  string _end = _tempLine.Substring(_pos + _searchText.Length);
-
-                  // set default color for starting text
-                  txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-                  txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-                  if (!string.IsNullOrEmpty(_begin))
-                  {
-                     txtHits.SelectedText = _begin;
-                  }
-
-                  // do a check to see if begin and end are valid for wholeword searches
-                  bool _highlight = true;
-                  if (__Grep.SearchSpec.UseWholeWordMatching)
-                  {
-                     _highlight = Grep.WholeWordOnly(_begin, _end);
-                  }
-
-                  // set highlight color for searched text
-                  if (_highlight)
-                  {
-                     txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-                     txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
-                  }
-                  txtHits.SelectedText = _text;
-
-                  // Check remaining string for other hits in same line
-                  _pos = _end.IndexOf(_searchText, __Grep.SearchSpec.UseCaseSensitivity ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
-
-                  // set default color for end, if no more hits in line
-                  _tempLine = _end;
-                  if (_pos < 0)
-                  {
-                     txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-                     txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-                     if (!string.IsNullOrEmpty(_end))
-                     {
-                        txtHits.SelectedText = _end;
-                     }
-                  }
-
-               } while (_pos > -1);
-            }
-            else
-            {
-               // set default color, no search text found
-               txtHits.SelectionColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsForeColor);
-               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-               if (!string.IsNullOrEmpty(_textToSearch))
-               {
-                  txtHits.SelectedText = _textToSearch;
-               }
-            }
-
-            txtHits.SelectedText = Environment.NewLine;
-         }
-      }
-
-      /// <summary>
-      /// Highlight the searched text in the results when using regular expressions
-      /// </summary>
-      /// <param name="hit">Hit Object containing results</param>
-      /// <history>
-      /// [Curtis_Beard]	   04/21/2006	Created
-      /// [Curtis_Beard]	   05/11/2006	FIX: Include context lines if present and prevent system beep
-      /// [Curtis_Beard]	   07/07/2006	FIX: 1512029, highlight whole word and case sensitive matches
-      /// [Curtis_Beard] 	   09/28/2006	FIX: use grep object for settings instead of gui items, remove searchText parameter
-      /// [Curtis_Beard]	   05/18/2006	FIX: 1723815, use correct whole word matching regex
-      /// [Curtis_Beard]		01/24/2012	CHG: allow back color use again since using .Net v2+
       /// [Curtis_Beard]      10/27/2014	CHG: 85, remove leading white space, add newline for display, fix windows sounds for empty text
       /// [Curtis_Beard]      11/26/2014	FIX: don't highlight found text that is part of the spacer text
-      /// [Curtis_Beard]      03/05/2015	FIX: issue with windows sound, cleanup logic for whole word/case sensitive
+      /// [Curtis_Beard]      02/24/2015	CHG: remove hit line restriction until proper fix for long loading
+      /// [Curtis_Beard]      03/04/2015	CHG: move standard code to function to cleanup this function.
+      /// [Curtis_Beard]      03/05/2015	FIX: 64/35, clear text field before anything to not have left over content.
+      /// [Curtis_Beard]		04/08/2015  CHG: 61, change from RichTextBox to AvalonEdit
       /// </history>
-      private void HighlightTextRegEx(HitObject hit)
+      private void ProcessMatchForDisplay(MatchResult match)
       {
-         string _textToSearch = string.Empty;
-         string spacerText = string.Empty;
-         string _tempString = string.Empty;
-         int _lastPos = 0;
-         Regex _regEx = new Regex(__Grep.SearchSpec.SearchText);
-         MatchCollection _col;
-         Match _item;
-
-         // Loop through hits and highlight search for text
-         for (int i = 0; i < hit.LineCount; i++)
+         if (match == null || match.Matches.Count == 0)
          {
-            // Retrieve hit text
-            _textToSearch = hit.RetrieveLine(i);
-            spacerText = hit.RetrieveSpacerText(i);
-
-            if (GeneralSettings.RemoveLeadingWhiteSpace)
-            {
-               _textToSearch = _textToSearch.TrimStart();
-            }
-
-            _textToSearch = string.Format("{0}{1}", spacerText, _textToSearch);
-
-            string pattern = string.Format("{0}{1}{0}", __Grep.SearchSpec.UseWholeWordMatching ? "\\b" : string.Empty, __Grep.SearchSpec.SearchText);
-            RegexOptions options = __Grep.SearchSpec.UseCaseSensitivity ? RegexOptions.None : RegexOptions.IgnoreCase;
-            _regEx = new Regex(pattern, options);
-            _col = _regEx.Matches(_textToSearch);
-
-            // loop through the matches
-            _lastPos = 0;
-            for (int j = 0; j < _col.Count; j++)
-            {
-               _item = _col[j];
-
-               // set the start text
-               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-
-               // check for empty string to prevent assigning nothing to selection text preventing
-               //  a system beep
-               _tempString = _textToSearch.Substring(_lastPos, _item.Index - _lastPos);
-               if (!_tempString.Equals(string.Empty))
-               {
-                  txtHits.SelectedText = _tempString;
-               }
-
-               // set the hit text
-               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.HighlightForeColor);
-               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.HighlightBackColor);
-               string selectedText = _textToSearch.Substring(_item.Index, _item.Length);
-               if (!string.IsNullOrEmpty(selectedText))
-               {
-                  txtHits.SelectedText = selectedText;
-               }
-
-               // set the end text
-               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-               if (j + 1 >= _col.Count)
-               {
-                  //  no more hits so just set the rest
-                  selectedText = _textToSearch.Substring(_item.Index + _item.Length);
-                  if (!string.IsNullOrEmpty(selectedText))
-                  {
-                     txtHits.SelectedText = selectedText;
-                  }
-                  _lastPos = _item.Index + _item.Length;
-               }
-               else
-               {
-                  // another hit so just set inbetween
-                  selectedText = _textToSearch.Substring(_item.Index + _item.Length, _col[j + 1].Index - (_item.Index + _item.Length));
-                  if (!string.IsNullOrEmpty(selectedText))
-                  {
-                     txtHits.SelectedText = selectedText;
-                  }
-                  _lastPos = _col[j + 1].Index;
-               }
-            }
-
-            if (_col.Count == 0)
-            {
-               //  no match, just a context line
-               txtHits.SelectionColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-               txtHits.SelectionBackColor = Convertors.ConvertStringToColor(AstroGrep.Core.GeneralSettings.ResultsBackColor);
-               if (!string.IsNullOrEmpty(_textToSearch))
-               {
-                  txtHits.SelectedText = _textToSearch;
-               }
-            }
-
-            txtHits.SelectedText = Environment.NewLine;
+            return;
          }
+
+         txtHits.Clear();
+         txtHits.SyntaxHighlighting = null;
+         txtHits.ScrollToHome();
+
+         for (int i = txtHits.TextArea.TextView.LineTransformers.Count - 1; i >= 0; i--)
+         {
+            if (txtHits.TextArea.TextView.LineTransformers[i] is ResultHighlighter)
+               txtHits.TextArea.TextView.LineTransformers.RemoveAt(i);
+            else if (txtHits.TextArea.TextView.LineTransformers[i] is AllResultHighlighter)
+               txtHits.TextArea.TextView.LineTransformers.RemoveAt(i);
+         }
+         var foreground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.HighlightForeColor);
+         var background = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.HighlightBackColor);
+         var nonForeground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsContextForeColor);
+         txtHits.TextArea.TextView.LineTransformers.Add(new ResultHighlighter(match, RemoveWhiteSpaceMenuItem.Checked)
+         {
+            MatchForeground = foreground,
+            MatchBackground = background,
+            NonMatchForeground = nonForeground
+         });
+
+         StringBuilder builder = new StringBuilder();
+         var lineNumbers = new List<LineNumber>();
+         var path = match.File.FullName;
+         int max = match.Matches.Count;
+         for (int i = 0; i < max; i++)
+         {
+            string line = match.Matches[i].Line;
+            if (RemoveWhiteSpaceMenuItem.Checked)
+            {
+               line = line.TrimStart();
+            }
+            builder.AppendLine(line);
+            lineNumbers.Add(new LineNumber()
+            {
+               Number = match.Matches[i].LineNumber,
+               HasMatch = match.Matches[i].HasMatch,
+               FileFullName = match.Matches[i].LineNumber > -1 || match.FromPlugin ? path : string.Empty,
+               ColumnNumber = match.Matches[i].ColumnNumber
+            });
+         }
+
+         // the last result will have a hanging newline, so remove it.
+         if (builder.Length > 0)
+         {
+            builder.Remove(builder.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+         }
+
+         txtHits.LineNumbers = lineNumbers;
+         txtHits.Text = builder.ToString();
+      }
+
+      /// <summary>
+      /// Displays the entire selected file and uses a syntax highlighter when available for that file extension.
+      /// </summary>
+      /// <param name="match">Currently selected MatchResult</param>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2016  CHG: 20/21, display entire file and use syntax highlighter
+      /// </history>
+      private void ProcessFileForDisplay(MatchResult match)
+      {
+         if (match == null || match.Matches.Count == 0)
+         {
+            txtHits.Clear();
+            txtHits.LineNumbers = null;
+            return;
+         }
+
+         if ((match.File.Length > 1024000 || FilterItem.IsBinaryFile(match.File)) && 
+            MessageBox.Show(this, "This is a large or binary file, are you sure you want to view the entire file?", 
+            Constants.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.No)
+         {
+            ProcessMatchForDisplay(match); // display just the results then and not the whole file.
+            return;
+         }
+
+         txtHits.Clear();
+         txtHits.LineNumbers = null;
+         txtHits.ScrollToHome();
+
+         var def = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinitionByExtension(match.File.Extension);
+         txtHits.SyntaxHighlighting = def;
+
+         for (int i = txtHits.TextArea.TextView.LineTransformers.Count - 1; i >= 0; i--)
+         {
+            if (txtHits.TextArea.TextView.LineTransformers[i] is ResultHighlighter)
+               txtHits.TextArea.TextView.LineTransformers.RemoveAt(i);
+            else if (txtHits.TextArea.TextView.LineTransformers[i] is AllResultHighlighter)
+               txtHits.TextArea.TextView.LineTransformers.RemoveAt(i);
+         }
+         var foreground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.HighlightForeColor);
+         var background = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.HighlightBackColor);
+         var nonForeground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsContextForeColor);
+         txtHits.TextArea.TextView.LineTransformers.Add(new ResultHighlighter(match, false, true)
+         {
+            MatchForeground = foreground,
+            MatchBackground = background,
+            NonMatchForeground = nonForeground
+         });
+
+         // convert MatchResultLine to LineNumber
+         List<LineNumber> lineNumbers = new List<LineNumber>();
+         foreach (MatchResultLine matchLine in match.Matches)
+         {
+            lineNumbers.Add(new LineNumber()
+            {
+               ColumnNumber = matchLine.ColumnNumber,
+               Number = matchLine.LineNumber,
+               HasMatch = matchLine.HasMatch,
+               FileFullName = match.File.FullName
+            });
+         }
+
+         txtHits.LineNumbers = lineNumbers;
+         txtHits.Encoding = match.DetectedEncoding;
+         txtHits.Load(match.File.FullName);
+      }
+
+      /// <summary>
+      /// Handles generating the text for all matches.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
+      /// </history>
+      private void ProcessAllMatchesForDisplay()
+      {
+         txtHits.Dispatcher.Invoke(new Action(() =>
+         {
+            txtHits.Clear();
+            txtHits.SyntaxHighlighting = null;
+            txtHits.ScrollToHome();
+
+            if (__Grep == null || __Grep.MatchResults.Count == 0)
+               return;
+
+            for (int i = txtHits.TextArea.TextView.LineTransformers.Count - 1; i >= 0; i--)
+            {
+               if (txtHits.TextArea.TextView.LineTransformers[i] is ResultHighlighter)
+                  txtHits.TextArea.TextView.LineTransformers.RemoveAt(i);
+               else if (txtHits.TextArea.TextView.LineTransformers[i] is AllResultHighlighter)
+                  txtHits.TextArea.TextView.LineTransformers.RemoveAt(i);
+            }
+            var foreground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.HighlightForeColor);
+            var background = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.HighlightBackColor);
+            var nonForeground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsContextForeColor);
+            txtHits.TextArea.TextView.LineTransformers.Add(new AllResultHighlighter(__Grep.MatchResults, RemoveWhiteSpaceMenuItem.Checked)
+            {
+               MatchForeground = foreground,
+               MatchBackground = background,
+               NonMatchForeground = nonForeground
+            });
+
+            StringBuilder builder = new StringBuilder();
+            var lineNumbers = new List<LineNumber>();
+
+            int maxResults = __Grep.MatchResults.Count;
+            for (int i = 0; i < maxResults; i++)
+            {
+               var match = __Grep.MatchResults[i];
+               var path = match.File.FullName;
+               builder.AppendLine(match.File.FullName);
+               builder.AppendLine();
+               lineNumbers.Add(new LineNumber() { FileFullName = path });
+               lineNumbers.Add(new LineNumber());
+
+               int max = match.Matches.Count;
+               for (int j = 0; j < max; j++)
+               {
+                  string line = match.Matches[j].Line;
+                  if (RemoveWhiteSpaceMenuItem.Checked)
+                  {
+                     line = line.TrimStart();
+                  }
+                  builder.AppendLine(line);
+                  lineNumbers.Add(new LineNumber()
+                  {
+                     Number = match.Matches[j].LineNumber,
+                     HasMatch = match.Matches[j].HasMatch,
+                     FileFullName = match.Matches[j].LineNumber > -1 ? path : string.Empty,
+                     ColumnNumber = match.Matches[j].ColumnNumber
+                  });
+               }
+
+               if (i + 1 < maxResults)
+               {
+                  builder.AppendLine();
+                  builder.AppendLine();
+                  lineNumbers.Add(new LineNumber());
+                  lineNumbers.Add(new LineNumber());
+               }
+            }
+
+            // the last result will have a hanging newline, so remove it.
+            if (builder.Length > 0)
+            {
+               builder.Remove(builder.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+            }
+
+            txtHits.LineNumbers = lineNumbers;
+            txtHits.Text = builder.ToString();
+         }));
       }
 
       /// <summary>
@@ -1720,7 +1442,8 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   07/10/2006	CHG: Disable combo boxes during search
       /// [Curtis_Beard]	   07/12/2006	CHG: make thread safe
       /// [Curtis_Beard]	   07/25/2006	ADD: enable/disable context lines label
-      /// [Curtis_Beard]	    10/30/2012	ADD: 28, search within results
+      /// [Curtis_Beard]	   10/30/2012	ADD: 28, search within results
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
       private void SetSearchState(bool enable)
       {
@@ -1731,18 +1454,17 @@ namespace AstroGrep.Windows.Forms
             return;
          }
 
-         mnuFile.Enabled = enable;
-         mnuEdit.Enabled = enable;
-         mnuView.Enabled = enable;
-         mnuTools.Enabled = enable;
-         mnuHelp.Enabled = enable;
+         FileMenu.Enabled = enable;
+         EditMenu.Enabled = enable;
+         ViewMenu.Enabled = enable;
+         ToolsMenu.Enabled = enable;
+         HelpMenu.Enabled = enable;
 
          btnSearch.ContextMenu.MenuItems[0].Enabled = (enable && lstFileNames.Items.Count > 0);
          btnSearch.Enabled = enable;
          btnCancel.Enabled = !enable;
          picBrowse.Enabled = enable;
-         pnlSearchOptions.Enabled = enable;
-         lblContextLines.Enabled = enable;
+         PanelOptionsContainer.Enabled = enable;
 
          cboFileName.Enabled = enable;
          cboFilePath.Enabled = enable;
@@ -1885,7 +1607,7 @@ namespace AstroGrep.Windows.Forms
             if (CommandLineArgs.IsNegation)
                chkNegation.Checked = true;
             if (CommandLineArgs.UseLineNumbers)
-               chkLineNumbers.Checked = true;
+               LineNumbersMenuItem.Checked = true;
             if (CommandLineArgs.ContextLines > -1)
                txtContextLines.Value = CommandLineArgs.ContextLines;
 
@@ -2289,25 +2011,17 @@ namespace AstroGrep.Windows.Forms
 
       #region Menu Events
       /// <summary>
-      /// Enable/Disable menu items if listview contains items
+      /// Enables file menu items when necessary.
       /// </summary>
       /// <param name="sender">System parm</param>
       /// <param name="e">System parm</param>
       /// <history>
       /// [Curtis_Beard]      11/03/2005	Created
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuFile_Select(object sender, EventArgs e)
+      private void FileMenu_DropDownOpening(object sender, EventArgs e)
       {
-         if (lstFileNames.Items.Count == 0)
-         {
-            mnuSaveResults.Enabled = false;
-            mnuPrintResults.Enabled = false;
-         }
-         else
-         {
-            mnuSaveResults.Enabled = true;
-            mnuPrintResults.Enabled = true;
-         }
+         SaveResultsMenuItem.Enabled = PrintResultsMenuItem.Enabled = lstFileNames.Items.Count > 0;
       }
 
       /// <summary>
@@ -2317,8 +2031,9 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]      05/06/2014  Created
+      /// [Curtis_Beard]      05/14/2015  CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuNewWindow_Click(object sender, EventArgs e)
+      private void NewWindowMenuItem_Click(object sender, EventArgs e)
       {
          System.Diagnostics.Process.Start(Constants.ProductFullName);
       }
@@ -2331,7 +2046,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   11/22/2006	Created
       /// </history>
-      private void mnuBrowse_Click(object sender, System.EventArgs e)
+      private void SelectPathMenuItem_Click(object sender, System.EventArgs e)
       {
          BrowseForFolder();
       }
@@ -2349,7 +2064,7 @@ namespace AstroGrep.Windows.Forms
       /// [Andrew_Radford]    20/09/2009	CHG: Use export class
       /// [Curtis_Beard]	   01/31/2012	CHG: show status bar message only once for text/html/xml
       /// </history>
-      private void mnuSaveResults_Click(object sender, System.EventArgs e)
+      private void SaveResultsMenuItem_Click(object sender, System.EventArgs e)
       {
          // only show dialog if information to save
          if (lstFileNames.Items.Count <= 0)
@@ -2374,19 +2089,19 @@ namespace AstroGrep.Windows.Forms
             {
                case 1:
                   // Save to text
-                  OutputResults(dlg.FileName, HitListExport.SaveResultsAsText);
+                  OutputResults(dlg.FileName, MatchResultsExport.SaveResultsAsText);
                   break;
                case 2:
                   // Save to html
-                  OutputResults(dlg.FileName, HitListExport.SaveResultsAsHTML);
+                  OutputResults(dlg.FileName, MatchResultsExport.SaveResultsAsHTML);
                   break;
                case 3:
                   // Save to xml
-                  OutputResults(dlg.FileName, HitListExport.SaveResultsAsXML);
+                  OutputResults(dlg.FileName, MatchResultsExport.SaveResultsAsXML);
                   break;
                case 4:
                   // Save to json
-                  OutputResults(dlg.FileName, HitListExport.SaveResultsAsJSON);
+                  OutputResults(dlg.FileName, MatchResultsExport.SaveResultsAsJSON);
                   break;
             }
          }
@@ -2396,12 +2111,13 @@ namespace AstroGrep.Windows.Forms
       /// Output results using given export delegate.
       /// </summary>
       /// <param name="filename">Current filename</param>
-      /// <param name="outputter">Export delegate</param>
+      /// <param name="outputter">File delegate</param>
       /// <history>
       /// [Andrew_Radford]   20/09/2009	Initial
       /// [Curtis_Beard]     12/03/2014	CHG: pass grep indexes instead of ListView
+      /// [Curtis_Beard]     04/08/2015	CHG: update export delegate with settings class
       /// </history>
-      private void OutputResults(string filename, HitListExport.ExportDelegate outputter)
+      private void OutputResults(string filename, MatchResultsExport.FileDelegate outputter)
       {
          SetStatusBarMessage(String.Format(Language.GetGenericText("SaveSaving"), filename));
 
@@ -2411,7 +2127,15 @@ namespace AstroGrep.Windows.Forms
             IEnumerable<ListViewItem> lv = lstFileNames.Items.Cast<ListViewItem>();
             var indexes = (from i in lv select int.Parse(i.SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text)).ToList();
 
-            outputter(filename, __Grep, indexes);
+            MatchResultsExport.ExportSettings settings = new MatchResultsExport.ExportSettings()
+            {
+               Path = filename,
+               Grep = __Grep,
+               GrepIndexes = indexes,
+               ShowLineNumbers = LineNumbersMenuItem.Checked,
+               RemoveLeadingWhiteSpace = RemoveWhiteSpaceMenuItem.Checked
+            };
+            outputter(settings);
             SetStatusBarMessage(Language.GetGenericText("SaveSaved"));
          }
          catch (Exception ex)
@@ -2436,52 +2160,58 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   12/07/2005	CHG: Pass in font name and size to print dialog
       /// [Curtis_Beard]	   10/11/2006	CHG: Pass in font and icon
       /// </history>
-      private void mnuPrintResults_Click(object sender, EventArgs e)
+      private void PrintResultsMenuItem_Click(object sender, EventArgs e)
       {
          if (lstFileNames.Items.Count > 0)
          {
-            var _form = new frmPrint(lstFileNames, __Grep.Greps, txtHits.Font, Icon);
-            _form.ShowDialog(this);
-            _form = null;
+            // get all grep indexes
+            IEnumerable<ListViewItem> lv = lstFileNames.Items.Cast<ListViewItem>();
+            var indexes = (from i in lv where i.Selected select int.Parse(i.SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text)).ToList();
+
+            MatchResultsExport.ExportSettings settings = new MatchResultsExport.ExportSettings()
+            {
+               Grep = __Grep,
+               GrepIndexes = indexes,
+               ShowLineNumbers = LineNumbersMenuItem.Checked,
+               RemoveLeadingWhiteSpace = RemoveWhiteSpaceMenuItem.Checked
+            };
+
+            using (var printForm = new frmPrint(settings, Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont), Icon))
+            {
+               printForm.ShowDialog(this);
+            }
          }
          else
             MessageBox.Show(Language.GetGenericText("PrintNoResults"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
       }
 
       /// <summary>
-      /// Menu Exit
+      /// Closes the program.
       /// </summary>
       /// <param name="sender">System parm</param>
       /// <param name="e">System parm</param>
       /// <history>
       /// [Theodore_Ward]     ??/??/????  Initial
       /// [Curtis_Beard]	   01/11/2005	.Net Conversion
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuExit_Click(object sender, System.EventArgs e)
+      private void ExitMenuItem_Click(object sender, System.EventArgs e)
       {
          this.Close();
       }
 
       /// <summary>
-      /// Enable/Disable menu items if listview contains items
+      /// Enables edit menu items when necessary.
       /// </summary>
       /// <param name="sender">System parm</param>
       /// <param name="e">System parm</param>
       /// <history>
       /// [Curtis_Beard]      11/03/2005	Created
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuEdit_Select(object sender, EventArgs e)
+      private void EditMenu_DropDownOpening(object sender, EventArgs e)
       {
-         if (lstFileNames.Items.Count == 0)
-         {
-            mnuSelectAll.Enabled = false;
-            mnuOpenSelected.Enabled = false;
-         }
-         else
-         {
-            mnuSelectAll.Enabled = true;
-            mnuOpenSelected.Enabled = true;
-         }
+         SelectAllMenuItem.Enabled = OpenSelectedMenuItem.Enabled = lstFileNames.Items.Count > 0;
       }
 
       /// <summary>
@@ -2494,25 +2224,26 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   01/11/2005	.Net Conversion
       /// [Curtis_Beard]	   09/28/2012	CHG: use common select method
       /// </history>
-      private void mnuSelectAll_Click(object sender, System.EventArgs e)
+      private void SelectAllMenuItem_Click(object sender, System.EventArgs e)
       {
          SelectAllListItems();
       }
 
       /// <summary>
-      /// Menu View Event
+      /// Enables view menu items when necessary.
       /// </summary>
       /// <param name="sender">system parameter</param>
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]	   11/11/2014	Initial
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuView_Select(object sender, EventArgs e)
+      private void ViewMenu_DropDownOpening(object sender, EventArgs e)
       {
-         ViewStatus.Enabled = GetLogItemsCountByType(LogItem.LogItemTypes.Status) > 0;
-         ViewExclusions.Enabled = GetLogItemsCountByType(LogItem.LogItemTypes.Exclusion) > 0;
-         ViewError.Enabled = GetLogItemsCountByType(LogItem.LogItemTypes.Error) > 0;
-         ViewAll.Enabled = AnyLogItems();
+         StatusMessageMenuItem.Enabled = GetLogItemsCountByType(LogItem.LogItemTypes.Status) > 0;
+         ExclusionMessageMenuItem.Enabled = GetLogItemsCountByType(LogItem.LogItemTypes.Exclusion) > 0;
+         ErrorMessageMenuItem.Enabled = GetLogItemsCountByType(LogItem.LogItemTypes.Error) > 0;
+         AllMessageMenuItem.Enabled = AnyLogItems();
       }
 
       /// <summary>
@@ -2522,8 +2253,9 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]	   11/11/2014	Initial
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void ViewStatus_Click(object sender, System.EventArgs e)
+      private void StatusMessageMenuItem_Click(object sender, System.EventArgs e)
       {
          DisplaySearchMessages(LogItem.LogItemTypes.Status);
       }
@@ -2535,8 +2267,9 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]	   11/11/2014	Initial
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void ViewExclusions_Click(object sender, System.EventArgs e)
+      private void ExclusionMessageMenuItem_Click(object sender, System.EventArgs e)
       {
          DisplaySearchMessages(LogItem.LogItemTypes.Exclusion);
       }
@@ -2548,8 +2281,9 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]	   11/11/2014	Initial
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void ViewError_Click(object sender, System.EventArgs e)
+      private void ErrorMessageMenuItem_Click(object sender, System.EventArgs e)
       {
          DisplaySearchMessages(LogItem.LogItemTypes.Error);
       }
@@ -2561,10 +2295,143 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]	   11/11/2014	Initial
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void ViewAll_Click(object sender, System.EventArgs e)
+      private void AllMessageMenuItem_Click(object sender, System.EventArgs e)
       {
          DisplaySearchMessages(null);
+      }      
+
+      /// <summary>
+      /// Zoom in view by 1.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   05/11/2015	CHG: zoom for TextEditor control
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void ZoomInMenuItem_Click(object sender, EventArgs e)
+      {
+         txtHits.ZoomIn();
+      }
+
+      /// <summary>
+      /// Zoom out view by 1.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   05/11/2015	CHG: zoom for TextEditor control
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void ZoomOutMenuItem_Click(object sender, EventArgs e)
+      {
+         txtHits.ZoomOut();
+      }
+
+      /// <summary>
+      /// Reset zoom level to initial value.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   05/11/2015	CHG: zoom for TextEditor control
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void ZoomRestoreMenuItem_Click(object sender, EventArgs e)
+      {
+         txtHits.ZoomReset();
+      }
+
+      /// <summary>
+      /// Option to toggle line numbers being displayed.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   04/08/2015	ADD: AvalonEdit view menu options
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void LineNumbersMenuItem_Click(object sender, System.EventArgs e)
+      {
+         LineNumbersMenuItem.Checked = !LineNumbersMenuItem.Checked;
+
+         txtHits.ShowLineNumbers = LineNumbersMenuItem.Checked;
+      }
+
+      /// <summary>
+      /// Option to toggle word wrapping.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   04/08/2015	ADD: AvalonEdit view menu options
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void WordWrapMenuItem_Click(object sender, System.EventArgs e)
+      {
+         WordWrapMenuItem.Checked = !WordWrapMenuItem.Checked;
+
+         txtHits.WordWrap = WordWrapMenuItem.Checked;
+      }
+
+      /// <summary>
+      /// Option to remove leading white space from each line.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   04/08/2015	ADD: AvalonEdit view menu options
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void RemoveWhiteSpaceMenuItem_Click(object sender, System.EventArgs e)
+      {
+         RemoveWhiteSpaceMenuItem.Checked = !RemoveWhiteSpaceMenuItem.Checked;
+
+         if (lstFileNames.SelectedItems.Count > 0)
+         {
+            lstFileNames_SelectedIndexChanged(null, null);
+         }
+         else if (txtHits.Text.Length > 0)
+         {
+            ProcessAllMatchesForDisplay();
+         }
+      }
+
+      /// <summary>
+      /// Option to view entire file contents.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   04/08/2015	ADD: AvalonEdit view menu options
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void EntireFileMenuItem_Click(object sender, System.EventArgs e)
+      {
+         EntireFileMenuItem.Checked = !EntireFileMenuItem.Checked;
+
+         lstFileNames_SelectedIndexChanged(null, null);
+      }
+
+      /// <summary>
+      /// View all results.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   04/08/2015	ADD: AvalonEdit view menu options
+      /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// </history>
+      private void AllResultsMenuItem_Click(object sender, System.EventArgs e)
+      {
+         foreach (ListViewItem item in lstFileNames.Items)
+         {
+            item.Selected = false;
+         }
+
+         ProcessAllMatchesForDisplay();
       }
 
       /// <summary>
@@ -2579,24 +2446,27 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
       /// [Curtis_Beard]	   03/16/2015	CHG: check for null HitObject
       /// </history>
-      private void mnuOpenSelected_Click(object sender, System.EventArgs e)
+      private void OpenSelectedMenuItem_Click(object sender, System.EventArgs e)
       {
          string path;
-         HitObject hit;
+         MatchResult hit;
 
          for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
          {
             // retrieve hit object
-            hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+            hit = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
 
             if (hit != null)
             {
                // retrieve the filename
-               path = hit.FilePath;
+               path = hit.File.FullName;
 
                // open the default editor at first hit
-               int index = hit.RetrieveFirstHitIndex();
-               TextEditors.EditFile(path, hit.RetrieveLineNumber(index), hit.RetrieveColumn(index), hit.RetrieveLine(index));
+               var matchLine = hit.GetFirstMatch();
+               if (matchLine != null)
+               {
+                  TextEditors.EditFile(path, matchLine.LineNumber, matchLine.ColumnNumber, matchLine.Line);
+               }
             }
          }
       }
@@ -2611,7 +2481,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   01/11/2005	.Net Conversion
       /// [Curtis_Beard]	   11/22/2006	CHG: Remove use of browse in combobox
       /// </history>
-      private void mnuClearMRU_Click(object sender, System.EventArgs e)
+      private void ClearMRUAllMenuItem_Click(object sender, System.EventArgs e)
       {
          cboFilePath.Items.Clear();
          cboFileName.Items.Clear();
@@ -2631,7 +2501,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   11/07/2014	ADD: clear each MRU list individually
       /// </history>
-      private void ToolsMRUSearchPaths_Click(object sender, EventArgs e)
+      private void ClearMRUPathsMenuItem_Click(object sender, EventArgs e)
       {
          cboFilePath.Items.Clear();
 
@@ -2647,7 +2517,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   11/07/2014	ADD: clear each MRU list individually
       /// </history>
-      private void ToolsMRUFilterTypes_Click(object sender, EventArgs e)
+      private void ClearMRUTypesMenuItem_Click(object sender, EventArgs e)
       {
          cboFileName.Items.Clear();
 
@@ -2663,7 +2533,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   11/07/2014	ADD: clear each MRU list individually
       /// </history>
-      private void ToolsMRUSearchText_Click(object sender, EventArgs e)
+      private void ClearMRUTextsMenuItem_Click(object sender, EventArgs e)
       {
          cboSearchForText.Items.Clear();
 
@@ -2699,7 +2569,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   01/28/2005	Created
       /// </history>
-      private void mnuSaveSearchSettings_Click(object sender, System.EventArgs e)
+      private void SaveSearchOptionsMenuItem_Click(object sender, System.EventArgs e)
       {
          if (VerifyInterface())
          {
@@ -2722,11 +2592,11 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   09/26/2012	CHG: Update status bar text
       /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
       /// </history>
-      private void mnuOptions_Click(object sender, System.EventArgs e)
+      private void OptionsMenuItem_Click(object sender, System.EventArgs e)
       {
-         frmOptions _form = new frmOptions();
+         var optionsForm = new frmOptions();
 
-         if (_form.ShowDialog(this) == DialogResult.OK)
+         if (optionsForm.ShowDialog(this) == DialogResult.OK)
          {
             //update combobox lengths
             while (cboFilePath.Items.Count > Core.GeneralSettings.MaximumMRUPaths)
@@ -2737,18 +2607,11 @@ namespace AstroGrep.Windows.Forms
                cboSearchForText.Items.RemoveAt(cboSearchForText.Items.Count - 1);
 
             // load new language if necessary
-            if (_form.IsLanguageChange)
+            if (optionsForm.IsLanguageChange)
             {
                Language.ProcessForm(this, this.toolTip1);
 
-               SetColumnsText();
-
-               // reload label
-               __SearchOptionsText = lnkSearchOptions.Text;
-               if (!__OptionsShow)
-                  lnkSearchOptions.Text = String.Format(__SearchOptionsText, ">>");
-               else
-                  lnkSearchOptions.Text = String.Format(__SearchOptionsText, "<<");
+               SetColumnsText();               
 
                // clear statusbar text
                SetStatusBarMessage(string.Empty);
@@ -2756,15 +2619,29 @@ namespace AstroGrep.Windows.Forms
             }
 
             // change results display and rehighlight
-            txtHits.ForeColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsForeColor);
-            txtHits.BackColor = Convertors.ConvertStringToColor(Core.GeneralSettings.ResultsBackColor);
-            txtHits.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
-            txtHits.WordWrap = Core.GeneralSettings.ResultsWordWrap;
+            var foreground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsForeColor);
+            var background = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsBackColor);
+            var contextForeground = Convertors.ConvertStringToSolidColorBrush(Core.GeneralSettings.ResultsContextForeColor);
+            var font = Convertors.ConvertStringToFont(Core.GeneralSettings.ResultsFont);
+            txtHits.Foreground = foreground;
+            txtHits.Background = background;
+            txtHits.LineNumbersForeground = contextForeground;
+            txtHits.LineNumbersMatchForeground = foreground;
+            txtHits.FontFamily = new System.Windows.Media.FontFamily(font.FontFamily.Name);
+            txtHits.FontSize = font.SizeInPoints * 96 / 72;
 
             lstFileNames.Font = Convertors.ConvertStringToFont(Core.GeneralSettings.FilePanelFont);
-            lstFileNames_SelectedIndexChanged(null, null);
+
+            // update current display
+            if (lstFileNames.SelectedItems.Count > 0)
+            {
+               lstFileNames_SelectedIndexChanged(null, null);
+            }
+            else if (txtHits.Text.Length > 0)
+            {
+               ProcessAllMatchesForDisplay();
+            }
          }
-         _form = null;
       }
 
       /// <summary>
@@ -2774,11 +2651,13 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		05/06/2014	Initial
+      /// [Curtis_Beard]		05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuHelpContents_Click(object sender, EventArgs e)
+      private void ViewHelpMenuItem_Click(object sender, EventArgs e)
       {
          //TODO: support currently selected language help file (AstroGrep-Help-en-us.chm, AstroGrep-Help-da-dk.chm, etc.)
          //Help.ShowHelp(this, Path.Combine(Constants.ProductLocation, "AstroGrep-Help.chm"));
+
          System.Diagnostics.Process.Start("http://astrogrep.sourceforge.net/help/");
       }
 
@@ -2789,10 +2668,24 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		05/06/2014	Initial
+      /// [Curtis_Beard]		05/14/2015	CHG: use https version of url, use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuHelpRegEx_Click(object sender, EventArgs e)
+      private void ViewRegExHelpMenuItem_Click(object sender, EventArgs e)
       {
-         System.Diagnostics.Process.Start("http://msdn.microsoft.com/en-us/library/az24scfc.aspx");
+         System.Diagnostics.Process.Start("https://msdn.microsoft.com/en-us/library/az24scfc.aspx");
+      }
+
+      /// <summary>
+      /// Open folder container log file(s).
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		05/15/2015	Initial
+      /// </history>
+      private void LogFileMenuItem_Click(object sender, EventArgs e)
+      {
+         System.Diagnostics.Process.Start(Constants.LogFile);
       }
 
       /// <summary>
@@ -2802,8 +2695,9 @@ namespace AstroGrep.Windows.Forms
       /// <param name="e">system parameter</param>
       /// <history>
       /// [Curtis_Beard]		05/06/2014	Initial
+      /// [Curtis_Beard]		05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuCheckForUpdates_Click(object sender, EventArgs e)
+      private void CheckForUpdateMenuItem_Click(object sender, EventArgs e)
       {
          var dlg = new frmCheckForUpdateTemp();
          dlg.ShowDialog(this);
@@ -2817,13 +2711,12 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Theodore_Ward]		??/??/????  Initial
       /// [Curtis_Beard]		01/11/2005	.Net Conversion
+      /// [Curtis_Beard]		05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
       /// </history>
-      private void mnuAbout_Click(object sender, EventArgs e)
+      private void AboutMenuItem_Click(object sender, EventArgs e)
       {
-         frmAbout _form = new frmAbout();
-
-         _form.ShowDialog(this);
-         _form = null;
+         var dlg = new frmAbout();
+         dlg.ShowDialog(this);
       }
 
       /// <summary>
@@ -2981,7 +2874,7 @@ namespace AstroGrep.Windows.Forms
          //enter Edit selected file
          if (e.KeyCode == Keys.Enter)
          {
-            mnuOpenSelected_Click(null, null);
+            OpenSelectedMenuItem_Click(null, null);
          }
 
          // ** I think the delete key is a bad idea, because its too easy to modify the results by mistake.
@@ -3002,7 +2895,7 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void OpenMenuItem_Click(object sender, System.EventArgs e)
       {
-         mnuOpenSelected_Click(sender, e);
+         OpenSelectedMenuItem_Click(sender, e);
       }
 
       /// <summary>
@@ -3048,15 +2941,15 @@ namespace AstroGrep.Windows.Forms
          try
          {
             string path;
-            HitObject hit;
+            MatchResult hit;
 
             for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
             {
                // retrieve hit object
-               hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+               hit = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
 
                // retrieve the filename
-               path = hit.FilePath;
+               path = hit.File.FullName;
 
                TextEditors.OpenFileWithDefaultApp(path);
             }
@@ -3116,10 +3009,10 @@ namespace AstroGrep.Windows.Forms
          for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
          {
             // retrieve hit object
-            var hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+            var hit = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
             var index = lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text;
 
-            files.Add(index, hit.FilePath);
+            files.Add(index, hit.File.FullName);
          }
 
          lstFileNames.BeginUpdate();
@@ -3160,10 +3053,10 @@ namespace AstroGrep.Windows.Forms
          for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
          {
             // retrieve hit object
-            var hit = __Grep.RetrieveHitObject(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+            var hit = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
 
             // retrieve the filename
-            files.Add(hit.FilePath);
+            files.Add(hit.File.FullName);
          }
 
          if (files.Count > 0)
@@ -3249,14 +3142,14 @@ namespace AstroGrep.Windows.Forms
       /// <summary>
       /// A line has been detected to contain the searching text
       /// </summary>
-      /// <param name="hit">The HitObject that contains the line</param>
+      /// <param name="match">The MatchResult that contains the line</param>
       /// <param name="index">The position in the HitObject's line collection</param>
       /// <history>
       /// [Curtis_Beard]		11/04/2005   Created
       /// </history>
-      private void ReceiveLineHit(HitObject hit, int index)
+      private void ReceiveLineHit(MatchResult match, int index)
       {
-         UpdateHitCount(hit);
+         UpdateHitCount(match);
          CalculateTotalCount();
       }
 
@@ -3270,6 +3163,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		05/28/2007  CHG: use Exception and display error
       /// [Curtis_Beard]		08/07/2007  ADD: 1741735, better search error handling
       /// [Curtis_Beard]		02/07/2012  CHG: 1741735, report full error message
+      /// [Curtis_Beard]	   04/08/2015	CHG: add logging
       /// </history>
       private void ReceiveSearchError(System.IO.FileInfo file, Exception ex)
       {
@@ -3278,11 +3172,13 @@ namespace AstroGrep.Windows.Forms
          if (file == null)
          {
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Error, languageLookupText, string.Format("{0}||{1}", string.Empty, ex.Message)));
+            LogClient.Instance.Logger.Error("Search error from grep: {0}", LogClient.GetAllExceptions(ex));
          }
          else
          {
             languageLookupText = "SearchFileError";
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Error, languageLookupText, string.Format("{0}||{1}", file.FullName, ex.Message)));
+            LogClient.Instance.Logger.Error("Search error from grep for file {0}: {1}", file.FullName, LogClient.GetAllExceptions(ex));
          }
 
          SetStatusBarErrorCount(GetLogItemsCountByType(LogItem.LogItemTypes.Error));
@@ -3294,8 +3190,9 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]		07/12/2006	Created
       /// [Curtis_Beard]		08/07/2007  ADD: 1741735, display any search errors
-      /// [Curtis_Beard]	    12/17/2014	ADD: support for Win7+ taskbar progress
-      /// [Curtis_Beard]	    02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
+      /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]	   02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
+      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
       /// </history>
       private void ReceiveSearchCancel()
       {
@@ -3307,6 +3204,8 @@ namespace AstroGrep.Windows.Forms
          SetStatusBarMessage(Language.GetGenericText(languageLookupText));
          SetSearchState(true);
          CalculateTotalCount();
+
+         CheckShowAllResults();
 
          ShowExclusionsErrorMessageBox();
       }
@@ -3321,9 +3220,10 @@ namespace AstroGrep.Windows.Forms
       /// [Ed_Jakubowski]		05/20/2009  ADD: Display the Count
       /// [Curtis_Beard]		01/30/2012  CHG: use language class for count text
       /// [Curtis_Beard]		04/08/2014	CHG: 74, command line exit, save options
-      /// [Curtis_Beard]	    12/17/2014	ADD: support for Win7+ taskbar progress
-      /// [Curtis_Beard]	    02/24/2015	CHG: only attempt file show when 1 item is selected (prevents flickering and loading on all deselect)
-      /// [Curtis_Beard]	    02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
+      /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]	   02/24/2015	CHG: only attempt file show when 1 item is selected (prevents flickering and loading on all deselect)
+      /// [Curtis_Beard]	   02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
+      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
       /// </history>
       private void ReceiveSearchComplete()
       {
@@ -3336,6 +3236,8 @@ namespace AstroGrep.Windows.Forms
          CalculateTotalCount();
          SetSearchState(true);
 
+         CheckShowAllResults();
+
          ShowExclusionsErrorMessageBox();
 
          if (CommandLineArgs.AnyArguments)
@@ -3343,24 +3245,24 @@ namespace AstroGrep.Windows.Forms
             if (!string.IsNullOrEmpty(CommandLineArgs.OutputPath))
             {
 
-               HitListExport.ExportDelegate del = HitListExport.SaveResultsAsText;
+               MatchResultsExport.FileDelegate del = MatchResultsExport.SaveResultsAsText;
                switch (CommandLineArgs.OutputType)
                {
                   case "xml":
-                     del = HitListExport.SaveResultsAsXML;
+                     del = MatchResultsExport.SaveResultsAsXML;
                      break;
 
                   case "json":
-                     del = HitListExport.SaveResultsAsJSON;
+                     del = MatchResultsExport.SaveResultsAsJSON;
                      break;
 
                   case "html":
-                     del = HitListExport.SaveResultsAsHTML;
+                     del = MatchResultsExport.SaveResultsAsHTML;
                      break;
 
                   default:
                   case "txt":
-                     del = HitListExport.SaveResultsAsText;
+                     del = MatchResultsExport.SaveResultsAsText;
                      break;
                }
 
@@ -3371,6 +3273,27 @@ namespace AstroGrep.Windows.Forms
             {
                this.Close();
             }
+         }
+      }
+
+      /// <summary>
+      /// Checks whether to show all results after a search (thread safe).
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
+      /// </history>
+      private void CheckShowAllResults()
+      {
+         if (chkAllResultsAfterSearch.InvokeRequired)
+         {
+            ShowAllResultsCallBack del = CheckShowAllResults;
+            chkAllResultsAfterSearch.Invoke(del);
+            return;
+         }
+
+         if (chkAllResultsAfterSearch.Checked)
+         {
+            ProcessAllMatchesForDisplay();
          }
       }
 
@@ -3457,26 +3380,26 @@ namespace AstroGrep.Windows.Forms
       /// <summary>
       /// Updates the count column (Thread safe)
       /// </summary>
-      /// <param name="hit">HitObject that contains updated information</param>
+      /// <param name="match">MatchResult that contains updated information</param>
       /// <history>
       /// [Curtis_Beard]		11/21/2005  Created
       /// </history>
-      private void UpdateHitCount(HitObject hit)
+      private void UpdateHitCount(MatchResult match)
       {
          // Makes this a thread safe operation
          if (lstFileNames.InvokeRequired)
          {
-            UpdateHitCountCallBack _delegate = new UpdateHitCountCallBack(UpdateHitCount);
-            lstFileNames.Invoke(_delegate, new object[1] { hit });
+            UpdateHitCountCallBack del = new UpdateHitCountCallBack(UpdateHitCount);
+            lstFileNames.Invoke(del, new object[1] { match });
             return;
          }
 
          // find correct item to update
-         foreach (ListViewItem _item in lstFileNames.Items)
+         foreach (ListViewItem item in lstFileNames.Items)
          {
-            if (int.Parse(_item.SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text) == hit.Index)
+            if (int.Parse(item.SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text) == match.Index)
             {
-               _item.SubItems[Constants.COLUMN_INDEX_COUNT].Text = hit.HitCount.ToString();
+               item.SubItems[Constants.COLUMN_INDEX_COUNT].Text = match.HitCount.ToString();
                break;
             }
          }
@@ -3586,7 +3509,7 @@ namespace AstroGrep.Windows.Forms
          }
 
          sbFilterCountPanel.Text = string.Format(Language.GetGenericText("ResultsStatusFilterCount"), count);
-         sbFilterCountPanel.BackColor = count > 0 ? Color.Yellow : SystemColors.Control;
+         sbFilterCountPanel.BackColor = count > 0 ? Color.Yellow : SystemColors.Window;
       }
 
       /// <summary>
@@ -3607,7 +3530,7 @@ namespace AstroGrep.Windows.Forms
          }
 
          sbErrorCountPanel.Text = string.Format(Language.GetGenericText("ResultsStatusErrorCount"), count);
-         sbErrorCountPanel.BackColor = count > 0 ? Color.Red : SystemColors.Control;
+         sbErrorCountPanel.BackColor = count > 0 ? Color.Red : SystemColors.Window;
       }
 
       /// <summary>
@@ -3686,21 +3609,20 @@ namespace AstroGrep.Windows.Forms
 
             SetWindowText();
 
-            // reset cursor
-            txtHits.Cursor = Cursors.IBeam;
-
             // disable gui
             SetSearchState(false);
 
             // reset display
             LogItems.Clear();
             SetStatusBarMessage(string.Empty);
+            SetStatusBarEncoding(string.Empty);
             SetStatusBarTotalCount(0);
             SetStatusBarFileCount(0);
             SetStatusBarFilterCount(0);
             SetStatusBarErrorCount(0);
 
             ClearItems();
+            txtHits.LineNumbers = null;
             txtHits.Clear();
 
             // setup structs to pass to grep
@@ -3727,12 +3649,15 @@ namespace AstroGrep.Windows.Forms
 
             API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.Indeterminate);
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, "SearchStarted"));
+            LogStartSearchMessage(searchSpec, fileFilterSpec);
+
             __Grep.BeginExecute();
          }
          catch (Exception ex)
          {
             RestoreTaskBarProgress();
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Error, "SearchGenericError", string.Format("{0}||{1}", string.Empty, ex.Message)));
+            LogClient.Instance.Logger.Error("Unhandled search error: {0}", LogClient.GetAllExceptions(ex));
 
             string message = string.Format(Language.GetGenericText("SearchGenericError"), ex.Message);
             MessageBox.Show(this, message, Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -3740,6 +3665,59 @@ namespace AstroGrep.Windows.Forms
             SetStatusBarMessage(message);
             SetSearchState(true);
             CalculateTotalCount();
+         }
+      }
+
+      /// <summary>
+      /// Logs a start search message to log file.
+      /// </summary>
+      /// <param name="searchSpec">Current search specification</param>
+      /// <param name="fileFilterSpec">Current file filter specification</param>
+      /// <history>
+      /// [Curtis_Beard]		05/15/2015	Initial
+      /// </history>
+      private void LogStartSearchMessage(ISearchSpec searchSpec, IFileFilterSpec fileFilterSpec)
+      {
+         StringBuilder searchTextOptions = new StringBuilder();
+         LogSearchOptionHelper(searchTextOptions, searchSpec.UseRegularExpressions, "regex");
+         LogSearchOptionHelper(searchTextOptions, searchSpec.UseCaseSensitivity, "case sensitive");
+         LogSearchOptionHelper(searchTextOptions, searchSpec.UseWholeWordMatching, "whole word");
+         LogSearchOptionHelper(searchTextOptions, searchSpec.UseNegation, "negation");
+         LogSearchOptionHelper(searchTextOptions, searchSpec.ReturnOnlyFileNames, "only file names");
+         LogSearchOptionHelper(searchTextOptions, searchSpec.ContextLines > 0, string.Format("{0} context lines", searchSpec.ContextLines));
+
+         if (searchTextOptions.Length > 0)
+         {
+            searchTextOptions.Insert(0, "[");
+            searchTextOptions.Append("]");
+         }
+
+         LogClient.Instance.Logger.Info("Starting search at '{0}'{1} against {2}{3} for {4}{5}",
+            searchSpec.StartFilePaths != null && searchSpec.StartFilePaths.Length > 0 ? string.Join(", ", searchSpec.StartFilePaths) : string.Join(", ", searchSpec.StartDirectories),
+            searchSpec.SearchInSubfolders ? "[include sub folders]" : "",
+            fileFilterSpec.FileFilter,
+            searchSpec.DetectFileEncoding ? "[detect encoding]" : "",
+            searchSpec.SearchText,
+            searchTextOptions.ToString());
+      }
+
+      /// <summary>
+      /// Handles formatting of log search option.
+      /// </summary>
+      /// <param name="optionBuilder">Current StringBuilder</param>
+      /// <param name="option">if option is enabled</param>
+      /// <param name="displayText">text to display for option</param>
+      /// <history>
+      /// [Curtis_Beard]		05/15/2015	Initial
+      /// </history>
+      private void LogSearchOptionHelper(StringBuilder optionBuilder, bool option, string displayText)
+      {
+         if (option)
+         {
+            if (optionBuilder.Length > 0)
+               optionBuilder.Append(", ");
+
+            optionBuilder.Append(displayText);
          }
       }
 
@@ -3774,16 +3752,18 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private IFileFilterSpec GetFilterSpecFromUI()
       {
-         string _fileName = cboFileName.Text;
+         string fileName = cboFileName.Text;
 
          // update path and fileName if fileName has a path in it
-         int slashPos = _fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
+         int slashPos = fileName.LastIndexOf(Path.DirectorySeparatorChar.ToString());
          if (slashPos > -1)
-            _fileName = _fileName.Substring(slashPos + 1);
+         {
+            fileName = fileName.Substring(slashPos + 1);
+         }
 
          var spec = new SearchInterfaces.FileFilterSpec
          {
-            FileFilter = _fileName,
+            FileFilter = fileName,
             FilterItems = __FilterItems.FindAll(delegate(FilterItem i) { return i.Enabled; })
          };
 
@@ -3813,7 +3793,6 @@ namespace AstroGrep.Windows.Forms
          {
             UseCaseSensitivity = chkCaseSensitive.Checked,
             ContextLines = Convert.ToInt32(txtContextLines.Value),
-            IncludeLineNumbers = chkLineNumbers.Checked,
             UseNegation = chkNegation.Checked,
             ReturnOnlyFileNames = chkFileNamesOnly.Checked,
             SearchInSubfolders = chkRecurse.Checked,
@@ -3877,36 +3856,36 @@ namespace AstroGrep.Windows.Forms
          // don't add if it already exists
          foreach (ListViewItem item in lstFileNames.Items)
          {
-            HitObject hit = __Grep.RetrieveHitObject(int.Parse(item.SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-            if (hit.FilePath.Equals(file.FullName, StringComparison.InvariantCultureIgnoreCase))
+            MatchResult hit = __Grep.RetrieveMatchResult(int.Parse(item.SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+            if (hit.File.FullName.Equals(file.FullName, StringComparison.InvariantCultureIgnoreCase))
             {
                return;
             }
          }
 
          // Create the list item
-         var _listItem = new ListViewItem(file.Name);
-         _listItem.Name = index.ToString();
-         _listItem.ImageIndex = ListViewImageManager.GetImageIndex(file, ListViewImageList);
-         _listItem.SubItems.Add(file.DirectoryName);
-         _listItem.SubItems.Add(file.Extension);
-         _listItem.SubItems.Add(file.LastWriteTime.ToString());
+         var listItem = new ListViewItem(file.Name);
+         listItem.Name = index.ToString();
+         listItem.ImageIndex = ListViewImageManager.GetImageIndex(file, ListViewImageList);
+         listItem.SubItems.Add(file.DirectoryName);
+         listItem.SubItems.Add(file.Extension);
+         listItem.SubItems.Add(file.LastWriteTime.ToString());
 
          // add explorer style of file size for display but store file size in bytes for comparision
-         ListViewItem.ListViewSubItem subItem = new ListViewItem.ListViewSubItem(_listItem, API.StrFormatByteSize(file.Length));
+         ListViewItem.ListViewSubItem subItem = new ListViewItem.ListViewSubItem(listItem, API.StrFormatByteSize(file.Length));
          subItem.Tag = file.Length;
-         _listItem.SubItems.Add(subItem);
+         listItem.SubItems.Add(subItem);
 
-         _listItem.SubItems.Add("0");
+         listItem.SubItems.Add("0");
 
          // must be last
-         _listItem.SubItems.Add(index.ToString());
+         listItem.SubItems.Add(index.ToString());
 
          // Add list item to listview
-         lstFileNames.Items.Add(_listItem);
+         lstFileNames.Items.Add(listItem);
 
          // clear it out
-         _listItem = null;
+         listItem = null;
       }
 
       /// <summary>
@@ -3954,50 +3933,170 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]        10/10/2012  Initial: 3575509, show copy/select all context menu
+      /// [Curtis_Beard]        04/08/2015  CHG: changes for CustomTextEditor
       /// </history>
       private void AddContextMenuForResults()
       {
-         ContextMenu ctx = new ContextMenu();
+         var menu = new System.Windows.Controls.ContextMenu();
+         var item = new System.Windows.Controls.MenuItem();
 
-         MenuItem item = new MenuItem(Language.GetGenericText("ResultsContextMenu.Copy"));
-         item.Click += new EventHandler(txtHitsContextCopy_Click);
-         ctx.MenuItems.Add(item);
+         item.Click += openFile_Click;
+         item.Header = Language.GetGenericText("ResultsContextMenu.OpenFileCurrentLine");
+         item.IsEnabled = false;
+         menu.Items.Add(item);
 
-         item = new MenuItem("-");
-         ctx.MenuItems.Add(item);
+         menu.Items.Add(new System.Windows.Controls.Separator());
 
-         item = new MenuItem(Language.GetGenericText("ResultsContextMenu.SelectAll"));
-         item.Click += new EventHandler(txtHitsContextSelectAll_Click);
-         ctx.MenuItems.Add(item);
+         item = new System.Windows.Controls.MenuItem();
+         item.Click += copyItem_Click;
+         item.Header = Language.GetGenericText("ResultsContextMenu.Copy");
+         menu.Items.Add(item);
 
-         txtHits.ContextMenu = ctx;
+         item = new System.Windows.Controls.MenuItem();
+         item.Header = Language.GetGenericText("ResultsContextMenu.SelectAll");
+         item.Click += selectAllItem_Click;
+         menu.Items.Add(item);
+
+         txtHits.ContextMenu = menu;
+         txtHits.ContextMenuOpening += menu_ContextMenuOpening;
       }
 
       /// <summary>
-      /// Copy selected text in results.
+      /// Handles determining enabling the open file menuitem.
       /// </summary>
-      /// <param name="sender">system parameter</param>
+      /// <param name="sender">CustomTextEditor</param>
       /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]        10/10/2012  Initial: 3575509, show copy/select all context menu
-      /// </history>
-      private void txtHitsContextCopy_Click(object sender, EventArgs e)
+      private void menu_ContextMenuOpening(object sender, System.Windows.Controls.ContextMenuEventArgs e)
       {
-         txtHits.Copy();
+         bool isEnabled = false;
+
+         var position = txtHits.GetPositionFromRightClickPoint();
+         if (position.HasValue)
+         {
+            try
+            {
+               string path = string.Empty;
+               int lineNumber = position.Value.Line;
+               int columnNumber = 1;
+
+               if (txtHits.LineNumbers != null && (lstFileNames.SelectedItems.Count == 0 || !EntireFileMenuItem.Checked))
+               {
+                  // either all results or file's matches
+                  var lineNumberHolder = txtHits.LineNumbers[position.Value.Line - 1];
+
+                  path = lineNumberHolder.FileFullName;
+
+                  if (!string.IsNullOrEmpty(path))
+                  {
+                     lineNumber = lineNumberHolder.Number > -1 ? lineNumberHolder.Number : 1;
+                     columnNumber = lineNumberHolder.ColumnNumber;
+
+                     isEnabled = true;
+                  }
+               }
+               else if (lstFileNames.SelectedItems.Count > 0 && __Grep != null)
+               {
+                  // full file
+                  MatchResult result = __Grep.RetrieveMatchResult(Convert.ToInt32(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+                  path = result.File.FullName;
+                  MatchResultLine matchLine = (from m in result.Matches where m.LineNumber == position.Value.Line select m).FirstOrDefault();
+                  if (matchLine != null && matchLine.LineNumber > -1)
+                  {
+                     lineNumber = matchLine.LineNumber;
+                     columnNumber = matchLine.ColumnNumber;
+                  }
+
+                  isEnabled = true;
+               }
+            }
+            catch { }
+         }
+
+         ((sender as TextEditorEx).ContextMenu.Items[0] as System.Windows.Controls.MenuItem).IsEnabled = isEnabled;
       }
 
       /// <summary>
-      /// Select all results text.
+      /// Handles finding the current line under the mouse pointer to open the texteditor at that location.
       /// </summary>
       /// <param name="sender">system parameter</param>
       /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]        10/10/2012  Initial: 3575509, show copy/select all context menu
-      /// </history>
-      private void txtHitsContextSelectAll_Click(object sender, EventArgs e)
+      private void openFile_Click(object sender, System.Windows.RoutedEventArgs e)
+      {
+         var position = txtHits.GetPositionFromRightClickPoint();
+         if (position.HasValue)
+         {
+            try
+            {
+               string path = string.Empty;
+               int lineNumber = position.Value.Line;
+               int columnNumber = 1;
+
+               if (txtHits.LineNumbers != null && (lstFileNames.SelectedItems.Count == 0 || !EntireFileMenuItem.Checked))
+               {
+                  // either all results or file's matches
+                  var lineNumberHolder = txtHits.LineNumbers[position.Value.Line - 1];
+
+                  path = lineNumberHolder.FileFullName;
+
+                  if (!string.IsNullOrEmpty(path))
+                  {
+                     string line = string.Empty;
+                     lineNumber = lineNumberHolder.Number > -1 ? lineNumberHolder.Number : 1;
+                     columnNumber = lineNumberHolder.ColumnNumber;
+
+                     var fileMatch = (from m in __Grep.MatchResults where m.File.FullName.Equals(path) select m).FirstOrDefault();
+                     foreach (var matchLine in fileMatch.Matches)
+                     {
+                        if (matchLine.LineNumber == lineNumber)
+                        {
+                           line = matchLine.Line;
+                           break;
+                        }
+                     }
+
+                     TextEditors.EditFile(path, lineNumber, columnNumber, line);
+                  }
+               }
+               else if (lstFileNames.SelectedItems.Count > 0 && __Grep != null)
+               {
+                  // full file
+                  MatchResult result = __Grep.RetrieveMatchResult(Convert.ToInt32(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
+                  string line = string.Empty;
+                  path = result.File.FullName;
+                  MatchResultLine matchLine = (from m in result.Matches where m.LineNumber == position.Value.Line select m).FirstOrDefault();
+                  if (matchLine != null && matchLine.LineNumber > -1)
+                  {
+                     line = matchLine.Line;
+                     lineNumber = matchLine.LineNumber;
+                     columnNumber = matchLine.ColumnNumber;
+                  }
+
+                  TextEditors.EditFile(path, lineNumber, columnNumber, line);
+               }
+            }
+            catch { }
+         }
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      private void selectAllItem_Click(object sender, System.Windows.RoutedEventArgs e)
       {
          txtHits.Focus();
          txtHits.SelectAll();
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      private void copyItem_Click(object sender, System.Windows.RoutedEventArgs e)
+      {
+         txtHits.Copy();
       }
 
       /// <summary>
