@@ -253,6 +253,7 @@
       <text name="ResultsPreviewSpacerText" value="(21)"/>
       <text name="ResultsPreviewText" value="&#x9;Los resultados del ejemplo alinean y, fósforo, exhibieron"/>
       <text name="ResultsPreviewTextMatch" value="fósforo"/>
+      <text name="ResultsPreviewLargeBinaryFile" value="Este es un archivo de gran tamaño o binario, ¿estás seguro de que desea ver todo el archivo?"/>
       
       <text name="ColorOtherText" value="&amp;Costumbre..."/>
       <!-- todo: color names -->

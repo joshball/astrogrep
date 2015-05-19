@@ -253,6 +253,7 @@
       <text name="ResultsPreviewSpacerText" value="(21)"/>
       <text name="ResultsPreviewText" value="&#x9;Eksempel på et resultat - linie og, søgematch, vises" />
       <text name="ResultsPreviewTextMatch" value="søgematch" />
+      <text name="ResultsPreviewLargeBinaryFile" value="Dette er en stor eller binær fil, er du sikker på, du vil se hele filen?"/>
       
       <text name="ColorOtherText" value="&amp;Brugerindstillet..." />
       <!-- todo: color names -->

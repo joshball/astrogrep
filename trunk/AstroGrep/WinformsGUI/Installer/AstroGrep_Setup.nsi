@@ -1,4 +1,4 @@
-﻿;--------------------------------
+;--------------------------------
 ; AstroGrep.nsi
 ;
 ; It will install AstroGrep files 
@@ -12,8 +12,8 @@
 !include "DotNetForm.nsdinc"
 
 !define MUI_COMPONENTSPAGE_SMALLDESC
-!define INS_VERSION 4.4.0.0
-!define APP_VERSION "4.4.0"
+!define INS_VERSION 4.4.1.0
+!define APP_VERSION "4.4.1"
 
 ;--------------------------------
 ;Variables

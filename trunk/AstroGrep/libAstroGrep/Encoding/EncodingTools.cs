@@ -557,38 +557,41 @@ namespace libAstroGrep
 
       }
 
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="fileContent"></param>
-      /// <returns></returns>
-      public static bool IsBinaryFile(string fileContent)
-      {
-         //http://stackoverflow.com/questions/910873/how-can-i-determine-if-a-file-is-binary-or-text-in-c
-         if (fileContent.Contains("\0\0\0\0"))
-            return true;
+      ///// <summary>
+      ///// 
+      ///// </summary>
+      ///// <param name="fileContent"></param>
+      ///// <returns></returns>
+      //public static bool IsBinaryFile(string fileContent)
+      //{
+      //   //http://stackoverflow.com/questions/910873/how-can-i-determine-if-a-file-is-binary-or-text-in-c
+      //   if (fileContent.Contains("\0\0\0\0"))
+      //      return true;
 
-         return false;
-      }
+      //   return false;
+      //}
+
+      ///// <summary>
+      ///// 
+      ///// </summary>
+      ///// <param name="bytes"></param>
+      ///// <returns></returns>
+      //public static bool IsBinaryFile(byte[] bytes)
+      //{
+      //   string text = System.Text.Encoding.Default.GetString(bytes);
+      //   return IsBinaryFile(text);
+      //}
 
       /// <summary>
-      /// 
+      /// Gets a sample of the file mainly for use in encoding detection
       /// </summary>
-      /// <param name="bytes"></param>
-      /// <returns></returns>
-      public static bool IsBinaryFile(byte[] bytes)
-      {
-         string text = System.Text.Encoding.Default.GetString(bytes);
-         return IsBinaryFile(text);
-      }
-
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="filePath"></param>
-      /// <param name="maxSize"></param>
-      /// <returns></returns>
-      public static byte[] ReadFileContentSample(string filePath, int maxSize = 10240)
+      /// <param name="filePath">Full file path</param>
+      /// <param name="maxSize">Optional maximum size of sample</param>
+      /// <returns>byte array of sample data</returns>
+      /// <history>
+      /// [Curtis_Beard]		05/18/2015	FIX: 69, set max size to 1024 instead of 10240
+      /// </history>
+      public static byte[] ReadFileContentSample(string filePath, int maxSize = 1024)
       {
          byte[] buffer;
          using (FileStream stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
@@ -600,6 +603,28 @@ namespace libAstroGrep
 
             stream.Read(buffer, 0, (int)bufferSize);
          }
+
+         return buffer;
+      }
+
+      /// <summary>
+      /// Gets a sample of the file mainly for use in encoding detection.
+      /// </summary>
+      /// <param name="stream">Currently open file stream</param>
+      /// <param name="maxSize">Optional maximum size of sample</param>
+      /// <returns>byte array of sample data</returns>
+      /// <history>
+      /// [Curtis_Beard]		05/18/2015	FIX: 69, initial to use open stream.  set max size to 1024 instead of 10240
+      /// </history>
+      public static byte[] ReadFileContentSample(FileStream stream, int maxSize = 1024)
+      {
+         byte[] buffer;
+         long streamLength = stream.Length;
+         long bufferSize = Math.Min(streamLength, maxSize);
+
+         buffer = new byte[bufferSize];
+
+         stream.Read(buffer, 0, (int)bufferSize);
 
          return buffer;
       }

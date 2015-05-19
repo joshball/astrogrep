@@ -253,6 +253,7 @@
       <text name="ResultsPreviewSpacerText" value="(21)"/>
       <text name="ResultsPreviewText" value="&#x9;Example results line and, match, displayed"/>
       <text name="ResultsPreviewTextMatch" value="match"/>
+      <text name="ResultsPreviewLargeBinaryFile" value="This is a large or binary file, are you sure you want to view the entire file?"/>
       
       <text name="ColorOtherText" value="&amp;Custom..."/>
       <!-- todo: color names -->

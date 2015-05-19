@@ -1287,7 +1287,8 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <param name="match">Currently selected MatchResult</param>
       /// <history>
-      /// [Curtis_Beard]		04/08/2016  CHG: 20/21, display entire file and use syntax highlighter
+      /// [Curtis_Beard]		04/08/2015  CHG: 20/21, display entire file and use syntax highlighter
+      /// [Curtis_Beard]		05/18/2015  FIX: 71, use language text for message.
       /// </history>
       private void ProcessFileForDisplay(MatchResult match)
       {
@@ -1299,8 +1300,8 @@ namespace AstroGrep.Windows.Forms
          }
 
          if ((match.File.Length > 1024000 || FilterItem.IsBinaryFile(match.File)) && 
-            MessageBox.Show(this, "This is a large or binary file, are you sure you want to view the entire file?", 
-            Constants.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.No)
+            MessageBox.Show(this, Language.GetGenericText("ResultsPreviewLargeBinaryFile"), Constants.ProductName, MessageBoxButtons.YesNo, 
+            MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.No)
          {
             ProcessMatchForDisplay(match); // display just the results then and not the whole file.
             return;
