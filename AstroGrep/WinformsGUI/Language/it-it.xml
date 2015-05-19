@@ -254,6 +254,7 @@
       <text name="ResultsPreviewSpacerText" value="(21)"/>
       <text name="ResultsPreviewText" value="&#x9;Esempio di visualizzazione della riga e della corrispondenza trovata"/>
       <text name="ResultsPreviewTextMatch" value="corrispondenza trovata"/>
+      <text name="ResultsPreviewLargeBinaryFile" value="Questo è un file di grandi dimensioni o binario, sei sicuro che si desidera visualizzare l'intero file?"/>
       
       <text name="ColorOtherText" value="&amp;Personalizza..."/>
       <!-- todo: color names -->

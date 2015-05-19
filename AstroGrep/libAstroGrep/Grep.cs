@@ -496,6 +496,8 @@ namespace libAstroGrep
       /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
       /// [Curtis_Beard]		03/05/2015	FIX: 64/35, if whole word doesn't pass our check but does pass regex, make it fail.  Code cleanup.
       /// [Curtis_Beard]		04/02/2015	CHG: remove line number logic and always include line number in MatchResultLine.
+      /// [Curtis_Beard]		05/18/2015	FIX: 72, don't grab file sample when detect encoding option is turned off.
+      /// [Curtis_Beard]		05/18/2015	FIX: 69, use same stream to detect encoding and grep contents
       /// </history>
       private void SearchFileContents(FileInfo file)
       {
@@ -593,13 +595,16 @@ namespace libAstroGrep
             }
             #endregion
 
+            // open stream to file to use in encoding detection if enabled and in grep logic
+            _stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
             #region Encoding Detection
 
             string usedEncoder = string.Empty;
             System.Text.Encoding encoding = null;
 
             //
-            // find a user specified file encoding
+            // User specified file encoding
             //
             FileEncoding fileEncoding = SearchSpec.FileEncodings != null && SearchSpec.FileEncodings.Count > 0 ? 
                (from f in SearchSpec.FileEncodings where f.FilePath.Equals(file.FullName, StringComparison.InvariantCultureIgnoreCase) && f.Enabled select f).ToList().FirstOrDefault()
@@ -612,24 +617,32 @@ namespace libAstroGrep
             else
             {
                //
-               // no user specified encoding, try to detect one
+               // Detect file encoding if enabled
                //
-               byte[] sampleBytes;
-
-               //Check if can read first
-               try
+               if (SearchSpec.DetectFileEncoding)
                {
-                  sampleBytes = EncodingTools.ReadFileContentSample(file.FullName);
-               }
-               catch (Exception ex)
-               {
-                  // can't read file
-                  OnSearchError(file, ex);
-                  return;
-               }
+                  byte[] sampleBytes;
 
-               usedEncoder = string.Empty;
-               encoding = DetectEncoding(sampleBytes, out usedEncoder);
+                  //Check if can read first
+                  try
+                  {
+                     sampleBytes = EncodingTools.ReadFileContentSample(_stream);
+                  }
+                  catch (Exception ex)
+                  {
+                     // can't read file for sample bytes
+                     OnSearchError(file, ex);
+                     return;
+                  }
+
+                  encoding = EncodingDetector.Detect(sampleBytes, out usedEncoder, defaultEncoding: System.Text.Encoding.Default);
+               }
+               else
+               {
+                  // Use original encoding method before detect encoding option availalbe
+                  usedEncoder = "Default";
+                  encoding = System.Text.Encoding.Default;
+               }
             }
 
             if (encoding == null)
@@ -655,7 +668,11 @@ namespace libAstroGrep
 
             #endregion
 
-            _stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            // could have read some data for the encoding check, seek back to start of file
+            if (_stream.CanSeek)
+            {
+               _stream.Seek(0, SeekOrigin.Begin);
+            }
             _reader = new StreamReader(_stream, encoding);
 
             do
