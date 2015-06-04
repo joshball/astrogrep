@@ -7,7 +7,7 @@
     <ProjectGuid>{583FF22B-9586-4543-B4B4-747E06C963ED}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>Images\AstroGrep_Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Images\AstroGrep_Icon_256x256.ico</ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>AstroGrep</AssemblyName>
@@ -89,13 +89,24 @@
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Portable|AnyCPU'">
+    <OutputPath>bin\Portable\</OutputPath>
+    <DefineConstants>TRACE;PORTABLE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>bin\Release\AstroGrep.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.1.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.5.0.2\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NLog, Version=3.2.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.3.2.0.0\lib\net40\NLog.dll</HintPath>
+    <Reference Include="NLog, Version=3.2.1.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.3.2.1\lib\net40\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -123,9 +134,6 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\Common.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Core\Constants.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -133,8 +141,6 @@
     <Compile Include="Core\GeneralSettings.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\Logging\ILogClient.cs" />
-    <Compile Include="Core\Logging\LogClient.cs" />
     <Compile Include="Core\LogItem.cs" />
     <Compile Include="Core\PluginManager.cs">
       <SubType>Code</SubType>
@@ -163,6 +169,11 @@
     <Compile Include="Plugin.IFilter\IFilterPlugin.cs" />
     <Compile Include="Plugin.MicrosoftWord\MicrosoftWordPlugin.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Windows\CommandLineProcessing.cs">
       <SubType>Code</SubType>
@@ -284,6 +295,7 @@
     </Compile>
     <Content Include="Images\ascending-arrow-gray.gif" />
     <Content Include="Images\AstroGrep_Icon.ico" />
+    <Content Include="Images\AstroGrep_Icon_256x256.ico" />
     <Content Include="Images\descending-arrow-gray.gif" />
     <Content Include="Images\folder-open.png" />
     <EmbeddedResource Include="Language\da-dk.xml" />
@@ -294,6 +306,10 @@
     <EmbeddedResource Include="Output\Output-fileNameOnly.html" />
     <EmbeddedResource Include="Output\Output.css" />
     <EmbeddedResource Include="Output\Output.html" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Controls\ColorButton.resx">
       <DependentUpon>ColorButton.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -348,6 +364,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AstroGrep.Common\AstroGrep.Common.csproj">
+      <Project>{9a78b1c9-9260-412d-bb93-143289831b38}</Project>
+      <Name>AstroGrep.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\libAstroGrep\libAstroGrep.csproj">
       <Project>{03EDAD50-4218-41D4-AEA8-5D072253EA17}</Project>
       <Name>libAstroGrep</Name>
@@ -375,9 +395,7 @@
     <None Include="Mono\Bundle.bat" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
 using AstroGrep.Output;
 using libAstroGrep;
 
@@ -129,7 +130,7 @@ namespace AstroGrep.Windows.Forms
          catch
          {
             MessageBox.Show(Language.GetGenericText("PrintErrorPrint"),
-               Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+               ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 
@@ -166,7 +167,7 @@ namespace AstroGrep.Windows.Forms
          catch
          {
             MessageBox.Show(Language.GetGenericText("PrintErrorPreview"),
-               Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+               ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 
@@ -194,7 +195,7 @@ namespace AstroGrep.Windows.Forms
          catch
          {
             MessageBox.Show(Language.GetGenericText("PrintErrorPageSettings"),
-               Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+               ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 

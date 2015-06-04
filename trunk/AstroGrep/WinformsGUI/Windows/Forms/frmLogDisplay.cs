@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
 using AstroGrep.Core;
 using libAstroGrep;
 
@@ -217,7 +218,7 @@ namespace AstroGrep.Windows.Forms
             }
             catch (Exception ex)
             {
-               MessageBox.Show(this, "Exception: " + ex.Message, Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+               MessageBox.Show(this, "Exception: " + ex.Message, ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
          }
 
@@ -291,7 +292,7 @@ namespace AstroGrep.Windows.Forms
                if (item.ItemType == LogItem.LogItemTypes.Exclusion)
                {
                   // convert details from format FilterItem~~FilterValue
-                  string[] values = Core.Common.SplitByString(detailsText, "~~");
+                  string[] values = Utils.SplitByString(detailsText, "~~");
                   var filterItem = FilterItem.FromString(values[0]);
                   detailsText = string.Format("{0} -> {1}{2}{3}{4}", 
                      Language.GetGenericText(string.Format("Exclusions.{0}", filterItem.FilterType.Category), filterItem.FilterType.Category.ToString()), 
@@ -305,7 +306,7 @@ namespace AstroGrep.Windows.Forms
                {
                   // Value = Language lookup text (e.g. SearchFinished,SearchCancelled)
                   // Details = 0||1 replacement arguments where 0 is file name or error message, 1 is details
-                  string[] values = Core.Common.SplitByString(detailsText, "||");
+                  string[] values = Utils.SplitByString(detailsText, "||");
                   valueText = string.Format(Language.GetGenericText(valueText), values);
                   detailsText = string.Empty;
                   if (values.Length > 1)
@@ -317,7 +318,7 @@ namespace AstroGrep.Windows.Forms
                {
                   // Value = Language lookup text (e.g. SearchGenericError, SearchFileError)
                   // Details = 0||1 replacement arguments where 0 = file or empty string, 1 = details (error text)
-                  string[] values = Core.Common.SplitByString(detailsText, "||");
+                  string[] values = Utils.SplitByString(detailsText, "||");
                   valueText = string.Format(Language.GetGenericText(valueText), values[0]);
                   detailsText = values[1];
                }

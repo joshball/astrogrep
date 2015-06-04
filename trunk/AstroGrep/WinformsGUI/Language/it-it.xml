@@ -160,6 +160,9 @@
       <control name="btnFileEncodingAdd" value="&amp;Aggiungi..."/>
       <control name="btnFileEncodingEdit" value="&amp;Modifica..."/>
       <control name="btnFileEncodingDelete" value="&amp;Cancella"/>
+      <control name="lblPerformance" value="performance"/>
+      <control name="chkUseEncodingCache" value="Attiva cache per codifiche rilevati."/>
+      <control name="btnCacheClear" value="Cancella cache"/>
    </screen>
    
    <screen name="frmPrint" value="Stampa">
@@ -349,6 +352,10 @@
       <text name="FileEncoding.Enabled" value="attivato"/>
       <text name="FileEncoding.FilePath" value="Percorso file"/>
       <text name="FileEncoding.Encoding" value="Codifica"/>
+      <text name="FileEncoding.Performance.Speed" value="velocità"/>
+      <text name="FileEncoding.Performance.Default" value="difetto"/>
+      <text name="FileEncoding.Performance.Accuracy" value="accuratezza"/>
+      <text name="FileEncoding.CacheCleared" value="Cache eliminato con successo."/>
    </generic>
    
 </language>

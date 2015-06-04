@@ -40,6 +40,7 @@ namespace AstroGrep
    /// [Mark_Guerra]       11/06/2014  CHG: 91, exclude compiled java classes and compiled windows html help files (class,chm)
    /// [Curtis_Beard]	   04/08/2015	CHG: add logging
    /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
+   /// [Curtis_Beard]	   06/02/2015	CHG: move some values to AstroGrep.Common
    /// </history>
    public class Constants
    {
@@ -85,101 +86,11 @@ namespace AstroGrep
       /// <summary>Default extension exclusion list</summary>
       private static string DEFAULT_EXTENSION_EXCLUDE_LIST = ".exe;.dll;.pdb;.msi;.sys;.ppt;.gif;.jpg;.jpeg;.png;.bmp;.class;.chm";
 
-      /// <summary>Product name</summary>
-      public const string ProductName = "AstroGrep";
-
       /// <summary>Default search panel width</summary>
       public const int DEFAULT_SEARCH_PANEL_WIDTH = 290;
 
       /// <summary>Default search panel width when under medium font size dpi setting</summary>
       public const int DEFAULT_SEARCH_PANEL_WIDTH_MEDIUM_FONT = 345;
-
-      /// <summary>Product Location</summary>
-      public static string ProductLocation
-      {
-         get
-         {
-            FileInfo file = new FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-            return file.Directory.FullName;
-         }
-      }
-
-      /// <summary>Product FullName to executing file.</summary>
-      public static string ProductFullName
-      {
-         get
-         {
-            FileInfo file = new FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-            return file.FullName;
-         }
-      }
-
-      /// <summary>
-      /// Gets the current product version.
-      /// </summary>
-      public static Version ProductVersion
-      {
-         get
-         {
-            System.Reflection.Assembly _assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            return _assembly.GetName().Version;
-         }
-      }
-
-      /// <summary>
-      /// Retrieves the current data directory for storing user settings, logs, etc.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]	  04/08/2015	ADD: logging
-      /// </history>
-      public static string DataDirectory
-      {
-         get
-         {
-            string path = string.Empty;
-
-            if (Core.Common.StoreDataLocal)
-            {
-               path = ProductLocation;
-            }
-            else
-            {
-               path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Constants.ProductName);
-            }
-
-            return path;
-         }
-      }
-
-      /// <summary>
-      /// Retrieves the log file's full name.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]	  04/08/2015	ADD: logging
-      /// </history>
-      public static string LogFile
-      {
-         get
-         {
-            return Path.Combine(DataDirectory, "Log", ProductName + ".log");
-         }
-      }
-
-      /// <summary>
-      /// Retrieves the log archive file's full name.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]	  04/08/2015	ADD: logging
-      /// </history>
-      public static string LogFileArchive
-      {
-         get
-         {
-            return Path.Combine(DataDirectory, "Log", ProductName + ".{#}.log");
-         }
-      }
 
       /// <summary>
       /// Gets the default exclusions

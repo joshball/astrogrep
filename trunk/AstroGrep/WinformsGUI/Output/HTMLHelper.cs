@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using AstroGrep.Core;
-using AstroGrep.Core.Logging;
+using AstroGrep.Common.Logging;
 using libAstroGrep;
 
 namespace AstroGrep.Output

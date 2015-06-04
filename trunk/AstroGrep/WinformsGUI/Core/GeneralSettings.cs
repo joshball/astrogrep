@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 
+using AstroGrep.Common;
+
 namespace AstroGrep.Core
 {
    /// <summary>
@@ -47,6 +49,7 @@ namespace AstroGrep.Core
    /// [Curtis_Beard]		03/06/2015	CHG: default texteditor is created instead of using delimeter which is now private
    /// [Curtis_Beard]	   04/08/2015	ADD: 20, option to show entire file contents
    /// [Curtis_Beard]	   03/02/2015	FIX: 49, graphical glitch when using 125% dpi setting
+   /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
    /// </history>
    public sealed class GeneralSettings
    {
@@ -111,11 +114,12 @@ namespace AstroGrep.Core
 
       private string filePanelFont = string.Format("Microsoft Sans Serif{0}8.25{0}Regular", Constants.FONT_SEPARATOR);
 
-      private bool detectFileEncoding = true;
-
       private bool removeLeadingWhiteSpace = false;
 
+      private bool detectFileEncoding = true;
       private string fileEncodings = string.Empty;
+      private int encodingPerformance = 2;
+      private bool useEncodingCache = true;
 
       private bool showEntireFile = false;
       #endregion
@@ -143,7 +147,7 @@ namespace AstroGrep.Core
       {
          get
          {
-            return Path.Combine(Constants.DataDirectory, "AstroGrep.general.config");
+            return Path.Combine(ApplicationPaths.DataFolder, "AstroGrep.general.config");
          }
       }
 
@@ -514,21 +518,30 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
-      /// Gets/sets whether to detect file encodings.
-      /// </summary>
-      static public bool DetectFileEncoding
-      {
-         get { return MySettings.detectFileEncoding; }
-         set { MySettings.detectFileEncoding = value; }
-      }
-
-      /// <summary>
       /// Gets/sets whether to remove leading white space from lines in file output area.
       /// </summary>
       static public bool RemoveLeadingWhiteSpace
       {
          get { return MySettings.removeLeadingWhiteSpace; }
          set { MySettings.removeLeadingWhiteSpace = value; }
+      }
+
+      /// <summary>
+      /// Show entire file contents.
+      /// </summary>
+      static public bool ShowEntireFile
+      {
+         get { return MySettings.showEntireFile; }
+         set { MySettings.showEntireFile = value; }
+      }
+
+      /// <summary>
+      /// Gets/sets whether to detect file encodings.
+      /// </summary>
+      static public bool DetectFileEncoding
+      {
+         get { return MySettings.detectFileEncoding; }
+         set { MySettings.detectFileEncoding = value; }
       }
 
       /// <summary>
@@ -541,12 +554,21 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
-      /// Show entire file contents.
+      /// Gets/Sets the user specified file encoding detection performance level.
       /// </summary>
-      static public bool ShowEntireFile
+      static public int EncodingPerformance
       {
-         get { return MySettings.showEntireFile; }
-         set { MySettings.showEntireFile = value; }
+         get { return MySettings.encodingPerformance; }
+         set { MySettings.encodingPerformance = value; }
+      }
+
+      /// <summary>
+      /// Gets/Sets to enable encoding cache.
+      /// </summary>
+      static public bool UseEncodingCache
+      {
+         get { return MySettings.useEncodingCache; }
+         set { MySettings.useEncodingCache = value; }
       }
    }
 }

@@ -42,29 +42,32 @@ namespace AstroGrep.Windows.Controls
    /// ted@astrocomma.com or curtismbeard@gmail.com
    /// 
    /// 
-   /// 
+   /// Design Note:
    /// If List is equal to number of total lines, then use each specified, otherwise
    /// use only given LineNumbers that match to the given line number displayed.
+   /// 
    /// </remarks>
    /// <history>
-   /// 
+   /// [Curtis_Beard]		04/08/2015	ADD: update RichTextBox to AvalonEdit
    /// </history>
    public class CustomLineNumberMargin : LineNumberMargin
    {
       /// <summary>
-      /// 
+      /// Current list of line numbers to display.
       /// </summary>
       public List<LineNumber> LineNumbers { get; set; }
 
       /// <summary>
-      /// 
+      /// Overrides to calculate size based on current line number max length.
       /// </summary>
-      /// <param name="availableSize"></param>
-      /// <returns></returns>
+      /// <param name="availableSize">available size</param>
+      /// <returns>Size value of margin width</returns>
+      /// <remarks>Defaults to 2</remarks>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	ADD: update RichTextBox to AvalonEdit
+      /// </history>
       protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
       {
-         //return base.MeasureOverride(availableSize);
-
          int numberLength = 2;
          if (LineNumbers != null && LineNumbers.Count == this.Document.LineCount)
          {
@@ -94,13 +97,14 @@ namespace AstroGrep.Windows.Controls
       }
 
       /// <summary>
-      /// 
+      /// Renders the current line numbers to the margin.
       /// </summary>
-      /// <param name="drawingContext"></param>
+      /// <param name="drawingContext">The current drawing context used to write line numbers</param>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	ADD: update RichTextBox to AvalonEdit
+      /// </history>
       protected override void OnRender(System.Windows.Media.DrawingContext drawingContext)
       {
-         //base.OnRender(drawingContext);
-
          TextView textView = this.TextView;
          Size renderSize = this.RenderSize;
          if (textView != null && textView.VisualLinesValid)
@@ -151,14 +155,17 @@ namespace AstroGrep.Windows.Controls
       }
 
       /// <summary>
-      /// 
+      /// Copied from source code of AvalonEdit in order to use in custom implemenation.
       /// </summary>
-      /// <param name="element"></param>
-      /// <param name="text"></param>
-      /// <param name="typeface"></param>
-      /// <param name="emSize"></param>
-      /// <param name="foreground"></param>
-      /// <returns></returns>
+      /// <param name="element">Current framework element</param>
+      /// <param name="text">Current text</param>
+      /// <param name="typeface">Current typeface</param>
+      /// <param name="emSize">Requested size</param>
+      /// <param name="foreground">Current foreground brush</param>
+      /// <returns>FormattedText for framework element</returns>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	ADD: update RichTextBox to AvalonEdit
+      /// </history>
       private FormattedText CreateFormattedText(FrameworkElement element, string text, Typeface typeface, double? emSize, Brush foreground)
       {
          return new FormattedText(
@@ -174,10 +181,13 @@ namespace AstroGrep.Windows.Controls
       }
 
       /// <summary>
-      /// 
+      /// Copied from source code of AvalonEdit in order to use in custom implemenation.
       /// </summary>
-      /// <param name="fe"></param>
-      /// <returns></returns>
+      /// <param name="fe">Current framework element</param>
+      /// <returns>Typeface based on current element</returns>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	ADD: update RichTextBox to AvalonEdit
+      /// </history>
       private Typeface CreateTypeface(FrameworkElement fe)
       {
          return new Typeface((FontFamily)fe.GetValue(TextBlock.FontFamilyProperty),

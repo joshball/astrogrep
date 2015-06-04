@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 
+using AstroGrep.Common;
+
 namespace AstroGrep.Core
 {
    /// <summary>
@@ -66,7 +68,7 @@ namespace AstroGrep.Core
       {
          get
          {
-            return Path.Combine(Constants.DataDirectory, "AstroGrep.plugins.config");
+            return Path.Combine(ApplicationPaths.DataFolder, "AstroGrep.plugins.config");
          }
       }
 

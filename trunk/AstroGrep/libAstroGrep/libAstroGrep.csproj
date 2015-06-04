@@ -35,7 +35,20 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Portable|AnyCPU'">
+    <OutputPath>bin\Portable\</OutputPath>
+    <DefineConstants>TRACE;PORTABLE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=3.2.1.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.3.2.1\lib\net40\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,85 +57,88 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Encoding\EncodingDetector.cs" />
-    <Compile Include="Encoding\EncodingTools.cs" />
-    <Compile Include="Encoding\FileEncoding.cs" />
-    <Compile Include="Encoding\KlerksSoftEncodingDetector.cs" />
-    <Compile Include="Encoding\Multilang\CMLangConvertCharset.cs" />
-    <Compile Include="Encoding\Multilang\CMLangConvertCharsetClass.cs" />
-    <Compile Include="Encoding\Multilang\CMLangString.cs" />
-    <Compile Include="Encoding\Multilang\CMLangStringClass.cs" />
-    <Compile Include="Encoding\Multilang\CMultiLanguage.cs" />
-    <Compile Include="Encoding\Multilang\CMultiLanguageClass.cs" />
-    <Compile Include="Encoding\Multilang\IEnumCodePage.cs" />
-    <Compile Include="Encoding\Multilang\IEnumRfc1766.cs" />
-    <Compile Include="Encoding\Multilang\IEnumScript.cs" />
-    <Compile Include="Encoding\Multilang\IMLangCodePages.cs" />
-    <Compile Include="Encoding\Multilang\IMLangConvertCharset.cs" />
-    <Compile Include="Encoding\Multilang\IMLangFontLink.cs" />
-    <Compile Include="Encoding\Multilang\IMLangFontLink2.cs" />
-    <Compile Include="Encoding\Multilang\IMLangLineBreakConsole.cs" />
-    <Compile Include="Encoding\Multilang\IMLangString.cs" />
-    <Compile Include="Encoding\Multilang\IMLangStringAStr.cs" />
-    <Compile Include="Encoding\Multilang\IMLangStringBufA.cs" />
-    <Compile Include="Encoding\Multilang\IMLangStringBufW.cs" />
-    <Compile Include="Encoding\Multilang\IMLangStringWStr.cs" />
-    <Compile Include="Encoding\Multilang\IMultiLanguage.cs" />
-    <Compile Include="Encoding\Multilang\IMultiLanguage2.cs" />
-    <Compile Include="Encoding\Multilang\IMultiLanguage3.cs" />
-    <Compile Include="Encoding\Multilang\ISequentialStream.cs" />
-    <Compile Include="Encoding\Multilang\IStream.cs" />
-    <Compile Include="Encoding\Multilang\tagDetectEncodingInfo.cs" />
-    <Compile Include="Encoding\Multilang\tagMIMECONTF.cs" />
-    <Compile Include="Encoding\Multilang\tagMIMECPINFO.cs" />
-    <Compile Include="Encoding\Multilang\tagMIMECSETINFO.cs" />
-    <Compile Include="Encoding\Multilang\tagMLCPF.cs" />
-    <Compile Include="Encoding\Multilang\tagMLDETECTCP.cs" />
-    <Compile Include="Encoding\Multilang\tagMLSTR_FLAGS.cs" />
-    <Compile Include="Encoding\Multilang\tagRFC1766INFO.cs" />
-    <Compile Include="Encoding\Multilang\tagSCRIPFONTINFO.cs" />
-    <Compile Include="Encoding\Multilang\tagSCRIPTINFO.cs" />
-    <Compile Include="Encoding\Multilang\tagSTATSTG.cs" />
-    <Compile Include="Encoding\Multilang\tagUNICODERANGE.cs" />
-    <Compile Include="Encoding\Multilang\_FILETIME.cs" />
-    <Compile Include="Encoding\Multilang\_LARGE_INTEGER.cs" />
-    <Compile Include="Encoding\Multilang\_RemotableHandle.cs" />
-    <Compile Include="Encoding\Multilang\_ULARGE_INTEGER.cs" />
-    <Compile Include="Encoding\Multilang\__MIDL_IWinTypes_0009.cs" />
-    <Compile Include="Encoding\Ude\CharsetDetector.cs" />
-    <Compile Include="Encoding\Ude\DetectionConfidence.cs" />
-    <Compile Include="Encoding\Ude\ICharsetDetector.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\Big5Prober.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\BitPackage.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\CharDistributionAnalyser.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\CharsetProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\Charsets.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\CodingStateMachine.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\EscCharsetProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\EscSM.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\EUCJPProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\EUCKRProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\EUCTWProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\GB18030Prober.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\HebrewProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\JapaneseContextAnalyser.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\LangBulgarianModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\LangCyrillicModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\LangGreekModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\LangHebrewModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\LangHungarianModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\LangThaiModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\Latin1Prober.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\MBCSGroupProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\MBCSSM.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\SBCharsetProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\SBCSGroupProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\SequenceModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\SJISProber.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\SMModel.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\UniversalDetector.cs" />
-    <Compile Include="Encoding\Ude\Ude.Core\UTF8Prober.cs" />
-    <Compile Include="Encoding\WinMergeEncodingDetector.cs" />
+    <Compile Include="EncodingDetection\Caching\EncodingCache.cs" />
+    <Compile Include="EncodingDetection\Caching\EncodingCacheItem.cs" />
+    <Compile Include="EncodingDetection\EncodingDetector.cs" />
+    <Compile Include="EncodingDetection\EncodingOptions.cs" />
+    <Compile Include="EncodingDetection\EncodingTools.cs" />
+    <Compile Include="EncodingDetection\FileEncoding.cs" />
+    <Compile Include="EncodingDetection\KlerksSoftEncodingDetector.cs" />
+    <Compile Include="EncodingDetection\Multilang\CMLangConvertCharset.cs" />
+    <Compile Include="EncodingDetection\Multilang\CMLangConvertCharsetClass.cs" />
+    <Compile Include="EncodingDetection\Multilang\CMLangString.cs" />
+    <Compile Include="EncodingDetection\Multilang\CMLangStringClass.cs" />
+    <Compile Include="EncodingDetection\Multilang\CMultiLanguage.cs" />
+    <Compile Include="EncodingDetection\Multilang\CMultiLanguageClass.cs" />
+    <Compile Include="EncodingDetection\Multilang\IEnumCodePage.cs" />
+    <Compile Include="EncodingDetection\Multilang\IEnumRfc1766.cs" />
+    <Compile Include="EncodingDetection\Multilang\IEnumScript.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangCodePages.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangConvertCharset.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangFontLink.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangFontLink2.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangLineBreakConsole.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangString.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangStringAStr.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangStringBufA.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangStringBufW.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMLangStringWStr.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMultiLanguage.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMultiLanguage2.cs" />
+    <Compile Include="EncodingDetection\Multilang\IMultiLanguage3.cs" />
+    <Compile Include="EncodingDetection\Multilang\ISequentialStream.cs" />
+    <Compile Include="EncodingDetection\Multilang\IStream.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagDetectEncodingInfo.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagMIMECONTF.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagMIMECPINFO.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagMIMECSETINFO.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagMLCPF.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagMLDETECTCP.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagMLSTR_FLAGS.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagRFC1766INFO.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagSCRIPFONTINFO.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagSCRIPTINFO.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagSTATSTG.cs" />
+    <Compile Include="EncodingDetection\Multilang\tagUNICODERANGE.cs" />
+    <Compile Include="EncodingDetection\Multilang\_FILETIME.cs" />
+    <Compile Include="EncodingDetection\Multilang\_LARGE_INTEGER.cs" />
+    <Compile Include="EncodingDetection\Multilang\_RemotableHandle.cs" />
+    <Compile Include="EncodingDetection\Multilang\_ULARGE_INTEGER.cs" />
+    <Compile Include="EncodingDetection\Multilang\__MIDL_IWinTypes_0009.cs" />
+    <Compile Include="EncodingDetection\Ude\CharsetDetector.cs" />
+    <Compile Include="EncodingDetection\Ude\DetectionConfidence.cs" />
+    <Compile Include="EncodingDetection\Ude\ICharsetDetector.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\Big5Prober.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\BitPackage.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\CharDistributionAnalyser.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\CharsetProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\Charsets.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\CodingStateMachine.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\EscCharsetProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\EscSM.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\EUCJPProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\EUCKRProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\EUCTWProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\GB18030Prober.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\HebrewProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\JapaneseContextAnalyser.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\LangBulgarianModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\LangCyrillicModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\LangGreekModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\LangHebrewModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\LangHungarianModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\LangThaiModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\Latin1Prober.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\MBCSGroupProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\MBCSSM.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\SBCharsetProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\SBCSGroupProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\SequenceModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\SJISProber.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\SMModel.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\UniversalDetector.cs" />
+    <Compile Include="EncodingDetection\Ude\Ude.Core\UTF8Prober.cs" />
+    <Compile Include="EncodingDetection\WinMergeEncodingDetector.cs" />
     <Compile Include="Filtering\ExclusionItem.cs" />
     <Compile Include="Filtering\FilterItem.cs" />
     <Compile Include="Filtering\FilterType.cs" />
@@ -138,6 +154,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AstroGrep.Common\AstroGrep.Common.csproj">
+      <Project>{9a78b1c9-9260-412d-bb93-143289831b38}</Project>
+      <Name>AstroGrep.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

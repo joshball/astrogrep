@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
 using AstroGrep.Core;
 
 namespace AstroGrep.Windows.Forms
@@ -93,6 +94,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   02/07/2012	Initial: 3485450, add check for updates
       /// [Curtis_Beard]	   11/26/2014	CHG: partial update to update checking
+      /// [Curtis_Beard]		06/02/2015	CHG: use Common code to get url
       /// </history>
       private void CheckForUpdate()
       {
@@ -101,7 +103,7 @@ namespace AstroGrep.Windows.Forms
             // give some delay to see the checking for version message
             Thread.Sleep(2000);
 
-            WebRequest webReq = WebRequest.Create("http://astrogrep.sourceforge.net/version.html");
+            WebRequest webReq = WebRequest.Create(ProductInformation.VersionUrl);
             webReq.Proxy = WebRequest.GetSystemWebProxy();
             webReq.Timeout = 9000;
 
@@ -127,15 +129,15 @@ namespace AstroGrep.Windows.Forms
                Version newestVersion = new Version(sbResult.ToString());
 
                // current version
-               Version currentVersion = AstroGrep.Constants.ProductVersion;
+               Version currentVersion = ProductInformation.ApplicationVersion;
 
                if (currentVersion.CompareTo(newestVersion) < 0)
                {
-                  UpdateMessage(string.Format(Language.GetGenericText("Update.NewVersion"), Constants.ProductName, newestVersion.ToString(3)), newestVersion.ToString(3));
+                  UpdateMessage(string.Format(Language.GetGenericText("Update.NewVersion"), ProductInformation.ApplicationName, newestVersion.ToString(3)), newestVersion.ToString(3));
                }
                else
                {
-                  UpdateMessage(string.Format(Language.GetGenericText("Update.Current"), Constants.ProductName, currentVersion.ToString(3)), string.Empty);
+                  UpdateMessage(string.Format(Language.GetGenericText("Update.Current"), ProductInformation.ApplicationName, currentVersion.ToString(3)), string.Empty);
                }
             }
          }
@@ -167,7 +169,7 @@ namespace AstroGrep.Windows.Forms
          if (!string.IsNullOrEmpty(newestVersion))
          {
             lnkDownload.Visible = true;
-            lnkDownload.Text = string.Format(Language.GetGenericText("Update.Latest"), Constants.ProductName, newestVersion);
+            lnkDownload.Text = string.Format(Language.GetGenericText("Update.Latest"), ProductInformation.ApplicationName, newestVersion);
          }
       }
 
@@ -179,10 +181,11 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   02/07/2012	Initial: 3485450, add check for updates
       /// [Curtis_Beard]	   11/26/2014	CHG: partial update to update checking
+      /// [Curtis_Beard]		06/02/2015	CHG: use Common code to get url
       /// </history>
       private void lnkDownload_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
       {
-         System.Diagnostics.Process.Start("http://astrogrep.sourceforge.net/download/");
+         System.Diagnostics.Process.Start(ProductInformation.DownloadUrl);
       }
    }
 }
