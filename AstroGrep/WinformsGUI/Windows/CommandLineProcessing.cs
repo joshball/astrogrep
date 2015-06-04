@@ -2,7 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 
-using AstroGrep.Core.Logging;
+using AstroGrep.Common.Logging;
 
 namespace AstroGrep.Windows
 {
@@ -13,7 +13,6 @@ namespace AstroGrep.Windows
    /// [/spath="value"]                - Start Path
    /// [/stypes="value"]               - File Types
    /// [/stext="value"]                - Search Text
-   /// [/local]                        - Store config files in local directory
    /// [/e]                            - Use regular expressions
    /// [/c]                            - Case sensitive
    /// [/w]                            - Whole Word
@@ -66,6 +65,7 @@ namespace AstroGrep.Windows
    /// <history>
    /// 	[Curtis_Beard]		07/25/2006	ADD: 1492221, command line parameters
    /// 	[Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
+   /// 	[Curtis_Beard]		06/02/2015	CHG: 97, remove /local since portable version created
    /// </history>
    public class CommandLineProcessing
    {
@@ -76,6 +76,7 @@ namespace AstroGrep.Windows
       /// [Curtis_Beard]		07/26/2006	Created
       /// [Curtis_Beard]		09/26/2012	ADD: display help option
       /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
+      /// [Curtis_Beard]		06/02/2015	CHG: 97, remove /local since portable version created
       /// </history>
       public struct CommandLineArguments
       {
@@ -127,9 +128,6 @@ namespace AstroGrep.Windows
          public bool SkipSystemFile;
          /// <summary></summary>
          public bool SkipSystemDirectory;
-
-         /// <summary></summary>
-         public bool StoreDataLocal;
 
          /// <summary></summary>
          public bool DisplayHelp;
@@ -245,6 +243,7 @@ namespace AstroGrep.Windows
       /// [Curtis_Beard]		07/26/2006	Created
       /// [Curtis_Beard]		09/26/2012	ADD: display help option
       /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
+      /// [Curtis_Beard]		06/02/2015	CHG: 97, remove /local since portable version created
       /// </history>
       private static void InitializeArgs(ref CommandLineArguments args)
       {
@@ -278,8 +277,6 @@ namespace AstroGrep.Windows
          args.SkipSystemFile = false;
          args.SkipSystemDirectory = false;
 
-         args.StoreDataLocal = false;
-
          args.DisplayHelp = false;
 
          args.OutputPath = string.Empty;
@@ -310,6 +307,7 @@ namespace AstroGrep.Windows
       /// [Curtis_Beard]		05/18/2007	CHG: use new command line arguments
       /// [Curtis_Beard]		09/26/2012	ADD: display help option
       /// [Curtis_Beard]		04/08/2014	CHG: 74, add missing search options, exit, save
+      /// [Curtis_Beard]		06/02/2015	CHG: 97, remove /local since portable version created
       /// </history>
       private static void ProcessFlags(Arguments myArgs, ref CommandLineArguments args)
       {
@@ -402,12 +400,6 @@ namespace AstroGrep.Windows
             args.SearchText = myArgs["stext"];
          }
 
-         if (myArgs["local"] != null)
-         {
-            args.StoreDataLocal = true;
-            Core.Common.StoreDataLocal = true;
-         }
-
          if (myArgs["h"] != null || myArgs["?"] != null || myArgs["help"] != null)
          {
             args.DisplayHelp = true;
@@ -431,7 +423,7 @@ namespace AstroGrep.Windows
             // set default path if not defined
             if (string.IsNullOrEmpty(args.OutputPath))
             {
-               args.OutputPath = System.IO.Path.Combine(AstroGrep.Constants.ProductLocation, string.Format("results.{0}", args.OutputType));
+               args.OutputPath = System.IO.Path.Combine(Environment.CurrentDirectory, string.Format("results.{0}", args.OutputType));
             }
 
             // since they want to save results, then we have to start search

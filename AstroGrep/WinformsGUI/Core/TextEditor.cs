@@ -1,5 +1,7 @@
 using System;
 
+using AstroGrep.Common;
+
 namespace AstroGrep
 {
    /// <summary>
@@ -211,7 +213,7 @@ namespace AstroGrep
 
          if (classAsString.Length > 0 && classAsString.IndexOf(DELIMETER) > -1)
          {
-            string[] values = Core.Common.SplitByString(classAsString, DELIMETER);
+            string[] values = Utils.SplitByString(classAsString, DELIMETER);
 
             if (values.Length >= 3)
             {

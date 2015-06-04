@@ -160,6 +160,9 @@
       <control name="btnFileEncodingAdd" value="A&amp;gregar..."/>
       <control name="btnFileEncodingEdit" value="Correg&amp;ir..."/>
       <control name="btnFileEncodingDelete" value="&amp;Quitar"/>
+      <control name="lblPerformance" value="rendimiento"/>
+      <control name="chkUseEncodingCache" value="Habilitar caché para codificaciones detectadas."/>
+      <control name="btnCacheClear" value="Limpiar Cache"/>
    </screen>
    
    <screen name="frmPrint" value="Impresión">
@@ -348,6 +351,10 @@
       <text name="FileEncoding.Enabled" value="Permitido"/>
       <text name="FileEncoding.FilePath" value="Ruta del archivo"/>
       <text name="FileEncoding.Encoding" value="codificación"/>
+      <text name="FileEncoding.Performance.Speed" value="velocidad"/>
+      <text name="FileEncoding.Performance.Default" value="defecto"/>
+      <text name="FileEncoding.Performance.Accuracy" value="precisión"/>
+      <text name="FileEncoding.CacheCleared" value="Caché aclaró éxito."/>
    </generic>
    
 </language>

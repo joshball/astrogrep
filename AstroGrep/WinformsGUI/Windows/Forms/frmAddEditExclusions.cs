@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
 using AstroGrep.Windows.Controls;
 using libAstroGrep;
 
@@ -294,14 +295,14 @@ namespace AstroGrep.Windows.Forms
          // needs to be a category
          if (cboCategories.SelectedIndex == -1)
          {
-            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.NoCategory"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.NoCategory"), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             return null;
          }
 
          // needs to be a type
          if (cboTypes.SelectedIndex == -1)
          {
-            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.NoType"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.NoType"), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             return null;
          }
 
@@ -333,7 +334,7 @@ namespace AstroGrep.Windows.Forms
          // needs to be a value
          if (item.FilterType.ValueType != FilterType.ValueTypes.Null && string.IsNullOrEmpty(item.Value.Trim()))
          {
-            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.NoValue"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.NoValue"), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             return null;
          }
 
@@ -341,7 +342,7 @@ namespace AstroGrep.Windows.Forms
          if (item.ValueOption == FilterType.ValueOptions.None &&
             (item.FilterType.SupportedValueOptions != null && item.FilterType.SupportedValueOptions.Count > 0 && item.FilterType.SupportedValueOptions[0] != FilterType.ValueOptions.None))
          {
-            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.InvalidOptions"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show(this, Language.GetGenericText("Exclusions.Error.InvalidOptions"), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             return null;
          }
 
@@ -356,7 +357,7 @@ namespace AstroGrep.Windows.Forms
                   var existing = (from i in filterItems where i.FilterType.Category == item.FilterType.Category && i.FilterType.SubCategory == item.FilterType.SubCategory select i).ToList();
                   if (existing.Count > 0)
                   {
-                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), item.FilterType.SubCategory, item.FilterType.Category), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), item.FilterType.SubCategory, item.FilterType.Category), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                      return null;
                   }
                }
@@ -368,7 +369,7 @@ namespace AstroGrep.Windows.Forms
                   var existing = (from i in filterItems where i.FilterType.Category == item.FilterType.Category && i.FilterType.SubCategory == item.FilterType.SubCategory select i).ToList();
                   if (existing.Count > 0)
                   {
-                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), item.FilterType.SubCategory, item.FilterType.Category), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), item.FilterType.SubCategory, item.FilterType.Category), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                      return null;
                   }
                }

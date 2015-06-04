@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
+
 namespace AstroGrep.Windows.Forms
 {
    /// <summary>
@@ -254,7 +256,7 @@ namespace AstroGrep.Windows.Forms
                {
                   this.DialogResult = DialogResult.None;
                   MessageBox.Show(this, Language.GetGenericText("TextEditorsErrorFileTypeExists"),
-                     Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                     ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                   return;
                }
             }
@@ -366,7 +368,7 @@ namespace AstroGrep.Windows.Forms
          {
             if (txtFileType.Text.Equals(Constants.ALL_FILE_TYPES))
             {
-               MessageBox.Show(Language.GetGenericText("TextEditorsAllTypesDefined"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+               MessageBox.Show(Language.GetGenericText("TextEditorsAllTypesDefined"), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                txtFileType.Text = string.Empty;
             }
          }

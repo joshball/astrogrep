@@ -606,7 +606,7 @@ namespace AstroGrep.Windows.Forms
          this.lblSearchOptions.Text = "Search Options";
          this.lblSearchOptions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
          this.lblSearchOptions.BackColor = SystemColors.Window;
-         this.lblSearchOptions.ForeColor = AstroGrep.Core.Common.ASTROGREP_ORANGE;
+         this.lblSearchOptions.ForeColor = AstroGrep.Common.ProductInformation.ApplicationColor;
          this.lblSearchOptions.Padding = new Padding(0, 0, 0, 2);
          this.lblSearchOptions.Paint += lblSearchOptions_Paint;
          // 
@@ -771,7 +771,7 @@ namespace AstroGrep.Windows.Forms
          this.lblSearchHeading.Text = "AstroGrep Search";
          this.lblSearchHeading.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
          this.lblSearchHeading.BackColor = SystemColors.Window;
-         this.lblSearchHeading.ForeColor = AstroGrep.Core.Common.ASTROGREP_ORANGE;
+         this.lblSearchHeading.ForeColor = AstroGrep.Common.ProductInformation.ApplicationColor;
          this.lblSearchHeading.Paint += lblSearchHeading_Paint;
          this.lblSearchHeading.Padding = new Padding(0, 0, 0, 4);
          // 

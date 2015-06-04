@@ -37,6 +37,7 @@ namespace AstroGrep.Windows.Controls
    /// </remarks>
    /// <history>
    /// [Curtis_Beard]		04/08/2015	ADD: update RichTextBox to AvalonEdit
+   /// [Curtis_Beard]	   05/11/2015	CHG: zoom for TextEditor control
    /// </history>
    public class TextEditorEx : TextEditor
    {
@@ -151,10 +152,17 @@ namespace AstroGrep.Windows.Controls
       /// <summary>
       /// Specifies the displayed line numbers in the left margin.
       /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	  05/28/2015	FIX: 74, invalidate measure when numbers are updated
+      /// </history>
       public List<LineNumber> LineNumbers
       {
          get { return customMargin.LineNumbers; }
-         set { customMargin.LineNumbers = value; }
+         set 
+         { 
+            customMargin.LineNumbers = value; 
+            customMargin.InvalidateMeasure(); 
+         }
       }
 
       /// <summary>

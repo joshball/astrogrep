@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+
+using libAstroGrep.EncodingDetection;
+using libAstroGrep.EncodingDetection.Caching;
 using libAstroGrep.Plugin;
 
 namespace libAstroGrep
@@ -149,9 +152,15 @@ namespace libAstroGrep
       /// <history>
       /// [Curtis_Beard]		07/12/2006	Created
       /// [Andrew_Radford]    13/08/2009  Added Const. dependency on ISearchSpec, IFileFilterSpec
+      /// [Curtis_Beard]		05/28/2015	FIX: 69, Created for speed improvements for encoding detection
       /// </history>
       public Grep(ISearchSpec searchSpec, IFileFilterSpec filterSpec)
       {
+         if (searchSpec.EncodingDetectionOptions == null)
+         {
+            throw new ArgumentNullException("ISearchSpec.EncodingDetectionOptions", "EncodingDetectionOptions must not be null");
+         }
+
          SearchSpec = searchSpec;
          FileFilterSpec = filterSpec;
          MatchResults = new List<MatchResult>();
@@ -165,6 +174,11 @@ namespace libAstroGrep
             {
                int.TryParse(fileCountFilter.Value, out userFilterCount);
             }
+         }
+
+         if (SearchSpec.EncodingDetectionOptions.DetectFileEncoding && SearchSpec.EncodingDetectionOptions.UseEncodingCache)
+         {
+            EncodingCache.Instance.Load(SearchSpec.EncodingDetectionOptions.PerformanceSetting);
          }
       }
 
@@ -283,6 +297,7 @@ namespace libAstroGrep
       /// <history>
       /// [Curtis_Beard]      07/12/2006	Created
       /// [Curtis_Beard]		08/21/2007	FIX: 1778467, send cancel event on generic error
+      /// [Curtis_Beard]		05/28/2015	FIX: 69, Created for speed improvements for encoding detection
       /// </history>
       private void StartGrep()
       {
@@ -305,6 +320,11 @@ namespace libAstroGrep
          finally
          {
             UnloadPlugins();
+
+            if (SearchSpec.EncodingDetectionOptions.DetectFileEncoding && SearchSpec.EncodingDetectionOptions.UseEncodingCache)
+            {
+               EncodingCache.Instance.Save(SearchSpec.EncodingDetectionOptions.PerformanceSetting);
+            }
          }
       }
 
@@ -498,10 +518,11 @@ namespace libAstroGrep
       /// [Curtis_Beard]		04/02/2015	CHG: remove line number logic and always include line number in MatchResultLine.
       /// [Curtis_Beard]		05/18/2015	FIX: 72, don't grab file sample when detect encoding option is turned off.
       /// [Curtis_Beard]		05/18/2015	FIX: 69, use same stream to detect encoding and grep contents
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
+      /// [Curtis_Beard]		06/02/2015	FIX: 75, use sample size from performance setting
       /// </history>
       private void SearchFileContents(FileInfo file)
       {
-
          // Raise SearchFile Event
          OnSearchingFile(file);
 
@@ -619,23 +640,48 @@ namespace libAstroGrep
                //
                // Detect file encoding if enabled
                //
-               if (SearchSpec.DetectFileEncoding)
+               if (SearchSpec.EncodingDetectionOptions.DetectFileEncoding)
                {
-                  byte[] sampleBytes;
-
-                  //Check if can read first
-                  try
+                  // encoding cache check
+                  var key = file.FullName;
+                  if (SearchSpec.EncodingDetectionOptions.UseEncodingCache &&
+                     EncodingCache.Instance.ContainsKey(key))
                   {
-                     sampleBytes = EncodingTools.ReadFileContentSample(_stream);
-                  }
-                  catch (Exception ex)
-                  {
-                     // can't read file for sample bytes
-                     OnSearchError(file, ex);
-                     return;
-                  }
+                     var value = EncodingCache.Instance.GetItem(key);
 
-                  encoding = EncodingDetector.Detect(sampleBytes, out usedEncoder, defaultEncoding: System.Text.Encoding.Default);
+                     usedEncoder = value.DetectorName;
+                     encoding = System.Text.Encoding.GetEncoding(value.CodePage);
+                  }
+                  else
+                  {
+                     byte[] sampleBytes;
+
+                     //Check if can read first
+                     try
+                     {
+                        int sampleSize = EncodingOptions.GetSampleSizeByPerformance(SearchSpec.EncodingDetectionOptions != null ? SearchSpec.EncodingDetectionOptions.PerformanceSetting : EncodingOptions.Performance.Default);
+                        sampleBytes = EncodingTools.ReadFileContentSample(_stream, sampleSize);
+                     }
+                     catch (Exception ex)
+                     {
+                        // can't read file for sample bytes
+                        OnSearchError(file, ex);
+                        return;
+                     }
+
+                     // detect encoding based on user set performance level that determines what detectors are used
+                     encoding = EncodingDetector.Detect(sampleBytes,
+                        out usedEncoder,
+                        EncodingOptions.GetEncodingDetectorOptionsByPerformance(SearchSpec.EncodingDetectionOptions != null ? SearchSpec.EncodingDetectionOptions.PerformanceSetting : EncodingOptions.Performance.Default),
+                        System.Text.Encoding.Default);
+
+                     // add to cache if enabled
+                     if (encoding != null && SearchSpec.EncodingDetectionOptions.UseEncodingCache)
+                     {
+                        var value = new EncodingCacheItem() { CodePage = encoding.CodePage, DetectorName = usedEncoder };
+                        EncodingCache.Instance.SetItem(key, value);
+                     }
+                  }
                }
                else
                {
@@ -1087,28 +1133,7 @@ namespace libAstroGrep
 
          return isStriktMatch;
       }
-
-      /// <summary>
-      /// Detect file encoding using passed in sample bytes of file.
-      /// If DetectFileEncoding is false, fall back to using Encoding.Default like before.
-      /// </summary>
-      /// <param name="sampleBytes">sample byts of current file</param>
-      /// <param name="usedEncoder">The used encoder name</param>
-      /// <returns>Encoding detected, otherwise if disabled use Encoding.Default</returns>
-      /// <history>
-      /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
-      /// </history>
-      private System.Text.Encoding DetectEncoding(byte[] sampleBytes, out string usedEncoder)
-      {
-         if (SearchSpec.DetectFileEncoding)
-         {
-            return EncodingDetector.Detect(sampleBytes, out usedEncoder, defaultEncoding: System.Text.Encoding.Default);
-         }
-
-         // this is the encoding previous versions used (so it is an option to return to that)
-         usedEncoder = "Default";
-         return System.Text.Encoding.Default;
-      }
+      
       #endregion
 
       #region Virtual Methods for Events

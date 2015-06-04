@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using libAstroGrep.EncodingDetection;
+
 namespace libAstroGrep
 {
    /// <summary>
@@ -29,6 +31,7 @@ namespace libAstroGrep
    /// <history>
    /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
    /// [Curtis_Beard]      04/02/2015	CHG: remove line numbers option
+   /// [Curtis_Beard]	   05/26/2015	FIX: 69, add encoding detection options
    /// </history>
    public interface ISearchSpec
    {
@@ -62,11 +65,10 @@ namespace libAstroGrep
       /// <summary>Whether to return only file names for grep results</summary>
       bool ReturnOnlyFileNames { get; }
 
-
-      /// <summary>Sets whether to detect file encoding or use default encoding (previous versions)</summary>
-      bool DetectFileEncoding { get; }
-
       /// <summary>Sets list of FileEncoding objects to force encoding of certain files selected by user</summary>
       List<FileEncoding> FileEncodings { get; }
+
+      /// <summary>Sets encoding options used when detecting encodings</summary>
+      EncodingOptions EncodingDetectionOptions { get; }
    }
 }

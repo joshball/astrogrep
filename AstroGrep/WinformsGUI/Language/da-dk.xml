@@ -160,6 +160,9 @@
       <control name="btnFileEncodingAdd" value="&amp;Tilføj..."/>
       <control name="btnFileEncodingEdit" value="&amp;Rediger..."/>
       <control name="btnFileEncodingDelete" value="&amp;Slet"/>
+      <control name="lblPerformance" value="ydeevne"/>
+      <control name="chkUseEncodingCache" value="Aktiver cache for fundne kodninger."/>
+      <control name="btnCacheClear" value="Ryd cache"/>
    </screen>
    
    <screen name="frmPrint" value="Print">
@@ -348,5 +351,9 @@
       <text name="FileEncoding.Enabled" value="I kraft"/>
       <text name="FileEncoding.FilePath" value="Fil sti"/>
       <text name="FileEncoding.Encoding" value="Kodning"/>
+      <text name="FileEncoding.Performance.Speed" value="hastighed"/>
+      <text name="FileEncoding.Performance.Default" value="standard"/>
+      <text name="FileEncoding.Performance.Accuracy" value="nøjagtighed"/>
+      <text name="FileEncoding.CacheCleared" value="Cache ryddet succes."/>
    </generic>
 </language>

@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 
-using AstroGrep.Core.Logging;
+using AstroGrep.Common.Logging;
 
 namespace AstroGrep.Core
 {

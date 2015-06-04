@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
 using AstroGrep.Core;
 using libAstroGrep;
+using libAstroGrep.EncodingDetection;
 using libAstroGrep.Plugin;
 
 namespace AstroGrep.Windows.Forms
@@ -117,6 +119,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      03/03/2015	CHG: 93, option to save messages form position
       /// [Curtis_Beard]	   04/08/2015	CHG: 81, remove old word wrap and white space options. now in frmMain.
       /// [Curtis_Beard]	   04/15/2015	CHG: add content forecolor
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
       /// </history>
       private void frmOptions_Load(object sender, System.EventArgs e)
       {
@@ -135,6 +138,7 @@ namespace AstroGrep.Windows.Forms
          chkShowExclusionErrorMessage.Checked = Core.GeneralSettings.ShowExclusionErrorMessage;
          chkSaveSearchOptions.Checked = Core.GeneralSettings.SaveSearchOptionsOnExit;
          chkDetectFileEncoding.Checked = Core.GeneralSettings.DetectFileEncoding;
+         chkUseEncodingCache.Checked = Core.GeneralSettings.UseEncodingCache;
          chkSaveMessagesPosition.Checked = Core.GeneralSettings.LogDisplaySavePosition;
 
          // ColorButton init
@@ -174,6 +178,19 @@ namespace AstroGrep.Windows.Forms
                }
             }
          }
+
+         // setup the performance drop down list
+         List<EncodingPerformance> performanceValues = new List<EncodingPerformance>();
+         Array values = Enum.GetValues(typeof(EncodingOptions.Performance));
+         foreach (EncodingOptions.Performance val in values)
+         {
+            performanceValues.Add(new EncodingPerformance() { Name = Language.GetGenericText(string.Format("FileEncoding.Performance.{0}", Enum.GetName(typeof(EncodingOptions.Performance), val))), Value = (int)val });
+         }
+         cboPerformance.DisplayMember = "Name";
+         cboPerformance.ValueMember = "Value";
+         cboPerformance.DataSource = performanceValues;
+         cboPerformance.SelectedValue = GeneralSettings.EncodingPerformance;
+         chkDetectFileEncoding_CheckedChanged(null, null);
 
          // set column text
          TextEditorsList.Columns[0].Text = Language.GetGenericText("TextEditorsColumnFileType");
@@ -465,6 +482,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      03/03/2015	CHG: 93, option to save messages form position
       /// [Curtis_Beard]	   04/08/2015	CHG: 81, remove old word wrap and white space options. now in frmMain.
       /// [Curtis_Beard]	   04/15/2015	CHG: add content forecolor
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
       /// </history>
       private void btnOK_Click(object sender, System.EventArgs e)
       {
@@ -480,6 +498,8 @@ namespace AstroGrep.Windows.Forms
          Core.GeneralSettings.SaveSearchOptionsOnExit = chkSaveSearchOptions.Checked;
          Core.GeneralSettings.FilePanelFont = Convertors.ConvertFontToString(__FileFont);
          Core.GeneralSettings.DetectFileEncoding = chkDetectFileEncoding.Checked;
+         Core.GeneralSettings.EncodingPerformance = (int)cboPerformance.SelectedValue;
+         Core.GeneralSettings.UseEncodingCache = chkUseEncodingCache.Checked;
          Core.GeneralSettings.LogDisplaySavePosition = chkSaveMessagesPosition.Checked;
 
          // Only load new language on a change
@@ -997,7 +1017,7 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// Sets the TextEditor's button states depending on if one is selected.
+      /// Sets the FileEncoding's button states depending on if one is selected.
       /// </summary>
       /// <history>
       /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
@@ -1155,6 +1175,46 @@ namespace AstroGrep.Windows.Forms
          }
       }
 
-      #endregion      
+      /// <summary>
+      /// Enable/Disable settings based on if encoding detection is enabled.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
+      /// </history>
+      private void chkDetectFileEncoding_CheckedChanged(object sender, EventArgs e)
+      {
+         lblPerformance.Enabled = cboPerformance.Enabled = chkUseEncodingCache.Enabled = btnCacheClear.Enabled = chkDetectFileEncoding.Checked;
+      }
+
+      /// <summary>
+      /// Clears the encoding cache.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
+      /// </history>
+      private void btnCacheClear_Click(object sender, EventArgs e)
+      {
+         libAstroGrep.EncodingDetection.Caching.EncodingCache.Instance.Clear(true);
+
+         MessageBox.Show(this, Language.GetGenericText("FileEncoding.CacheCleared", "Cache cleared successfully."), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+      }
+
+      /// <summary>
+      /// Used to display encoding performance enum values.
+      /// </summary>
+      internal class EncodingPerformance
+      {
+         /// <summary>Display name of performance value</summary>
+         public string Name { get; set; }
+
+         /// <summary>Performance enum value</summary>
+         public int Value { get; set; }
+      }
+
+      #endregion
    }
 }

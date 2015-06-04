@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using AstroGrep.Core.Logging;
+using AstroGrep.Common;
+using AstroGrep.Common.Logging;
 using libAstroGrep.Plugin;
 
 namespace AstroGrep.Core
@@ -149,17 +150,17 @@ namespace AstroGrep.Core
          }
 
          // load any external plugins
-         string pluginPath = System.IO.Path.Combine(Constants.ProductLocation, "Plugins");
+         string pluginPath = System.IO.Path.Combine(ApplicationPaths.DataFolder, "Plugins");
          if (System.IO.Directory.Exists(pluginPath))
          {
             LoadPluginsFromDirectory(pluginPath);
          }
 
          // enable/disable plugins based on saved state (if found)
-         string[] plugins = Common.SplitByString(Core.PluginSettings.Plugins, DELIMETER);
+         string[] plugins = Utils.SplitByString(Core.PluginSettings.Plugins, DELIMETER);
          foreach (string plugin in plugins)
          {
-            string[] values = Common.SplitByString(plugin, Constants.PLUGIN_ARGS_SEPARATOR);
+            string[] values = Utils.SplitByString(plugin, Constants.PLUGIN_ARGS_SEPARATOR);
             if (values.Length == 3 || values.Length == 4)
             {
                string name = values[0];

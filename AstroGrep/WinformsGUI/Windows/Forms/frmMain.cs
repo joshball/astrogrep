@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -7,11 +8,13 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.IO;
 
+using AstroGrep.Common;
+using AstroGrep.Common.Logging;
 using AstroGrep.Core;
-using AstroGrep.Core.Logging;
 using AstroGrep.Output;
 using AstroGrep.Windows.Controls;
 using libAstroGrep;
+using libAstroGrep.EncodingDetection;
 
 namespace AstroGrep.Windows.Forms
 {
@@ -57,6 +60,7 @@ namespace AstroGrep.Windows.Forms
       private readonly List<LogItem> LogItems = new List<LogItem>();
       private List<FilterItem> __FilterItems = new List<FilterItem>();
       private CommandLineProcessing.CommandLineArguments __CommandLineArgs = new CommandLineProcessing.CommandLineArguments();
+      private long StartingTime = 0;
 
       private System.ComponentModel.IContainer components;
 
@@ -188,6 +192,8 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   11/22/2006	CHG: Remove use of browse in combobox
       /// [Curtis_Beard]	   10/16/2012	CHG: Save search settings on exit
       /// [Curtis_Beard]	   05/15/2015	CHG: add exiting log entry
+      /// [Curtis_Beard]	   05/28/2015	CHG: update exit log entry to stopping
+      /// [Curtis_Beard]	  06/02/2015	CHG: add portable to exit log message if enabled
       /// </history>
       private void frmMain_Closed(object sender, EventArgs e)
       {
@@ -203,7 +209,10 @@ namespace AstroGrep.Windows.Forms
             textElementHost.Dispose();
          }
 
-         LogClient.Instance.Logger.Info("### AstroGrep Exiting ###");
+         LogClient.Instance.Logger.Info("### STOPPING {0}, version {1}{2} ###", 
+            ProductInformation.ApplicationName, 
+            ProductInformation.ApplicationVersion.ToString(3), 
+            ProductInformation.IsPortable ? " (Portable)" : string.Empty);
 
          Application.Exit();
       }
@@ -218,27 +227,13 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   10/27/2014	CHG: 87, set focus to search text field for ctrl-f
       /// [Curtis_Beard]	   05/11/2015	CHG: zoom for TextEditor control
       /// [Curtis_Beard]	   05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem and handle zooming key commands
+      /// [Curtis_Beard]	   05/28/2015	CHG: remove zooming key commands since they are handled by ToolStripMenuItem
       /// </history>
       protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
       {
          if (keyData == (Keys.Control | Keys.F))
          {
             cboSearchForText.Focus();
-            return true;
-         }
-         else if (keyData == (Keys.Control | Keys.Add))
-         {
-            ZoomInMenuItem_Click(null, null);
-            return true;
-         }
-         else if (keyData == (Keys.Control | Keys.Subtract))
-         {
-            ZoomOutMenuItem_Click(null, null);
-            return true;
-         }
-         else if (keyData == (Keys.Control | Keys.Divide))
-         {
-            ZoomRestoreMenuItem_Click(null, null);
             return true;
          }
 
@@ -296,7 +291,7 @@ namespace AstroGrep.Windows.Forms
          var rect = lblSearchOptions.ClientRectangle;
          rect.Height -= 1;
 
-         e.Graphics.DrawLine(new Pen(Common.ASTROGREP_ORANGE) { Width = 2 }, rect.X, rect.Height, rect.Width, rect.Height);
+         e.Graphics.DrawLine(new Pen(ProductInformation.ApplicationColor) { Width = 2 }, rect.X, rect.Height, rect.Width, rect.Height);
       }
 
       /// <summary>
@@ -312,7 +307,7 @@ namespace AstroGrep.Windows.Forms
          var rect = lblSearchHeading.ClientRectangle;
          rect.Height -= 1;
 
-         e.Graphics.DrawLine(new Pen(Common.ASTROGREP_ORANGE) { Width = 2 }, rect.X, rect.Height, rect.Width, rect.Height);
+         e.Graphics.DrawLine(new Pen(ProductInformation.ApplicationColor) { Width = 2 }, rect.X, rect.Height, rect.Width, rect.Height);
       }
 
       /// <summary>
@@ -472,6 +467,7 @@ namespace AstroGrep.Windows.Forms
       ///                                 changed from DoubleClick event to MouseDown
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488322, use first hit line/column position instead of line 1, column 1
+      /// [Curtis_Beard]	   05/27/2015	FIX: 73, open text editor even when no first match (usually during file only search)
       /// </history>
       private void lstFileNames_MouseDown(object sender, MouseEventArgs e)
       {
@@ -481,18 +477,7 @@ namespace AstroGrep.Windows.Forms
             if (lstFileNames.SelectedItems.Count == 0)
                return;
 
-            // retrieve the hit object
-            MatchResult hit = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-
-            // Retrieve the filename
-            string path = hit.File.FullName;
-
-            // open the default editor at first hit
-            var matchLine = hit.GetFirstMatch();
-            if (matchLine != null)
-            {
-               TextEditors.EditFile(path, matchLine.LineNumber, matchLine.ColumnNumber, matchLine.Line);
-            }
+            TextEditors.EditFile(__Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text)));
          }
       }
 
@@ -1105,21 +1090,21 @@ namespace AstroGrep.Windows.Forms
             if (!int.TryParse(txtContextLines.Text, out _lines) || _lines < 0 || _lines > Constants.MAX_CONTEXT_LINES)
             {
                MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorContextLines"), 0, Constants.MAX_CONTEXT_LINES.ToString()),
-                  Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                  ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                return false;
             }
 
             if (cboFileName.Text.Trim().Equals(string.Empty))
             {
                MessageBox.Show(Language.GetGenericText("VerifyErrorFileType"),
-                  Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                  ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                return false;
             }
 
             if (cboFilePath.Text.Trim().Equals(string.Empty))
             {
                MessageBox.Show(Language.GetGenericText("VerifyErrorNoStartPath"),
-                  Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                  ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                return false;
             }
 
@@ -1129,7 +1114,7 @@ namespace AstroGrep.Windows.Forms
                if (!System.IO.Directory.Exists(path))
                {
                   MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorInvalidStartPath"), path),
-                     Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                     ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                   return false;
                }
             }
@@ -1151,7 +1136,7 @@ namespace AstroGrep.Windows.Forms
                catch (Exception ex)
                {
                   MessageBox.Show(String.Format(Language.GetGenericText("VerifyErrorInvalidRegEx"), ex.Message),
-                     Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                     ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                   return false;
                }
             }
@@ -1159,7 +1144,7 @@ namespace AstroGrep.Windows.Forms
          catch
          {
             MessageBox.Show(Language.GetGenericText("VerifyErrorGeneric"),
-               Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+               ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             return false;
          }
 
@@ -1231,7 +1216,7 @@ namespace AstroGrep.Windows.Forms
          }
 
          txtHits.Clear();
-         txtHits.SyntaxHighlighting = null;
+         txtHits.SyntaxHighlighting = null;         
          txtHits.ScrollToHome();
 
          for (int i = txtHits.TextArea.TextView.LineTransformers.Count - 1; i >= 0; i--)
@@ -1299,8 +1284,8 @@ namespace AstroGrep.Windows.Forms
             return;
          }
 
-         if ((match.File.Length > 1024000 || FilterItem.IsBinaryFile(match.File)) && 
-            MessageBox.Show(this, Language.GetGenericText("ResultsPreviewLargeBinaryFile"), Constants.ProductName, MessageBoxButtons.YesNo, 
+         if ((match.File.Length > 1024000 || FilterItem.IsBinaryFile(match.File)) &&
+            MessageBox.Show(this, Language.GetGenericText("ResultsPreviewLargeBinaryFile"), ProductInformation.ApplicationName, MessageBoxButtons.YesNo, 
             MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.No)
          {
             ProcessMatchForDisplay(match); // display just the results then and not the whole file.
@@ -1353,7 +1338,7 @@ namespace AstroGrep.Windows.Forms
       /// Handles generating the text for all matches.
       /// </summary>
       /// <history>
-      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
+      /// [Curtis_Beard]		04/08/2015  CHG: 54, add check to show all the results after a search
       /// </history>
       private void ProcessAllMatchesForDisplay()
       {
@@ -2006,6 +1991,11 @@ namespace AstroGrep.Windows.Forms
          // Set view state of status bar
          //mnuViewStatusBar.Checked = Core.GeneralSettings.ShowStatusBar;
          //stbStatus.Visible = Core.GeneralSettings.ShowStatusBar;
+
+         //if (GeneralSettings.UseEncodingCache)
+         //{
+         //   EncodingCache.Instance.Load((EncodingOptions.Performance)GeneralSettings.EncodingPerformance);            
+         //}
       }
 
       #endregion
@@ -2036,7 +2026,7 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void NewWindowMenuItem_Click(object sender, EventArgs e)
       {
-         System.Diagnostics.Process.Start(Constants.ProductFullName);
+         System.Diagnostics.Process.Start(ApplicationPaths.ExecutingAssembly);
       }
 
       /// <summary>
@@ -2070,7 +2060,7 @@ namespace AstroGrep.Windows.Forms
          // only show dialog if information to save
          if (lstFileNames.Items.Count <= 0)
          {
-            MessageBox.Show(Language.GetGenericText("SaveNoResults"), Constants.ProductName, MessageBoxButtons.OK,
+            MessageBox.Show(Language.GetGenericText("SaveNoResults"), ProductInformation.ApplicationName, MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
             return;
          }
@@ -2143,7 +2133,7 @@ namespace AstroGrep.Windows.Forms
          {
             MessageBox.Show(
                 String.Format(Language.GetGenericText("SaveError"), ex),
-                Constants.ProductName,
+                ProductInformation.ApplicationName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
          }
@@ -2183,7 +2173,7 @@ namespace AstroGrep.Windows.Forms
             }
          }
          else
-            MessageBox.Show(Language.GetGenericText("PrintNoResults"), Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(Language.GetGenericText("PrintNoResults"), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
       }
 
       /// <summary>
@@ -2446,29 +2436,13 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   12/07/2005	CHG: Use column constant
       /// [Curtis_Beard]	   07/26/2006	ADD: 1512026, column position
       /// [Curtis_Beard]	   03/16/2015	CHG: check for null HitObject
+      /// [Curtis_Beard]	   05/27/2015	FIX: 73, open text editor even when no first match (usually during file only search)
       /// </history>
       private void OpenSelectedMenuItem_Click(object sender, System.EventArgs e)
       {
-         string path;
-         MatchResult hit;
-
          for (int i = 0; i < lstFileNames.SelectedItems.Count; i++)
          {
-            // retrieve hit object
-            hit = __Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-
-            if (hit != null)
-            {
-               // retrieve the filename
-               path = hit.File.FullName;
-
-               // open the default editor at first hit
-               var matchLine = hit.GetFirstMatch();
-               if (matchLine != null)
-               {
-                  TextEditors.EditFile(path, matchLine.LineNumber, matchLine.ColumnNumber, matchLine.Line);
-               }
-            }
+            TextEditors.EditFile(__Grep.RetrieveMatchResult(int.Parse(lstFileNames.SelectedItems[i].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text)));
          }
       }
 
@@ -2596,6 +2570,8 @@ namespace AstroGrep.Windows.Forms
       private void OptionsMenuItem_Click(object sender, System.EventArgs e)
       {
          var optionsForm = new frmOptions();
+         var previousUseEncodingCache = GeneralSettings.UseEncodingCache;
+         var previousEncodingPerformance = GeneralSettings.EncodingPerformance;
 
          if (optionsForm.ShowDialog(this) == DialogResult.OK)
          {
@@ -2653,13 +2629,14 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]		05/06/2014	Initial
       /// [Curtis_Beard]		05/14/2015	CHG: use ToolStripMenuItem instead of MenuItem
+      /// [Curtis_Beard]		06/02/2015	CHG: use Common code to get url
       /// </history>
       private void ViewHelpMenuItem_Click(object sender, EventArgs e)
       {
          //TODO: support currently selected language help file (AstroGrep-Help-en-us.chm, AstroGrep-Help-da-dk.chm, etc.)
          //Help.ShowHelp(this, Path.Combine(Constants.ProductLocation, "AstroGrep-Help.chm"));
 
-         System.Diagnostics.Process.Start("http://astrogrep.sourceforge.net/help/");
+         System.Diagnostics.Process.Start(ProductInformation.HelpUrl);
       }
 
       /// <summary>
@@ -2670,10 +2647,11 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]		05/06/2014	Initial
       /// [Curtis_Beard]		05/14/2015	CHG: use https version of url, use ToolStripMenuItem instead of MenuItem
+      /// [Curtis_Beard]		06/02/2015	CHG: use Common code to get url
       /// </history>
       private void ViewRegExHelpMenuItem_Click(object sender, EventArgs e)
       {
-         System.Diagnostics.Process.Start("https://msdn.microsoft.com/en-us/library/az24scfc.aspx");
+         System.Diagnostics.Process.Start(ProductInformation.RegExHelpUrl);
       }
 
       /// <summary>
@@ -2686,7 +2664,7 @@ namespace AstroGrep.Windows.Forms
       /// </history>
       private void LogFileMenuItem_Click(object sender, EventArgs e)
       {
-         System.Diagnostics.Process.Start(Constants.LogFile);
+         System.Diagnostics.Process.Start(ApplicationPaths.LogFile);
       }
 
       /// <summary>
@@ -3193,10 +3171,13 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		08/07/2007  ADD: 1741735, display any search errors
       /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
       /// [Curtis_Beard]	   02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
-      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
+      /// [Curtis_Beard]		04/08/2015  CHG: 54, add check to show all the results after a search
+      /// [Curtis_Beard]		05/26/2015  CHG: add stop search messsage to log with time
       /// </history>
       private void ReceiveSearchCancel()
       {
+         LogStopSearchMessage("cancel");
+
          RestoreTaskBarProgress();
 
          const string languageLookupText = "SearchCancelled";
@@ -3224,10 +3205,13 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
       /// [Curtis_Beard]	   02/24/2015	CHG: only attempt file show when 1 item is selected (prevents flickering and loading on all deselect)
       /// [Curtis_Beard]	   02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
-      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
+      /// [Curtis_Beard]		04/08/2015  CHG: 54, add check to show all the results after a search
+      /// [Curtis_Beard]		05/26/2015  CHG: add stop search messsage to log with time
       /// </history>
       private void ReceiveSearchComplete()
       {
+         LogStopSearchMessage("finished");
+
          RestoreTaskBarProgress();
 
          const string languageLookupText = "SearchFinished";
@@ -3281,7 +3265,7 @@ namespace AstroGrep.Windows.Forms
       /// Checks whether to show all results after a search (thread safe).
       /// </summary>
       /// <history>
-      /// [Curtis_Beard]		04/08/2016  CHG: 54, add check to show all the results after a search
+      /// [Curtis_Beard]		04/08/2015  CHG: 54, add check to show all the results after a search
       /// </history>
       private void CheckShowAllResults()
       {
@@ -3585,6 +3569,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]		12/01/2014	ADD: support for encoding detection event
       /// [Curtis_Beard]		12/17/2014	ADD: support for Win7+ taskbar progress
       /// [Curtis_Beard]		02/24/2015	CHG: remove isSearching check so that you can view selected file during a search
+      /// [Curtis_Beard]		05/26/2015  CHG: add stop search messsage to log with time
       /// </history>
       private void StartSearch(bool searchWithInResults)
       {
@@ -3651,17 +3636,20 @@ namespace AstroGrep.Windows.Forms
             API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.Indeterminate);
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Status, "SearchStarted"));
             LogStartSearchMessage(searchSpec, fileFilterSpec);
+            StartingTime = Stopwatch.GetTimestamp();
 
             __Grep.BeginExecute();
          }
          catch (Exception ex)
          {
+            LogStopSearchMessage("error");
+
             RestoreTaskBarProgress();
             LogItems.Add(new LogItem(LogItem.LogItemTypes.Error, "SearchGenericError", string.Format("{0}||{1}", string.Empty, ex.Message)));
             LogClient.Instance.Logger.Error("Unhandled search error: {0}", LogClient.GetAllExceptions(ex));
 
             string message = string.Format(Language.GetGenericText("SearchGenericError"), ex.Message);
-            MessageBox.Show(this, message, Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(this, message, ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             SetStatusBarMessage(message);
             SetSearchState(true);
@@ -3676,6 +3664,7 @@ namespace AstroGrep.Windows.Forms
       /// <param name="fileFilterSpec">Current file filter specification</param>
       /// <history>
       /// [Curtis_Beard]		05/15/2015	Initial
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting, cache for file encoding detection
       /// </history>
       private void LogStartSearchMessage(ISearchSpec searchSpec, IFileFilterSpec fileFilterSpec)
       {
@@ -3693,11 +3682,26 @@ namespace AstroGrep.Windows.Forms
             searchTextOptions.Append("]");
          }
 
-         LogClient.Instance.Logger.Info("Starting search at '{0}'{1} against {2}{3} for {4}{5}",
+         StringBuilder fileEncoding = new StringBuilder();
+         if (searchSpec.EncodingDetectionOptions.DetectFileEncoding)
+         {
+            fileEncoding.Append("[");
+            fileEncoding.Append("detect encoding");
+            fileEncoding.AppendFormat(", performance set at {0}", Enum.GetName(typeof(EncodingOptions.Performance), GeneralSettings.EncodingPerformance).ToLower());
+
+            if (searchSpec.EncodingDetectionOptions.UseEncodingCache)
+            {
+               fileEncoding.Append(", cache enabled");
+            }
+
+            fileEncoding.Append("]");
+         }
+
+         LogClient.Instance.Logger.Info("Search started in '{0}'{1} against {2}{3} for {4}{5}",
             searchSpec.StartFilePaths != null && searchSpec.StartFilePaths.Length > 0 ? string.Join(", ", searchSpec.StartFilePaths) : string.Join(", ", searchSpec.StartDirectories),
             searchSpec.SearchInSubfolders ? "[include sub folders]" : "",
             fileFilterSpec.FileFilter,
-            searchSpec.DetectFileEncoding ? "[detect encoding]" : "",
+            fileEncoding.ToString(),
             searchSpec.SearchText,
             searchTextOptions.ToString());
       }
@@ -3720,6 +3724,23 @@ namespace AstroGrep.Windows.Forms
 
             optionBuilder.Append(displayText);
          }
+      }
+
+      /// <summary>
+      /// Logs a stop search message to log file.
+      /// </summary>
+      /// <param name="stopType">Stopping type for current log entry</param>
+      /// <history>
+      /// [Curtis_Beard]		05/26/2015  CHG: add stop search messsage to log with time
+      /// </history>
+      private void LogStopSearchMessage(string stopType)
+      {
+         long endingTime = Stopwatch.GetTimestamp();
+         long elapsedTime = endingTime - StartingTime;
+         double elapsedSeconds = elapsedTime * (1.0 / Stopwatch.Frequency);
+         string stopTypeMessage = !string.IsNullOrEmpty(stopType) ? string.Format(" ({0})", stopType) : string.Empty;
+
+         LogClient.Instance.Logger.Info("Search stopped{0}, taking {1} seconds.", stopTypeMessage, elapsedSeconds);
       }
 
       /// <summary>
@@ -3787,6 +3808,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   02/04/2014	ADD: 66, option to detect file encoding
       /// [Curtis_Beard]	   12/01/2014	CHG: moved struct declaration to SearchInterfaces.cs under Core.
       /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
       /// </history>
       private ISearchSpec GetSearchSpecFromUI(string path, string fileFilter, string[] filePaths)
       {
@@ -3800,8 +3822,13 @@ namespace AstroGrep.Windows.Forms
             UseRegularExpressions = chkRegularExpressions.Checked,
             UseWholeWordMatching = chkWholeWordOnly.Checked,
             SearchText = cboSearchForText.Text,
-            DetectFileEncoding = GeneralSettings.DetectFileEncoding,
-            FileEncodings = FileEncoding.ConvertStringToFileEncodings(GeneralSettings.FileEncodings)
+            FileEncodings = FileEncoding.ConvertStringToFileEncodings(GeneralSettings.FileEncodings),
+            EncodingDetectionOptions = new EncodingOptions()
+            {
+               DetectFileEncoding = GeneralSettings.DetectFileEncoding,
+               PerformanceSetting = (EncodingOptions.Performance)GeneralSettings.EncodingPerformance,
+               UseEncodingCache = GeneralSettings.UseEncodingCache
+            }
          };
 
          if (filePaths != null && filePaths.Length > 0)
@@ -3925,7 +3952,7 @@ namespace AstroGrep.Windows.Forms
             GetLogItemsCountByType(LogItem.LogItemTypes.Error) > 0))
          {
             MessageBox.Show(this, Language.GetGenericText("ExclusionErrorMessageText"),
-               Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+               ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
          }
       }
 

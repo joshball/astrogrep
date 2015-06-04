@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using libAstroGrep;
+using libAstroGrep.EncodingDetection;
 
 namespace AstroGrep.Core
 {
@@ -43,6 +44,7 @@ namespace AstroGrep.Core
       /// [Curtis_Beard]		12/01/2014	Moved from frmMain.cs
       /// [Curtis_Beard]      02/09/2015	CHG: 92, support for specific file encodings
       /// [Curtis_Beard]      04/07/2015	CHG: remove line numbers
+      /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
       /// </history>
       public struct SearchSpec : ISearchSpec
       {
@@ -76,11 +78,11 @@ namespace AstroGrep.Core
          /// <summary>enable only processing the file up until one match is found</summary>
          public bool ReturnOnlyFileNames { get; set; }
 
-         /// <summary>enable detecting the file encoding (false uses Encoding.Default)</summary>
-         public bool DetectFileEncoding { get; set; }
-
          /// <summary>list of FileEncodings objects to force encoding of certain files selected by user</summary>
          public List<FileEncoding> FileEncodings { get; set; }
+
+         /// <summary>Current encoding options set by user</summary>
+         public EncodingOptions EncodingDetectionOptions { get; set; }
       }
 
       /// <summary>

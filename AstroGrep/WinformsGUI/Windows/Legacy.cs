@@ -1,5 +1,6 @@
 using System;
 
+using AstroGrep.Common;
 using AstroGrep.Core;
 
 namespace AstroGrep.Windows
@@ -620,7 +621,7 @@ namespace AstroGrep.Windows
       {
          if (Registry.CheckStartupSetting("HighlightForeColor"))
          {
-            AstroGrep.Core.GeneralSettings.HighlightForeColor = Convertors.ConvertColorToString(Registry.GetStartupSetting("HighlightForeColor", Core.Common.ASTROGREP_ORANGE));
+            AstroGrep.Core.GeneralSettings.HighlightForeColor = Convertors.ConvertColorToString(Registry.GetStartupSetting("HighlightForeColor", ProductInformation.ApplicationColor));
             Registry.DeleteStartupSetting("HighlightForeColor");
          }
          if (Registry.CheckStartupSetting("HighlightBackColor"))

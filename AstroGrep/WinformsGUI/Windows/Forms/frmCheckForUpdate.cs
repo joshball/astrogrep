@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
+
 namespace AstroGrep.Windows.Forms
 {
    /// <summary>
@@ -70,7 +72,7 @@ namespace AstroGrep.Windows.Forms
             // give some delay to see the checking for version message
             Thread.Sleep(2000);
 
-            WebRequest webReq = WebRequest.Create("http://astrogrep.sourceforge.net/version.html");
+            WebRequest webReq = WebRequest.Create(ProductInformation.VersionUrl);
             webReq.Proxy = WebRequest.GetSystemWebProxy();
             webReq.Timeout = 4000;
 
@@ -96,7 +98,7 @@ namespace AstroGrep.Windows.Forms
                Version newestVersion = new Version(sbResult.ToString());
 
                // current version
-               Version currentVersion = AstroGrep.Constants.ProductVersion;
+               Version currentVersion = AstroGrep.Common.ProductInformation.ApplicationVersion;
 
                //if (currentVersion.CompareTo(newestVersion) < 0)
                //{
@@ -105,7 +107,7 @@ namespace AstroGrep.Windows.Forms
                //}
                //else
                //{
-               //UpdateMessage(string.Format(Language.GetGenericText("Update.Current"), Constants.ProductName, currentVersion.ToString(3)), string.Empty);
+               //UpdateMessage(string.Format(Language.GetGenericText("Update.Current"), ProductInformation.ApplicationName, currentVersion.ToString(3)), string.Empty);
                //}
             }
          }
@@ -219,7 +221,7 @@ namespace AstroGrep.Windows.Forms
                   System.Diagnostics.Process.Start(installFile);
 
                   // close all AstroGrep instances but our own
-                  var ourProcesses = System.Diagnostics.Process.GetProcesses().Where(pr => pr.ProcessName.Equals(Constants.ProductName));
+                  var ourProcesses = System.Diagnostics.Process.GetProcesses().Where(pr => pr.ProcessName.Equals(ProductInformation.ApplicationName));
                   var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
 
                   foreach (var process in ourProcesses)
@@ -259,7 +261,7 @@ namespace AstroGrep.Windows.Forms
 
                string file = string.Format("AstroGrep_Setup_v{0}.exe", newestVersion);
                string remoteFile = string.Format("http://downloads.sourceforge.net/astrogrep/{0}", file);
-               string localFile = Path.Combine(Constants.DataDirectory, file);
+               string localFile = Path.Combine(ApplicationPaths.DataFolder, file);
                installFile = localFile;
 
                if (File.Exists(localFile))

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-using AstroGrep.Core.Logging;
+using AstroGrep.Common;
+using AstroGrep.Common.Logging;
 using AstroGrep.Windows;
 
 namespace AstroGrep.Core
@@ -39,6 +40,34 @@ namespace AstroGrep.Core
    {
       private static TextEditor[] __TextEditors;
       private const string DELIMETER = "|;;|";
+
+      /// <summary>
+      /// Edit file from given MatchResult at first match if available.
+      /// </summary>
+      /// <param name="match">Current MatchResult</param>
+      /// <history>
+      /// [Curtis_Beard]	   05/27/2015	FIX: 73, open text editor even when no first match (usually during file only search)
+      /// </history>
+      public static void EditFile(libAstroGrep.MatchResult match)
+      {
+         if (match != null)
+         {
+            // open the default editor at first match
+            var lineNumber = 1;
+            var columnNumber = 1;
+            var lineText = string.Empty;
+
+            var matchLine = match.GetFirstMatch();
+            if (matchLine != null)
+            {
+               lineNumber = matchLine.LineNumber;
+               columnNumber = matchLine.ColumnNumber;
+               lineText = matchLine.Line;
+            }
+            
+            EditFile(match.File.FullName, lineNumber, columnNumber, lineText);
+         }
+      }
 
       /// <summary>
       /// Edit a file that the user has double clicked on
@@ -115,7 +144,7 @@ namespace AstroGrep.Core
                if (editorToUse == null)
                {
                   MessageBox.Show(Language.GetGenericText("TextEditorsErrorNotDefined"),
-                     Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                     ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                }
                else
                {
@@ -144,7 +173,7 @@ namespace AstroGrep.Core
             LogClient.Instance.Logger.Error("Unable to open text editor for file {0} at line {1}, column {2}, with text {3} and message {4}", path, line, column, lineText, ex.Message);
 
             MessageBox.Show(String.Format(Language.GetGenericText("TextEditorsErrorGeneric"), path, ex.Message),
-                  Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                  ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
          }
       }
 
@@ -162,7 +191,7 @@ namespace AstroGrep.Core
          if (editorsString.Length > 0)
          {
             //parse string for each editor
-            string[] editors = Core.Common.SplitByString(editorsString, DELIMETER);
+            string[] editors = Utils.SplitByString(editorsString, DELIMETER);
             if (editors.Length > 0)
             {
                __TextEditors = new TextEditor[editors.Length];
@@ -267,7 +296,7 @@ namespace AstroGrep.Core
             {
                // no file argument specified
                MessageBox.Show(Language.GetGenericText("TextEditorsErrorNoCmdLineForFile"),
-                  Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                  ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else if (string.IsNullOrEmpty(textEditor.Editor))
             {
@@ -296,7 +325,7 @@ namespace AstroGrep.Core
             LogClient.Instance.Logger.Error("Unable to open text editor for editor {0}, file {1} at line {2}, column {3}, with message {4}", textEditor.ToString(), path, line, column, ex.Message);
 
             MessageBox.Show(String.Format(Language.GetGenericText("TextEditorsErrorGeneric"), path, ex.Message),
-               Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+               ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
          }
       }
 

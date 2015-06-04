@@ -7,7 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
 using libAstroGrep;
+using libAstroGrep.EncodingDetection;
 
 namespace AstroGrep.Windows.Forms
 {
@@ -157,13 +159,13 @@ namespace AstroGrep.Windows.Forms
       {
          if (string.IsNullOrEmpty(txtFile.Text) || !System.IO.File.Exists(txtFile.Text))
          {
-            MessageBox.Show(this, "Please select a valid file.", Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show(this, "Please select a valid file.", ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             return null;
          }
 
          if (cboEncodings.SelectedItem == null)
          {
-            MessageBox.Show(this, "Please select an encoding.", Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show(this, "Please select an encoding.", ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             return null;
          }
 

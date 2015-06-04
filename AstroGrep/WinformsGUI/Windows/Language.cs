@@ -4,6 +4,8 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 
+using AstroGrep.Common;
+
 namespace AstroGrep.Windows
 {
    /// <summary>
@@ -178,7 +180,7 @@ namespace AstroGrep.Windows
       {
          get 
          {
-            return Path.Combine(Constants.ProductLocation, "Language");
+            return Path.Combine(ApplicationPaths.DataFolder, "Language");
          }
       }
 

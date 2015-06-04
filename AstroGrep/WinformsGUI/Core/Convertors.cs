@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using AstroGrep.Common;
+
 namespace AstroGrep.Core
 {
    /// <summary>
@@ -63,7 +65,7 @@ namespace AstroGrep.Core
       /// </history>
       public static string[] GetComboBoxEntriesFromString(string values)
       {
-         string[] entries = Core.Common.SplitByString(values, Constants.SEARCH_ENTRIES_SEPARATOR);
+         string[] entries = Utils.SplitByString(values, Constants.SEARCH_ENTRIES_SEPARATOR);
 
          return entries;
       }
@@ -136,7 +138,7 @@ namespace AstroGrep.Core
       /// </history>
       public static System.Drawing.Font ConvertStringToFont(string font)
       {
-         string[] fontValues = Core.Common.SplitByString(font, Constants.FONT_SEPARATOR);
+         string[] fontValues = Utils.SplitByString(font, Constants.FONT_SEPARATOR);
 
          return new System.Drawing.Font(fontValues[0], float.Parse(fontValues[1], System.Globalization.CultureInfo.InvariantCulture), (System.Drawing.FontStyle)Enum.Parse(typeof(System.Drawing.FontStyle), fontValues[2], true));
       }

@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 
+using AstroGrep.Common;
 using AstroGrep.Core;
 
 namespace AstroGrep.Windows.Forms
@@ -38,6 +39,7 @@ namespace AstroGrep.Windows.Forms
    /// [Curtis_Beard]	   11/03/2005	CHG: set hover text to link
    /// [Andrew_Radford]    17/08/2008	CHG: Moved Winforms designer stuff to a .designer file
    /// [Curtis_Beard]	   05/06/2014	CHG: removed updater code
+   /// [Curtis_Beard]      06/04/2015  CHG: remove header, text, image painting
    /// </history>
 	public partial class frmAbout : Form
 	{
@@ -56,55 +58,7 @@ namespace AstroGrep.Windows.Forms
 			// Required for Windows Form Designer support
 			//
 			InitializeComponent();
-
-			HeaderPanel.Paint += HeaderPanel_Paint;
 		}
-	
-      /// <summary>
-      /// Used to draw custom header
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      /// <history>
-      /// [Curtis_Beard]      11/03/2005  Created
-      /// [Curtis_Beard]      09/12/2006  CHG: Implement panel paint instead of form
-      /// [Curtis_Beard]	   02/07/2012  CHG: 3485450, add check for updates
-      /// [Curtis_Beard]	   03/02/2015   FIX: 49, graphical glitch when using 125% dpi setting
-      /// </history>
-      private void HeaderPanel_Paint(object sender, PaintEventArgs e)
-      {
-         const int _borderBuffer = 10;
-
-         using (Graphics graphics = e.Graphics)
-         {
-            graphics.SmoothingMode = SmoothingMode.HighQuality;
-            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-            // Gradient the panel
-            using (LinearGradientBrush _gradientBrush = new LinearGradientBrush(new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height), Core.Common.ASTROGREP_ORANGE, Color.White, LinearGradientMode.ForwardDiagonal))
-            {
-               graphics.FillRectangle(_gradientBrush, new RectangleF(0, 0, HeaderPanel.Width, HeaderPanel.Height));
-            }
-
-            // Draw picture
-            int picX = _borderBuffer;
-            int picY = (HeaderPanel.Height - picIcon.Height) / 2;
-            graphics.DrawImage(picIcon.Image, picX, picY);
-
-            // Draw text
-            int dpiChange = 0;
-            if (Windows.API.GetCurrentDPIFontScalingSize(graphics) == API.DPIFontScalingSizes.Medium)
-            {
-                dpiChange = -5;
-            }
-            int _xCorner = _borderBuffer + picIcon.Width + 10;
-            graphics.DrawString(string.Format("{0} {1}", Constants.ProductName, Constants.ProductVersion.ToString(3)), HeaderPanel.Font, Brushes.Black, _xCorner, picY + dpiChange);
-
-            // Draw a bottom border line
-            graphics.DrawLine(SystemPens.ControlDark, 0, HeaderPanel.Height - 2, HeaderPanel.Width, HeaderPanel.Height - 2);
-            graphics.DrawLine(SystemPens.ControlLightLight, 0, HeaderPanel.Height - 1, HeaderPanel.Width, HeaderPanel.Height - 1);
-         }
-      }
 
       /// <summary>
       /// Opens the systems default browser and displays the web link
@@ -133,20 +87,6 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// Closes form
-      /// </summary>
-      /// <param name="sender">System parm</param>
-      /// <param name="e">System parm</param>
-      /// <history>
-      /// [Theodore_Ward]     ??/??/????  Initial
-      /// [Curtis_Beard]	   01/11/2005	.Net Conversion
-      /// </history>
-      private void cmdOK_Click(object sender, EventArgs e)
-      {
-         this.Close();
-      }
-
-      /// <summary>
       /// Load values for form
       /// </summary>
       /// <param name="sender">System parm</param>
@@ -158,6 +98,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   07/07/2006	CHG: call reflection and fileversion info once
       /// [Curtis_Beard]	   05/18/2007	CHG: always use current year for copyright
       /// [Curtis_Beard]	   02/07/2012	CHG: 3485450, add check for updates, cleanup about dialog
+      /// [Curtis_Beard]      06/04/2015  CHG: add product name and version text setup
       /// </history>
       private void frmAbout_Load(object sender, System.EventArgs e)
       {
@@ -172,10 +113,35 @@ namespace AstroGrep.Windows.Forms
          //Language.GenerateXml(Me, Application.StartupPath & "\" & Me.Name & ".xml")
          Language.ProcessForm(this);
 
-         this.Text = string.Format(this.Text, Constants.ProductName);
-         lnkHomePage.Text = string.Format(lnkHomePage.Text, Constants.ProductName);
+         this.Text = string.Format(this.Text, ProductInformation.ApplicationName);
+         lnkHomePage.Text = string.Format(lnkHomePage.Text, ProductInformation.ApplicationName);
          lnkHomePage.Links.Add(0, lnkHomePage.Text.Length, "http://astrogrep.sourceforge.net/");
          CopyrightLabel.Text = string.Format("Copyright (C) 2002-{0} AstroComma Inc.", DateTime.Now.Year.ToString());
+         lblProductName.Text = ProductInformation.ApplicationName;
+         lblProductVersion.Text = string.Format("{0}{1}", ProductInformation.ApplicationVersion.ToString(3), ProductInformation.IsPortable ? " (Portable)" : string.Empty);
+      }
+
+      /// <summary>
+      /// Process Escape and Enter keys for this form.
+      /// </summary>
+      /// <param name="keyData">Current key data</param>
+      /// <returns>true if processed, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]      06/04/2015  Initial, handle escape and enter keys
+      /// </history>
+      protected override bool ProcessDialogKey(Keys keyData)
+      {
+         if (Form.ModifierKeys == Keys.None && keyData == Keys.Escape)
+         {
+            this.Close();
+            return true;
+         }
+         else if (Form.ModifierKeys == Keys.None && keyData == Keys.Enter)
+         {
+            return true;
+         }
+
+         return base.ProcessDialogKey(keyData);
       }
    }
 }

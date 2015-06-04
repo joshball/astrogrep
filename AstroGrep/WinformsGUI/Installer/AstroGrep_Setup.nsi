@@ -12,8 +12,8 @@
 !include "DotNetForm.nsdinc"
 
 !define MUI_COMPONENTSPAGE_SMALLDESC
-!define INS_VERSION 4.4.1.0
-!define APP_VERSION "4.4.1"
+!define INS_VERSION 4.4.2.0
+!define APP_VERSION "4.4.2"
 
 ;--------------------------------
 ;Variables
@@ -232,6 +232,7 @@ Section $(TITLE_SecRequired) SecRequired
   ; Put main files
   File "..\bin\release\AstroGrep.exe"
   File "..\bin\release\AstroGrep.exe.config"
+  File "..\bin\release\AstroGrep.Common.dll"
   File "..\bin\release\libAstroGrep.dll"
   File "..\bin\release\AstroGrep.AdminProcess.exe"
   File "..\bin\release\AstroGrep.AdminProcess.exe.config"
@@ -326,6 +327,7 @@ Section "Uninstall"
 	Delete $INSTDIR\AstroGrep.AdminProcess.exe.config
 	Delete $INSTDIR\AstroGrep.AdminProcess.exe
 	Delete $INSTDIR\libAstroGrep.dll
+	Delete $INSTDIR\AstroGrep.Common.dll
 	Delete $INSTDIR\AstroGrep.exe.config
 	Delete $INSTDIR\AstroGrep.exe
 	Delete "$INSTDIR\Uninstall.exe"

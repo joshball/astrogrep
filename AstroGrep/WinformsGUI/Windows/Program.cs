@@ -1,7 +1,8 @@
 using System;
 using System.Windows.Forms;
 
-using AstroGrep.Core.Logging;
+using AstroGrep.Common;
+using AstroGrep.Common.Logging;
 
 namespace AstroGrep.Windows
 {
@@ -47,6 +48,7 @@ namespace AstroGrep.Windows
       /// [Curtis_Beard]	  10/11/2006	CHG: Remove setting reference to frmMain in Common class
       /// [Curtis_Beard]     09/26/2012	CHG: 3572487, detect command line arg for displaying help and show dialog with options
       /// [Curtis_Beard]	  04/08/2015	CHG: add logging
+      /// [Curtis_Beard]	  06/02/2015	CHG: add portable to starting log message if enabled
       /// </history>
       [STAThread]
       static void Main()
@@ -60,7 +62,10 @@ namespace AstroGrep.Windows
             CommandLineProcessing.CommandLineArguments args = CommandLineProcessing.Process(Environment.GetCommandLineArgs());
 
             // needs to go after command line processing since StoreDataLocal determines log file location
-            LogClient.Instance.Logger.Info("### STARTING {0}, version {1} ###", Constants.ProductName, Constants.ProductVersion.ToString(3));
+            LogClient.Instance.Logger.Info("### STARTING {0}, version {1}{2} ###", 
+               ProductInformation.ApplicationName, 
+               ProductInformation.ApplicationVersion.ToString(3),
+               ProductInformation.IsPortable ? " (Portable)" : string.Empty);
 
             Legacy.ConvertLanguageValue();
             Language.Load(AstroGrep.Core.GeneralSettings.Language);
@@ -89,7 +94,7 @@ namespace AstroGrep.Windows
             LogClient.Instance.Logger.Fatal("Unhandled exception, exiting AstroGrep: {0}", LogClient.GetAllExceptions(ex));
 
             MessageBox.Show(string.Format("A critical error occurred and AstroGrep must be shutdown.  Please restart AstroGrep.\n({0})", ex.Message),
-               Constants.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+               ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             Application.Exit();
          }

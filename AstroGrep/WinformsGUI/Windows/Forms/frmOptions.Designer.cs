@@ -49,6 +49,10 @@ namespace AstroGrep.Windows.Forms
          this.cboPathMRUCount = new System.Windows.Forms.ComboBox();
          this.lblStoredPaths = new System.Windows.Forms.Label();
          this.tabFileEncoding = new System.Windows.Forms.TabPage();
+         this.btnCacheClear = new System.Windows.Forms.Button();
+         this.chkUseEncodingCache = new System.Windows.Forms.CheckBox();
+         this.cboPerformance = new System.Windows.Forms.ComboBox();
+         this.lblPerformance = new System.Windows.Forms.Label();
          this.chkDetectFileEncoding = new System.Windows.Forms.CheckBox();
          this.btnFileEncodingDelete = new System.Windows.Forms.Button();
          this.btnFileEncodingEdit = new System.Windows.Forms.Button();
@@ -73,11 +77,17 @@ namespace AstroGrep.Windows.Forms
          this.lblResultPreview = new System.Windows.Forms.Label();
          this.rtxtResultsPreview = new System.Windows.Forms.RichTextBox();
          this.grpResultWindow = new System.Windows.Forms.GroupBox();
+         this.btnResultsContextForeColor = new AstroGrep.Windows.Controls.ColorButton();
+         this.lblResultsContextForeColor = new System.Windows.Forms.Label();
          this.lblCurrentFont = new System.Windows.Forms.Label();
          this.btnFindFont = new System.Windows.Forms.Button();
+         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
+         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
          this.lblResultsWindowBack = new System.Windows.Forms.Label();
          this.lblResultsWindowFore = new System.Windows.Forms.Label();
          this.grpResultMatch = new System.Windows.Forms.GroupBox();
+         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
+         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
          this.BackColorLabel = new System.Windows.Forms.Label();
          this.ForeColorLabel = new System.Windows.Forms.Label();
          this.tabPlugins = new System.Windows.Forms.TabPage();
@@ -97,12 +107,6 @@ namespace AstroGrep.Windows.Forms
          this.PluginsColumnExt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.btnOK = new System.Windows.Forms.Button();
          this.btnCancel = new System.Windows.Forms.Button();
-         this.lblResultsContextForeColor = new System.Windows.Forms.Label();
-         this.btnResultsContextForeColor = new AstroGrep.Windows.Controls.ColorButton();
-         this.btnResultsWindowBackColor = new AstroGrep.Windows.Controls.ColorButton();
-         this.btnResultsWindowForeColor = new AstroGrep.Windows.Controls.ColorButton();
-         this.BackColorButton = new AstroGrep.Windows.Controls.ColorButton();
-         this.ForeColorButton = new AstroGrep.Windows.Controls.ColorButton();
          this.tbcOptions.SuspendLayout();
          this.tabGeneral.SuspendLayout();
          this.ShortcutGroup.SuspendLayout();
@@ -299,6 +303,10 @@ namespace AstroGrep.Windows.Forms
          // 
          // tabFileEncoding
          // 
+         this.tabFileEncoding.Controls.Add(this.btnCacheClear);
+         this.tabFileEncoding.Controls.Add(this.chkUseEncodingCache);
+         this.tabFileEncoding.Controls.Add(this.cboPerformance);
+         this.tabFileEncoding.Controls.Add(this.lblPerformance);
          this.tabFileEncoding.Controls.Add(this.chkDetectFileEncoding);
          this.tabFileEncoding.Controls.Add(this.btnFileEncodingDelete);
          this.tabFileEncoding.Controls.Add(this.btnFileEncodingEdit);
@@ -311,6 +319,48 @@ namespace AstroGrep.Windows.Forms
          this.tabFileEncoding.Text = "File Encoding";
          this.tabFileEncoding.UseVisualStyleBackColor = true;
          // 
+         // btnCacheClear
+         // 
+         this.btnCacheClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this.btnCacheClear.AutoSize = true;
+         this.btnCacheClear.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.btnCacheClear.Location = new System.Drawing.Point(466, 59);
+         this.btnCacheClear.Name = "btnCacheClear";
+         this.btnCacheClear.Size = new System.Drawing.Size(79, 23);
+         this.btnCacheClear.TabIndex = 43;
+         this.btnCacheClear.Text = "Clear Cache";
+         this.btnCacheClear.UseVisualStyleBackColor = true;
+         this.btnCacheClear.Click += new System.EventHandler(this.btnCacheClear_Click);
+         // 
+         // chkUseEncodingCache
+         // 
+         this.chkUseEncodingCache.AutoSize = true;
+         this.chkUseEncodingCache.Location = new System.Drawing.Point(8, 63);
+         this.chkUseEncodingCache.Name = "chkUseEncodingCache";
+         this.chkUseEncodingCache.Size = new System.Drawing.Size(207, 17);
+         this.chkUseEncodingCache.TabIndex = 42;
+         this.chkUseEncodingCache.Text = "Enable cache for detected encodings.";
+         this.chkUseEncodingCache.UseVisualStyleBackColor = true;
+         // 
+         // cboPerformance
+         // 
+         this.cboPerformance.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cboPerformance.FlatStyle = System.Windows.Forms.FlatStyle.System;
+         this.cboPerformance.FormattingEnabled = true;
+         this.cboPerformance.Location = new System.Drawing.Point(78, 32);
+         this.cboPerformance.Name = "cboPerformance";
+         this.cboPerformance.Size = new System.Drawing.Size(121, 21);
+         this.cboPerformance.TabIndex = 41;
+         // 
+         // lblPerformance
+         // 
+         this.lblPerformance.AutoSize = true;
+         this.lblPerformance.Location = new System.Drawing.Point(5, 35);
+         this.lblPerformance.Name = "lblPerformance";
+         this.lblPerformance.Size = new System.Drawing.Size(67, 13);
+         this.lblPerformance.TabIndex = 40;
+         this.lblPerformance.Text = "Performance";
+         // 
          // chkDetectFileEncoding
          // 
          this.chkDetectFileEncoding.AutoSize = true;
@@ -320,6 +370,7 @@ namespace AstroGrep.Windows.Forms
          this.chkDetectFileEncoding.TabIndex = 39;
          this.chkDetectFileEncoding.Text = "Detect file encoding.";
          this.chkDetectFileEncoding.UseVisualStyleBackColor = true;
+         this.chkDetectFileEncoding.CheckedChanged += new System.EventHandler(this.chkDetectFileEncoding_CheckedChanged);
          // 
          // btnFileEncodingDelete
          // 
@@ -365,9 +416,9 @@ namespace AstroGrep.Windows.Forms
             this.clhEncoding});
          this.lstFiles.FullRowSelect = true;
          this.lstFiles.HideSelection = false;
-         this.lstFiles.Location = new System.Drawing.Point(8, 32);
+         this.lstFiles.Location = new System.Drawing.Point(8, 91);
          this.lstFiles.Name = "lstFiles";
-         this.lstFiles.Size = new System.Drawing.Size(537, 258);
+         this.lstFiles.Size = new System.Drawing.Size(537, 199);
          this.lstFiles.TabIndex = 1;
          this.lstFiles.UseCompatibleStateImageBehavior = false;
          this.lstFiles.View = System.Windows.Forms.View.Details;
@@ -566,6 +617,24 @@ namespace AstroGrep.Windows.Forms
          this.grpResultWindow.TabStop = false;
          this.grpResultWindow.Text = "Results Window";
          // 
+         // btnResultsContextForeColor
+         // 
+         this.btnResultsContextForeColor.ForeColor = System.Drawing.Color.Silver;
+         this.btnResultsContextForeColor.Location = new System.Drawing.Point(144, 68);
+         this.btnResultsContextForeColor.Name = "btnResultsContextForeColor";
+         this.btnResultsContextForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+         this.btnResultsContextForeColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsContextForeColor.TabIndex = 26;
+         // 
+         // lblResultsContextForeColor
+         // 
+         this.lblResultsContextForeColor.Location = new System.Drawing.Point(8, 68);
+         this.lblResultsContextForeColor.Name = "lblResultsContextForeColor";
+         this.lblResultsContextForeColor.Size = new System.Drawing.Size(136, 23);
+         this.lblResultsContextForeColor.TabIndex = 25;
+         this.lblResultsContextForeColor.Text = "Context Fore Color";
+         this.lblResultsContextForeColor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+         // 
          // lblCurrentFont
          // 
          this.lblCurrentFont.AutoSize = true;
@@ -587,6 +656,22 @@ namespace AstroGrep.Windows.Forms
          this.btnFindFont.Text = "&Find Font";
          this.btnFindFont.UseVisualStyleBackColor = true;
          this.btnFindFont.Click += new System.EventHandler(this.btnFindFont_Click);
+         // 
+         // btnResultsWindowBackColor
+         // 
+         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(441, 24);
+         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
+         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.btnResultsWindowBackColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowBackColor.TabIndex = 22;
+         // 
+         // btnResultsWindowForeColor
+         // 
+         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
+         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
+         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.btnResultsWindowForeColor.Size = new System.Drawing.Size(75, 23);
+         this.btnResultsWindowForeColor.TabIndex = 21;
          // 
          // lblResultsWindowBack
          // 
@@ -620,6 +705,22 @@ namespace AstroGrep.Windows.Forms
          this.grpResultMatch.TabIndex = 23;
          this.grpResultMatch.TabStop = false;
          this.grpResultMatch.Text = "Results Match";
+         // 
+         // BackColorButton
+         // 
+         this.BackColorButton.Location = new System.Drawing.Point(441, 24);
+         this.BackColorButton.Name = "BackColorButton";
+         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+         this.BackColorButton.Size = new System.Drawing.Size(75, 23);
+         this.BackColorButton.TabIndex = 18;
+         // 
+         // ForeColorButton
+         // 
+         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
+         this.ForeColorButton.Name = "ForeColorButton";
+         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.ForeColorButton.Size = new System.Drawing.Size(75, 23);
+         this.ForeColorButton.TabIndex = 17;
          // 
          // BackColorLabel
          // 
@@ -801,56 +902,6 @@ namespace AstroGrep.Windows.Forms
          this.btnCancel.Text = "&Cancel";
          this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
          // 
-         // lblResultsContextForeColor
-         // 
-         this.lblResultsContextForeColor.Location = new System.Drawing.Point(8, 68);
-         this.lblResultsContextForeColor.Name = "lblResultsContextForeColor";
-         this.lblResultsContextForeColor.Size = new System.Drawing.Size(136, 23);
-         this.lblResultsContextForeColor.TabIndex = 25;
-         this.lblResultsContextForeColor.Text = "Context Fore Color";
-         this.lblResultsContextForeColor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-         // 
-         // btnResultsContextForeColor
-         // 
-         this.btnResultsContextForeColor.ForeColor = System.Drawing.Color.Silver;
-         this.btnResultsContextForeColor.Location = new System.Drawing.Point(144, 68);
-         this.btnResultsContextForeColor.Name = "btnResultsContextForeColor";
-         this.btnResultsContextForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-         this.btnResultsContextForeColor.Size = new System.Drawing.Size(75, 23);
-         this.btnResultsContextForeColor.TabIndex = 26;
-         // 
-         // btnResultsWindowBackColor
-         // 
-         this.btnResultsWindowBackColor.Location = new System.Drawing.Point(441, 24);
-         this.btnResultsWindowBackColor.Name = "btnResultsWindowBackColor";
-         this.btnResultsWindowBackColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-         this.btnResultsWindowBackColor.Size = new System.Drawing.Size(75, 23);
-         this.btnResultsWindowBackColor.TabIndex = 22;
-         // 
-         // btnResultsWindowForeColor
-         // 
-         this.btnResultsWindowForeColor.Location = new System.Drawing.Point(144, 24);
-         this.btnResultsWindowForeColor.Name = "btnResultsWindowForeColor";
-         this.btnResultsWindowForeColor.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-         this.btnResultsWindowForeColor.Size = new System.Drawing.Size(75, 23);
-         this.btnResultsWindowForeColor.TabIndex = 21;
-         // 
-         // BackColorButton
-         // 
-         this.BackColorButton.Location = new System.Drawing.Point(441, 24);
-         this.BackColorButton.Name = "BackColorButton";
-         this.BackColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-         this.BackColorButton.Size = new System.Drawing.Size(75, 23);
-         this.BackColorButton.TabIndex = 18;
-         // 
-         // ForeColorButton
-         // 
-         this.ForeColorButton.Location = new System.Drawing.Point(144, 24);
-         this.ForeColorButton.Name = "ForeColorButton";
-         this.ForeColorButton.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-         this.ForeColorButton.Size = new System.Drawing.Size(75, 23);
-         this.ForeColorButton.TabIndex = 17;
-         // 
          // frmOptions
          // 
          this.AcceptButton = this.btnOK;
@@ -957,5 +1008,9 @@ namespace AstroGrep.Windows.Forms
       private CheckBox chkSaveMessagesPosition;
       private Controls.ColorButton btnResultsContextForeColor;
       private Label lblResultsContextForeColor;
+      private ComboBox cboPerformance;
+      private Label lblPerformance;
+      private CheckBox chkUseEncodingCache;
+      private Button btnCacheClear;
    }
 }
