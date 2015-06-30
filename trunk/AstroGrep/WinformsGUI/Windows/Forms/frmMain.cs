@@ -2566,6 +2566,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   02/24/2012	CHG: 3488321, ability to change results font
       /// [Curtis_Beard]	   09/26/2012	CHG: Update status bar text
       /// [Curtis_Beard]	   10/10/2012	ADD: 3479503, ability to change file list font
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
       /// </history>
       private void OptionsMenuItem_Click(object sender, System.EventArgs e)
       {
@@ -2588,7 +2589,8 @@ namespace AstroGrep.Windows.Forms
             {
                Language.ProcessForm(this, this.toolTip1);
 
-               SetColumnsText();               
+               SetColumnsText();
+               SetWindowText();
 
                // clear statusbar text
                SetStatusBarMessage(string.Empty);
@@ -3990,67 +3992,17 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// Handles determining enabling the open file menuitem.
+      /// Get TextEditorOpener for give position.
       /// </summary>
-      /// <param name="sender">CustomTextEditor</param>
-      /// <param name="e">system parameter</param>
-      private void menu_ContextMenuOpening(object sender, System.Windows.Controls.ContextMenuEventArgs e)
+      /// <param name="position">Current TextViewPosition from results preview area</param>
+      /// <returns>TextEditorOpener for current position</returns>
+      /// <history>
+      /// [Curtis_Beard]		06/29/2015	CHG: reconfigure to use common method
+      /// </history>
+      private TextEditors.TextEditorOpener GetEditorAtLocation(ICSharpCode.AvalonEdit.TextViewPosition? position)
       {
-         bool isEnabled = false;
+         var opener = new TextEditors.TextEditorOpener();
 
-         var position = txtHits.GetPositionFromRightClickPoint();
-         if (position.HasValue)
-         {
-            try
-            {
-               string path = string.Empty;
-               int lineNumber = position.Value.Line;
-               int columnNumber = 1;
-
-               if (txtHits.LineNumbers != null && (lstFileNames.SelectedItems.Count == 0 || !EntireFileMenuItem.Checked))
-               {
-                  // either all results or file's matches
-                  var lineNumberHolder = txtHits.LineNumbers[position.Value.Line - 1];
-
-                  path = lineNumberHolder.FileFullName;
-
-                  if (!string.IsNullOrEmpty(path))
-                  {
-                     lineNumber = lineNumberHolder.Number > -1 ? lineNumberHolder.Number : 1;
-                     columnNumber = lineNumberHolder.ColumnNumber;
-
-                     isEnabled = true;
-                  }
-               }
-               else if (lstFileNames.SelectedItems.Count > 0 && __Grep != null)
-               {
-                  // full file
-                  MatchResult result = __Grep.RetrieveMatchResult(Convert.ToInt32(lstFileNames.SelectedItems[0].SubItems[Constants.COLUMN_INDEX_GREP_INDEX].Text));
-                  path = result.File.FullName;
-                  MatchResultLine matchLine = (from m in result.Matches where m.LineNumber == position.Value.Line select m).FirstOrDefault();
-                  if (matchLine != null && matchLine.LineNumber > -1)
-                  {
-                     lineNumber = matchLine.LineNumber;
-                     columnNumber = matchLine.ColumnNumber;
-                  }
-
-                  isEnabled = true;
-               }
-            }
-            catch { }
-         }
-
-         ((sender as TextEditorEx).ContextMenu.Items[0] as System.Windows.Controls.MenuItem).IsEnabled = isEnabled;
-      }
-
-      /// <summary>
-      /// Handles finding the current line under the mouse pointer to open the texteditor at that location.
-      /// </summary>
-      /// <param name="sender">system parameter</param>
-      /// <param name="e">system parameter</param>
-      private void openFile_Click(object sender, System.Windows.RoutedEventArgs e)
-      {
-         var position = txtHits.GetPositionFromRightClickPoint();
          if (position.HasValue)
          {
             try
@@ -4082,7 +4034,7 @@ namespace AstroGrep.Windows.Forms
                         }
                      }
 
-                     TextEditors.EditFile(path, lineNumber, columnNumber, line);
+                     opener = new TextEditors.TextEditorOpener(path, lineNumber, columnNumber, line);
                   }
                }
                else if (lstFileNames.SelectedItems.Count > 0 && __Grep != null)
@@ -4099,18 +4051,85 @@ namespace AstroGrep.Windows.Forms
                      columnNumber = matchLine.ColumnNumber;
                   }
 
-                  TextEditors.EditFile(path, lineNumber, columnNumber, line);
+                  opener = new TextEditors.TextEditorOpener(path, lineNumber, columnNumber, line);
                }
             }
             catch { }
          }
+
+         return opener;
       }
 
       /// <summary>
-      /// 
+      /// Handles finding the current line under the mouse pointer during a double click to open the texteditor at that location.
       /// </summary>
       /// <param name="sender">system parameter</param>
       /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		06/29/2015	FIX: 77, add back support for double click to open editor
+      /// </history>
+      private void txtHits_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+      {
+         if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+         {
+            ICSharpCode.AvalonEdit.TextViewPosition? position = null;
+            var mousePos = e.GetPosition(txtHits);
+            if (mousePos != null)
+            {
+               position = txtHits.GetPositionFromPoint(mousePos);
+            }
+
+            var opener = GetEditorAtLocation(position);
+            if (opener.HasValue())
+            {
+               e.Handled = true;
+               TextEditors.EditFile(opener);
+            }
+         }
+      }
+
+      /// <summary>
+      /// Handles determining enabling the open file menuitem.
+      /// </summary>
+      /// <param name="sender">CustomTextEditor</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	Initial
+      /// [Curtis_Beard]		06/29/2015	CHG: reconfigure to use common method
+      /// </history>
+      private void menu_ContextMenuOpening(object sender, System.Windows.Controls.ContextMenuEventArgs e)
+      {
+         var opener = GetEditorAtLocation(txtHits.GetPositionFromRightClickPoint());
+
+         ((sender as TextEditorEx).ContextMenu.Items[0] as System.Windows.Controls.MenuItem).IsEnabled = opener.HasValue();
+      }
+
+      /// <summary>
+      /// Handles finding the current line under the mouse pointer to open the texteditor at that location.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	Initial
+      /// [Curtis_Beard]		06/29/2015	CHG: reconfigure to use common method
+      /// </history>
+      private void openFile_Click(object sender, System.Windows.RoutedEventArgs e)
+      {
+         var opener = GetEditorAtLocation(txtHits.GetPositionFromRightClickPoint());
+         if (opener.HasValue())
+         {
+            TextEditors.EditFile(opener);
+         }
+      }
+
+      /// <summary>
+      /// Handles selecting all text in results preview area.
+      /// </summary>
+      /// <param name="sender">system parameter</param>
+      /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	Initial
+      /// </history>
       private void selectAllItem_Click(object sender, System.Windows.RoutedEventArgs e)
       {
          txtHits.Focus();
@@ -4118,10 +4137,13 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// 
+      /// Handles setting clipboard data with currently selected text from results preview area.
       /// </summary>
       /// <param name="sender">system parameter</param>
       /// <param name="e">system parameter</param>
+      /// <history>
+      /// [Curtis_Beard]		04/08/2015	Initial
+      /// </history>
       private void copyItem_Click(object sender, System.Windows.RoutedEventArgs e)
       {
          txtHits.Copy();
@@ -4149,10 +4171,11 @@ namespace AstroGrep.Windows.Forms
       }
 
       /// <summary>
-      /// 
+      /// Determines if any log items are present.
       /// </summary>
-      /// <returns></returns>
+      /// <returns>true if log items are present, false otherwise</returns>
       /// <history>
+      /// [Curtis_Beard]	   ??/??/????	Initial
       /// </history>
       private bool AnyLogItems()
       {
@@ -4164,12 +4187,13 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   09/18/2013	CHG: 64/53, add search path to window title
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
       /// </history>
       private void SetWindowText()
       {
          if (cboFilePath.Items.Count > 0)
          {
-            this.Text = string.Format("{0} - AstroGrep", cboFilePath.Items[0].ToString());
+            this.Text = string.Format("{0} - {1}", cboFilePath.Items[0].ToString(), this.Text);
          }
       }
 

@@ -298,6 +298,7 @@
     <Content Include="Images\AstroGrep_Icon_256x256.ico" />
     <Content Include="Images\descending-arrow-gray.gif" />
     <Content Include="Images\folder-open.png" />
+    <EmbeddedResource Include="Language\pl-pl.xml" />
     <EmbeddedResource Include="Language\da-dk.xml" />
     <EmbeddedResource Include="Language\de-de.xml" />
     <EmbeddedResource Include="Language\en-us.xml" />

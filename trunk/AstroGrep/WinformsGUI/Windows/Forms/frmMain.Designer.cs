@@ -801,6 +801,7 @@ namespace AstroGrep.Windows.Forms
          this.txtHits.Name = "txtHits";
          this.txtHits.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Auto;
          this.txtHits.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Auto;
+         this.txtHits.PreviewMouseDoubleClick += txtHits_PreviewMouseDoubleClick;
          // 
          // splitUpDown
          // 

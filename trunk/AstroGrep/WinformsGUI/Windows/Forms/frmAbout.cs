@@ -43,8 +43,6 @@ namespace AstroGrep.Windows.Forms
    /// </history>
 	public partial class frmAbout : Form
 	{
-      private System.ComponentModel.IContainer components;
-
       /// <summary>
       /// Creates an instance of the frmAbout class.
       /// </summary>
@@ -54,9 +52,6 @@ namespace AstroGrep.Windows.Forms
       /// </history>
 		public frmAbout()
 		{
-			//
-			// Required for Windows Form Designer support
-			//
 			InitializeComponent();
 		}
 
@@ -99,24 +94,19 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   05/18/2007	CHG: always use current year for copyright
       /// [Curtis_Beard]	   02/07/2012	CHG: 3485450, add check for updates, cleanup about dialog
       /// [Curtis_Beard]      06/04/2015  CHG: add product name and version text setup
+      /// [Curtis_Beard]      06/15/2015  CHG: use language text for control text values
       /// </history>
       private void frmAbout_Load(object sender, System.EventArgs e)
       {
-         this.Text = "About {0}";
-
-         // Setup the hyperlinks
-         LicenseLinkLabel.Links.Add(0, LicenseLinkLabel.Text.Length, "http://www.gnu.org/copyleft/gpl.html");
-         LicenseLinkLabel.LinkColor = Color.Blue;
-         lnkHomePage.Text = "{0} Home Page";
-         lnkHomePage.LinkColor = Color.Blue;
-
          //Language.GenerateXml(Me, Application.StartupPath & "\" & Me.Name & ".xml")
          Language.ProcessForm(this);
 
-         this.Text = string.Format(this.Text, ProductInformation.ApplicationName);
+         this.Text = string.Format(this.Text, ProductInformation.ApplicationName);         
          lnkHomePage.Text = string.Format(lnkHomePage.Text, ProductInformation.ApplicationName);
          lnkHomePage.Links.Add(0, lnkHomePage.Text.Length, "http://astrogrep.sourceforge.net/");
-         CopyrightLabel.Text = string.Format("Copyright (C) 2002-{0} AstroComma Inc.", DateTime.Now.Year.ToString());
+         LicenseLinkLabel.Links.Add(0, LicenseLinkLabel.Text.Length, "http://www.gnu.org/copyleft/gpl.html");
+
+         CopyrightLabel.Text = string.Format(CopyrightLabel.Text, DateTime.Now.Year.ToString());
          lblProductName.Text = ProductInformation.ApplicationName;
          lblProductVersion.Text = string.Format("{0}{1}", ProductInformation.ApplicationVersion.ToString(3), ProductInformation.IsPortable ? " (Portable)" : string.Empty);
       }

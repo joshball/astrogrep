@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<language displayName="Polski" culture="pl-pl" version="1.0">
+   <screen name="frmMain" value="AstroGrep">
+      <control name="lblSearchHeading" value="Wyszukiwanie AstroGrep" />
+      <control name="lblSearchText" value="Szukany tekst" />
+      <control name="lblFileTypes" value="Rozszerzenia plików" />
+      <control name="btnCancel" value="&amp;Anuluj" />
+      <control name="lblSearchPath" value="Przeszukiwana ścieżka" />
+      <control name="lblContextLines" value="Linie kontekstu" tooltip="Linie wyświetlane powyżej i poniżej pasującego tekstu" />
+      <control name="txtContextLines" tooltip="Linie wyświetlane powyżej i poniżej pasującego tekstu" />
+      <control name="chkNegation" value="Ne&amp;gacja" tooltip="Znajdź pliki nie zawierające poszukiwanego tekstu" />
+      <control name="chkFileNamesOnly" value="Pokaż tylko na&amp;zwy plików" tooltip="Wyświetla nazwy plików zamiast ich pasującej zawartości (może być szybsze przy dużych plikach)" />
+      <control name="chkRecurse" value="Szukaj w pod&amp;folderach" tooltip="Szukaj w podfolderach" />
+      <control name="chkWholeWordOnly" value="&amp;Całe słowo" tooltip="Znajduj tylko całe słowa (a nie ich części)" />
+      <control name="chkCaseSensitive" value="Wielkość &amp;liter" tooltip="Znajduj litery odpowiednio dużej lub małej wielkości" />
+      <control name="chkRegularExpressions" value="Wyrażenia &amp;regularne" tooltip="Używaj &quot;wyrażeń regularnych&quot; do sprawdzania" />
+      <control name="chkAllResultsAfterSearch" value="Pokaż wszystkie wyniki &amp;wyszukiwania" tooltip="Wyświetla wszystkie wyniki wyszukiwania w jednym wspólnym poglądzie." />
+      <control name="lblSearchOptions" value="Opcje wyszukiwania" />
+      <control name="picBrowse" tooltip="Przeglądaj..." />
+      <control name="lnkExclusions" value="Wyjątki" />
+      <control name="lstFileNames">
+         <menuitem index="0" value="Skopiuj wszystko" />
+         <menuitem index="1" value="Skopiuj nazwę" />
+         <menuitem index="2" value="Skopiuj lokalizację" />
+         <menuitem index="3" value="Skopiuj lokalizację i nazwę" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="Operacje na pliku">
+            <menuitem index="0" value="Skopiuj" />
+            <menuitem index="1" value="Usuń" />
+         </menuitem>
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="Otwórz plik" />
+         <menuitem index="8" value="Otwórz katalog" />
+         <menuitem index="9" value="Otwórz programem domyślnym" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Usuń z listy" />
+      </control>
+      <control name="btnSearch" value="&amp;Szukaj">
+         <menuitem index="0" value="Szukaj w wynikach"/>
+      </control>
+
+      <menu index="0" value="&amp;Plik">
+         <menuitem index="0" value="Nowe &amp;okno" />
+         <menuitem index="1" value="-" />
+         <menuitem index="2" value="Wybierz ścieżkę &amp;wyszukiwania..." />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="&amp;Zapisz wyniki..." />
+         <menuitem index="5" value="Wy&amp;drukuj wyniki..." />
+         <menuitem index="6" value="-" />
+         <menuitem index="7" value="&amp;Wyjdź" />
+      </menu>
+      <menu index="1" value="&amp;Edycja">
+         <menuitem index="0" value="Wybierz &amp;wszystkie pliki" />
+         <menuitem index="1" value="Otwórz wy&amp;brane pliki" />
+      </menu>
+      <menu index="2" value="Wi&amp;dok">
+         <menuitem index="0" value="Wiadomości &amp;stanu" />
+         <menuitem index="1" value="Wiadomości wy&amp;kluczeń" />
+         <menuitem index="2" value="Wiadomości &amp;błędów" />
+         <menuitem index="3" value="&amp;Wszystkie wiadomości" />
+         <menuitem index="4" value="-" />
+         <menuitem index="5" value="&amp;Powiększenie">
+            <menuitem index="0" value="Przybliż (Ctrl+Kółko myszy w górę)"/>
+            <menuitem index="1" value="Oddal (Ctrl+Kółko myszy w dół)"/>
+            <menuitem index="2" value="Przywróć domyślne powiększenie"/>
+         </menuitem>
+         <menuitem index="6" value="Numery linii" />
+         <menuitem index="7" value="Zawijanie tekstu" />
+         <menuitem index="8" value="Usuń poprzedzające spa&amp;cje"/>
+         <menuitem index="9" value="Cały plik" />
+         <menuitem index="10" value="-" />
+         <menuitem index="11" value="Wszystkie wyniki" />
+      </menu>
+      <menu index="3" value="&amp;Narzędzia">
+         <menuitem index="0" value="&amp;Wyczyść listy ostatnio używanych">
+            <menuitem index="0" value="Przeszukiwane ścieżki"/>
+            <menuitem index="1" value="Rozszerzenia plików"/>
+            <menuitem index="2" value="Szukany tekst"/>
+            <menuitem index="3" value="-"/>
+            <menuitem index="4" value="Wszystko"/>
+         </menuitem>
+         <menuitem index="1" value="-" />
+         <menuitem index="2" value="&amp;Zapisz opcje wyszukiwania" />
+         <menuitem index="3" value="&amp;Ustawienia" />
+      </menu>
+      <menu index="4" value="Po&amp;moc">
+         <menuitem index="0" value="&amp;Wyświetl pomoc" />
+         <menuitem index="1" value="Wyrażenia &amp;regularne" />
+         <menuitem index="2" value="Plik &amp;dziennika" />
+         <menuitem index="3" value="-" />
+         <menuitem index="4" value="Sprawdź dostępność &amp;aktualizacji..." />
+         <menuitem index="5" value="-" />
+         <menuitem index="6" value="&amp;Informacje o AstroGrep" />
+      </menu>
+      
+      <!-- status bar items default state-->
+      <control name="sbTotalCountPanel" value="Łącznie: 0"/>
+      <control name="sbFileCountPanel" value="Pliki: 0"/>
+      <control name="sbFilterCountPanel" value="Wyjątki: 0" tooltip="Naciśnij podwójnie, aby wyświetlić wyjątki."/>
+      <control name="sbErrorCountPanel" value="Błędy: 0" tooltip="Naciśnij podwójnie, aby wyświetlić błędy."/>
+   </screen>
+   
+   <screen name="frmAbout" value="Informacje o {0}">
+      <control name="lnkHomePage" value="Strona domowa {0}" />
+      <control name="LicenseLinkLabel" value="Licencja GNU"/>
+      <control name="CopyrightLabel" value="Prawa autorskie (C) 2002 - {0} AstroComma Inc."/>
+      <control name="lblDescription" value="Dodatkowe prawa autorskie (C) 2002 dla Theodore L. Ward. AstroGrep jest rozprowadzany BEZ ŻADNEJ GWARANCJI. Jest to darmowe oprogramowanie i mile widziane jest dalsze rozpowszechnianie go na określonych warunkach."/>
+      <control name="lblDisclaimer" value="Stworzone przez Theodore Ward oraz przekształcone na .NET przez Curtis Beard"/>
+   </screen>
+   
+   <screen name="frmAddEditTextEditor" value="Edytory tekstu">
+      <control name="lblAllTypesMessage" value="Edytor tekstu może zostać wybrany dla wszystkich nieustalonych rozszerzeń poprzez zdefiniowanie * dla rozszerzeń plików." />
+      <control name="lblCmdOptions" value="Opcje wiersza poleceń:&#xD;&#xA;  %1 - Plik&#xD;&#xA;  %2 - Numer linii&#xD;&#xA;  %3 - Kolumna" />
+      <control name="lblCmdOptionsView" value="Podgląd: {0} {1}" />
+      <control name="btnBrowse" tooltip="Przeglądaj..." />
+      <control name="lblCmdLineArgs" value="Wiersz poleceń" />
+      <control name="lblTextEditorLocation" value="Lokalizacja edytora tekstu" />
+      <control name="lblFileType" value="Rozszerzenia plików" />
+      <control name="btnCancel" value="&amp;Anuluj" />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="lblMultiTypes" value="Rozdziel rozszerzenia za pomocą znaku | ."/>
+      <control name="lblTabSize" value="Rozmiar tabulatora" />
+      <control name="chkUseQuotesAroundFileName" value="Używaj &amp;cudzysłowia wokół nazwy pliku."/>
+   </screen>
+   
+   <screen name="frmOptions" value="Ustawienia">
+      <control name="chkRightClickOption" value="Uaktywnij opcję wyszukiwania pod &amp;PPM na folderach" />
+      <control name="lblStoredPaths" value="Liczba przechowywanych ostatnio używanych ścieżek" />
+      <control name="btnEdit" value="&amp;Edytuj..." />
+      <control name="btnRemove" value="&amp;Usuń" />
+      <control name="btnAdd" value="&amp;Dodaj..." />
+      <control name="lblResultPreview" value="Podgląd wyników" />
+      <control name="lblResultsWindowBack" value="Kolor tła" />
+      <control name="lblResultsWindowFore" value="Kolor tekstu" />
+      <control name="lblResultsContextForeColor" value="Kolor linii kontekstu" />
+      <control name="grpResultWindow" value="Okno wyników" />
+      <control name="BackColorLabel" value="Kolor tła" />
+      <control name="ForeColorLabel" value="Kolor tekstu" />
+      <control name="grpResultMatch" value="Znalezione dopasowania" />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="&amp;Anuluj" />
+      <control name="tabResults" value="Wyniki" />
+      <control name="tabGeneral" value="Ogólne" />
+      <control name="tabTextEditors" value="Edytory tekstu" />
+      <control name="LanguageGroup" value="Język"/>
+      <control name="tabPlugins" value="Wtyczki"/>
+      <control name="chkDesktopShortcut" value="Skrót na &amp;pulpicie"/>
+      <control name="chkStartMenuShortcut" value="Skrót w Menu &amp;Start"/>
+      <control name="ShortcutGroup" value="Skróty"/>
+      <control name="PluginDetailsGroup" value="Szczegóły wtyczki"/>
+      <control name="lblPluginDetailName" value="Nazwa:"/>
+      <control name="lblPluginDetailVersion" value="Wersja:"/>
+      <control name="lblPluginDetailAuthor" value="Autor:"/>
+      <control name="btnFindFont" value="Ustaw &amp;czcionkę..."/>
+      <control name="chkShowExclusionErrorMessage" value="Pokazuj &amp;informacje o wykluczonych elementach oraz o wystąpieniu błędów."/>
+      <control name="chkSaveSearchOptions" value="Zapisz opcje wyszukiwania przy &amp;wyjściu."/>
+      <control name="grpFileList" value="Lista plików" />
+      <control name="btnFileFindFont" value="Ustaw czcionkę..."/>
+      <control name="chkDetectFileEncoding" value="Wykrywaj &amp;kodowanie plików."/>
+      <control name="chkSaveMessagesPosition" value="Zapisz pozycję &amp;okna wiadomości."/>
+
+      <control name="tabFileEncoding" value="Kodowanie plików" />
+      <control name="btnFileEncodingAdd" value="&amp;Dodaj..."/>
+      <control name="btnFileEncodingEdit" value="&amp;Edytuj..."/>
+      <control name="btnFileEncodingDelete" value="&amp;Usuń"/>
+      <control name="lblPerformance" value="Wydajność"/>
+      <control name="chkUseEncodingCache" value="Włącz pamięć podręczną dla wykrytych kodowań."/>
+      <control name="btnCacheClear" value="Wyczyść podręczną"/>
+   </screen>
+   
+   <screen name="frmPrint" value="Drukuj">
+      <control name="cmdCancel" value="&amp;Anuluj" />
+      <control name="lblSelect" value="Proszę wybrać rodzaj wyjściowy:" />
+      <control name="cmdPageSetup" value="&amp;Ustawienia strony" />
+      <control name="cmdPrint" value="&amp;Drukuj" />
+      <control name="cmdPreview" value="&amp;Podgląd" />
+   </screen>
+
+   <screen name="frmExclusions" value="Wykluczenia">
+      <control name="btnEdit" value="&amp;Edytuj..." />
+      <control name="btnDelete" value="&amp;Usuń" />
+      <control name="btnAdd" value="&amp;Dodaj..." />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="&amp;Anuluj" />
+      <control name="btnRestoreDefaults" value="&amp;Przywróć domyślne" />
+   </screen>
+
+   <screen name="frmAddEditExclusions" value="Wykluczenia">
+      <control name="lblCategory" value="Kategoria" />
+      <control name="lblType" value="Rodzaj" />
+      <control name="lblOptions" value="Opcje" />
+      <control name="lblValue" value="Wartość" />
+      <control name="chkIgnoreCase" value="Ignoruj wielkość liter" />
+      <control name="btnCancel" value="&amp;Anuluj" />
+      <control name="btnOK" value="&amp;OK" />
+   </screen>
+
+   <screen name="frmCommandLine" value="AstroGrep">
+      <control name="btnOK" value="&amp;OK"/>
+   </screen>
+
+   <screen name="frmLogDisplay" value="Wiadomości">
+      <control name="sbtnStatus" value="Stan"/>
+      <control name="sbtnExclusions" value="Wykluczenia"/>
+      <control name="sbtnError" value="Błędy"/>
+   </screen>
+
+   <screen name="frmCheckForUpdateTemp" value="Sprwadź dostępność aktualizacji">
+      <control name="lblVersionCheck" value="Sprawdzanie aktualizacji..." />
+   </screen>
+
+   <screen name="frmAddEditFileEncoding" value="Kodowanie pliku">
+      <control name="picBrowse" tooltip="Przeglądaj..." />
+      <control name="btnOK" value="&amp;OK" />
+      <control name="btnCancel" value="&amp;Anuluj" />
+      <control name="lblFilePath" value="Ścieżka do pliku" />
+      <control name="lblEncoding" value="Kodowanie" />
+   </screen>
+   
+   <generic>
+      <text name="Browse" value="Przeglądaj..."/>
+      
+      <text name="SaveDialogTitle" value="Zapisz wyniki jako" />
+      <text name="SaveNoResults" value="Brak wyników do zapisania."/>
+      <text name="SaveError" value="Nie można zapisać wyników: {0}"/>
+      <text name="SaveSaving" value="Zapisywanie wyników do pliku: {0}"/>
+      <text name="SaveSaved" value="Wyniki zapisane"/>
+      
+      <text name="PrintTypeSelected" value="Wybrane elementy"/>
+      <text name="PrintTypeFile" value="Lista plików"/>
+      <text name="PrintTypeAll" value="Wszystko"/>
+      <text name="PrintErrorPageSettings" value="Wystąpił błąd podczas ładowania Ustawień strony. Upewnij się, czy posiadasz dostęp do drukarki. Musi być ona podłączona oraz dostępna, aby móc drukować."/>
+      <text name="PrintErrorPreview" value="Wystąpił błąd podczas ładowania dokumentu w Podglądzie drukowania. Upewnij się, czy posiadasz dostęp do drukarki. Musi być ona podłączona oraz dostępna, aby móc drukować."/>
+      <text name="PrintErrorPrint" value="Wystąpił błąd podczas ładowania dokumentu do drukowania. Upewnij się, czy posiadasz dostęp do drukarki. Musi być ona podłączona oraz dostępna, aby móc drukować."/>
+      <text name="PrintErrorDocument" value="Wystąpił błąd podczas tworzenia dokumentu do drukowania. ({0})"/>
+      <text name="PrintNoResults" value="W tej chwili brak wyników do wydrukowania."/>
+      
+      <text name="OpenFolderDescription" value="Proszę wybrać folder początkowy."/>
+      
+      <text name="VerifyErrorContextLines" value="Liczba linii kontekstu musi wynosić pomiędzy {0} a {1}."/>
+      <text name="VerifyErrorFileType" value="Musisz podać nazwę pliku, w którym chcesz wyszukiwać."/>
+      <text name="VerifyErrorNoStartPath" value="Musisz podać ścieżkę, by móc wyszukiwać."/>
+      <text name="VerifyErrorInvalidStartPath" value="Folder '{0}' jest niepoprawny."/>
+      <text name="VerifyErrorNoSearchText" value="Musisz podać szukany tekst."/>
+      <text name="VerifyErrorInvalidRegEx" value="Podane wyrażenie regularne ({0}) jest niepoprawne.  Proszę je poprawić."/>
+      <text name="VerifyErrorGeneric" value="Nie można zweryfikować podanych parametrów.  Proszę sprawdzić, czy są poprawne."/>
+      <text name="VerifyErrorFileHitCount" value="Minimalna ilość plików musi być większa lub równa {0}."/>
+      
+      <text name="SearchGenericError" value="Podczas wyszukiwania wystąpił błąd."/>
+      <text name="SearchFileError" value="Podczas przeszukiwania pliku wystąpił błąd: {0}."/>
+      <text name="SearchCancelled" value="Wyszukiwanie anulowane"/>
+      <text name="SearchFinished" value="Wyszukiwanie zakończone"/>
+      <text name="SearchStarted" value="Wyszukiwanie rozpoczęte"/>
+      <text name="SearchSearching" value="Wyszukiwanie {0}"/>
+      <text name="SearchSearchingByPlugin" value="Do przeszukania pliku wykorzystano wtyczkę {0}." />
+      <text name="SearchExplorerItem" value="Wyszukiwanie przy pomocy {0}..."/>
+
+      <text name="ResultsPreviewSpacerText" value="(21)"/>
+      <text name="ResultsPreviewText" value="&#x9;Wyświetlana przykładowa linia z wynikiem oraz wynik."/>
+      <text name="ResultsPreviewTextMatch" value="wynik"/>
+      <text name="ResultsPreviewLargeBinaryFile" value="Ten plik jest duży lub binarny, na pewno chcesz wyświetlić jego całą zawartość?"/>
+      
+      <text name="ColorOtherText" value="&amp;Własne..."/>
+      <!-- todo: color names -->
+      
+      <text name="TextEditorsErrorNoCmdLineForFile" value="Nie określono argumentu wiersza poleceń dla nazwy pliku. &#xD;&#xA; Proszę podać argument dla pliku w menu Narzędzia->Ustawienia."/>
+      <text name="TextEditorsErrorNotDefined" value="Nie określono edytora tekstu dla danego rozszerzenia pliku ani dla wszystkich rozszerzeń.  &#xD;&#xA; Proszę ustawić edytor tekstu w menu Narzędzia->Ustawienia."/>
+      <text name="TextEditorsErrorGeneric" value="Błąd poczas edytowania pliku {0}.&#xD;&#xA;Wystąpił następujący problem: {1}"/>
+      <text name="TextEditorsBrowseTitle" value="Wybierz plik wykonywalny edytora tekstu"/>
+      <text name="TextEditorsAllTypesDefined" value="Edytor tekstu dla wszystkich rozszerzeń plików został już zdefiniowany."/>
+      <text name="TextEditorsColumnFileType" value="Rozszerzenie pliku"/>
+      <text name="TextEditorsColumnLocation" value="Edytor tekstu"/>
+      <text name="TextEditorsColumnCmdLine" value="Wiersz poleceń"/>
+      <text name="TextEditorsColumnTabSize" value="Rozmiar tabulatora"/>
+      <text name="TextEditorsErrorNoEditor" value="Proszę określić edytor tekstu."/>
+      <text name="TextEditorsErrorFileTypeExists" value="Rozszerzenie pliku zostało już zdefiniowane.  Proszę spróbować ponownie."/>
+      
+      <text name="ResultsColumnFile" value="Nazwa"/>
+      <text name="ResultsColumnLocation" value="Lokalizacja"/>
+      <text name="ResultsColumnDate" value="Data modyfikacji"/>
+      <text name="ResultsColumnCount" value="Ilość"/>
+      <text name="ResultsColumnSize" value="Rozmiar"/>
+      <text name="ResultsColumnFileExt" value="Rozszerzenie pliku"/>
+      
+      <text name="ResultsStatusTotalCount" value="Łącznie: {0}"/>
+      <text name="ResultsStatusFileCount" value="Pliki: {0}"/>
+      <text name="ResultsStatusFilterCount" value="Wyjątki: {0}"/>
+      <text name="ResultsStatusErrorCount" value="Błędy: {0}"/>
+
+      <text name="ResultsContextMenu.OpenFileCurrentLine" value="Otwórz plik na bieżącej linii"/>
+      <text name="ResultsContextMenu.Copy" value="Skopiuj"/>
+      <text name="ResultsContextMenu.SelectAll" value="Zaznacz wszystko"/>
+      
+      <text name="PluginsColumnEnabled" value="Aktywna"/>
+      <text name="PluginsColumnName" value="Nazwa"/>
+      <text name="PluginsColumnExtensions" value="Rozszerzenia"/>
+
+      <text name="Update.Current" value="{0} jest aktualny ({1})"/>
+      <text name="Update.NewVersion" value="Dostępna jest wersja {1} programu {0}."/>
+      <text name="Update.Latest" value="Pobierz aktualizację {0} {1}"/>
+      <text name="Update.Error" value="Sprawdzanie aktualizacji nie powiodło się"/>
+
+      <text name="Exclusions.Enabled" value="Włączony"/>
+      <text name="Exclusions.Category" value="Kategoria"/>
+      <text name="Exclusions.Type" value="Rodzaj"/>
+      <text name="Exclusions.Value" value="Wartość"/>
+      <text name="Exclusions.Option" value="Opcje"/>
+
+      <text name="Exclusions.File" value="Plik"/>
+      <text name="Exclusions.Directory" value="Katalog"/>
+
+      <text name="Exclusions.Name" value="Nazwa"/>
+      <text name="Exclusions.Path" value="Ścieżka"/>
+      <text name="Exclusions.Hidden" value="Ukryty"/>
+      <text name="Exclusions.System" value="Systemowy"/>
+      <text name="Exclusions.DateModified" value="Data modyfikacji"/>
+      <text name="Exclusions.DateCreated" value="Data stworzenia"/>
+      <text name="Exclusions.Extension" value="Rozszerzenie"/>
+      <text name="Exclusions.Size" value="Rozmiar"/>
+      <text name="Exclusions.Binary" value="Binarny"/>
+      <text name="Exclusions.MinimumHitCount" value="Minimalna ilość"/>
+      <text name="Exclusions.ReadOnly" value="Tylko do odczytu"/>
+            
+      <text name="Exclusions.None" value=""/>
+      <text name="Exclusions.Equals" value="Równe"/>
+      <text name="Exclusions.Contains" value="Zawiera"/>
+      <text name="Exclusions.StartsWith" value="Rozpoczyna się od"/>
+      <text name="Exclusions.EndsWith" value="Kończy się na"/>
+      <text name="Exclusions.NotEquals" value="Nie jest równe"/>
+      <text name="Exclusions.GreaterThan" value="Większe od"/>
+      <text name="Exclusions.GreaterThanEquals" value="Większe od równego"/>
+      <text name="Exclusions.LessThan" value="Mniejsze od"/>
+      <text name="Exclusions.LessThanEquals" value="Mniejsze od równego"/>
+      <text name="Exclusions.IgnoreCase" value=" (ignorowana wielkość)"/>
+
+      <text name="Exclusions.Error.NoCategory" value="Proszę wybrać kategorię."/>
+      <text name="Exclusions.Error.NoType" value="Proszę wybrać rodzaj."/>
+      <text name="Exclusions.Error.NoValue" value="Proszę podać wartość."/>
+      <!--<text name="Exclusions.Error.InvalidExtensionFormat" value="Nieprawidłowe rozszerzenie pliku. Rozszerzenie to .xxx"/>-->
+      <text name="Exclusions.Error.InvalidOptions" value="Proszę wybrać prawidłową wartość opcji."/>
+      <text name="Exclusions.Error.TypeCategoryLimit" value="Niestety nie możesz zdefiniować więcej niż 1 wyjątek rodzaju {0} w kategorii {1}."/>
+      
+      <text name="ExclusionErrorMessageText" value="W Twoim wyszukiwaniu znalazły się elementy wykluczone lub z błędami.  &#xA;Możesz zobaczyć te elementy poprzez podwójne kliknięcie na powiązanym pasku stanu w prawym dolnym rogu. &#xA;&#xA;Możesz wyłaczyć tę wiadomość w Ustawieniach."/>
+
+      <text name="LogDisplay.Column.Date" value="Data"/>
+      <text name="LogDisplay.Column.Type" value="Rodzaj"/>
+      <text name="LogDisplay.Column.Value" value="Wartość"/>
+      <text name="LogDisplay.Column.Details" value="Szczegóły"/>
+      <text name="LogDisplay.Status" value="Stan"/>
+      <text name="LogDisplay.Exclusion" value="Wyjątek"/>
+      <text name="LogDisplay.Error" value="Błąd"/>
+
+      <text name="FileEncoding.Enabled" value="Aktywne"/>
+      <text name="FileEncoding.FilePath" value="Ścieżka do pliku"/>
+      <text name="FileEncoding.Encoding" value="Kodowaie"/>
+      <text name="FileEncoding.Performance.Speed" value="Szybkość"/>
+      <text name="FileEncoding.Performance.Default" value="Domyślna"/>
+      <text name="FileEncoding.Performance.Accuracy" value="Dokładność"/>
+      <text name="FileEncoding.CacheCleared" value="Pamięć podręczna została pomyślnie wyczyszczona."/>
+   </generic>
+   
+</language>

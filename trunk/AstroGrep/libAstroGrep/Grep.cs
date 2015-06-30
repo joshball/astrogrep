@@ -520,6 +520,7 @@ namespace libAstroGrep
       /// [Curtis_Beard]		05/18/2015	FIX: 69, use same stream to detect encoding and grep contents
       /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
       /// [Curtis_Beard]		06/02/2015	FIX: 75, use sample size from performance setting
+      /// [theblackbunny]		06/25/2015	FIX: 39, remove context lines that intersect with each other in different MatchResults
       /// </history>
       private void SearchFileContents(FileInfo file)
       {
@@ -534,8 +535,9 @@ namespace libAstroGrep
          MatchCollection _regularExpCol = null;
          bool _hitOccurred = false;
          bool _fileNameDisplayed = false;
+         int _maxContextLines = 0;
          var _context = new string[11];
-         int _contextIndex = 0;
+         int _contextIndex = -1;
          int _lastHit = 0;
          int userFilterCount = 0;
 
@@ -721,6 +723,7 @@ namespace libAstroGrep
             }
             _reader = new StreamReader(_stream, encoding);
 
+            _maxContextLines = SearchSpec.ContextLines + 1;
             do
             {
                string textLine = _reader.ReadLine();
@@ -825,9 +828,9 @@ namespace libAstroGrep
 
 
                      // Display context lines if applicable.
-                     if (SearchSpec.ContextLines > 0 && _lastHit == 0)
+                     if (SearchSpec.ContextLines > 0 && _lastHit <= 0)
                      {
-                        if (match.Matches.Count > 0)
+                        if (match.Matches.Count > 0 && _lastHit < -_maxContextLines)
                         {
                            // Insert a blank space before the context lines.
                            var matchLine = new MatchResultLine() { Line = string.Empty, LineNumber = -1 };
@@ -840,13 +843,24 @@ namespace libAstroGrep
                            }
                         }
 
-                        // Display preceeding n context lines before the hit.
-                        int tempPosInStr = _posInStr;
-                        for (tempPosInStr = SearchSpec.ContextLines; tempPosInStr >= 1; tempPosInStr--)
+                        // Display preceding n context lines before the hit.
+                        int tempContextLines = SearchSpec.ContextLines;
+                        // But only output the context lines which are not part of the previous context
+                        if(_lastHit >= -_maxContextLines)
+                        {
+                           tempContextLines = -_lastHit;
+                        }
+                        // Roll back the context index to get the first context line that needs to be displayed
+                        _contextIndex = _contextIndex - tempContextLines;
+                        if(_contextIndex < 0)
+                        {
+                           _contextIndex += _maxContextLines;
+                        }
+                        for (int tempPosInStr = tempContextLines; tempPosInStr >= 1; tempPosInStr--)
                         {
                            _contextIndex = _contextIndex + 1;
-                           if (_contextIndex > SearchSpec.ContextLines)
-                              _contextIndex = 1;
+                           if (_contextIndex >= _maxContextLines)
+                              _contextIndex = 0;
 
                            // If there is a match in the first one or two lines,
                            // the entire preceeding context may not be available.
@@ -897,31 +911,41 @@ namespace libAstroGrep
                         OnLineHit(match, _index);
                      }
                   }
-                  else if (_lastHit > 0 && SearchSpec.ContextLines > 0)
+                  else if (SearchSpec.ContextLines > 0)
                   {
-                     //***************************************************
-                     // We didn't find a hit, but since lastHit is > 0, we
-                     // need to display this context line.
-                     //***************************************************
-                     var matchLine = new MatchResultLine() { Line = textLine, LineNumber = _lineNumber };
-                     match.Matches.Add(matchLine);
-                     int _index = match.Matches.Count - 1;
-
-                     if (DoesPassHitCountCheck(match))
+                     if(_lastHit > 0)
                      {
-                        OnLineHit(match, _index);
+                        //***************************************************
+                        // We didn't find a hit, but since lastHit is > 0, we
+                        // need to display this context line.
+                        //***************************************************
+                        var matchLine = new MatchResultLine() { Line = textLine, LineNumber = _lineNumber };
+                        match.Matches.Add(matchLine);
+                        int _index = match.Matches.Count - 1;
+
+                        if (DoesPassHitCountCheck(match))
+                        {
+                           OnLineHit(match, _index);
+                        }
                      }
-                     _lastHit -= 1;
+                     if(_lastHit >= -_maxContextLines)
+                     {
+                        //*****************************************************
+                        // We continue keeping track of the number of potential
+                        // context lines since the last displayed context line
+                        // until we pass (-_maxContextLines).
+                        //*****************************************************
+                        _lastHit -= 1;
+                     }
 
                   } // Found a hit or not.
 
-                  // If we are showing context lines, keep the last n lines.
+                  // If we are showing context lines, keep the last n+1 lines.
                   if (SearchSpec.ContextLines > 0)
                   {
-                     if (_contextIndex == SearchSpec.ContextLines)
-                        _contextIndex = 1;
-                     else
-                        _contextIndex += 1;
+                     _contextIndex += 1;
+                     if (_contextIndex >= _maxContextLines)
+                        _contextIndex = 0;
 
                      _context[_contextIndex] = textLine;
                   }

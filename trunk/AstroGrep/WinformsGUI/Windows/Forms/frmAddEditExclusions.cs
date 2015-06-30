@@ -289,6 +289,7 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   03/07/2012	ADD: 3131609, exclusions
       /// [Curtis_Beard]	   11/11/2014	CHG: use FilterItem
+      /// [Curtis_Beard]	   06/15/2015	CHG: use language string for replacement values instead of raw values for TypeCategoryLimit error.
       /// </history>
       private FilterItem VerifyInterface()
       {
@@ -357,7 +358,7 @@ namespace AstroGrep.Windows.Forms
                   var existing = (from i in filterItems where i.FilterType.Category == item.FilterType.Category && i.FilterType.SubCategory == item.FilterType.SubCategory select i).ToList();
                   if (existing.Count > 0)
                   {
-                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), item.FilterType.SubCategory, item.FilterType.Category), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), Language.GetGenericText(string.Format("Exclusions.{0}", item.FilterType.SubCategory)), Language.GetGenericText(string.Format("Exclusions.{0}", item.FilterType.Category))), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                      return null;
                   }
                }
@@ -369,7 +370,7 @@ namespace AstroGrep.Windows.Forms
                   var existing = (from i in filterItems where i.FilterType.Category == item.FilterType.Category && i.FilterType.SubCategory == item.FilterType.SubCategory select i).ToList();
                   if (existing.Count > 0)
                   {
-                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), item.FilterType.SubCategory, item.FilterType.Category), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                     MessageBox.Show(this, string.Format(Language.GetGenericText("Exclusions.Error.TypeCategoryLimit"), Language.GetGenericText(string.Format("Exclusions.{0}", item.FilterType.SubCategory)), Language.GetGenericText(string.Format("Exclusions.{0}", item.FilterType.Category))), ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                      return null;
                   }
                }

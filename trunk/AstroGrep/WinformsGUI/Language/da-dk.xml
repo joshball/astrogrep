@@ -102,13 +102,16 @@
    
    <screen name="frmAbout" value="Om {0}">
       <control name="lnkHomePage" value="{0} Hjemmeside" />
-      <control name="cmdOK" value="&amp;OK" />
+      <control name="LicenseLinkLabel" value="GNU License"/>
+      <control name="CopyrightLabel" value="Copyright (C) 2002 - {0} AstroComma Inc."/>
+      <control name="lblDescription" value="Yderligere Copyright (C) 2002 til Theodore L. Ward. AstroGrep kommer med ABSOLUT INGEN GARANTI. Dette er fri software, og du er velkommen til at redistribuere det under visse betingelser."/>
+      <control name="lblDisclaimer" value="Oprettet af Theodore Ward og omdannes til .Net af Curtis Beard"/>
    </screen>
    
    <screen name="frmAddEditTextEditor" value="Tekst Editorer">
       <control name="lblAllTypesMessage" value="En teksteditor kan vælges for alle ukendte filtyper ved at bruge * for filtypen." />
       <control name="lblCmdOptions" value="Kommandolinie Indstillinger:&#xD;&#xA;  %1 - Filer&#xD;&#xA;  %2 - Linie Nummer&#xD;&#xA;  %3 - Kollonne" />
-      <control name="lblCmdOptionsView" value="Preview: {0}" />
+      <control name="lblCmdOptionsView" value="Preview: {0} {1}" />
       <control name="btnBrowse" tooltip="Gennemse..." />
       <control name="lblCmdLineArgs" value="Kommandolinie" />
       <control name="lblTextEditorLocation" value="Angiv Program" />

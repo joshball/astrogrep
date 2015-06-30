@@ -70,6 +70,21 @@ namespace AstroGrep.Core
       }
 
       /// <summary>
+      /// Edit a file that the user has double clicked on.
+      /// </summary>
+      /// <param name="opener">TextEditorOpener object containing the information necessary top edit a file.</param>
+      /// <history>
+      /// [Curtis_Beard]	   06/25/2015	Initial
+      /// </history>
+      public static void EditFile(TextEditorOpener opener)
+      {
+         if (opener != null && opener.HasValue())
+         {
+            EditFile(opener.Path, opener.LineNumber, opener.ColumnNumber, opener.LineText);
+         }
+      }
+
+      /// <summary>
       /// Edit a file that the user has double clicked on
       /// </summary>
       /// <param name="path">Fully qualified file path</param>
@@ -330,5 +345,59 @@ namespace AstroGrep.Core
       }
 
       #endregion
+
+      /// <summary>
+      /// TextEditor opener object to wrap around necessary values to edit a file.
+      /// </summary>
+      /// <history>
+      /// [Curtis_Beard]	   06/25/2015	Initial
+      /// </history>
+      public class TextEditorOpener
+      {
+         /// <summary>Full file path</summary>
+         public string Path { get; set; }
+         /// <summary>Line number</summary>
+         public int LineNumber { get; set; }
+         /// <summary>Column number</summary>
+         public int ColumnNumber { get; set; }
+         /// <summary>Current line's text</summary>
+         public string LineText { get; set; }
+
+         /// <summary>
+         /// Create an instance of this class.
+         /// </summary>
+         public TextEditorOpener()
+         {
+            Path = string.Empty;
+            LineNumber = 1;
+            ColumnNumber = 1;
+            LineText = string.Empty;
+         }
+
+         /// <summary>
+         /// Create an instance of this class.
+         /// </summary>
+         /// <param name="path">full file path</param>
+         /// <param name="lineNumber">line number</param>
+         /// <param name="columnNumber">column number</param>
+         /// <param name="lineText">current line's text</param>
+         public TextEditorOpener(string path, int lineNumber, int columnNumber, string lineText)
+            : this()
+         {
+            Path = path;
+            LineNumber = lineNumber;
+            ColumnNumber = columnNumber;
+            LineText = lineText;
+         }
+
+         /// <summary>
+         /// Determines if object has a value or is empty.
+         /// </summary>
+         /// <returns>true if value present, false otherwise</returns>
+         public bool HasValue()
+         {
+            return !string.IsNullOrEmpty(Path);
+         }
+      }
    }
 }
