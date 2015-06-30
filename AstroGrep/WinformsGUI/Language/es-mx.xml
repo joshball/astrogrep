@@ -102,13 +102,16 @@
    
    <screen name="frmAbout" value="Sobre {0}">
       <control name="lnkHomePage" value="{0} Home Page" />
-      <control name="cmdOK" value="&amp;Autorización" />
+      <control name="LicenseLinkLabel" value="GNU Licencia"/>
+      <control name="CopyrightLabel" value="Copyright (C) 2002 - {0} AstroComma Inc."/>
+      <control name="lblDescription" value="Derechos de autor adicional (C) 2002 a Theodore L. Ward. AstroGrep viene con ABSOLUTAMENTE NINGUNA GARANTÍA. Esto es software libre, y le invitamos a redistribuirlo bajo ciertas condiciones."/>
+      <control name="lblDisclaimer" value="Creado por Theodore Ward y convertido a .Net por Curtis Barba"/>
    </screen>
    
    <screen name="frmAddEditTextEditor" value="Editores de textos">
       <control name="lblAllTypesMessage" value="Un editor de textos se puede utilizar para todos los tipos desconocidos usando a * para el tipo del archivo." />
       <control name="lblCmdOptions" value="Línea de comando opciones:&#xD;&#xA;  %1 - Archivo&#xD;&#xA;  %2 - Línea número&#xD;&#xA;  %3 - Columna" />
-      <control name="lblCmdOptionsView" value="Inspección previo: {0}" />
+      <control name="lblCmdOptionsView" value="Inspección previo: {0} {1}" />
       <control name="btnBrowse" tooltip="Hojear..." />
       <control name="lblCmdLineArgs" value="Línea de comando" />
       <control name="lblTextEditorLocation" value="Localización" />

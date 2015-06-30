@@ -385,10 +385,11 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      07/26/2006	ADD: 1512026, column
       /// [Justin_Dearing]    11/01/2007	ADD: Preview will show editor name.
       /// [Curtis_Beard]		03/06/2015	FIX: 65, add support for using quotes around file name, rename function
+      /// [Curtis_Beard]		06/15/2015	CHG: use language value for preview text instead of hard coded.
       /// </history>
       private void UpdateCmdLinePreview()
       {
-         const string previewText = "Preview: {0} {1}";
+         string previewText = Language.GetControlText(lblCmdOptionsView);
          string editor = string.Empty;
          string editorPath = txtTextEditorLocation.Text;
          string args = txtCmdLineArgs.Text;

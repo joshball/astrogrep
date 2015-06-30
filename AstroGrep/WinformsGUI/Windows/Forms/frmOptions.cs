@@ -120,6 +120,7 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]	   04/08/2015	CHG: 81, remove old word wrap and white space options. now in frmMain.
       /// [Curtis_Beard]	   04/15/2015	CHG: add content forecolor
       /// [Curtis_Beard]	   05/26/2015	FIX: 69, add performance setting for file detection
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
       /// </history>
       private void frmOptions_Load(object sender, System.EventArgs e)
       {
@@ -163,7 +164,7 @@ namespace AstroGrep.Windows.Forms
 
          //Language.GenerateXml(this, Application.StartupPath + "\\" + this.Name + ".xml");
          Language.ProcessForm(this);
-         Language.LegacyLoadComboBox(cboLanguage);
+         Language.LoadComboBox(cboLanguage);
 
          // set the user selected language
          if (cboLanguage.Items.Count > 0)
@@ -171,7 +172,7 @@ namespace AstroGrep.Windows.Forms
             foreach (object oItem in cboLanguage.Items)
             {
                LanguageItem item = (LanguageItem)oItem;
-               if (item.Culture.Equals(Core.GeneralSettings.Language))
+               if (item.Culture.Equals(Core.GeneralSettings.Language, StringComparison.OrdinalIgnoreCase))
                {
                   cboLanguage.SelectedItem = item;
                   break;

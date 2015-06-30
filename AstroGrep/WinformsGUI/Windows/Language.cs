@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
 using AstroGrep.Common;
+using AstroGrep.Common.Logging;
 
 namespace AstroGrep.Windows
 {
@@ -41,15 +43,33 @@ namespace AstroGrep.Windows
       private static XmlDocument __XmlDoc = null;
       private static XmlNode __RootNode = null;
       private static XmlNode __XmlGenericNode = null;
+      private static List<LanguageItem> internalLanguages = null;
       #endregion
 
       /// <summary>
       /// Initializes an instance of the Language class.
       /// </summary>
       private Language()
-      {}
+      { }
+
+      private static void LoadInternalLanguages()
+      {
+         if (internalLanguages == null)
+         {
+            internalLanguages = new List<LanguageItem>();
+
+            // load our internally defined languages
+            internalLanguages.Add(new LanguageItem("English", "en-us"));
+            internalLanguages.Add(new LanguageItem("Español", "es-mx"));
+            internalLanguages.Add(new LanguageItem("Deutsch", "de-de"));
+            internalLanguages.Add(new LanguageItem("Italiano", "it-it"));
+            internalLanguages.Add(new LanguageItem("Danish", "da-dk"));
+            internalLanguages.Add(new LanguageItem("Polski", "pl-pl"));
+         }
+      }
 
       #region Public Methods
+      
       /// <summary>
       /// Loads the given language's file.
       /// </summary>
@@ -57,42 +77,24 @@ namespace AstroGrep.Windows
       /// <history>
       /// [Curtis_Beard]		07/31/2006	Created
       /// [Curtis_Beard]		10/11/2006	CHG: Close stream
+      /// [Curtis_Beard]		06/15/205	CHG: 57, support external language files
       /// </history>
-      public static void Load(string language)
+      public static void Load(string culture)
       {
-         try
+         LoadInternalLanguages();
+
+         if (!LoadInternal(culture))
          {
-            System.Reflection.Assembly _assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            string _name = _assembly.GetName().Name;
-
-            Stream _stream = _assembly.GetManifestResourceStream(String.Format("{0}.Language.{1}.xml", _name, language));
-
-            if (_stream != null)
+            if (!LoadExternal(culture))
             {
-               string _contents = string.Empty;
-
-               using (StreamReader _reader = new StreamReader(_stream))
+               // failed to load internal and external, so try default
+               if (LoadInternal(Constants.DEFAULT_LANGUAGE))
                {
-                  _contents = _reader.ReadToEnd();
-               }
-
-               _stream.Close();
-
-               if (!_contents.Equals(string.Empty))
-               {
-                  __XmlDoc = new XmlDocument();
-                  __XmlDoc.LoadXml(_contents);
-
-                  __RootNode = __XmlDoc.SelectSingleNode("language");
-
-                  if (__RootNode != null)
-                     __XmlGenericNode = __RootNode.SelectSingleNode("generic");
-               }
+                  // success in loading default, make sure to update settings value
+                  Core.GeneralSettings.Language = Constants.DEFAULT_LANGUAGE;
+               }               
             }
-
-            _assembly = null;
          }
-         catch {}
       }
 
       /// <summary>
@@ -101,74 +103,25 @@ namespace AstroGrep.Windows
       /// <param name="combo">ComboBox to load</param>
       /// <history>
       /// [Curtis_Beard]		05/18/2007	Created
+      /// [Curtis_Beard]		06/15/2015	CHG: add polish language entry
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
       /// </history>
       public static void LoadComboBox(ComboBox combo)
       {
+         LoadInternalLanguages();
+
          combo.Items.Clear();
          combo.DisplayMember = "DisplayName";
          combo.ValueMember = "Culture";
 
-         if (Directory.Exists(LanguageLocation))
-         {
-            string[] files = Directory.GetFiles(LanguageLocation, "*.xml");
+         // load any external languages
+         var items = new List<LanguageItem>();
+         items.AddRange(internalLanguages);
+         items.AddRange(GetExternalLanguages());         
 
-            if (files.Length > 0)
-            {
-               foreach (string file in files)
-               {
-                  // retrieve language information from file
-                  string displayName = string.Empty;
-                  string culture = string.Empty;
-                  GetLanguageInformation(file, ref displayName, ref culture);
-
-                  // valid language file
-                  if (!displayName.Equals(string.Empty) && !culture.Equals(string.Empty))
-                  {
-                     LanguageItem item = new LanguageItem(displayName, culture);
-                     combo.Items.Add(item);
-                  }
-               }
-            }
-         }
-
-         // only load embedded language if a failure occurred
-         if (combo.Items.Count == 0)
-         {
-            LanguageItem item = new LanguageItem("English (U.S.)", "en-us");
-            combo.Items.Add(item);
-         }
+         // add languages to ComboBox
+         combo.Items.AddRange(items.ToArray());
       }
-
-		/// <summary>
-		/// Loads the given ComboBox with the available languages.
-		/// </summary>
-		/// <param name="combo">ComboBox to load</param>
-		/// <remarks>Legacy version until language files are external</remarks>
-		/// <history>
-		/// [Curtis_Beard]		10/11/2007	Created
-		/// </history>
-		public static void LegacyLoadComboBox(ComboBox combo)
-		{
-			combo.Items.Clear();
-			combo.DisplayMember = "DisplayName";
-			combo.ValueMember = "Culture";
-
-			// legacy has a defined set of languages
-			LanguageItem item = new LanguageItem("English", "en-us");
-			combo.Items.Add(item);
-
-			item = new LanguageItem("Español", "es-mx");
-			combo.Items.Add(item);
-
-			item = new LanguageItem("Deutsch", "de-de");
-			combo.Items.Add(item);
-
-			item = new LanguageItem("Italiano", "it-it");
-			combo.Items.Add(item);
-
-			item = new LanguageItem("Danish", "da-dk");
-			combo.Items.Add(item);
-		}
 
       /// <summary>
       /// Gets the location of all the language files.
@@ -738,27 +691,6 @@ namespace AstroGrep.Windows
          SetToolStripItemText(control, tip);
       }
 
-      ///// <summary>
-      ///// Processa given MenuItem to set its text property.
-      ///// </summary>
-      ///// <param name="item">MenuItem to process</param>
-      ///// <param name="index">Index of MenuItem's parent</param>
-      ///// <history>
-      ///// [Curtis_Beard]		07/31/2006	Created
-      ///// </history>
-      //private static void ProcessMenuItem(MenuItem item, int index)
-      //{
-      //   if (item.MenuItems.Count == 0)
-      //      SetMenuItemText(item, index);
-      //   else
-      //   {
-      //      foreach (MenuItem child in item.MenuItems)
-      //         ProcessMenuItem(child, index);
-
-      //      //SetMenuItemText(item, index);
-      //   }
-      //}
-
       /// <summary>
       /// Set a given form's text property.
       /// </summary>
@@ -889,58 +821,16 @@ namespace AstroGrep.Windows
       }
 
       /// <summary>
-      /// Attempts to load the embedded default language (English)
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]		05/22/2007	Created
-      /// </history>
-      private static void LoadEmbeddedLanguage()
-      {
-         // load english embedded resource
-         System.Reflection.Assembly thisAssembly = System.Reflection.Assembly.GetExecutingAssembly();
-         string assName = thisAssembly.GetName().Name;
-
-         Stream resStream = thisAssembly.GetManifestResourceStream(String.Format("{0}.Language.en-us.xml", assName));
-
-         if (resStream != null)
-         {
-            string contents = string.Empty;
-
-            using (StreamReader reader = new StreamReader(resStream))
-            {
-               contents = reader.ReadToEnd();
-            }
-            resStream.Close();
-
-            if (!contents.Equals(string.Empty))
-            {
-               __XmlDoc = new XmlDocument();
-               __XmlDoc.LoadXml(contents);
-               contents = string.Empty;
-
-               __RootNode = __XmlDoc.SelectSingleNode("language");
-
-               if (__RootNode != null)
-                  __XmlGenericNode = __RootNode.SelectSingleNode("generic");
-            }
-         }
-
-         thisAssembly = null;
-      }
-
-      /// <summary>
       /// Retrieve the language information from the file specified.
       /// </summary>
       /// <param name="path">Full path to language file</param>
-      /// <param name="displayName">Return, language display name</param>
-      /// <param name="culture">Return, language culture string</param>
+      /// <returns>LanguageItem object containing file information, otherwise null</returns>
       /// <history>
-      /// [Curtis_Beard]		05/22/2007	Created
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
       /// </history>
-      private static void GetLanguageInformation(string path, ref string displayName, ref string culture)
+      private static LanguageItem GetLanguageItemFromFile(string path)
       {
-         displayName = string.Empty;
-         culture = string.Empty;
+         LanguageItem item = null;
 
          try
          {
@@ -954,18 +844,95 @@ namespace AstroGrep.Windows
 
                if (root != null && root.Attributes.Count > 0)
                {
+                  string displayName = string.Empty;
+                  string culture = string.Empty;
+
                   if (root.Attributes["displayName"] != null)
                      displayName = root.Attributes["displayName"].Value;
 
                   if (root.Attributes["culture"] != null)
                      culture = root.Attributes["culture"].Value;
-               }
 
-               root = null;
-               doc = null;
+                  if (!string.IsNullOrEmpty(displayName) && !string.IsNullOrEmpty(culture))
+                  {
+                     item = new LanguageItem(displayName, culture, true, path);
+                  }
+               }
             }
          }
-         catch {}
+         catch (Exception ex)
+         {
+            LogClient.Instance.Logger.Error("Unable to retrieve external language information from file {0}, {1}", path, LogClient.GetAllExceptions(ex));
+         }
+
+         return item;
+      }
+
+      /// <summary>
+      /// Retrieve all external language files from LanguageLocation property.
+      /// </summary>
+      /// <returns>List of all external language items</returns>
+      /// <history>
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
+      /// </history>
+      private static List<LanguageItem> GetExternalLanguages()
+      {
+         var items = new List<LanguageItem>();
+
+         try
+         {
+            if (Directory.Exists(LanguageLocation))
+            {
+               string[] files = Directory.GetFiles(LanguageLocation, "*.xml");
+
+               if (files.Length > 0)
+               {
+                  foreach (string file in files)
+                  {
+                     var item = GetLanguageItemFromFile(file);
+                     if (item != null && !DoesExistInList(internalLanguages, item.Culture) && !DoesExistInList(items, item.Culture))
+                     {
+                        items.Add(item);
+                     }
+                     else
+                     {
+                        LogClient.Instance.Logger.Info("External language already exists {0}", item != null ? item.Culture : string.Empty);
+                     }
+                  }
+               }
+            }
+         }
+         catch (Exception ex)
+         {
+            LogClient.Instance.Logger.Error("Unable to retrieve external languages {0}", LogClient.GetAllExceptions(ex));
+         }
+
+         return items;
+      }
+
+      /// <summary>
+      /// Check the given LanguageItem list for a given culture.
+      /// </summary>
+      /// <param name="items">List to check against</param>
+      /// <param name="culture">Culture to check</param>
+      /// <returns>true if list contains culture, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
+      /// </history>
+      private static bool DoesExistInList(List<LanguageItem> items, string culture)
+      {
+         if (items != null && !string.IsNullOrEmpty(culture))
+         {
+            foreach (var item in items)
+            {
+               if (item.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase))
+               {
+                  return true;
+               }
+            }
+         }
+
+         return false;
       }
 
       /// <summary>
@@ -984,6 +951,114 @@ namespace AstroGrep.Windows
             return GetParentControl(ctrl.Parent);
          }
       }
+
+      /// <summary>
+      /// Attempts to load an internal language file for the given culture.
+      /// </summary>
+      /// <param name="culture">Culture to load</param>
+      /// <returns>true on success, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
+      /// </history>
+      private static bool LoadInternal(string culture)
+      {
+         try
+         {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            string _name = assembly.GetName().Name;
+
+            using (Stream stream = assembly.GetManifestResourceStream(String.Format("{0}.Language.{1}.xml", _name, culture)))
+            {
+               if (stream != null)
+               {
+                  string contents = string.Empty;
+
+                  using (StreamReader _reader = new StreamReader(stream))
+                  {
+                     contents = _reader.ReadToEnd();
+                  }
+
+                  stream.Close();
+
+                  if (!contents.Equals(string.Empty))
+                  {
+                     __XmlDoc = new XmlDocument();
+                     __XmlDoc.LoadXml(contents);
+
+                     __RootNode = __XmlDoc.SelectSingleNode("language");
+
+                     if (__RootNode != null)
+                     {
+                        __XmlGenericNode = __RootNode.SelectSingleNode("generic");
+
+                        if (__XmlGenericNode != null)
+                        {
+                           return true;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         catch (Exception ex)
+         {
+            LogClient.Instance.Logger.Error("Error loading internal language {0}, {1}", culture, LogClient.GetAllExceptions(ex));
+         }
+
+         return false;
+      }
+
+      /// <summary>
+      /// Attempts to load an external language file for the given culture.
+      /// </summary>
+      /// <param name="culture">Culture to load</param>
+      /// <returns>true on success, false otherwise</returns>
+      /// <history>
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
+      /// </history>
+      private static bool LoadExternal(string culture)
+      {
+         try
+         {
+            if (Directory.Exists(LanguageLocation))
+            {
+               var items = GetExternalLanguages();
+               if (items != null && items.Count > 0)
+               {
+                  var item = (from i in items where i.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase) select i).FirstOrDefault();
+                  if (item != null)
+                  {
+                     // found external language match, load content from file                     
+                     __XmlDoc = new XmlDocument();
+                     __XmlDoc.Load(item.ExternalFilePath);
+
+                     XmlNode root = __XmlDoc.SelectSingleNode("language");
+
+                     if (root != null && root.Attributes.Count > 0)
+                     {
+                        __RootNode = root;
+
+                        if (__RootNode != null)
+                        {
+                           __XmlGenericNode = __RootNode.SelectSingleNode("generic");
+
+                           if (__XmlGenericNode != null)
+                           {
+                              return true;
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         catch (Exception ex)
+         {
+            LogClient.Instance.Logger.Error("Error loading external language {0}, {1}", culture, LogClient.GetAllExceptions(ex));
+         }
+
+         return false;
+      }
       #endregion
    }
 
@@ -992,11 +1067,48 @@ namespace AstroGrep.Windows
    /// </summary>
    /// <history>
    /// [Curtis_Beard]		05/22/2007	Created
+   /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
    /// </history>
    internal class LanguageItem
    {
-      private string __displayName = string.Empty;
-      private string __culture = string.Empty;
+      /// <summary>
+      /// Gets/Sets the language's display name.
+      /// </summary>
+      public string DisplayName
+      {
+         get;
+         set;
+      }
+
+      /// <summary>
+      /// Gets/Sets the language's culture string.
+      /// </summary>
+      public string Culture
+      {
+         get;
+         set;
+      }
+
+      /// <summary>
+      /// Gets/Sets whether language is from external file.
+      /// </summary>
+      public bool IsExternal
+      {
+         get;
+         set;
+      }
+
+      /// <summary>
+      /// Gets/Sets the external language's file path.
+      /// </summary>
+      /// <remarks>
+      /// Will be null if internal
+      /// </remarks>
+      public string ExternalFilePath
+      {
+         get;
+         set;
+      }
 
       /// <summary>
       /// Creates a new instance of the LanguageItem class.
@@ -1005,35 +1117,34 @@ namespace AstroGrep.Windows
       /// <param name="culture">Culture string</param>
       /// <history>
       /// [Curtis_Beard]		05/22/2007	Created
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
       /// </history>
       public LanguageItem(string displayName, string culture)
       {
-         __displayName = displayName;
-         __culture = culture;
+         DisplayName = displayName;
+         Culture = culture;
+         IsExternal = false;
+         ExternalFilePath = null;
       }
 
       /// <summary>
-      /// Gets/Sets the language's display name.
+      /// Creates a new instance of the LanguageItem class.
       /// </summary>
+      /// <param name="displayName">Display name</param>
+      /// <param name="culture">Culture string</param>
+      /// <param name="isExternal">Language is from external file</param>
       /// <history>
-      /// [Curtis_Beard]		05/22/2007	Created
+      /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
       /// </history>
-      public string DisplayName
+      public LanguageItem(string displayName, string culture, bool isExternal, string filePath)
+         : this(displayName, culture)
       {
-         get { return __displayName; }
-         set { __displayName=value; }
-      }
+         IsExternal = isExternal;
 
-      /// <summary>
-      /// Gets/Sets the language's culture string.
-      /// </summary>
-      /// <history>
-      /// [Curtis_Beard]		05/22/2007	Created
-      /// </history>
-      public string Culture
-      {
-         get { return __culture; }
-         set { __culture=value; }
+         if (IsExternal)
+         {
+            ExternalFilePath = filePath;
+         }
       }
    }
 }
