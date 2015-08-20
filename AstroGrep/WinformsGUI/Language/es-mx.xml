@@ -265,7 +265,6 @@
       <!-- todo: color names -->
       
       <text name="TextEditorsErrorNoCmdLineForFile" value="No se ha especificado ninguna línea de comando discusión para el nombre de fichero. &#xD;&#xA; Especificar por favor la discusión del archivo debajo de Herramientas->Opciones."/>
-      <text name="TextEditorsErrorNotDefined" value="No se especificó ningún editor de textos para el archivo dado y no se define ningún editor de textos para todos los tipos. &#xD;&#xA; Especificar por favor un editor de textos debajo de Herramientas->Opciones."/>
       <text name="TextEditorsErrorGeneric" value="Error que corrige el archivo {0}.&#xD;&#xA;El problema siguiente ocurrió: {1}"/>
       <text name="TextEditorsBrowseTitle" value="Seleccionar el editor de textos ejecutable."/>
       <text name="TextEditorsAllTypesDefined" value="Todos los tipos editor de textos se definen ya."/>

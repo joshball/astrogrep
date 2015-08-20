@@ -264,7 +264,6 @@
       <!-- todo: color names -->
       
       <text name="TextEditorsErrorNoCmdLineForFile" value="No command line argument has been specified for the filename. &#xD;&#xA; Please specify the file argument under Tools->Options."/>
-      <text name="TextEditorsErrorNotDefined" value="No Text Editor was specified for the given file and no Text Editor is defined for all types. &#xD;&#xA; Please specify a Text Editor under Tools->Options"/>
       <text name="TextEditorsErrorGeneric" value="Error editing file {0}.&#xD;&#xA;The following problem occurred: {1}"/>
       <text name="TextEditorsBrowseTitle" value="Select the text editor executable"/>
       <text name="TextEditorsAllTypesDefined" value="The all types Text Editor is already defined."/>

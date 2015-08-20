@@ -152,19 +152,19 @@
       <control name="lblPluginDetailVersion" value="Wersja:"/>
       <control name="lblPluginDetailAuthor" value="Autor:"/>
       <control name="btnFindFont" value="Ustaw &amp;czcionkę..."/>
-      <control name="chkShowExclusionErrorMessage" value="Pokazuj &amp;informacje o wykluczonych elementach oraz o wystąpieniu błędów."/>
-      <control name="chkSaveSearchOptions" value="Zapisz opcje wyszukiwania przy &amp;wyjściu."/>
+      <control name="chkShowExclusionErrorMessage" value="Pokazuj &amp;informacje o wykluczonych elementach oraz o wystąpieniu błędów"/>
+      <control name="chkSaveSearchOptions" value="Zapisz opcje wyszukiwania przy &amp;wyjściu"/>
       <control name="grpFileList" value="Lista plików" />
       <control name="btnFileFindFont" value="Ustaw czcionkę..."/>
-      <control name="chkDetectFileEncoding" value="Wykrywaj &amp;kodowanie plików."/>
-      <control name="chkSaveMessagesPosition" value="Zapisz pozycję &amp;okna wiadomości."/>
+      <control name="chkDetectFileEncoding" value="Wykrywaj &amp;kodowanie plików"/>
+      <control name="chkSaveMessagesPosition" value="Zapisz pozycję &amp;okna wiadomości"/>
 
       <control name="tabFileEncoding" value="Kodowanie plików" />
       <control name="btnFileEncodingAdd" value="&amp;Dodaj..."/>
       <control name="btnFileEncodingEdit" value="&amp;Edytuj..."/>
       <control name="btnFileEncodingDelete" value="&amp;Usuń"/>
       <control name="lblPerformance" value="Wydajność"/>
-      <control name="chkUseEncodingCache" value="Włącz pamięć podręczną dla wykrytych kodowań."/>
+      <control name="chkUseEncodingCache" value="Włącz pamięć podręczną dla wykrytych kodowań"/>
       <control name="btnCacheClear" value="Wyczyść podręczną"/>
    </screen>
    
@@ -205,7 +205,7 @@
       <control name="sbtnError" value="Błędy"/>
    </screen>
 
-   <screen name="frmCheckForUpdateTemp" value="Sprwadź dostępność aktualizacji">
+   <screen name="frmCheckForUpdateTemp" value="Sprawdź dostępność aktualizacji">
       <control name="lblVersionCheck" value="Sprawdzanie aktualizacji..." />
    </screen>
 
@@ -264,8 +264,7 @@
       <!-- todo: color names -->
       
       <text name="TextEditorsErrorNoCmdLineForFile" value="Nie określono argumentu wiersza poleceń dla nazwy pliku. &#xD;&#xA; Proszę podać argument dla pliku w menu Narzędzia->Ustawienia."/>
-      <text name="TextEditorsErrorNotDefined" value="Nie określono edytora tekstu dla danego rozszerzenia pliku ani dla wszystkich rozszerzeń.  &#xD;&#xA; Proszę ustawić edytor tekstu w menu Narzędzia->Ustawienia."/>
-      <text name="TextEditorsErrorGeneric" value="Błąd poczas edytowania pliku {0}.&#xD;&#xA;Wystąpił następujący problem: {1}"/>
+      <text name="TextEditorsErrorGeneric" value="Błąd podczas edytowania pliku {0}.&#xD;&#xA;Wystąpił następujący problem: {1}"/>
       <text name="TextEditorsBrowseTitle" value="Wybierz plik wykonywalny edytora tekstu"/>
       <text name="TextEditorsAllTypesDefined" value="Edytor tekstu dla wszystkich rozszerzeń plików został już zdefiniowany."/>
       <text name="TextEditorsColumnFileType" value="Rozszerzenie pliku"/>
@@ -340,7 +339,7 @@
       <text name="Exclusions.Error.InvalidOptions" value="Proszę wybrać prawidłową wartość opcji."/>
       <text name="Exclusions.Error.TypeCategoryLimit" value="Niestety nie możesz zdefiniować więcej niż 1 wyjątek rodzaju {0} w kategorii {1}."/>
       
-      <text name="ExclusionErrorMessageText" value="W Twoim wyszukiwaniu znalazły się elementy wykluczone lub z błędami.  &#xA;Możesz zobaczyć te elementy poprzez podwójne kliknięcie na powiązanym pasku stanu w prawym dolnym rogu. &#xA;&#xA;Możesz wyłaczyć tę wiadomość w Ustawieniach."/>
+      <text name="ExclusionErrorMessageText" value="W Twoim wyszukiwaniu znalazły się elementy wykluczone lub z błędami.  &#xA;Możesz zobaczyć te elementy poprzez podwójne kliknięcie na powiązanym pasku stanu w prawym dolnym rogu. &#xA;&#xA;Możesz wyłączyć tę wiadomość w Ustawieniach."/>
 
       <text name="LogDisplay.Column.Date" value="Data"/>
       <text name="LogDisplay.Column.Type" value="Rodzaj"/>
@@ -352,7 +351,7 @@
 
       <text name="FileEncoding.Enabled" value="Aktywne"/>
       <text name="FileEncoding.FilePath" value="Ścieżka do pliku"/>
-      <text name="FileEncoding.Encoding" value="Kodowaie"/>
+      <text name="FileEncoding.Encoding" value="Kodowanie"/>
       <text name="FileEncoding.Performance.Speed" value="Szybkość"/>
       <text name="FileEncoding.Performance.Default" value="Domyślna"/>
       <text name="FileEncoding.Performance.Accuracy" value="Dokładność"/>

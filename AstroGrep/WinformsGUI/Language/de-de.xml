@@ -265,7 +265,6 @@
       <!-- todo: color names -->
 
       <text name="TextEditorsErrorNoCmdLineForFile" value="Kein Übergabeparameter wurde angegeben. &#xD;&#xA; Bitte geben Sie einen Übergabeparameter an: Werkzeuge->Einstellungen."/>
-      <text name="TextEditorsErrorNotDefined" value="Kein Texteditor ist diesen Dateityp angegeben und es existiert kein Editoreintrag, welcher für alle Dateitypen gilt. &#xD;&#xA; Bitte fügen Sie einen Texteditor hinzu: Werkzeuge->Einstellungen"/>
       <text name="TextEditorsErrorGeneric" value="Fehler beim Bearbeiten der Datei {0}.&#xD;&#xA;Das folgende Problem trat auf: {1}"/>
       <text name="TextEditorsBrowseTitle" value="Wählen Sie die Startdatei des Texteditors aus (exe)."/>
       <text name="TextEditorsAllTypesDefined" value="Ein Texteditor für alle Dateitypen * wurde schon definiert."/>
