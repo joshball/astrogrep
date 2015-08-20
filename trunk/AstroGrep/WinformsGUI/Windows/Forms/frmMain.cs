@@ -1207,16 +1207,20 @@ namespace AstroGrep.Windows.Forms
       /// [Curtis_Beard]      03/04/2015	CHG: move standard code to function to cleanup this function.
       /// [Curtis_Beard]      03/05/2015	FIX: 64/35, clear text field before anything to not have left over content.
       /// [Curtis_Beard]		04/08/2015  CHG: 61, change from RichTextBox to AvalonEdit
+      /// [Curtis_Beard]		07/06/2015  FIX: 78, display empty preview area when result is null or no matches
       /// </history>
       private void ProcessMatchForDisplay(MatchResult match)
       {
          if (match == null || match.Matches.Count == 0)
          {
+            txtHits.Clear();
+            txtHits.SyntaxHighlighting = null;
+            txtHits.LineNumbers = null;
             return;
          }
 
          txtHits.Clear();
-         txtHits.SyntaxHighlighting = null;         
+         txtHits.SyntaxHighlighting = null;
          txtHits.ScrollToHome();
 
          for (int i = txtHits.TextArea.TextView.LineTransformers.Count - 1; i >= 0; i--)
@@ -4188,12 +4192,13 @@ namespace AstroGrep.Windows.Forms
       /// <history>
       /// [Curtis_Beard]	   09/18/2013	CHG: 64/53, add search path to window title
       /// [Curtis_Beard]		06/15/2015	CHG: 57, support external language files
+      /// [Curtis_Beard]		07/09/2015	FIX: prevent repeating folder text
       /// </history>
       private void SetWindowText()
       {
          if (cboFilePath.Items.Count > 0)
          {
-            this.Text = string.Format("{0} - {1}", cboFilePath.Items[0].ToString(), this.Text);
+            this.Text = string.Format("{0} - {1}", cboFilePath.Items[0].ToString(), ProductInformation.ApplicationName);
          }
       }
 
@@ -4202,6 +4207,7 @@ namespace AstroGrep.Windows.Forms
       /// </summary>
       /// <history>
       /// [Curtis_Beard]	   12/17/2014	ADD: support for Win7+ taskbar progress
+      /// [Curtis_Beard]		07/06/2015  FIX: 78, add try/catch to resolve crash
       /// </history>
       private void RestoreTaskBarProgress()
       {
@@ -4212,7 +4218,11 @@ namespace AstroGrep.Windows.Forms
             return;
          }
 
-         API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.NoProgress);
+         try
+         {
+            API.TaskbarProgress.SetState(this.Handle, API.TaskbarProgress.TaskbarStates.NoProgress);
+         }
+         catch { }
       }
       #endregion
    }

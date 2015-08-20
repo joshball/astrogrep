@@ -100,6 +100,7 @@ namespace AstroGrep.Core
       /// [Curtis_Beard]      09/28/2012  CHG: 3553474, support multiple file types per editor
       /// [Curtis_Beard]		04/07/2015	CHG: check for a valid line text before using
       /// [Curtis_Beard]	   04/08/2015	CHG: add logging
+      /// [Curtis_Beard]	   08/20/2015	FIX: 81, use associated app instead of displaying message
       /// </history>
       public static void EditFile(string path, int line, int column, string lineText)
       {
@@ -158,8 +159,8 @@ namespace AstroGrep.Core
 
                if (editorToUse == null)
                {
-                  MessageBox.Show(Language.GetGenericText("TextEditorsErrorNotDefined"),
-                     ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                  // since nothing defined, just use default app associated with file type
+                  OpenFileWithDefaultApp(path);
                }
                else
                {
@@ -302,20 +303,21 @@ namespace AstroGrep.Core
       /// [Curtis_Beard]	   08/13/2014	ADD: 80, add ability to open default app when no editor is specified
       /// [Curtis_Beard]		03/06/2015	FIX: 65, check editor for using quotes around file name, cleanup
       /// [Curtis_Beard]	   04/08/2015	CHG: add logging
+      /// [Curtis_Beard]	   08/20/2015	CHG: 80, make check for empty editor to use default app the first check.
       /// </history>
       private static void OpenEditor(TextEditor textEditor, string path, int line, int column)
       {
          try
          {
-            if (textEditor.Arguments.IndexOf("%1") == -1)
+            if (string.IsNullOrEmpty(textEditor.Editor))
+            {
+               OpenFileWithDefaultApp(path);
+            }
+            else if (textEditor.Arguments.IndexOf("%1") == -1)
             {
                // no file argument specified
                MessageBox.Show(Language.GetGenericText("TextEditorsErrorNoCmdLineForFile"),
                   ProductInformation.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else if (string.IsNullOrEmpty(textEditor.Editor))
-            {
-               OpenFileWithDefaultApp(path);
             }
             else
             {

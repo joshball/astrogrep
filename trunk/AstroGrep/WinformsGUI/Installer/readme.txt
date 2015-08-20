@@ -1,12 +1,12 @@
-﻿Changelog for AstroGrep v4.4.3
+﻿Changelog for AstroGrep v4.4.4
 ===================================================================
 Bugs
--77: Double-click in Results window No Longer Opens File (added back per requests)
--39: Lines repeating in output (now results preview area will combine context lines when they overlap in different match sections.  thanks to theblackbunny)
+-81: Open with associated app if no editors
+-80: SerializationException in the log file
+-79: Path in the title bar is multiplied every time I search
 
 Featured Requests:
--57: Allow external language files.  Language files can be now read from %appdata%\AstroGrep\Language\ or local directory\Language when using portable version.  
-     The current US English language file can be found at http://astrogrep.sourceforge.net/download/en-us.xml
+-80: Open With Associated App (keep the text editor location blank and it will use the default app instead), also bug #80 will also make it so any no defined editors will launch default app
 
 Other
-- Added Polish language, thanks to Maciej Gryniuk
+- Updated Polish language, thanks to Maciej Gryniuk

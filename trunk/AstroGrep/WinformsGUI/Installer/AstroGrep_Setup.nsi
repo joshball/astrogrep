@@ -13,8 +13,8 @@
 
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_LANGDLL_ALLLANGUAGES
-!define INS_VERSION 4.4.3.0
-!define APP_VERSION "4.4.3"
+!define INS_VERSION 4.4.4.0
+!define APP_VERSION "4.4.4"
 
 ;--------------------------------
 ;Variables

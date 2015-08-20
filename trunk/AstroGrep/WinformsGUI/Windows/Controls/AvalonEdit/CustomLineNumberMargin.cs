@@ -65,13 +65,18 @@ namespace AstroGrep.Windows.Controls
       /// <remarks>Defaults to 2</remarks>
       /// <history>
       /// [Curtis_Beard]		04/08/2015	ADD: update RichTextBox to AvalonEdit
+      /// [Curtis_Beard]		07/06/2015  FIX: 78, fix issue when LineNumbers selection list doesn't have any results (crash)
       /// </history>
       protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
       {
          int numberLength = 2;
          if (LineNumbers != null && LineNumbers.Count == this.Document.LineCount)
          {
-            numberLength = (from n in LineNumbers where n.Number > -1 select n.Number).Max().ToString().Length;
+            var list = (from n in LineNumbers where n.Number > -1 select n.Number);
+            if (list != null && list.Count() > 0)
+            {
+               numberLength = list.Max().ToString().Length;
+            }
          }
          else
          {

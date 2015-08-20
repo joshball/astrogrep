@@ -190,6 +190,7 @@ namespace libAstroGrep.EncodingDetection.Caching
       /// <param name="performanceSetting">Desired performance setting cache to load</param>
       /// <history>
       /// [Curtis_Beard]		05/28/2015	FIX: 69, Created for speed improvements for encoding detection
+      /// [Curtis_Beard]		07/27/2015	FIX: 80, seek to beginning of stream
       /// </history>
       public void Load(EncodingOptions.Performance performanceSetting)
       {
@@ -216,6 +217,10 @@ namespace libAstroGrep.EncodingDetection.Caching
 
                      // Deserialize the cache from the file and  
                      // assign the reference to the local variable.
+                     if (deflate.CanSeek)
+                     {
+                        deflate.Seek(0, SeekOrigin.Begin);
+                     }
                      cache = (Dictionary<string, EncodingCacheItem>)formatter.Deserialize(deflate);
 
                      // load up lrulist with all keys so they are insync

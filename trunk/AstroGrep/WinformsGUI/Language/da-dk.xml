@@ -265,7 +265,6 @@
       <!-- todo: color names -->
       
       <text name="TextEditorsErrorNoCmdLineForFile" value="Der er ikke angivet kommandolinie parameter for denne filtype. &#xD;&#xA; Angiv venligst parametren under Indstillinger->Program Indstillinger." />
-      <text name="TextEditorsErrorNotDefined" value="Der er ikke angivet en teksteditor for den givne filtype og der er heller ikke angivet en standard editor. &#xD;&#xA; Angiv venligst en teksteditor under Indstillinger->Program Indstillinger" />
       <text name="TextEditorsErrorGeneric" value="Problem ved ændringen af filen {0}.&#xD;&#xA;Følgende problem opstod: {1}" />
       <text name="TextEditorsBrowseTitle" value="Angiv den eksekverbare teksteditor fil" />
       <text name="TextEditorsAllTypesDefined" value="Standard teksteditoren er allerede angivet." />

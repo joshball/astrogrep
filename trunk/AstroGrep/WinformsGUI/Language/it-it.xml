@@ -266,7 +266,6 @@
       <!-- todo: color names -->
       
       <text name="TextEditorsErrorNoCmdLineForFile" value="Non è stato specificato alcun argomento della riga di comando per il nome file. &#xD;&#xA; Specificare l'argomento del file in Strumenti->Opzioni."/>
-      <text name="TextEditorsErrorNotDefined" value="Non è stato definito alcun editor di testo né per il file specificato né per 'tutti i tipi di file'. &#xD;&#xA; Definire un editor di testo in Strumenti->Opzioni"/>
       <text name="TextEditorsErrorGeneric" value="Errore durante la modifica del file {0}.&#xD;&#xA; È stato rilevato il seguente problema: {1}"/>
       <text name="TextEditorsBrowseTitle" value="Selezionare l'eseguibile dell'editor di testo"/>
       <text name="TextEditorsAllTypesDefined" value="L'editor di testo per 'tutti i tipi di file' è già stato specificato."/>
